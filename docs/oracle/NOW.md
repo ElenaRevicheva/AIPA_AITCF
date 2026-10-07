@@ -182,7 +182,8 @@ git log keeps the record.
   `dist/atuona-creative-ai.js` + new `dist/atuona-fact-engine.js`, `.env` `ATUONA_TEXT_MODEL=claude-fable-5-1`, `pm2 restart`
   14:24:11 (newer than files). Log: `[fact-engine] pool: 577 facts in 10 lanes`, `Primary: claude-fable-5-1`. Backups
   `dist/atuona-creative-ai.js.bak-20261007-pre-factengine`, `.env.bak-20261007-pre-fable`. 10 creative commands draw 3 art + 1
-  counterpoint fact (ledger `data/atuona/fact-ledger.json`) + footer; translation, /art, /artist, recap, arc, chat UNCHANGED.
+  counterpoint fact + footer; usage lives in the EXISTING memory `creativeMemory.factLedger` → `atuona-state.json` via
+  `saveState()` (redeployed 14:27 UTC after Elena: no reinventing — the separate ledger file never got written); translation, /art, /artist, recap, arc, chat UNCHANGED.
   **Still to prove:** one live `/inspire` → log `[fact-engine] drew …` + `[atuona/claude] claude-fable-5-1 … in=` (tokens).
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 

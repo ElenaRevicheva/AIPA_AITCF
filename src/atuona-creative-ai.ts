@@ -47,7 +47,7 @@ import {
 import { runAddedImageProviders, runAddedImageProvidersDetailed, persistGeminiStillBytes } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
-import { initFactPool, drawFacts, factsPromptBlock, factsFooter } from './atuona-fact-engine';
+import { initFactPool, drawFacts, factsPromptBlock, factsFooter, FactLedger } from './atuona-fact-engine';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -776,7 +776,8 @@ function loadState(): void {
           usedEnhancements: state.creativeMemory.usedEnhancements || [],
           recentResponseFingerprints: state.creativeMemory.recentResponseFingerprints || [],
           recentProactiveKnowledgeKeys: (state.creativeMemory as any).recentProactiveKnowledgeKeys || [],
-          recentCreateKnowledgeKeys: (state.creativeMemory as any).recentCreateKnowledgeKeys || []
+          recentCreateKnowledgeKeys: (state.creativeMemory as any).recentCreateKnowledgeKeys || [],
+          factLedger: (state.creativeMemory as any).factLedger || { facts: {}, domains: {} }
         };
       }
       
@@ -2492,7 +2493,9 @@ ${FULL_KNOWLEDGE_BASE}
 async function buildFactKnowledgeBlock(): Promise<{ block: string; footer: string }> {
   const canon = await getUndergroundCanonCorpus();
   const canonSample = sampleCanonExcerpts(canon, 12);
-  const facts = drawFacts(3, 1);
+  if (!creativeMemory.factLedger) creativeMemory.factLedger = { facts: {}, domains: {} };
+  const facts = drawFacts(creativeMemory.factLedger, 3, 1);
+  saveState();
   const block = `${BOOK_UNDERGROUND_STYLE_CANON}
 ${canonSample ? `
 ═══════════════════════════════════════════════════════════════
@@ -3451,6 +3454,8 @@ interface CreativeMemory {
   recentProactiveKnowledgeKeys: string[][]; // last N days' module keys, newest last
   // /create knowledge module tracking (rotation independent from daily inspirations)
   recentCreateKnowledgeKeys: string[][];
+  // Fact engine usage (7 Oct 2026): which KB facts/lanes were drawn, so rotation survives restarts
+  factLedger?: FactLedger;
 }
 
 let creativeMemory: CreativeMemory = {
@@ -3468,7 +3473,8 @@ let creativeMemory: CreativeMemory = {
   usedEnhancements: [],
   recentResponseFingerprints: [],
   recentProactiveKnowledgeKeys: [],
-  recentCreateKnowledgeKeys: []
+  recentCreateKnowledgeKeys: [],
+  factLedger: { facts: {}, domains: {} }
 };
 
 /**

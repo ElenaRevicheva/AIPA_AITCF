@@ -6,44 +6,18 @@
 // and ASKED the model to pick obscure ones. A model shown 610 facts picks the most
 // salient ones every time (salience bias). Here the CODE picks: 4 facts per command,
 // 3 from the art lanes (the book is art history + Impressionism first) and 1 from
-// the rest, always the least-used, with a ledger on disk so restarts do not reset it.
+// the rest, always the least-used. Usage lives in Atuona's EXISTING memory (creativeMemory.factLedger,
+// persisted by saveState() into atuona-state.json) — this module owns no file.
 // =============================================================================
-import * as fs from 'fs';
-import * as path from 'path';
 import * as crypto from 'crypto';
 
 export interface KbFact { id: string; domain: string; text: string; hash: string; }
-interface Ledger { facts: Record<string, { n: number; last: number }>; domains: Record<string, number>; }
+export interface FactLedger { facts: Record<string, { n: number; last: number }>; domains: Record<string, number>; }
 
 const ART_DOMAINS = ['ATU', 'GAU', 'ART', 'MOD', 'AUC'];   // Atuona, Gauguin, art history, museums, auctions
 const OTHER_DOMAINS = ['FAS', 'VIB', 'NFT', 'ATL', 'AGT']; // fashion, vibe coding, NFT fusion, Atlas, agentic AI
 
 let POOL: KbFact[] = [];
-
-function ledgerPath(): string {
-  const root = process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), 'data');
-  return path.join(root, 'atuona', 'fact-ledger.json');
-}
-
-function readLedger(): Ledger {
-  try {
-    const l = JSON.parse(fs.readFileSync(ledgerPath(), 'utf8'));
-    return { facts: l.facts || {}, domains: l.domains || {} };
-  } catch {
-    return { facts: {}, domains: {} };
-  }
-}
-
-function writeLedger(l: Ledger): void {
-  try {
-    fs.mkdirSync(path.dirname(ledgerPath()), { recursive: true });
-    const tmp = ledgerPath() + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(l));
-    fs.renameSync(tmp, ledgerPath());
-  } catch (e) {
-    console.warn('[fact-engine] ledger write failed:', (e as Error).message);
-  }
-}
 
 /** Split each module into its bullet facts, each prefixed with the module title and section header. */
 export function initFactPool(modules: Record<string, string>): number {
@@ -73,7 +47,7 @@ export function initFactPool(modules: Record<string, string>): number {
 }
 
 /** Least-used fact of a domain; ties broken at random. */
-function pickFromDomain(domain: string, l: Ledger): KbFact | undefined {
+function pickFromDomain(domain: string, l: FactLedger): KbFact | undefined {
   const cands = POOL.filter(f => f.domain === domain);
   if (!cands.length) return undefined;
   const min = Math.min(...cands.map(f => l.facts[f.hash]?.n || 0));
@@ -82,13 +56,14 @@ function pickFromDomain(domain: string, l: Ledger): KbFact | undefined {
 }
 
 /** Least-recently-drawn domains first, ties at random. */
-function orderDomains(domains: string[], l: Ledger): string[] {
+function orderDomains(domains: string[], l: FactLedger): string[] {
   return [...domains].sort((a, b) => (l.domains[a] || 0) - (l.domains[b] || 0) || Math.random() - 0.5);
 }
 
-export function drawFacts(artCount = 3, otherCount = 1): KbFact[] {
+/** Draws facts and records them in the caller's ledger (Atuona's creativeMemory.factLedger); caller saves. */
+export function drawFacts(l: FactLedger, artCount = 3, otherCount = 1): KbFact[] {
   if (!POOL.length) return [];
-  const l = readLedger();
+  l.facts = l.facts || {}; l.domains = l.domains || {};
   const picked: KbFact[] = [];
   for (const d of orderDomains(ART_DOMAINS, l).slice(0, artCount)) { const f = pickFromDomain(d, l); if (f) picked.push(f); }
   for (const d of orderDomains(OTHER_DOMAINS, l).slice(0, otherCount)) { const f = pickFromDomain(d, l); if (f) picked.push(f); }
@@ -98,7 +73,6 @@ export function drawFacts(artCount = 3, otherCount = 1): KbFact[] {
     l.facts[f.hash] = { n: e.n + 1, last: now };
     l.domains[f.domain] = now;
   }
-  writeLedger(l);
   console.log(`[fact-engine] drew ${picked.map(f => f.id).join(' ')}`);
   return picked;
 }
