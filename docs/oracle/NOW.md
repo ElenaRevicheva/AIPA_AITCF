@@ -142,6 +142,12 @@ git log keeps the record.
   Atuona answers in the kept logs (29 Sep→7 Oct): Grok 238, DeepSeek 17, Claude 0. Atuona sends temperature 0.9, which Opus 5
   rejects — the code retries without it, so the "poetry temperature" never applied on Claude. Model choice for the book:
   `docs/atuona/ATUONA_TEXT_MODEL_DECISION_2026-10-07.md`.
+- **7 Oct: Elena topped up $7; live probe 200 on opus-5 / opus-5-5 / fable-5-1. BLIND TEST RUN ($2.65, 9 calls, 0 refusals):**
+  `docs/atuona/ATUONA_BLIND_TEST_2026-10-07.md`; the answer KEY is only on Oracle `~/atuona-blindtest/key.json` (do not reveal
+  before she picks). Real prompts are ~38k tokens (~$0.20 per Opus call, ~$0.45 Fable). **Elena's move:** pick A/B/C per prompt.
+  ⚠️ Building the prompts by importing `dist/atuona-creative-ai.js` started a 2nd bot instance for seconds: one duplicate radar
+  post to her chat + 409s in the live log; live bot verified (2 Telegram connections, 0 pending). Never import that module again —
+  copy constants out instead.
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
 - Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
