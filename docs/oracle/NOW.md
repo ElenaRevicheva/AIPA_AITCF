@@ -298,7 +298,12 @@ git log keeps the record.
   Kling O3 needs `VENICE_OMIT=aspect_ratio,resolution`; `gen.mjs` takes `VENICE_VIDEO_MODEL` (backup `.bak-pre-venicemodels`).
   Sheet `film9_s13_engine_test_venice.jpg`. Ledger $28.46 of the $30 cap (venice $24.79).
   **BLOCKED on money (Elena's move):** whole film on Kling O3 4K ≈ $85 clean / ~$115 with re-takes; Venice wallet balance is
-  not readable with our key (needs admin key) → she tops up Venice and sets the new cap before Gate 4. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  not readable with our key (needs admin key) → she tops up Venice and sets the new cap before Gate 4.
+  **7 Oct full-film audit (before her top-up):** `docs/atuona/film9_ALL_FRAMES_2026-10-07.jpg` = every scenario shot in order,
+  checksums verified on Oracle (k13 = dusk take 075f8900; nothing rejected in the set). 31 frames cover 29 shots. **GAPS:**
+  NEVER-CUT shots with no frame — **15 cage, 30 password (refused twice on GPT 2.5, never redesigned), 31 three**; also 10a/10b
+  (never planned as keyframes). No frame but on the 4:30 cut list: 3, 4, 8, 12, 16a, 23, 29, 33. 1c = text card; 35 = composite.
+  Elena decides: make the missing frames (and how 30 is redesigned) or cut to 4:30, before motion starts. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
