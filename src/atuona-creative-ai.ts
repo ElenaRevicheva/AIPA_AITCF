@@ -1152,103 +1152,103 @@ const KNOWLEDGE_ATUONA = `
 ATUONA - THE REAL PLACE:
 
 Geography & Location:
-- Atuona is the main village on Hiva Oa, the second-largest island in the Marquesas archipelago
-- Located in French Polynesia, 1,400 km northeast of Tahiti
-- Coordinates: 9°48'S, 139°02'W - literally the edge of the world
-- Population: ~2,000 people, mostly Polynesian Marquesans
-- The name "Hiva Oa" means "long ridgeback" in Marquesan
+- Atuona is the main village of Hiva Oa, the second-largest Marquesas island (about 320 sq km), and the administrative centre of the southern Marquesas.
+- Atuona lies in French Polynesia, about 1,400 km northeast of Tahiti; Britannica puts the Marquesas group as a whole about 1,200 km away.
+- Atuona sits at about 9°48'S, 139°02'W, on the south coast of Hiva Oa.
+- Atuona had 1,993 inhabitants at the 2022 census, most of them Marquesan.
+- In local Marquesan tradition, the name Hiva Oa means long ridge.
 
 Landscape & Atmosphere:
-- Dramatic volcanic peaks rising from the Pacific - Mount Temetiu (1,276m) dominates
-- Lush valleys with breadfruit, mango, coconut palms, hibiscus
-- Black sand beaches, hidden coves, ancient stone tikis in the jungle
-- Constant trade winds, tropical humidity, sudden rain showers
-- The light here is different - golden, soft, the light Gauguin sought
-- Smell of frangipani, salt air, wood smoke from copra drying
+- Mount Temetiu, the island summit at about 1,213 m (sources range up to 1,276 m), towers over Atuona and the western end of the Bay of Traitors.
+- Hiva Oa is called the Garden of the Marquesas; its people live largely on breadfruit, coconut, yam and taro they grow themselves.
+- At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki over 2.4 m tall, the largest in Polynesia.
+- Atuona sits on a small inlet, Vevau in Marquesan, on the north shore of Ta'a Oa, the wide bay the French call Baie des Traitres; the rocky islet Hanakee guards it.
+- The bay at Atuona, Ta'aoa or the Bay of Traitors, lies inside the crater of the old volcano that built this side of Hiva Oa.
+- Copra, dried coconut meat, is the cash export of Hiva Oa, produced alongside a subsistence economy of breadfruit, coconut, yam and taro.
 
 Culture & Daily Life:
-- Marquesan culture: tattoo tradition (oldest in Polynesia), wood carving, tapa cloth
-- The "Pua" - traditional feast with roasted pig, poi, breadfruit
-- Catholic church (where Gauguin is buried) mixed with ancient beliefs in "mana" (spiritual power)
-- Time moves differently - "Polynesian time" - nothing is rushed
-- The locals say: "Kaoha nui" (great love) as greeting
-- Art is life here - every house has carvings, every body has tattoos
+- Marquesan tattoo, patutiki, could cover whole bodies; in 1897-98 German physician Karl von den Steinen recorded hundreds of its motifs as colonisation was ending the practice.
+- Marquesan feasts were ko'ika; their staple was ma, breadfruit paste fermented in deep pits for long storage and eaten as popoi.
+- Gauguin is buried not in a church but in the hillside Calvary (Calvaire) cemetery above Atuona; he had bought his house plot from the Catholic mission.
+- Atuona was once the seat of government for all the Marquesas, a role later taken by Taiohae on Nuku Hiva.
+- The everyday Marquesan greeting is kaoha, used much as aloha in Hawaii; kaoha nui (nui, great) is the warmer, fuller form.
+- The Matavaa, the Awakening, a Marquesas arts festival founded in 1987 by the Motu Haka federation, rotates among the six inhabited islands, Hiva Oa among them.
 
 Gauguin's House:
-- His "Maison du Jouir" (House of Pleasure) - now reconstructed museum
-- Original was bamboo and palm fronds, decorated with his explicit carvings
-- He lived there 1901-1903, painting his final masterpieces
-- Died May 8, 1903 at 54 - syphilis, morphine addiction, broken heart
-- His grave overlooks the bay he painted so many times
+- The Maison du Jouir (House of Pleasure) was rebuilt in Atuona as part of the Paul Gauguin Cultural Center, completed in 2003.
+- The original was a two-storey thatched house on stilts; its carved door panels, inscribed Maison du Jouir, Soyez mysterieuses and Soyez amoureuses, are now in the Musee d'Orsay.
+- He lived at Atuona from September 1901 until May 1903; Riders on the Beach and Contes barbares, both 1902 and now in the Museum Folkwang, Essen, were painted there.
+- He died at Atuona on 8 May 1903, aged 54, cause still debated; teeth dug from his well in 2000 held no mercury, the usual syphilis cure of his day.
+- His grave of unhewn pinkish stones in Calvary cemetery looks over Atuona Bay; a bronze cast of his Oviri was set on it on 29 March 1973; Jacques Brel lies a few metres away.
 
 The Journey to Atuona:
-- From Paris: 30+ hours - Paris → Los Angeles → Tahiti → Hiva Oa
-- From Tahiti: 3.5-hour flight on small ATR-72 plane
-- Or by cargo ship "Aranui 5" - 14-day voyage through all Marquesas
-- The airport is tiny, carved into a mountain
-- Landing feels like arriving at the end of the earth
+- From Paris, Air Tahiti Nui flies to Papeete via Los Angeles, its only Paris stopover since Seattle was dropped in January 2025; Air Tahiti then flies on to Hiva Oa.
+- From Papeete, Air Tahiti ATR 72s fly to Hiva Oa in well over 3 hours, among the longest legs on its network.
+- By sea: the Aranui 5, a passenger-freighter in service since December 2015, makes a 14-day loop from Papeete through the six inhabited Marquesas, Hiva Oa included.
+- Hiva Oa-Atuona airport, also called Jacques Brel airport, sits on the Tepuna plateau above town, with a single asphalt runway 1,215 m long.
+- Jacques Brel, who sailed in in 1975, used his light plane Jojo to fly the sick to Nuku Hiva and fetch mail and medicine; Jojo now sits in the Espace Jacques Brel hangar.
 `;
 
 const KNOWLEDGE_GAUGUIN = `
 PAUL GAUGUIN - THE MAN WHO SOUGHT PARADISE:
 
 PRECISE TIMELINE (use this for accuracy):
-- 1848: Born June 7 in Paris
-- 1849-1855: Childhood in Peru (mother's family)
-- 1865-1871: Merchant marine, then French Navy
-- 1871-1883: Successful stockbroker in Paris, Sunday painter
-- 1883: Age 35 - Quit job to paint full-time
-- 1886: First trip to Brittany (Pont-Aven)
-- 1887: Panama and Martinique trip
-- 1888: Arles with Van Gogh (October-December) - the ear incident
-- 1889: Brittany again, painted "The Yellow Christ"
-- 1891-1893: FIRST TAHITI TRIP - painted "Spirit of the Dead Watching" (1892)
-- 1893-1895: Back in PARIS - broke, disillusioned, tried to sell Tahiti works
-- 1895-1901: SECOND TAHITI TRIP - painted masterpieces including "Where Do We Come From?" (1897), "Nevermore" (1897)
-- 1901: Moved to Marquesas Islands (Hiva Oa, Atuona)
-- 1901-1903: ATUONA PERIOD - "Riders on the Beach" (1902), final works
-- 1903: Died May 8, age 54, in Atuona
+- Born 7 June 1848 in Paris, the year of the revolutions; his maternal grandmother was the socialist writer Flora Tristan.
+- His father Clovis died of a heart attack on the voyage to Peru; the 18-month-old Paul grew up in Lima among his mother's Tristan Moscoso kin until 1854, then Orléans.
+- December 1865: signed on at Le Havre as a pilot's apprentice on the clipper Luzitano, later second lieutenant on the three-master Chili; 1868 navy service on the corvette Jérôme-Napoléon.
+- From 1871 a Paris Bourse stockbroker (job found via Gustave Arosa); by 1879 earning 30,000 francs a year, painting Sundays in Pissarro's garden.
+- After the 1882 Bourse crash, in October 1883 (aged 35) he wrote to Pissarro that he would live from painting at all costs; in January 1884 the family moved to cheaper Rouen.
+- Summer 1886: first stay at Pont-Aven, chosen because it was cheap; an accomplished boxer and fencer, he quickly dominated the young art students there.
+- 1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.
+- 1888: Arles with Van Gogh in the Yellow House, from his arrival on 23 October until Van Gogh cut his ear on 23 December, after which Gauguin fled.
+- 1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan discreetly supported him.
+- First Tahiti trip: sailed 1 April 1891, back in France August 1893; painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.
+- 1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.
+- Second Tahiti stay: sailed 28 June 1895, arrived September 1895, left for the Marquesas 1901; painted Nevermore (1897) and Where Do We Come From? (1897-98).
+- Arrived at Atuona, Hiva Oa, on 16 September 1901, and bought land in the town centre from the Catholic mission after first attending mass regularly.
+- Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).
+- Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.
 
 KEY PAINTINGS BY PERIOD:
 Brittany Period (1886-1890):
-- "Vision After the Sermon" (1888) - Jacob wrestling angel, Breton women
-- "The Yellow Christ" (1889) - crucifixion with Breton landscape
+- Vision After the Sermon (1888): Breton women see Jacob wrestle the angel; painted for the church at Nizon, refused by its priest; Edinburgh bought it in 1925 for £1,150.
+- The Yellow Christ (1889): its Christ copies a 17th-century painted wooden crucifix in the Trémalo chapel near Pont-Aven; now Buffalo AKG Art Museum.
 
 First Tahiti (1891-1893):
-- "Ia Orana Maria" (1891) - Tahitian Madonna
-- "Spirit of the Dead Watching/Manao tupapau" (1892) - girl on bed, spirit behind
-- "Arearea" (1892) - two women, red dog
-- "Woman with Mango/Vahine no te vi" (1892) - NOT 1896
+- Ia Orana Maria (1891, Met): a Tahitian Madonna and child pointed out by a yellow-winged angel; the composition is based on his photograph of a Borobudur relief.
+- Manao tupapau (1892), on burlap: Teha'amana lies face down, a spirit-woman behind; he wrote Mette on 8 Dec 1892 that the pose was 'on the verge of being indecent'.
+- Arearea (1892, Musée d'Orsay): two women and a red dog that drew sarcasm at the 1893 Durand-Ruel show; Gauguin bought it back in 1895 before leaving Europe.
+- Vahine no te vi (Woman of the Mango), 1892 not 1896, Baltimore Museum of Art; Edgar Degas bought it in 1895.
 
 Paris Interlude (1893-1895):
-- "Mahana no atua/Day of the God" (1894) - memory of Tahiti
-- Worked on woodcuts, ceramics
+- Mahana no atua (1894, Art Institute of Chicago) was painted in Paris from memory; its idol of the goddess Hina derives from photographs of Borobudur reliefs.
+- In Paris he cut the Noa Noa woodcuts (1894) with an experimental technique and fired the stoneware Oviri that winter, showing it at the 1895 Société Nationale salon.
 
 Second Tahiti (1895-1901):
-- "Te Tamari No Atua/Nativity" (1896) - Tahitian nativity
-- "Where Do We Come From? What Are We? Where Are We Going?" (1897) - 4m masterpiece, painted before suicide attempt
-- "Nevermore" (1897) - reclining nude, raven
-- "Two Tahitian Women" (1899) - breasts, mangos
+- Te tamari no atua (1896, Neue Pinakothek, Munich): a Polynesian Nativity painted as Pahura gave birth around Christmas 1896; the baby girl died in infancy.
+- Where Do We Come From? (1897-98, MFA Boston) is 139 x 375 cm, about 3.75 m; after finishing it he tried to kill himself with arsenic, months after daughter Aline died.
+- Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.
+- Two Tahitian Women (1899, Met): one woman holds mango blossoms, not mangoes; the same pair reappears in Faa Iheihe (Tate) and Rupe Rupe (Pushkin Museum).
 
 Marquesas/Atuona (1901-1903):
-- "Contes Barbares/Primitive Tales" (1902)
-- "Riders on the Beach" (1902) - pink sand
-- "Self-Portrait Near Golgotha" (1903) - one of last works
+- Contes barbares (1902, Museum Folkwang): the crouching claw-footed figure behind two Polynesian women is Meijer de Haan, his Brittany friend, dead since 1895.
+- Riders on the Beach (1902, Museum Folkwang, Essen): horsemen on a pink beach, a colour often read as anticipating Fauvism; a second version also exists.
+- Self-Portrait near Golgotha dates from 1896, not 1903 (MASP, São Paulo); it was found among his belongings after his death.
 
 His Philosophy:
-- "I am a savage" - rejected European civilization
-- "Art is either plagiarism or revolution"
-- "Life has no meaning unless one lives it with a will"
-- "Don't copy nature too literally. Art is abstraction."
-- Color has its own emotional language
-- Sought the "primitive" as authentic truth
+- In a 1903 letter to Charles Morice: 'You were wrong that day when you said I was wrong to say I was a savage. It's true enough: I am a savage.'
+- 'Art is either plagiarism or revolution' is traced to a letter in Le Soir, 25 April 1895; the popular wording spread via James Huneker's paraphrase (1913).
+- Dec 1902-Feb 1903, sick in Atuona, he wrote the memoir Avant et après, ending with a philosophy of life as a struggle to reconcile opposites.
+- To Schuffenecker, Pont-Aven, 14 August 1888: 'Don't copy nature too much. Art is an abstraction; derive this abstraction from nature while dreaming before it.'
+- In Martinique (1887) he began setting analogous colours side by side for a muted effect, soon moving to non-representational colour with a life of its own.
+- His 'primitive' Tahiti was partly bookish: he was lent Moerenhout's 1837 Voyage aux îles du Grand Océan to learn the island's forgotten religion.
 
 His Technique:
-- Synthetism: flat areas of bold color, dark outlines
-- Cloisonnism: inspired by stained glass, Japanese prints, medieval enamels
-- Mixed memory, imagination, observation - never purely from life
-- Used local Polynesian pigments - earth colors, crushed flowers
-- Carved wood frames as part of the artwork
+- Synthetism's debut: the June 1889 Volpini show at the Café des Arts, filling walls left bare when the owner's Italian mirrors arrived late; Gauguin hung 11 zincographs on yellow paper.
+- 'Cloisonnism' was coined by critic Édouard Dujardin in the Revue indépendante, March 1888, for Louis Anquetin's paintings; Bernard and Gauguin then worked in the style.
+- He took to Tahiti photographs and prints, including a Borobudur temple frieze and an Egyptian fresco, which he called 'a whole little world of friends' in a letter to Redon.
+- No source for Polynesian flower pigments; documented instead: he painted on coarse burlap, as in Manao tupapau (1892).
+- He carved wood from his stockbroker years: a carved and painted mahogany medallion of the singer Valérie Roumi (1880), now in the Ny Carlsberg Glyptotek.
 
 The Lost Painting Theory:
 - Legend says he painted "Paradise on Earth" days before death
@@ -1257,14 +1257,14 @@ The Lost Painting Theory:
 - The ultimate Gauguin mystery
 
 His Final Days in Atuona:
-- "Maison du Jouir" (House of Pleasure) with provocative carvings
-- Living in poverty, legs covered in eczema/syphilis sores
-- Addicted to morphine and absinthe for pain
-- Fighting Bishop Martin and colonial authorities
-- Sentenced to prison for defamation (died before serving)
-- Still painting, demanding art supplies by mail
-- Last words reportedly: "I have been defeated"
-- Buried in Calvary Cemetery, Atuona - grave overlooks bay
+- Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved lintels read 'Soyez amoureuses vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.
+- Sores on his legs were treated with arsenic; he called them eczema; syphilis is unproven. His ankle, shattered in an 1894 Concarneau brawl, never healed.
+- By September 1902 he took morphine injections, then handed his syringe set to a neighbour and used laudanum; an empty laudanum bottle stood by his deathbed.
+- He fought Bishop Martin over mission schools and carved Père Paillard (Father Lechery, 1902, NGA Washington), a horned bishop displayed outside his house.
+- On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.
+- Vollard's deal (from 1900): 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.
+- No deathbed words are recorded; in his last letter to Charles Morice, weeks before death, he wrote: 'I am on the ground, but not yet defeated.'
+- Buried in Atuona's Catholic Calvary Cemetery at 2pm the day after his death; a bronze cast of his Oviri was set on the grave in 1973, as he had wished.
 `;
 
 const KNOWLEDGE_ART_HISTORY = `
@@ -1273,191 +1273,191 @@ ART HISTORY - Complete Guide to Impressionism and Beyond:
 THE IMPRESSIONIST PAINTERS (Complete List):
 
 CLAUDE MONET (1840-1926) - The Father of Impressionism:
-- "Impression, Sunrise" (1872) - gave movement its name
-- "Water Lilies" series (1896-1926) - 250 paintings at Giverny
-- "Haystacks" series - same subject, different light/seasons
-- "Rouen Cathedral" series - 30+ paintings of same facade
-- "La Grenouillère" (1869) - with Renoir, proto-Impressionism
-- Lived at Giverny 1883-1926, created famous gardens
-- Went nearly blind but kept painting
-- Quote: "I want to paint the air"
+- Monet's Impression, Sunrise, shown in 1874, gave Impressionism its name; in 2014 astronomer Donald Olson dated its Le Havre harbour view to 13 November 1872, about 7:35 a.m.
+- Monet painted about 250 Water Lilies over the last three decades of his life at Giverny; the eight great murals opened at the Orangerie on 16 May 1927, months after his death.
+- In Moscow in 1896 Kandinsky saw a Monet Haystack and could not tell what it was until the catalogue told him; that painful non-recognition, he wrote, gave painting a fairy-tale power.
+- Monet painted Rouen Cathedral's west facade more than 30 times (1892-94); in 1892 he worked from the fitting room of Fernand Levy's lingerie shop, screened off after customers complained.
+- On 25 September 1869 Monet wrote to Bazille of a dream painting, the baths of La Grenouillere, with only 'bad sketches' done; Renoir painted the same Seine bathing spot beside him.
+- In 1893 Monet bought land crossed by the Ru, an arm of the Epte, to dig his lily pond; local farmers protested that his strange water plants would poison their water and cattle.
+- In January 1923 Dr Charles Coutela removed the cataract from Monet's right eye; with Zeiss Katral lenses Monet found his recent colours dull and began repainting canvases brighter.
+- On 7 October 1890, painting his grainstacks, Monet wrote to Gustave Geffroy that he was chasing 'instantaneity', above all the enveloppe, the same light spread over everything, as the sun set too fast.
 
 PIERRE-AUGUSTE RENOIR (1841-1919) - Joy and Sensuality:
-- "Dance at Le Moulin de la Galette" (1876) - Parisian life
-- "Luncheon of the Boating Party" (1881) - friends at Chatou
-- "Bathers" series - voluptuous nudes
-- "La Loge" (1874) - theater box, fashionable woman
-- Later developed "Ingresque" style - firmer forms
-- Painted despite crippling arthritis, brush strapped to hand
-- Quote: "Pain passes, but beauty remains"
+- Renoir's smaller version of Bal du moulin de la Galette (1876) sold at Sotheby's New York on 17 May 1990 for $78.1 million to Ryoei Saito; the large one, Caillebotte's, is in the Orsay.
+- Luncheon of the Boating Party (1880-81) is set at the Maison Fournaise, Chatou; Aline Charigot, his future wife, holds the dog; Duncan Phillips paid $125,000 for it in 1923.
+- Renoir spent about three years (1884-87) on The Large Bathers, now in Philadelphia, basing it partly on Girardon's 1672 lead relief The Bath of the Nymphs at Versailles.
+- In La Loge (1874, Courtauld) the woman is Montmartre model Nini Lopez, nicknamed 'Gueule-de-Raie', the man Renoir's brother Edmond; Renoir sold it to pere Martin for 425 francs.
+- After an 1881-82 trip to Italy with Aline Charigot, struck by Raphael's Farnesina frescoes, Renoir turned to firm Ingres-like contours, his self-declared 'crisis of Impressionism'.
+- Renoir's brush was not strapped on: in Sacha Guitry's 1915 film he paints at 74 while his son Claude, 14, places the brush in his permanently clenched hand.
+- Asked by Matisse why he kept painting despite crippling arthritis, Renoir reportedly answered: 'The pain passes, but the beauty remains.'
 
 EDGAR DEGAS (1834-1917) - Movement and Modern Life:
-- "The Dance Class" series - ballet rehearsals
-- "L'Absinthe" (1876) - café alienation
-- "The Tub" series - women bathing
-- "At the Races" - horses, jockeys
-- "Little Dancer of Fourteen Years" (1881) - sculpture
-- Not strictly Impressionist - called himself "Realist"
-- Master of pastels, unusual angles, cropped compositions
-- Quote: "Art is not what you see, but what you make others see"
+- Degas's The Dance Class (1874-76) shows the old ballet master Jules Perrot, who had been ballet master of the Imperial Theatres in St Petersburg from 1849 to 1860.
+- Degas's Dans un cafe (1875-76) posed actress Ellen Andree and engraver Marcellin Desboutin at the Nouvelle-Athenes; renamed L'Absinthe in London in 1893, it caused uproar.
+- Degas told George Moore his bathing women were 'honest, simple folk' unaware of an audience: 'It is as if you looked through a key-hole' (Impressions and Opinions, 1891).
+- Degas copied horse positions from Muybridge's 1887 Animal Locomotion photographs, counterproofing drawings to see both sides, and used them for his first bronze horses in motion.
+- Little Dancer Aged Fourteen, shown in wax in 1881 with a real tulle tutu, silk ribbon and hair, was modelled by Marie van Goethem; the bronzes were cast only around 1922.
+- Degas rejected the label 'Impressionist', preferring to be called a Realist or an Independent, though he helped organise the group shows of 1874-86.
+- Degas layered his pastels using a secret fixative from his friend Luigi Chialiva, a chemist-trained painter; a casein-based fixative was patented in the US in 1899 by Chialiva and Dupont.
+- The sourced Degas line is 'Drawing is not what you see but what you must make others see' (Shop-Talk of Edgar Degas); the popular 'Art is not what you see' version is a paraphrase.
 
 CAMILLE PISSARRO (1830-1903) - The Patriarch:
-- Only artist in all 8 Impressionist exhibitions
-- Taught Cézanne, Gauguin, Van Gogh
-- "Boulevard Montmartre" series - Paris streets from above
-- Rural scenes of Pontoise, Éragny
-- Briefly adopted Pointillism (1886-1888)
-- Quote: "Blessed are they who see beautiful things"
+- Pissarro was the only artist to show at all eight Paris Impressionist exhibitions, from 1874 to 1886.
+- Pissarro mentored Cezanne and Gauguin, who called him 'one of my masters'; Cezanne listed himself as 'pupil of Pissarro' in Aix in 1902; for Van Gogh, Pissarro suggested Auvers and Dr Gachet in 1890.
+- Between February and April 1897 Pissarro painted 14 views of the boulevard Montmartre from his room at the Grand Hotel de Russie, in snow, rain, fog, sunlight and once at night.
+- Pissarro rented his Eragny house for eight years, then bought it on 19 July 1892 at his wife Julie's insistence, with 15,000 francs borrowed from Monet.
+- Introduced to Seurat in October 1885, Pissarro, nearly 30 years older, adopted the dot technique, showed with Seurat and Signac in 1886, and abandoned it by about 1890.
+- Late in life Cezanne spoke with particular tenderness of 'the humble and colossal Pissarro', and called him 'a father for me, a man to consult and a little like the good Lord'.
 
 BERTHE MORISOT (1841-1895) - The First Lady:
-- First woman in Impressionist group
-- "The Cradle" (1872) - sister watching baby
-- "Summer's Day" (1879) - women in boat
-- Married Édouard Manet's brother Eugène
-- Delicate brushwork, domestic scenes, gardens
-- Quote: "I don't think any man would ever treat a woman as his equal"
+- Berthe Morisot was the only woman in the first Impressionist exhibition of 1874 and showed in seven of the eight, missing only 1879 after the birth of her daughter Julie.
+- The Cradle (1872) shows Morisot's sister Edma watching her baby Blanche; it failed to sell at the 1874 exhibition, stayed in the family, and entered the Louvre in 1930.
+- Summer's Day (1879, National Gallery London) shows two women in a rowing boat on the lake of the Bois de Boulogne; it was shown at the 1880 Impressionist exhibition.
+- In 1874, the year of the first Impressionist show, Berthe Morisot married Eugene Manet, younger brother of Edouard Manet, who had painted her many times.
+- When Berthe Morisot died in 1895, her death certificate described her as 'sans profession', no profession.
+- Morisot wrote in her notebook in 1890: 'I don't think there has ever been a man who treated a woman as an equal, and that's all I would have asked, for I know I'm worth as much as they.'
 
 ALFRED SISLEY (1839-1899) - Pure Landscape:
-- Most consistent Impressionist - never changed style
-- "Flood at Port-Marly" (1876) - water reflections
-- "Snow at Louveciennes" series
-- English parents, lived in France
-- Died poor, prices rose after death
+- In 1893-94 Sisley painted the church of Notre-Dame at Moret about a dozen times from nearly the same spot, in different seasons and weather, his most deliberate series.
+- When the Seine flooded Port-Marly in spring 1876 Sisley painted several views; Boat in the Flood was bought by Count Isaac de Camondo at the Tavernier sale on 6 March 1900.
+- Not a series: Snow at Louveciennes (1878, Musee d'Orsay) is one of many snow scenes Sisley painted, a snowy lane narrowing into the distance with a single small figure.
+- Born in Paris to a British merchant father, Sisley stayed British all his life: his 1898 application for French citizenship was refused and a second was overtaken by his final illness.
+- Sisley died of throat cancer at Moret on 29 January 1899; on 1 May 1899 Monet's benefit sale at Galerie Georges Petit raised 145,000 francs for his children.
 
 MARY CASSATT (1844-1926) - American in Paris:
-- Only American in Impressionist exhibitions
-- "The Child's Bath" (1893) - mother and child
-- "Little Girl in a Blue Armchair" (1878)
-- Influenced by Japanese prints
-- Helped American collectors buy Impressionists
-- Quote: "I have touched with a sense of art some people"
+- Mary Cassatt was the only American officially associated with the Impressionists; Degas invited her to exhibit with them in 1877, after her Salon submissions were rejected.
+- Cassatt's The Child's Bath (1893, Art Institute of Chicago) followed her study of the 1890 Paris exhibition of Japanese prints: high viewpoint, flat patterns, cropped figures.
+- Degas worked on the background of Cassatt's Little Girl in a Blue Armchair (1878) and supplied the model, a friend's daughter; the American jury of the 1878 World's Fair rejected it.
+- After a major Paris exhibition of Japanese masters in 1890, Cassatt made a set of colour drypoint and aquatint prints in 1891, among her most original works.
+- Cassatt urged her friend Louisine Havemeyer to buy her first artwork, a Degas pastel; the Havemeyer bequest after 1929 gave the Met nearly 2,000 works.
+- Of Degas's pastels in a Paris dealer's window around 1875, Cassatt said: 'I used to go and flatten my nose against that window and absorb all I could of his art. It changed my life.'
 
 GUSTAVE CAILLEBOTTE (1848-1894) - The Collector:
-- "Paris Street; Rainy Day" (1877) - geometric precision
-- "The Floor Scrapers" (1875) - workers
-- Wealthy, funded Impressionist exhibitions
-- His collection became Musée d'Orsay core
+- Paris Street; Rainy Day (1877) shows today's Place de Dublin, where rue de Saint-Petersbourg meets rue de Moscou; Caillebotte showed it at the 1877 Impressionist show he helped fund.
+- The Floor Scrapers (1875), set in Caillebotte's flat at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition.
+- Caillebotte bought his first Monet in 1875, paid studio rents for friends, and in 1877 secured the rooms at 6 rue Le Peletier, chose the artists and hung the third Impressionist show himself.
+- Caillebotte left 68 works to the State in 1894, Renoir as executor; after a press row the State took only about 40, shown at the Musée du Luxembourg in 1897 and now at Orsay.
 
 FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent:
-- "Family Reunion" (1867)
-- Died in Franco-Prussian War at 28
-- Funded early Impressionist shows
-- What might have been...
+- Bazille's Family Reunion (1867-68, Orsay) records a summer 1867 gathering at Méric near Montpellier: eleven relatives under a chestnut tree, eight of them gazing out at the viewer.
+- Bazille was killed on 28 November 1870 at Beaune-la-Rolande, hit twice while leading a failed assault after his officer fell; he was 28, days short of his 29th birthday.
+- Bazille died in 1870, before any Impressionist show; instead he kept Monet afloat by buying Women in the Garden for 2,500 francs, paid in monthly instalments of 50 francs.
+- In Bazille's Studio (1870, Orsay), set in the rue de la Condamine studio he shared with Renoir, Manet painted Bazille's own tall figure; Edmond Maître sits at the piano.
 
 ARMAND GUILLAUMIN (1841-1927) - The Colorist:
-- Vivid colors, almost Fauvist
-- "Sunset at Ivry" - industrial landscapes
-- Won lottery 1891, could paint full-time
+- A critic called Guillaumin a 'furious colourist' in 1886; in the 1890s, painting the Creuse around Crozant, his palette grew bolder still, a Fauve before Fauvism.
+- Guillaumin's Sunset at Ivry (1873), factory smoke over the Seine, was lent by Dr Gachet to the first Impressionist show in 1874; the Gachet family gave it to the nation in 1951.
+- In 1891 Guillaumin won 100,000 francs in the French state lottery, quit his government job and painted full-time.
 
 ÉDOUARD MANET (1832-1883) - The Reluctant Leader:
-- "Olympia" (1863) - scandal, modern nude
-- "Le Déjeuner sur l'herbe" (1863) - naked woman with clothed men
-- "A Bar at the Folies-Bergère" (1882) - mirrors, modernity
-- Never exhibited with Impressionists but inspired them
-- Quote: "There is only one true thing: paint what you see"
+- Olympia, painted in 1863, caused its scandal at the 1865 Salon; in 1890 Monet raised 19,415 francs from nearly 100 subscribers to buy it from Manet's widow for the nation.
+- Manet showed Le Déjeuner sur l'herbe at the 1863 Salon des Refusés as 'Le Bain'; its poses come from Raimondi's engraving after Raphael's Judgment of Paris, Victorine Meurent the nude.
+- The barmaid in Manet's A Bar at the Folies-Bergère (Salon 1882) was Suzon, a real Folies employee posed in his studio; the canvas first hung above Emmanuel Chabrier's piano.
+- Manet never exhibited in any of the eight Impressionist exhibitions (1874-86), holding to the official Salon, though the younger painters looked to him as their leader.
+- Manet's friend Antonin Proust recalled that Olympia escaped destruction at the 1865 Salon only because of the precautions taken by the administration.
 
 POST-IMPRESSIONISTS (1880s-1910s):
 
 PAUL CÉZANNE (1839-1906) - Father of Modern Art:
-- "Mont Sainte-Victoire" series - 87 paintings/watercolors
-- "The Card Players" (1890-95) - sold for $250M
-- "The Large Bathers" (1906)
-- "Treat nature by the cylinder, sphere, cone"
-- Led directly to Cubism (Picasso, Braque)
+- Cézanne painted Mont Sainte-Victoire again and again in his last 20 years; counts vary, often 44 oils and 43 watercolours, elsewhere over 30 oils and about 45 watercolours.
+- One of Cézanne's five Card Players, the last in private hands, was sold by shipowner George Embiricos's estate to Qatar's royal family in 2011 for a reported $250M.
+- Cézanne worked seven years on The Large Bathers, unfinished at his death in 1906; Philadelphia paid $110,000 in 1937 and a paper protested that 41,000 citizens had no bathtub.
+- Cézanne's 'treat nature by means of the cylinder, the sphere, the cone' comes from a letter to the young painter Émile Bernard dated 15 April 1904.
+- The 1907 Salon d'Automne memorial show of 56 Cézanne works, mostly lent by Auguste Pellerin, overwhelmed Picasso, Braque, Matisse and Léger on the eve of Cubism.
 
 VINCENT VAN GOGH (1853-1890) - Tortured Genius:
-- "Starry Night" (1889) - painted from asylum
-- "Sunflowers" series (1888) - for Gauguin's room
-- "The Bedroom" (1888) - Yellow House, Arles
-- "Wheatfield with Crows" (1890) - final painting
-- Only sold one painting in lifetime ("The Red Vineyard")
-- 2,100 artworks in 10 years
-- Shot himself July 27, 1890, died July 29
+- The Starry Night (June 1889) shows the pre-dawn view from his east-facing room at the Saint-Rémy asylum, with an invented village; MoMA acquired it in 1941 via the Lillie P. Bliss Bequest.
+- In August 1888 Van Gogh painted four Sunflowers 'with the enthusiasm of a Marseillais eating bouillabaisse'; two, with 14 and 15 blooms, were meant for Gauguin's room in the Yellow House.
+- Van Gogh painted The Bedroom in October 1888; after floodwater damaged it while he was in hospital, he made two copies at Saint-Rémy in 1889, now in Chicago and, smaller, at Orsay.
+- Wheatfield with Crows was not his last painting: a letter dates it to about 10 July 1890; the Van Gogh Museum names the unfinished Tree Roots, painted on his last morning, as his probable last.
+- The Red Vineyard, bought by Belgian painter Anna Boch for 400 francs at Les XX in Brussels in 1890, is his only certain painting sale; uncle Cor had earlier commissioned 19 cityscape drawings.
+- Van Gogh made about 2,100 artworks in a career of about ten years, including around 860 oil paintings, most of them in his last two years.
+- Van Gogh shot himself on 27 July 1890, walked back to the Auberge Ravoux, and died in his attic room there in the early hours of 29 July, with Theo at his side.
 
 GEORGES SEURAT (1859-1891) - Scientific Color:
-- "A Sunday Afternoon on the Island of La Grande Jatte" (1886)
-- Pointillism/Divisionism - dots of pure color
-- Color theory based on Chevreul's research
-- Died at 31, unfinished "The Circus"
+- Seurat painted La Grande Jatte in 1884-86 and added its border of red, orange and blue dots in 1888-89; the Bartletts bought it for $20,000 in 1924 and gave it to the Art Institute in 1926.
+- Seurat preferred to call his method 'chromoluminarism'; the critic Félix Fénéon coined 'neo-impressionism' in 1886 after seeing La Grande Jatte at the last Impressionist show.
+- Seurat built on Chevreul's 1839 law of simultaneous contrast, found at the Gobelins dye works, and on Ogden Rood's Modern Chromatics, translated into French in 1881.
+- Seurat died on 29 March 1891, aged 31, probably of diphtheria, while his unfinished The Circus hung at the Salon des Indépendants; it is now at Orsay.
 
 HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre:
-- "At the Moulin Rouge" (1892-95)
-- "Jane Avril" posters - invented modern poster art
-- Aristocrat with genetic disorder (short legs)
-- Captured Parisian nightlife, prostitutes, dancers
-- Died at 36 from alcoholism
+- In At the Moulin Rouge (1892-95, Art Institute of Chicago) the strip with the acid-green face at right was cut off, perhaps to help it sell, and reattached by 1914; Lautrec stands small at the back.
+- Lautrec did not invent the poster (Chéret made the Moulin Rouge's 1889 opening poster); his first, Moulin Rouge: La Goulue, hit Paris streets in 1891 in an estimated 1,000-3,000 copies.
+- Lautrec's parents were first cousins; he broke his left femur in May 1878 and the right in 1879, probably due to pycnodysostosis; adult height about 1.54 m, on 70 cm legs.
+- Lautrec's Elles (1896), twelve prints of brothel women waking, washing and dressing, published by Gustave Pellet in 100 copies, flopped because it refused to be erotic.
+- After an 1899 breakdown and months in a sanatorium, Lautrec died on 9 September 1901 at his family's Château de Malromé, aged 36, of alcoholism and syphilis.
 
 PAUL SIGNAC (1863-1935) - Seurat's Heir:
-- Continued Pointillism after Seurat's death
-- "The Port of Saint-Tropez" - Mediterranean light
-- Theoretical writings on color
+- Signac carried Neo-Impressionism on after Seurat's death, serving as President of the Société des Artistes Indépendants from 1908 until his own death in 1935.
+- Signac sailed his 11-metre boat Olympia, named after Manet's painting, and from 1892 based it at the little port of Saint-Tropez, which he is credited with 'discovering'.
+- Signac's treatise D'Eugène Delacroix au néo-impressionnisme, serialised in La Revue blanche and published as a book in 1899, was dedicated to Seurat and later read from Matisse to Kandinsky.
 
 THE ART MARKET HISTORY:
-- Paul Durand-Ruel: dealer who saved Impressionists, bought 1,500 Monets
-- Ambroise Vollard: Gauguin's dealer, also Cézanne, Picasso
-- Theo van Gogh: Vincent's brother, dealer at Goupil & Cie
-- Artists died poor, dealers got rich decades later
-- Impressionist prices: then 100-500 francs, now $50-300M+
+- Between 1891 and 1922 Paul Durand-Ruel bought about 12,000 pictures: some 1,500 Renoirs, over 1,000 Monets, 800 Pissarros and around 400 each by Degas, Sisley and Cassatt.
+- Vollard bought some 150 Cézannes for his first show in 1895 and gave Picasso his first Paris show in 1901; from about 1900 he advanced Gauguin 300 francs a month for 25 paintings a year.
+- Theo van Gogh ran the 19 boulevard Montmartre branch of Boussod, Valadon & Cie, Goupil's successors, where from about 1884 he showed and sold the Impressionists.
+- Durand-Ruel himself nearly went under first: 'Without America, I would have been lost, ruined, after having bought so many Monets and Renoirs. The two exhibitions there in 1886 saved me.'
+- In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.
 
 KEY DATES:
-- 1863: Salon des Refusés - rejected artists exhibit
-- 1874: First Impressionist Exhibition, Nadar's studio
-- 1886: Eighth (final) Impressionist Exhibition
-- 1886: Van Gogh arrives in Paris, meets everyone
-- 1888: Gauguin visits Van Gogh in Arles
-- 1891: Gauguin sails for Tahiti
+- In 1863 Napoleon III decreed the Salon des Refusés at the Palais de l'Industrie after the jury refused about 2,217 of over 5,000 paintings; more than a thousand people a day came.
+- The first Impressionist show ran 15 April-15 May 1874 at Nadar's studio, 35 boulevard des Capucines: 30 artists, 165 works, 1 franc entry, about 3,500 visitors.
+- The eighth and last Impressionist exhibition ran 15 May-15 June 1886; Seurat's La Grande Jatte made it a watershed, and Fénéon named the new style néo-impressionnisme.
+- Van Gogh reached Paris in March 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.
+- Gauguin reached Arles in late October 1888 and stayed about nine weeks at the Yellow House, leaving after the evening of 23 December, when Vincent cut off his ear.
+- Gauguin sailed for Tahiti on 1 April 1891, paid for by a February 1891 Hôtel Drouot sale of his works, boosted by two enthusiastic articles by Octave Mirbeau.
 `;
 
 const KNOWLEDGE_AUCTION_HOUSES = `
 AUCTION HOUSES - The Art Market World:
 
 CHRISTIE'S:
-- Founded 1766 in London by James Christie
-- Headquarters: King Street, St. James's, London + Rockefeller Center, NYC
-- Sold: da Vinci's "Salvator Mundi" for $450.3M (2017) - record
-- Private sales, evening sales (the glamorous events), day sales
-- "White glove sale" = every lot sold
-- The paddle, the auctioneer's gavel, the tension in the room
+- James Christie held his first sale in Pall Mall, London, on 5 December 1766; lot one, 'six breakfast pint basons and plates', was knocked down for 19 shillings.
+- Christie's main salerooms are at 8 King Street, St James's, London, and 20 Rockefeller Plaza in New York's Rockefeller Center.
+- Christie's New York sold Leonardo's Salvator Mundi on 15 November 2017 for $450.3 million with premium, the auction record; it had sold in 2005 at a small US regional sale, reportedly under $10,000.
+- In 1779 James Christie valued Robert Walpole's Houghton pictures; the planned sale was cancelled when Catherine the Great bought all 204 works en bloc for £40,555 and sent a ship to fetch them.
+- A 'white glove' sale means every lot sold; the May 2018 Peggy and David Rockefeller sale at Christie's New York was one, all 1,500+ lots, $832 million, proceeds to charity.
+- On 11 May 2015 Jussi Pylkkanen hammered Picasso's Les Femmes d'Alger (Version O) at Christie's NY after 11.5 minutes of bidding, $179.4M; at $152M he told the room 'We're in new territory'.
 
 SOTHEBY'S:
-- Founded 1744 - oldest auction house
-- Headquarters: New Bond Street, London + York Avenue, NYC
-- Rival to Christie's - they divide the art world
-- Famous sales: Gauguin's "Nafea Faa Ipoipo" - $300M (private 2015)
-- Online bidding now mainstream since COVID
+- Sotheby's began on 11 March 1744, when bookseller Samuel Baker sold Sir John Stanley's library in London's Strand for £826; it is the oldest of the major international houses, not the oldest anywhere.
+- Sotheby's left York Avenue: on 8 November 2025 it opened its new global HQ in Marcel Breuer's former Whitney building on Madison Avenue; over its New Bond Street door sits a c.1320 BC Sekhmet bust.
+- The rivals once colluded: Sotheby's chairman Alfred Taubman was convicted on 5 Dec 2001 of fixing seller commissions with Christie's, got a year and a day; the houses paid $512M in settlements.
+- Sotheby's invented the gala sale on 15 Oct 1958: seven Goldschmidt pictures by Manet, Cezanne, Renoir, Van Gogh made £781,000 in 21 minutes; Cezanne's Garcon au gilet rouge hit a record £220,000.
+- On 29 June 2020 Oliver Barker, alone in a London studio, auctioned to phone banks in NY, Hong Kong and London; Bacon's Oresteia triptych made $84.6M after a 10-minute duel with an online bidder in China.
 
 PHILLIPS:
-- Third major house, founded 1796
-- Known for contemporary art, watches, design
-- More youthful, edgier than Christie's/Sotheby's
+- Phillips was founded in London in 1796 by Harry Phillips, formerly a clerk to James Christie; with no staff or premises he held a dozen sales in year one, selling anything from tea services to a saddle mare.
+- On 26 Oct 2017 Phillips (with Bacs & Russo) sold Paul Newman's own Rolex Daytona, engraved 'DRIVE CAREFULLY ME' by Joanne Woodward, for $17,752,500 after 12 minutes, a wristwatch record.
+- Phillips was bought by Bernard Arnault's LVMH in 1999; after heavy losses it became Phillips, de Pury & Luxembourg in 2001, and Moscow's Mercury Group took a majority stake in October 2008.
 
 HOW AUCTIONS WORK:
-- Consignment: owner gives work to auction house
-- Estimate: low-high range published in catalogue
-- Reserve: secret minimum price below which won't sell
-- Premium: buyer pays 25% on top of hammer price
-- Seller pays 10-25% commission to house
-- "Chandelier bidding" - auctioneer pretends to see bids
-- "Bought in" = didn't meet reserve, unsold
+- Divorce feeds the rooms: after Harry and Linda Macklowe's bitter split, a court ordered their 65 works sold; Sotheby's auctioned them in Nov 2021 and May 2022 for $922.2 million.
+- Estimates are opening gambits: Christie's put Salvator Mundi at about $100 million in 2017, and Sotheby's estimated Bacon's Oresteia triptych at $60-80 million before it made $84.6 million.
+- The reserve is the confidential minimum agreed by consignor and house, never printed in the catalogue, and it cannot be set above the lot's low estimate.
+- The buyer's premium is tiered, not a flat 25%: from September 2025 Christie's charges 27% of hammer up to $1.5M, 22% from $1.5M to $8M, and 15% above $8M.
+- At the top, sellers often pay nothing: a coveted consignor may have the commission waived and even pocket part of the buyer's premium, a deal the trade calls an 'enhanced hammer'.
+- Chandelier bidding is legal in New York only below the reserve: the auctioneer may bid for the seller up to that figure; NYC rules once required catalogues to disclose it, later repealed.
+- A lot that fails to reach its reserve is 'bought in', and the trade calls it 'burned'; burned works usually resell later for less, often at a different house.
 
 THE CATALOGUE:
-- Provenance: ownership history (gaps are red flags)
-- Condition report: damage, restoration
-- Literature: published references
-- Exhibition history
-- Authentication letters
+- Provenance haunts sales: Yasuda bought Van Gogh's Sunflowers at Christie's London on 30 March 1987 for £24.75M; in 2022 heirs of banker Paul von Mendelssohn-Bartholdy sued its owner Sompo, citing Nazi-era duress.
+- Christie's published Salvator Mundi's condition report: by 1900 it had been 'grotesquely repainted', even given a beard; conservator Dianne Modestini removed overpaint and inpainted losses in 2007-10.
+- The online Cezanne catalogue raisonne (Feilchenfeldt, Warman, Nash) lists 40+ literature references for Le Garcon au gilet rouge, and its lot no. 6 at Sotheby's on 15 Oct 1958; Paul Mellon bought it.
+- Monet's Haystacks debuted at Durand-Ruel, Paris, on 4 May 1891, fifteen stacks among 22 new canvases; Bertha Palmer of Chicago bought nine. One Palmer 'Meules' made $110.7M at Sotheby's in May 2019.
+- Authentication is perilous: the Andy Warhol Foundation dissolved its authentication board in early 2012 after spending nearly $7 million defending an antitrust suit over a rejected 1964 self-portrait.
 
 PRIVATE SALES:
-- Many top works never go to auction
-- Discreet, no public price
-- "Guaranteed price" deals with third parties
-- Art advisors, intermediaries, secrecy
+- Gauguin's Nafea Faa Ipoipo (1892) never went to auction: in 2015 the Staechelin family, who had lent it to the Kunstmuseum Basel, sold it privately to a Qatari buyer, reportedly for nearly $300 million.
+- In 2011 the estate of Greek shipowner George Embiricos, who never lent it out, sold a version of Cezanne's The Card Players privately to Qatar's royal family, reportedly for about $250 million.
+- Third-party guarantees appear in catalogues as an 'irrevocable bid' symbol: an outside party has committed to bid at a level that ensures the lot sells.
+- In 2013 Swiss dealer Yves Bouvier bought Salvator Mundi in a Sotheby's-brokered private deal for $80M and resold it within days to Dmitry Rybolovlev for $127.5M, sparking years of lawsuits.
 
 THE PLAYERS:
-- Collectors: old money, new money, oligarchs, tech billionaires
-- Dealers: galleries, private dealers, runners
-- Museums: often can't compete on price
-- Art advisors: paid by collectors to guide purchases
+- In May 1990 paper magnate Ryoei Saito bought Van Gogh's Portrait of Dr Gachet at Christie's for $82.5M and, two days later, Renoir's Bal du moulin de la Galette for $78.1M; he later joked of cremating them.
+- With their dealer Durand-Ruel short of cash, Monet, Renoir, Sisley and Morisot auctioned 73 works at the Hotel Drouot on 24 March 1875; the crowd jeered, police were called, and the artists bought some back.
+- Alan Bond bought Van Gogh's Irises at Sotheby's NY in Nov 1987 for $53.9M with Sotheby's lending him about half; unable to pay, he sold it in 1990 to the J. Paul Getty Museum for an undisclosed sum.
+- In January 2016 Sotheby's bought the advisory firm Art Agency, Partners of Amy Cappellazzo and Allan Schwartzman for up to $85 million, buying the advisers' client book.
 `;
 
 const KNOWLEDGE_FASHION = `
@@ -1560,89 +1560,89 @@ const KNOWLEDGE_MODERN_ART = `
 MODERN ART MUSEUMS - World's Great Collections:
 
 TATE MODERN (London):
-- Opened 2000 in former Bankside Power Station
-- Herzog & de Meuron architecture - industrial cathedral
-- Turbine Hall: massive commissions (Ai Weiwei sunflower seeds, Olafur Eliasson sun)
-- Free admission (special exhibitions paid)
-- Collections: Picasso, Dalí, Warhol, Rothko, Bacon, Hockney
-- Switch House extension (2016) - 10 floors of twisted brick
-- 6 million visitors/year - most visited modern art museum
-- Views of St Paul's Cathedral across Millennium Bridge
-- Level 2: permanent collection by theme not chronology
-- Members Room on Level 6 - London skyline views
+- Tate Modern was opened by the Queen on 11 May 2000 inside Bankside Power Station, Sir Giles Gilbert Scott's power station, which closed in 1981.
+- Herzog & de Meuron kept Scott's 99-metre chimney and added a two-storey glass 'light beam' on the roof; Michael Craig-Martin's Swiss Light glowed atop the chimney until it was dismantled in May 2008.
+- Turbine Hall commissions: Eliasson's The Weather Project (2003), a mist-veiled sun of mono-frequency lamps under a mirrored ceiling; Ai Weiwei's Sunflower Seeds (2010), 100 million porcelain seeds painted in Jingdezhen.
+- The first Turbine Hall commission, on opening day 12 May 2000, was Louise Bourgeois's I Do, I Undo, I Redo: three 9-metre steel towers visitors could climb, guarded by her giant spider Maman, later acquired by Tate.
+- Rothko gave Tate nine of his Seagram murals with exact instructions for wall colour, light and hanging height; they arrived in London on 25 February 1970, the same day he was found dead in his New York studio.
+- The 10-storey Switch House (2016, now the Blavatnik Building) is a twisting pyramid clad in a perforated lattice of 336,000 bricks that glows at night; beneath it, the power station's round oil Tanks became galleries for live art.
+- Tate Modern drew 5.25 million visitors in its first year, double the 2.5 million the three older Tates drew combined; it peaked at 6.1 million in 2019 and recorded about 4.6 million in 2024.
+- The Millennium Bridge linking Tate Modern to St Paul's opened on 10 June 2000 and closed within days because crowds made it sway; fitted with 37 viscous and 54 tuned mass dampers, it reopened 22 February 2002.
+- At its 2000 opening Tate Modern rejected chronology and hung the collection in four themes: History/Memory/Society, Nude/Action/Body, Landscape/Matter/Environment and Still Life/Object/Real Life.
+- Residents of the glass-walled Neo Bankside flats sued Tate over its 10th-floor viewing terrace; in February 2023 the UK Supreme Court ruled 3-2 that visitors peering into their homes was a nuisance.
 
 TATE BRITAIN (London):
-- Original Tate, opened 1897, Millbank
-- British art from 1500 to today
-- Turner Collection - largest in world (300+ oils, 30,000 works on paper)
-- Pre-Raphaelites: Millais, Rossetti, Hunt
-- Turner Prize awarded here annually
-- Clore Gallery for Turner
+- Tate Britain stands on the site of Millbank Penitentiary, demolished in 1890; Henry Tate paid for the building, opened by the Prince of Wales on 21 July 1897 as the National Gallery of British Art.
+- On 7 January 1928 the Thames burst its wall opposite the Tate, flooding the lower galleries: 18 works were lost and Turner's drawings were soaked in mud; the director fell into a flooded manhole and had to be rescued.
+- The Turner Bequest, left to the nation at his death in 1851, holds nearly 300 oil paintings and about 30,000 sketches and watercolours, including some 300 sketchbooks; most of it is in Tate Britain's Clore Gallery.
+- For Tate's Ophelia, Millais painted the Hogsmill river at Ewell outdoors, then posed Elizabeth Siddall in a bath warmed by lamps; they went out, she fell ill, and her father billed Millais £50.
+- The Turner Prize, founded in 1984, is shown at Tate Britain only every other year; in alternate years it travels to venues such as Baltic in Gateshead, Turner Contemporary in Margate and Towner Eastbourne.
+- James Stirling and Michael Wilford's Clore Gallery, built to house the Turner Bequest, opened on 1 April 1987; its pediment over the entrance abstractly echoes the Tate's Victorian portico.
 
 OTHER LONDON ART:
-- National Gallery: Old Masters, Impressionists (Van Gogh Sunflowers)
-- Courtauld Gallery: Manet's "A Bar at the Folies-Bergère"
-- Royal Academy: summer exhibition since 1769
-- Serpentine Galleries: contemporary, free
-- Saatchi Gallery: controversial, YBAs
-- White Cube: Damien Hirst's gallery
-- Hauser & Wirth: mega-gallery
+- On 10 March 1914 suffragette Mary Richardson smuggled a meat cleaver into the National Gallery and slashed Velázquez's Rokeby Venus seven times in protest at the treatment of Emmeline Pankhurst.
+- The Courtauld holds Manet's A Bar at the Folies-Bergère (1882), his last major work, painted in his studio with a real barmaid, Suzon, posing; the mirror reflection is impossibly shifted to the right.
+- The Royal Academy Summer Exhibition has run every year since 1769, through both World Wars, making it the world's oldest open-submission exhibition: anyone may send in work.
+- The Serpentine opened in 1970 in a 1933-34 tea pavilion in Kensington Gardens; Zaha Hadid's 2000 anniversary tent, meant to stand one night, began the annual Serpentine Pavilion series.
+- Charles Saatchi opened his gallery in 1985 in a disused paint factory on Boundary Road, St John's Wood; it moved to County Hall in 2003 and in 2008 to the Duke of York's Headquarters, a former military building in Chelsea.
+- White Cube is Jay Jopling's gallery, not Hirst's: it opened in May 1993 in one small square room on Duke Street, St James's, and in its first decade never showed the same artist twice. Hirst was among its artists.
+- Hauser & Wirth, founded in Zurich in 1992, opened its first London gallery in 2003 inside a former bank on Piccadilly designed by Sir Edwin Lutyens; in 2014 it turned a Somerset farm into a gallery.
 
 MUSEUM OF MODERN ART - MoMA (New York):
-- Founded 1929, 11 West 53rd Street
-- "Starry Night" (Van Gogh) - most famous work
-- "Les Demoiselles d'Avignon" (Picasso)
-- Monet's "Water Lilies" - immersive room
-- Warhol's "Campbell's Soup Cans," "Marilyn"
-- Sculpture Garden - Rodin, Picasso
-- Film archive - 30,000 films
+- MoMA, conceived by Abby Aldrich Rockefeller, Lillie P. Bliss and Mary Quinn Sullivan, opened on 7 November 1929 in six rooms on the 12th floor of the Heckscher Building, 730 Fifth Avenue; it reached 53rd Street in 1932.
+- MoMA acquired Van Gogh's The Starry Night in 1941 through the Lillie P. Bliss Bequest, whose terms let the museum sell works from her collection to buy new masterpieces.
+- MoMA bought Les Demoiselles d'Avignon (1907) in 1939, once owned by couturier Jacques Doucet, paying partly by trading away Degas's Jockeys on Horseback before Distant Hills from the Bliss Bequest.
+- MoMA's first Monet Water Lilies, an 18.5-foot canvas bought in 1955, was destroyed on 15 April 1958 when a workman's cigarette set sawdust alight; an electrician died and 500 people were evacuated.
+- Warhol's Campbell's Soup Cans (1962) at MoMA is 32 hand-painted canvases, each 20 x 16 inches with a hand-stamped fleur-de-lis rim, first shown at the Ferus Gallery, Los Angeles, in his first painting show.
+- Philip Johnson's Abby Aldrich Rockefeller Sculpture Garden (completed April 1953) set marble-paved terraces around shallow pools; Picasso's She-Goat and Rodin's Monument to Balzac have stood there.
+- MoMA's Film Library, founded in 1935 with Iris Barry as first curator, now holds more than 30,000 films and 1.5 million film stills.
 
 CENTRE POMPIDOU (Paris):
-- Opened 1977, Beaubourg
-- Rogers and Piano architecture - inside-out building
-- Largest modern art collection in Europe
-- Matisse, Kandinsky, Duchamp, Magritte
-- Views from escalator tubes
-- Pompidou-Metz: branch in Lorraine (2010)
+- The Centre Pompidou, open since 1977, closed on 22 September 2025 for a five-year overhaul (asbestos removal, new rooftop terrace) and is due to reopen in 2030.
+- Piano, Rogers and Franchini beat 681 entries in 1971 by putting the Pompidou's guts outside, colour-coded: blue for air, green for water, yellow for electricity, red for movement and safety.
+- The Pompidou's Musée national d'art moderne holds over 100,000 works by some 6,400 artists, Europe's largest modern and contemporary collection and second in the world only to MoMA.
+- Brancusi left his whole Paris studio to the French state on condition it be rebuilt exactly as at his death (1957); Renzo Piano rebuilt it on the Pompidou piazza in 1997, with 137 sculptures and his tools.
+- The Pompidou's glass escalator tube is nicknamed 'la Chenille' (the Caterpillar); Jean Widmer put it at the heart of the 1977 logo, and some 250 million people had ridden it by 2020.
+- Centre Pompidou-Metz, by Shigeru Ban, opened on 12 May 2010 under a woven timber roof said to be inspired by a Chinese hat; its spire is 77 metres high, a nod to the Paris centre's 1977 opening.
 
 MUSÉE D'ORSAY (Paris):
-- Former railway station (Gare d'Orsay)
-- Impressionists and Post-Impressionists
-- Monet, Renoir, Degas, Van Gogh, Gauguin, Cézanne
-- The clock - giant windows overlooking Seine
-- Rooftop restaurant with Sacré-Cœur view
+- Victor Laloux's Gare d'Orsay opened on 28 May 1900 for the Exposition Universelle as the world's first electrified urban terminus, its stone facade hiding a metal frame; it reopened as a museum in December 1986.
+- Courbet's L'Origine du monde (1866), commissioned by diplomat Khalil-Bey and kept behind a curtain, later belonged to psychoanalyst Jacques Lacan; it entered the Musée d'Orsay in 1995 in lieu of inheritance tax.
+- Painter Gustave Caillebotte left his Impressionist collection to France in 1894; after two years of wrangling the state accepted only about 40 works, now the core of Orsay's Impressionists.
+- On Orsay's fifth floor, at the exit of the Impressionist gallery, Café Campana sits behind one of the giant station clocks; through its glass face you see across the Seine to the Louvre and Sacré-Cœur.
+- Orsay has no rooftop restaurant: its Restaurant, a listed historic monument, is the 1900 dining room of the station hotel, with ceilings painted by Gabriel Ferrier and Benjamin-Constant.
 
 GUGGENHEIM MUSEUMS:
-- New York (1959): Frank Lloyd Wright spiral
-- Bilbao (1997): Frank Gehry titanium curves - changed city
-- Venice: Peggy Guggenheim Collection, Grand Canal
-- Abu Dhabi: under construction, Jean Nouvel
+- Frank Lloyd Wright worked on the Guggenheim's spiral for about 15 years but died in April 1959, six months before it opened on Fifth Avenue on 21 October 1959.
+- Gehry's titanium Guggenheim Bilbao opened on 18 October 1997; its 130-metre-long Arcelor gallery holds Richard Serra's The Matter of Time, eight walk-through sculptures of 5-cm weathering steel.
+- Peggy Guggenheim's ashes lie in the garden of her unfinished Grand Canal palazzo, Palazzo Venier dei Leoni, beside the graves of her 14 dogs under the inscription 'Here lie my beloved babies'.
+- Guggenheim Abu Dhabi is by Frank Gehry, not Jean Nouvel (who built Louvre Abu Dhabi); first announced in 2006, the Saadiyat Island museum, the network's largest, was set to open on 11 December 2026.
 
 CONTEMPORARY ART WORLDWIDE:
-- Broad (Los Angeles): Koons, Basquiat, Hirst, free admission
-- LACMA (Los Angeles): Urban Light installation, 202 streetlamps
-- SFMOMA (San Francisco): Snøhetta expansion, Richter, Warhol
-- Art Institute of Chicago: "American Gothic," Impressionist collection
-- Reina Sofía (Madrid): Picasso's "Guernica"
-- Stedelijk (Amsterdam): modern design, Van Gogh nearby
-- Louisiana (Denmark): sculpture park, Øresund views
-- Museum Ludwig (Cologne): Pop Art, German Expressionism
+- The Broad opened on 20 September 2015 with free general admission; Diller Scofidio + Renfro designed the 120,000-sq-ft building around a 'veil-and-vault' concept.
+- Chris Burden's Urban Light (2008) at LACMA is 202 restored 1920s-30s cast-iron Los Angeles street lamps of 17 designs; he bought the first at the Rose Bowl flea market and painted them all one grey.
+- SFMOMA reopened on 14 May 2016 with Snøhetta's expansion behind Mario Botta's 1995 building, partly to show the Doris and Donald Fisher Collection, lent for 100 years.
+- A judge called Grant Wood's American Gothic a 'comic valentine', but at the Art Institute's 1930 annual it won a bronze medal and a $300 prize and entered the collection.
+- Guernica reached Madrid from MoMA on 10 September 1981 and hung in the Prado's Casón del Buen Retiro until July 1992, when it moved to its purpose-built room at the Reina Sofía.
+- The Stedelijk's 2012 extension by Benthem Crouwel is nicknamed 'the Bathtub': a seamless white fibre-reinforced shell on just six supports that moved the entrance to Museumplein.
+- Louisiana, the Øresund-side museum Knud W. Jensen opened in 1958, kept the name of the 1855 villa: its builder, Alexander Brun, married three women all named Louise.
+- Museum Ludwig was founded in 1976 when Peter and Irene Ludwig gave Cologne 350 works; it holds Europe's largest Pop Art collection and the world's third-largest Picasso collection.
 
 ART FAIRS:
-- Art Basel: Basel, Miami Beach, Hong Kong - the art Olympics
-- Frieze: London, New York, Los Angeles - contemporary focus
-- FIAC: Paris, Grand Palais
-- Venice Biennale: every 2 years, national pavilions
-- documenta: Kassel, Germany, every 5 years
-- Armory Show: New York, since 1994
+- Art Basel was started in 1970 by Basel gallerists Ernst Beyeler, Trudl Bruckner and Balz Hilt; it added Miami Beach (2002), Hong Kong (2013), Paris (2022) and Qatar (2026).
+- Frieze, founded in 2003 by frieze magazine's Amanda Sharp and Matthew Slotover, opened in Regent's Park and grew from 27,700 visitors to 105,000 by 2016; New York came in 2012, LA in 2019, Seoul in 2022.
+- FIAC, first held in 1974 at the Gare de la Bastille, ended after 2021 when the Grand Palais gave its October slot to Art Basel, which launched Paris+ par Art Basel in 2022.
+- The Venice Biennale opened on 30 April 1895 in the presence of the Italian King and Queen; Belgium built the first national pavilion in 1907, followed by Germany, Britain and Hungary in 1909.
+- Arnold Bode founded documenta in 1955 as a side event of Kassel's federal garden show, to reconnect Germany with art the Nazis banned; held every five years, each lasts 100 days.
+- The Armory Show began in 1994 as the Gramercy International Art Fair in the Gramercy Park Hotel, run by five dealers; it took its name in 1999 on moving to the 69th Regiment Armory, home of the 1913 show.
 
 CONTEMPORARY ART MOVEMENTS:
-- YBAs (Young British Artists): Hirst, Emin, Ofili - Saatchi backed
-- Neo-Expressionism: Basquiat, Schnabel, 1980s energy
-- Street Art: Banksy, Kaws, Shepard Fairey
-- Digital/NFT Art: Beeple, Pak, generative art
-- Installation Art: Kusama infinity rooms, Turrell light spaces
-- Performance Art: Marina Abramović, Tino Sehgal
+- The YBAs coalesced around Freeze, a July 1988 show Goldsmiths student Damien Hirst organised in an empty Port of London Authority building in Docklands, with Sarah Lucas, Gary Hume and others.
+- Julian Schnabel's first solo show at Mary Boone in 1979 sold out before it opened; his large paintings on broken ceramic plates became emblems of 1980s Neo-Expressionism.
+- On 5 October 2018 Banksy's Girl with Balloon shredded itself in its frame at Sotheby's London after selling for £1,042,000; renamed Love Is in the Bin, it resold in 2021 for £18,582,000.
+- Beeple's NFT Everydays: The First 5000 Days, a collage of daily images he began on 1 May 2007, sold at Christie's in March 2021 for $69.3 million, paid in Ether.
+- Kusama's Infinity Mirrored Room - The Souls of Millions of Light Years Away, a mirrored chamber of hanging LED lights about 4 metres square, is one of the most popular works at The Broad in Los Angeles.
+- In The Artist Is Present (MoMA, 14 March-31 May 2010) Abramović sat silently for 736 hours 30 minutes as 1,545 people sat opposite her; Ulay appeared on opening night.
 `;
 
 const KNOWLEDGE_VIBE_NFT_ART_FUSION = `

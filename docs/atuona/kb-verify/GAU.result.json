@@ -1,0 +1,434 @@
+[
+ {
+  "id": "GAU-001",
+  "original": "1848: Born June 7 in Paris",
+  "verdict": "VERIFIED",
+  "final_text": "Born 7 June 1848 in Paris, the year of the revolutions; his maternal grandmother was the socialist writer Flora Tristan.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Birth date and Flora Tristan lineage"
+ },
+ {
+  "id": "GAU-002",
+  "original": "1849-1855: Childhood in Peru (mother's family)",
+  "verdict": "CORRECTED",
+  "final_text": "His father Clovis died of a heart attack on the voyage to Peru; the 18-month-old Paul grew up in Lima among his mother's Tristan Moscoso kin until 1854, then Orléans.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Father died en route; return to France 1854"
+ },
+ {
+  "id": "GAU-003",
+  "original": "1865-1871: Merchant marine, then French Navy",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "December 1865: signed on at Le Havre as a pilot's apprentice on the clipper Luzitano, later second lieutenant on the three-master Chili; 1868 navy service on the corvette Jérôme-Napoléon.",
+  "source_url": "https://fr.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Ship names and dates of sea service"
+ },
+ {
+  "id": "GAU-004",
+  "original": "1871-1883: Successful stockbroker in Paris, Sunday painter",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "From 1871 a Paris Bourse stockbroker (job found via Gustave Arosa); by 1879 earning 30,000 francs a year, painting Sundays in Pissarro's garden.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Bourse job, 1879 income, Pissarro Sundays"
+ },
+ {
+  "id": "GAU-005",
+  "original": "1883: Age 35 - Quit job to paint full-time",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "After the 1882 Bourse crash, in October 1883 (aged 35) he wrote to Pissarro that he would live from painting at all costs; in January 1884 the family moved to cheaper Rouen.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "1882 crash, October 1883 letter, Rouen move"
+ },
+ {
+  "id": "GAU-006",
+  "original": "1886: First trip to Brittany (Pont-Aven)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Summer 1886: first stay at Pont-Aven, chosen because it was cheap; an accomplished boxer and fencer, he quickly dominated the young art students there.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Pont-Aven 1886, cheap, boxer and fencer"
+ },
+ {
+  "id": "GAU-007",
+  "original": "1887: Panama and Martinique trip",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Panama canal labour, arrest, Martinique dates"
+ },
+ {
+  "id": "GAU-008",
+  "original": "1888: Arles with Van Gogh (October-December) - the ear incident",
+  "verdict": "VERIFIED",
+  "final_text": "1888: Arles with Van Gogh in the Yellow House, from his arrival on 23 October until Van Gogh cut his ear on 23 December, after which Gauguin fled.",
+  "source_url": "https://www.thecollector.com/van-gogh-yellow-house",
+  "source_note": "Arrival 23 Oct; ear incident 23 Dec 1888"
+ },
+ {
+  "id": "GAU-009",
+  "original": "1889: Brittany again, painted \"The Yellow Christ\"",
+  "verdict": "VERIFIED",
+  "final_text": "1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan discreetly supported him.",
+  "source_url": "https://fr.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "1889 Brittany works; Meijer de Haan help"
+ },
+ {
+  "id": "GAU-010",
+  "original": "1891-1893: FIRST TAHITI TRIP - painted \"Spirit of the Dead Watching\" (1892)",
+  "verdict": "VERIFIED",
+  "final_text": "First Tahiti trip: sailed 1 April 1891, back in France August 1893; painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Sailing date, return, Manao tupapau date"
+ },
+ {
+  "id": "GAU-011",
+  "original": "1893-1895: Back in PARIS - broke, disillusioned, tried to sell Tahiti works",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Durand-Ruel 1893 reception; failed 1895 auction"
+ },
+ {
+  "id": "GAU-012",
+  "original": "1895-1901: SECOND TAHITI TRIP - painted masterpieces including \"Where Do We Come From?\" (1897), \"Nevermore\" (1897)",
+  "verdict": "CORRECTED",
+  "final_text": "Second Tahiti stay: sailed 28 June 1895, arrived September 1895, left for the Marquesas 1901; painted Nevermore (1897) and Where Do We Come From? (1897-98).",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "1895 departure; Where Do We Come From dated 1897-98"
+ },
+ {
+  "id": "GAU-013",
+  "original": "1901: Moved to Marquesas Islands (Hiva Oa, Atuona)",
+  "verdict": "VERIFIED",
+  "final_text": "Arrived at Atuona, Hiva Oa, on 16 September 1901, and bought land in the town centre from the Catholic mission after first attending mass regularly.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Arrival date and land bought from mission"
+ },
+ {
+  "id": "GAU-014",
+  "original": "1901-1903: ATUONA PERIOD - \"Riders on the Beach\" (1902), final works",
+  "verdict": "VERIFIED",
+  "final_text": "Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Marquesas output aimed at Vollard clientele"
+ },
+ {
+  "id": "GAU-015",
+  "original": "1903: Died May 8, age 54, in Atuona",
+  "verdict": "VERIFIED",
+  "final_text": "Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Death date, age, found by Tioka"
+ },
+ {
+  "id": "GAU-016",
+  "original": "\"Vision After the Sermon\" (1888) - Jacob wrestling angel, Breton women",
+  "verdict": "VERIFIED",
+  "final_text": "Vision After the Sermon (1888): Breton women see Jacob wrestle the angel; painted for the church at Nizon, refused by its priest; Edinburgh bought it in 1925 for £1,150.",
+  "source_url": "https://www.studiointernational.com/gauguin-s-vision",
+  "source_note": "Nizon priest refused; NGS bought 1925"
+ },
+ {
+  "id": "GAU-017",
+  "original": "\"The Yellow Christ\" (1889) - crucifixion with Breton landscape",
+  "verdict": "VERIFIED",
+  "final_text": "The Yellow Christ (1889): its Christ copies a 17th-century painted wooden crucifix in the Trémalo chapel near Pont-Aven; now Buffalo AKG Art Museum.",
+  "source_url": "https://en.wikipedia.org/wiki/The_Yellow_Christ",
+  "source_note": "Trémalo crucifix model; Buffalo AKG"
+ },
+ {
+  "id": "GAU-018",
+  "original": "\"Ia Orana Maria\" (1891) - Tahitian Madonna",
+  "verdict": "VERIFIED",
+  "final_text": "Ia Orana Maria (1891, Met): a Tahitian Madonna and child pointed out by a yellow-winged angel; the composition is based on his photograph of a Borobudur relief.",
+  "source_url": "https://www.metmuseum.org/art/collection/search/438821",
+  "source_note": "Met: Borobudur relief photograph source"
+ },
+ {
+  "id": "GAU-019",
+  "original": "\"Spirit of the Dead Watching/Manao tupapau\" (1892) - girl on bed, spirit behind",
+  "verdict": "VERIFIED",
+  "final_text": "Manao tupapau (1892), on burlap: Teha'amana lies face down, a spirit-woman behind; he wrote Mette on 8 Dec 1892 that the pose was 'on the verge of being indecent'.",
+  "source_url": "https://en.wikipedia.org/wiki/Spirit_of_the_Dead_Watching",
+  "source_note": "Burlap support; letter to Mette 8 Dec 1892"
+ },
+ {
+  "id": "GAU-020",
+  "original": "\"Arearea\" (1892) - two women, red dog",
+  "verdict": "VERIFIED",
+  "final_text": "Arearea (1892, Musée d'Orsay): two women and a red dog that drew sarcasm at the 1893 Durand-Ruel show; Gauguin bought it back in 1895 before leaving Europe.",
+  "source_url": "https://en.wikipedia.org/wiki/Arearea",
+  "source_note": "Red dog mocked; bought back 1895"
+ },
+ {
+  "id": "GAU-021",
+  "original": "\"Woman with Mango/Vahine no te vi\" (1892) - NOT 1896",
+  "verdict": "VERIFIED",
+  "final_text": "Vahine no te vi (Woman of the Mango), 1892 not 1896, Baltimore Museum of Art; Edgar Degas bought it in 1895.",
+  "source_url": "https://collection.artbma.org/objects/37463/vahine-no-te-vi-woman-of-the-mango",
+  "source_note": "BMA: 1892; owned by Degas"
+ },
+ {
+  "id": "GAU-022",
+  "original": "\"Mahana no atua/Day of the God\" (1894) - memory of Tahiti",
+  "verdict": "VERIFIED",
+  "final_text": "Mahana no atua (1894, Art Institute of Chicago) was painted in Paris from memory; its idol of the goddess Hina derives from photographs of Borobudur reliefs.",
+  "source_url": "https://en.wikipedia.org/wiki/Mahana_no_atua",
+  "source_note": "Painted in Paris; Hina from Borobudur"
+ },
+ {
+  "id": "GAU-023",
+  "original": "Worked on woodcuts, ceramics",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In Paris he cut the Noa Noa woodcuts (1894) with an experimental technique and fired the stoneware Oviri that winter, showing it at the 1895 Société Nationale salon.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Noa Noa woodcuts; Oviri at 1895 salon"
+ },
+ {
+  "id": "GAU-024",
+  "original": "\"Te Tamari No Atua/Nativity\" (1896) - Tahitian nativity",
+  "verdict": "VERIFIED",
+  "final_text": "Te tamari no atua (1896, Neue Pinakothek, Munich): a Polynesian Nativity painted as Pahura gave birth around Christmas 1896; the baby girl died in infancy.",
+  "source_url": "https://en.wikipedia.org/wiki/Te_tamari_no_atua",
+  "source_note": "Nativity linked to Pahura's daughter"
+ },
+ {
+  "id": "GAU-025",
+  "original": "\"Where Do We Come From? What Are We? Where Are We Going?\" (1897) - 4m masterpiece, painted before suicide attempt",
+  "verdict": "CORRECTED",
+  "final_text": "Where Do We Come From? (1897-98, MFA Boston) is 139 x 375 cm, about 3.75 m; after finishing it he tried to kill himself with arsenic, months after daughter Aline died.",
+  "source_url": "https://en.wikipedia.org/wiki/Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F",
+  "source_note": "Dimensions; arsenic suicide attempt after completion"
+ },
+ {
+  "id": "GAU-026",
+  "original": "\"Nevermore\" (1897) - reclining nude, raven",
+  "verdict": "VERIFIED",
+  "final_text": "Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.",
+  "source_url": "https://en.wikipedia.org/wiki/Nevermore_(Gauguin)",
+  "source_note": "Model Pahura; Delius bought 1898"
+ },
+ {
+  "id": "GAU-027",
+  "original": "\"Two Tahitian Women\" (1899) - breasts, mangos",
+  "verdict": "CORRECTED",
+  "final_text": "Two Tahitian Women (1899, Met): one woman holds mango blossoms, not mangoes; the same pair reappears in Faa Iheihe (Tate) and Rupe Rupe (Pushkin Museum).",
+  "source_url": "https://www.metmuseum.org/art/collection/search/436446",
+  "source_note": "Met: mango blossoms; reused figures"
+ },
+ {
+  "id": "GAU-028",
+  "original": "\"Contes Barbares/Primitive Tales\" (1902)",
+  "verdict": "VERIFIED",
+  "final_text": "Contes barbares (1902, Museum Folkwang): the crouching claw-footed figure behind two Polynesian women is Meijer de Haan, his Brittany friend, dead since 1895.",
+  "source_url": "https://artsandculture.google.com/asset/YgG_lk-tyTVL6A",
+  "source_note": "Meijer de Haan figure; Folkwang"
+ },
+ {
+  "id": "GAU-029",
+  "original": "\"Riders on the Beach\" (1902) - pink sand",
+  "verdict": "VERIFIED",
+  "final_text": "Riders on the Beach (1902, Museum Folkwang, Essen): horsemen on a pink beach, a colour often read as anticipating Fauvism; a second version also exists.",
+  "source_url": "https://www.getdailyart.com/en/18899/paul-gauguin/riders-on-the-beach",
+  "source_note": "Pink beach; Folkwang; two versions"
+ },
+ {
+  "id": "GAU-030",
+  "original": "\"Self-Portrait Near Golgotha\" (1903) - one of last works",
+  "verdict": "CORRECTED",
+  "final_text": "Self-Portrait near Golgotha dates from 1896, not 1903 (MASP, São Paulo); it was found among his belongings after his death.",
+  "source_url": "https://www.masp.org.br/en/collections/works/self-portrait-near-golgotha",
+  "source_note": "MASP dates it 1896"
+ },
+ {
+  "id": "GAU-031",
+  "original": "\"I am a savage\" - rejected European civilization",
+  "verdict": "VERIFIED",
+  "final_text": "In a 1903 letter to Charles Morice: 'You were wrong that day when you said I was wrong to say I was a savage. It's true enough: I am a savage.'",
+  "source_url": "https://www.christies.com.cn/lot/lot-1788892",
+  "source_note": "1903 letter to Charles Morice"
+ },
+ {
+  "id": "GAU-032",
+  "original": "\"Art is either plagiarism or revolution\"",
+  "verdict": "CORRECTED",
+  "final_text": "'Art is either plagiarism or revolution' is traced to a letter in Le Soir, 25 April 1895; the popular wording spread via James Huneker's paraphrase (1913).",
+  "source_url": "https://wist.info/gaugin-paul/41235/",
+  "source_note": "Le Soir 1895; Huneker paraphrase"
+ },
+ {
+  "id": "GAU-033",
+  "original": "\"Life has no meaning unless one lives it with a will\"",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "Dec 1902-Feb 1903, sick in Atuona, he wrote the memoir Avant et après, ending with a philosophy of life as a struggle to reconcile opposites.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Avant et après written in Atuona"
+ },
+ {
+  "id": "GAU-034",
+  "original": "\"Don't copy nature too literally. Art is abstraction.\"",
+  "verdict": "VERIFIED",
+  "final_text": "To Schuffenecker, Pont-Aven, 14 August 1888: 'Don't copy nature too much. Art is an abstraction; derive this abstraction from nature while dreaming before it.'",
+  "source_url": "https://en.wikiquote.org/wiki/Paul_Gauguin",
+  "source_note": "Letter to Schuffenecker 14 Aug 1888"
+ },
+ {
+  "id": "GAU-035",
+  "original": "Color has its own emotional language",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In Martinique (1887) he began setting analogous colours side by side for a muted effect, soon moving to non-representational colour with a life of its own.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Cachin on Martinique colour shift"
+ },
+ {
+  "id": "GAU-036",
+  "original": "Sought the \"primitive\" as authentic truth",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "His 'primitive' Tahiti was partly bookish: he was lent Moerenhout's 1837 Voyage aux îles du Grand Océan to learn the island's forgotten religion.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Moerenhout book source of Tahitian myths"
+ },
+ {
+  "id": "GAU-037",
+  "original": "Synthetism: flat areas of bold color, dark outlines",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Synthetism's debut: the June 1889 Volpini show at the Café des Arts, filling walls left bare when the owner's Italian mirrors arrived late; Gauguin hung 11 zincographs on yellow paper.",
+  "source_url": "https://en.wikipedia.org/wiki/The_Volpini_Exhibition,_1889",
+  "source_note": "Volpini café show origins"
+ },
+ {
+  "id": "GAU-038",
+  "original": "Cloisonnism: inspired by stained glass, Japanese prints, medieval enamels",
+  "verdict": "CORRECTED",
+  "final_text": "'Cloisonnism' was coined by critic Édouard Dujardin in the Revue indépendante, March 1888, for Louis Anquetin's paintings; Bernard and Gauguin then worked in the style.",
+  "source_url": "https://en.wikipedia.org/wiki/Cloisonnism",
+  "source_note": "Dujardin coined term for Anquetin"
+ },
+ {
+  "id": "GAU-039",
+  "original": "Mixed memory, imagination, observation - never purely from life",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "He took to Tahiti photographs and prints, including a Borobudur temple frieze and an Egyptian fresco, which he called 'a whole little world of friends' in a letter to Redon.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Photographs carried to Tahiti; Redon letter"
+ },
+ {
+  "id": "GAU-040",
+  "original": "Used local Polynesian pigments - earth colors, crushed flowers",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "No source for Polynesian flower pigments; documented instead: he painted on coarse burlap, as in Manao tupapau (1892).",
+  "source_url": "https://en.wikipedia.org/wiki/Spirit_of_the_Dead_Watching",
+  "source_note": "Oil on burlap support"
+ },
+ {
+  "id": "GAU-041",
+  "original": "Carved wood frames as part of the artwork",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "He carved wood from his stockbroker years: a carved and painted mahogany medallion of the singer Valérie Roumi (1880), now in the Ny Carlsberg Glyptotek.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "1880 mahogany medallion, Glyptotek"
+ },
+ {
+  "id": "GAU-042",
+  "original": "Legend says he painted \"Paradise on Earth\" days before death",
+  "verdict": "NOVEL_CANON",
+  "final_text": "Legend says he painted \"Paradise on Earth\" days before death",
+  "source_url": "",
+  "source_note": "the novel's own lore (Ule's lost Gauguin) — fiction by design, kept",
+  "rejected_replacement": "No 'Paradise on Earth' is recorded. Real story: at the 1903 Papeete sale Breton Village in the Snow was shown upside down as 'Niagara Falls'; Victor Segalen bought it.",
+  "rejected_source": "https://nga.gov.au/stories-ideas/in-focus-paul-gauguins-breton-village-in-the-snow"
+ },
+ {
+  "id": "GAU-043",
+  "original": "Never catalogued, possibly destroyed or hidden",
+  "verdict": "NOVEL_CANON",
+  "final_text": "Never catalogued, possibly destroyed or hidden",
+  "source_url": "",
+  "source_note": "the novel's own lore (Ule's lost Gauguin) — fiction by design, kept",
+  "rejected_replacement": "Without a will, his lesser effects were sold in Atuona and his letters, manuscripts and paintings auctioned in Papeete on 5 September 1903; Segalen bought seven paintings.",
+  "rejected_source": "https://en.wikipedia.org/wiki/Paul_Gauguin"
+ },
+ {
+  "id": "GAU-044",
+  "original": "Some say buried with him, others that locals preserved it",
+  "verdict": "NOVEL_CANON",
+  "final_text": "Some say buried with him, others that locals preserved it",
+  "source_url": "",
+  "source_note": "the novel's own lore (Ule's lost Gauguin) — fiction by design, kept",
+  "rejected_replacement": "Breton Village in the Snow, long believed his last painting, stayed with Segalen's family until 1952, when France's national museums acquired it.",
+  "rejected_source": "https://nga.gov.au/stories-ideas/in-focus-paul-gauguins-breton-village-in-the-snow"
+ },
+ {
+  "id": "GAU-045",
+  "original": "The ultimate Gauguin mystery",
+  "verdict": "NOVEL_CANON",
+  "final_text": "The ultimate Gauguin mystery",
+  "source_url": "",
+  "source_note": "the novel's own lore (Ule's lost Gauguin) — fiction by design, kept",
+  "rejected_replacement": "A real mystery: four teeth in a bottle at the bottom of his Atuona well, DNA-linked to Gauguin, held no mercury, so he either lacked syphilis or was never treated.",
+  "rejected_source": "https://hyperallergic.com/posthumous-prognosis-for-supposedly-syphilitic-gauguin-via-his-teeth"
+ },
+ {
+  "id": "GAU-046",
+  "original": "\"Maison du Jouir\" (House of Pleasure) with provocative carvings",
+  "verdict": "VERIFIED",
+  "final_text": "Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved lintels read 'Soyez amoureuses vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Lintels; four pieces at Orsay"
+ },
+ {
+  "id": "GAU-047",
+  "original": "Living in poverty, legs covered in eczema/syphilis sores",
+  "verdict": "CORRECTED",
+  "final_text": "Sores on his legs were treated with arsenic; he called them eczema; syphilis is unproven. His ankle, shattered in an 1894 Concarneau brawl, never healed.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Eczema claim; no direct syphilis evidence"
+ },
+ {
+  "id": "GAU-048",
+  "original": "Addicted to morphine and absinthe for pain",
+  "verdict": "CORRECTED",
+  "final_text": "By September 1902 he took morphine injections, then handed his syringe set to a neighbour and used laudanum; an empty laudanum bottle stood by his deathbed.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Morphine, syringe, laudanum (Danielsson); absinthe unsourced"
+ },
+ {
+  "id": "GAU-049",
+  "original": "Fighting Bishop Martin and colonial authorities",
+  "verdict": "VERIFIED",
+  "final_text": "He fought Bishop Martin over mission schools and carved Père Paillard (Father Lechery, 1902, NGA Washington), a horned bishop displayed outside his house.",
+  "source_url": "https://www.nga.gov/artworks/46713-pere-paillard",
+  "source_note": "NGA: Père Paillard lampoons Bishop Martin"
+ },
+ {
+  "id": "GAU-050",
+  "original": "Sentenced to prison for defamation (died before serving)",
+  "verdict": "CORRECTED",
+  "final_text": "On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Sentence date and terms; appeal pending"
+ },
+ {
+  "id": "GAU-051",
+  "original": "Still painting, demanding art supplies by mail",
+  "verdict": "VERIFIED",
+  "final_text": "Vollard's deal (from 1900): 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Vollard contract terms; April 1902 shipment"
+ },
+ {
+  "id": "GAU-052",
+  "original": "Last words reportedly: \"I have been defeated\"",
+  "verdict": "CORRECTED",
+  "final_text": "No deathbed words are recorded; in his last letter to Charles Morice, weeks before death, he wrote: 'I am on the ground, but not yet defeated.'",
+  "source_url": "https://kwize.com/en/themes/Paul-Gauguin/",
+  "source_note": "Last letter to Morice, 1903"
+ },
+ {
+  "id": "GAU-053",
+  "original": "Buried in Calvary Cemetery, Atuona - grave overlooks bay",
+  "verdict": "VERIFIED",
+  "final_text": "Buried in Atuona's Catholic Calvary Cemetery at 2pm the day after his death; a bronze cast of his Oviri was set on the grave in 1973, as he had wished.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Calvary Cemetery burial; Oviri bronze 1973"
+ }
+]

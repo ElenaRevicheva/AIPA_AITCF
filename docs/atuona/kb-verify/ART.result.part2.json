@@ -1,0 +1,394 @@
+[
+  {
+    "id": "ART-049",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GUSTAVE CAILLEBOTTE (1848-1894) - The Collector: Wealthy, funded Impressionist exhibitions",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Caillebotte bought his first Monet in 1875, paid studio rents for friends, and in 1877 secured the rooms at 6 rue Le Peletier, chose the artists and hung the third Impressionist show himself.",
+    "source_url": "https://en.wikipedia.org/wiki/Gustave_Caillebotte",
+    "source_note": "Wikipedia: first Monet 1875, 1877 rental space, hanging"
+  },
+  {
+    "id": "ART-050",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GUSTAVE CAILLEBOTTE (1848-1894) - The Collector: His collection became Musée d'Orsay core",
+    "verdict": "CORRECTED",
+    "final_text": "Caillebotte left 68 works to the State in 1894, Renoir as executor; after a press row the State took only about 40, shown at the Musée du Luxembourg in 1897 and now at Orsay.",
+    "source_url": "https://www.musee-orsay.fr/en/node/286",
+    "source_note": "Orsay: 68-work bequest, 40 chosen, Luxembourg 1897"
+  },
+  {
+    "id": "ART-051",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent: \"Family Reunion\" (1867)",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Bazille's Family Reunion (1867-68, Orsay) records a summer 1867 gathering at Méric near Montpellier: eleven relatives under a chestnut tree, eight of them gazing out at the viewer.",
+    "source_url": "https://en.wikipedia.org/wiki/The_Family_Reunion_(painting)",
+    "source_note": "Wikipedia: Méric terrace, chestnut tree, eleven figures"
+  },
+  {
+    "id": "ART-052",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent: Died in Franco-Prussian War at 28",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Bazille was killed on 28 November 1870 at Beaune-la-Rolande, hit twice while leading a failed assault after his officer fell; he was 28, days short of his 29th birthday.",
+    "source_url": "https://en.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Bazille",
+    "source_note": "Wikipedia: Beaune-la-Rolande, 28 Nov 1870, aged 28"
+  },
+  {
+    "id": "ART-053",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent: Funded early Impressionist shows",
+    "verdict": "CORRECTED",
+    "final_text": "Bazille died in 1870, before any Impressionist show; instead he kept Monet afloat by buying Women in the Garden for 2,500 francs, paid in monthly instalments of 50 francs.",
+    "source_url": "https://en.wikipedia.org/wiki/Women_in_the_Garden",
+    "source_note": "Bazille bought it 2,500 francs, 50-franc instalments"
+  },
+  {
+    "id": "ART-054",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent: What might have been...",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "In Bazille's Studio (1870, Orsay), set in the rue de la Condamine studio he shared with Renoir, Manet painted Bazille's own tall figure; Edmond Maître sits at the piano.",
+    "source_url": "https://en.wikipedia.org/wiki/Bazille%27s_Studio",
+    "source_note": "Bazille's letter: Manet painted his figure; Maître at piano"
+  },
+  {
+    "id": "ART-055",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ARMAND GUILLAUMIN (1841-1927) - The Colorist: Vivid colors, almost Fauvist",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "A critic called Guillaumin a 'furious colourist' in 1886; in the 1890s, painting the Creuse around Crozant, his palette grew bolder still, a Fauve before Fauvism.",
+    "source_url": "https://en.wikipedia.org/wiki/Armand_Guillaumin",
+    "source_note": "Wikipedia: 'furious colourist' 1886, Crozant, bolder palette"
+  },
+  {
+    "id": "ART-056",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ARMAND GUILLAUMIN (1841-1927) - The Colorist: \"Sunset at Ivry\" - industrial landscapes",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Guillaumin's Sunset at Ivry (1873), factory smoke over the Seine, was lent by Dr Gachet to the first Impressionist show in 1874; the Gachet family gave it to the nation in 1951.",
+    "source_url": "https://www.musee-orsay.fr/fr/oeuvres/soleil-couchant-ivry-367",
+    "source_note": "Orsay: 1873, Gachet loan 1874, Gachet gift 1951"
+  },
+  {
+    "id": "ART-057",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ARMAND GUILLAUMIN (1841-1927) - The Colorist: Won lottery 1891, could paint full-time",
+    "verdict": "VERIFIED",
+    "final_text": "In 1891 Guillaumin won 100,000 francs in the French state lottery, quit his government job and painted full-time.",
+    "source_url": "https://en.wikipedia.org/wiki/Armand_Guillaumin",
+    "source_note": "Wikipedia: 1891 state lottery, 100,000 francs"
+  },
+  {
+    "id": "ART-058",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ÉDOUARD MANET (1832-1883) - The Reluctant Leader: \"Olympia\" (1863) - scandal, modern nude",
+    "verdict": "CORRECTED",
+    "final_text": "Olympia, painted in 1863, caused its scandal at the 1865 Salon; in 1890 Monet raised 19,415 francs from nearly 100 subscribers to buy it from Manet's widow for the nation.",
+    "source_url": "https://en.wikipedia.org/wiki/Olympia_(Manet)",
+    "source_note": "Painted 1863, Salon 1865; Monet subscription 19,415 francs"
+  },
+  {
+    "id": "ART-059",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ÉDOUARD MANET (1832-1883) - The Reluctant Leader: \"Le Déjeuner sur l'herbe\" (1863) - naked woman with clothed men",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Manet showed Le Déjeuner sur l'herbe at the 1863 Salon des Refusés as 'Le Bain'; its poses come from Raimondi's engraving after Raphael's Judgment of Paris, Victorine Meurent the nude.",
+    "source_url": "https://en.wikipedia.org/wiki/Le_D%C3%A9jeuner_sur_l%27herbe",
+    "source_note": "Wikipedia: title Le Bain, Raimondi source, Meurent"
+  },
+  {
+    "id": "ART-060",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ÉDOUARD MANET (1832-1883) - The Reluctant Leader: \"A Bar at the Folies-Bergère\" (1882) - mirrors, modernity",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The barmaid in Manet's A Bar at the Folies-Bergère (Salon 1882) was Suzon, a real Folies employee posed in his studio; the canvas first hung above Emmanuel Chabrier's piano.",
+    "source_url": "https://en.wikipedia.org/wiki/A_Bar_at_the_Folies-Berg%C3%A8re",
+    "source_note": "Wikipedia: model Suzon, Salon 1882, owned by Chabrier"
+  },
+  {
+    "id": "ART-061",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ÉDOUARD MANET (1832-1883) - The Reluctant Leader: Never exhibited with Impressionists but inspired them",
+    "verdict": "VERIFIED",
+    "final_text": "Manet never exhibited in any of the eight Impressionist exhibitions (1874-86), holding to the official Salon, though the younger painters looked to him as their leader.",
+    "source_url": "https://en.wikipedia.org/wiki/%C3%89douard_Manet",
+    "source_note": "Wikipedia: Manet never showed with the Impressionists"
+  },
+  {
+    "id": "ART-062",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › ÉDOUARD MANET (1832-1883) - The Reluctant Leader: Quote: \"There is only one true thing: paint what you see\"",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Manet's friend Antonin Proust recalled that Olympia escaped destruction at the 1865 Salon only because of the precautions taken by the administration.",
+    "source_url": "https://en.wikipedia.org/wiki/Olympia_(Manet)",
+    "source_note": "Antonin Proust quote on precautions protecting Olympia"
+  },
+  {
+    "id": "ART-063",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL CÉZANNE (1839-1906) - Father of Modern Art: \"Mont Sainte-Victoire\" series - 87 paintings/watercolors",
+    "verdict": "CORRECTED",
+    "final_text": "Cézanne painted Mont Sainte-Victoire again and again in his last 20 years; counts vary, often 44 oils and 43 watercolours, elsewhere over 30 oils and about 45 watercolours.",
+    "source_url": "https://www.clevelandart.org/art/1958.21",
+    "source_note": "Counts vary: 44 oils/43 watercolours vs 36/45"
+  },
+  {
+    "id": "ART-064",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL CÉZANNE (1839-1906) - Father of Modern Art: \"The Card Players\" (1890-95) - sold for $250M",
+    "verdict": "CORRECTED",
+    "final_text": "One of Cézanne's five Card Players, the last in private hands, was sold by shipowner George Embiricos's estate to Qatar's royal family in 2011 for a reported $250M.",
+    "source_url": "https://www.arabianbusiness.com/gcc/qatar-royals-buy-cezanne-painting-for-250m-443738",
+    "source_note": "Reported $250M, Embiricos estate, Qatar 2011"
+  },
+  {
+    "id": "ART-065",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL CÉZANNE (1839-1906) - Father of Modern Art: \"The Large Bathers\" (1906)",
+    "verdict": "CORRECTED",
+    "final_text": "Cézanne worked seven years on The Large Bathers, unfinished at his death in 1906; Philadelphia paid $110,000 in 1937 and a paper protested that 41,000 citizens had no bathtub.",
+    "source_url": "https://en.wikipedia.org/wiki/The_Bathers_(C%C3%A9zanne)",
+    "source_note": "Wikipedia: seven years, unfinished, 1937 $110,000, bathtubs"
+  },
+  {
+    "id": "ART-066",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL CÉZANNE (1839-1906) - Father of Modern Art: \"Treat nature by the cylinder, sphere, cone\"",
+    "verdict": "VERIFIED",
+    "final_text": "Cézanne's 'treat nature by means of the cylinder, the sphere, the cone' comes from a letter to the young painter Émile Bernard dated 15 April 1904.",
+    "source_url": "https://en.wikiquote.org/wiki/Paul_C%C3%A9zanne",
+    "source_note": "Wikiquote: letter to Émile Bernard, 15 April 1904"
+  },
+  {
+    "id": "ART-067",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL CÉZANNE (1839-1906) - Father of Modern Art: Led directly to Cubism (Picasso, Braque)",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The 1907 Salon d'Automne memorial show of 56 Cézanne works, mostly lent by Auguste Pellerin, overwhelmed Picasso, Braque, Matisse and Léger on the eve of Cubism.",
+    "source_url": "https://www.cezannecatalogue.com/exhibitions/entry.php?id=21",
+    "source_note": "1907 Salon d'Automne, 56 works, Pellerin loans"
+  },
+  {
+    "id": "ART-068",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: \"Starry Night\" (1889) - painted from asylum",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The Starry Night (June 1889) shows the pre-dawn view from his east-facing room at the Saint-Rémy asylum, with an invented village; MoMA acquired it in 1941 via the Lillie P. Bliss Bequest.",
+    "source_url": "https://en.wikipedia.org/wiki/The_Starry_Night",
+    "source_note": "Wikipedia/MoMA: east window, imaginary village, Bliss 1941"
+  },
+  {
+    "id": "ART-069",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: \"Sunflowers\" series (1888) - for Gauguin's room",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In August 1888 Van Gogh painted four Sunflowers 'with the enthusiasm of a Marseillais eating bouillabaisse'; two, with 14 and 15 blooms, were meant for Gauguin's room in the Yellow House.",
+    "source_url": "https://www.nationalgallery.org.uk/paintings/learn-about-art/paintings-in-depth/the-sunflowers?viewPage=2",
+    "source_note": "National Gallery: letter quote, two for Gauguin's room"
+  },
+  {
+    "id": "ART-070",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: \"The Bedroom\" (1888) - Yellow House, Arles",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Van Gogh painted The Bedroom in October 1888; after floodwater damaged it while he was in hospital, he made two copies at Saint-Rémy in 1889, now in Chicago and, smaller, at Orsay.",
+    "source_url": "https://www.nortonsimon.org/exhibitions/2010-2019/vangoghbedroom/",
+    "source_note": "Norton Simon: three versions, flood damage, Chicago/Orsay"
+  },
+  {
+    "id": "ART-071",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: \"Wheatfield with Crows\" (1890) - final painting",
+    "verdict": "CORRECTED",
+    "final_text": "Wheatfield with Crows was not his last painting: a letter dates it to about 10 July 1890; the Van Gogh Museum names the unfinished Tree Roots, painted on his last morning, as his probable last.",
+    "source_url": "https://www.smithsonianmag.com/smart-news/van-gogh-museum-suggests-artists-last-painting-has-long-been-misidentified-180971572/",
+    "source_note": "VGM: Tree Roots probable last; Wheatfield c.10 July"
+  },
+  {
+    "id": "ART-072",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: Only sold one painting in lifetime (\"The Red Vineyard\")",
+    "verdict": "CORRECTED",
+    "final_text": "The Red Vineyard, bought by Belgian painter Anna Boch for 400 francs at Les XX in Brussels in 1890, is his only certain painting sale; uncle Cor had earlier commissioned 19 cityscape drawings.",
+    "source_url": "https://theconversation.com/van-gogh-museum-at-50-vincent-van-gogh-and-the-art-market-a-brief-history-197361",
+    "source_note": "Only certain painting sale; other sales documented"
+  },
+  {
+    "id": "ART-073",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: 2,100 artworks in 10 years",
+    "verdict": "VERIFIED",
+    "final_text": "Van Gogh made about 2,100 artworks in a career of about ten years, including around 860 oil paintings, most of them in his last two years.",
+    "source_url": "https://en.wikipedia.org/wiki/Vincent_van_Gogh",
+    "source_note": "Wikipedia: ~2,100 works, ~860 oils"
+  },
+  {
+    "id": "ART-074",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › VINCENT VAN GOGH (1853-1890) - Tortured Genius: Shot himself July 27, 1890, died July 29",
+    "verdict": "VERIFIED",
+    "final_text": "Van Gogh shot himself on 27 July 1890, walked back to the Auberge Ravoux, and died in his attic room there in the early hours of 29 July, with Theo at his side.",
+    "source_url": "https://en.wikipedia.org/wiki/Death_of_Vincent_van_Gogh",
+    "source_note": "Wikipedia: 27 July shooting, 29 July death, Theo present"
+  },
+  {
+    "id": "ART-075",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GEORGES SEURAT (1859-1891) - Scientific Color: \"A Sunday Afternoon on the Island of La Grande Jatte\" (1886)",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Seurat painted La Grande Jatte in 1884-86 and added its border of red, orange and blue dots in 1888-89; the Bartletts bought it for $20,000 in 1924 and gave it to the Art Institute in 1926.",
+    "source_url": "https://www.artic.edu/artworks/27992/a-sunday-on-la-grande-jatte-1884",
+    "source_note": "AIC: dates, painted border, $20,000, gift 1926"
+  },
+  {
+    "id": "ART-076",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GEORGES SEURAT (1859-1891) - Scientific Color: Pointillism/Divisionism - dots of pure color",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Seurat preferred to call his method 'chromoluminarism'; the critic Félix Fénéon coined 'neo-impressionism' in 1886 after seeing La Grande Jatte at the last Impressionist show.",
+    "source_url": "https://en.wikipedia.org/wiki/Neo-Impressionism",
+    "source_note": "Wikipedia: chromoluminarism, Fénéon coined term 1886"
+  },
+  {
+    "id": "ART-077",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GEORGES SEURAT (1859-1891) - Scientific Color: Color theory based on Chevreul's research",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Seurat built on Chevreul's 1839 law of simultaneous contrast, found at the Gobelins dye works, and on Ogden Rood's Modern Chromatics, translated into French in 1881.",
+    "source_url": "https://en.wikipedia.org/wiki/Ogden_Rood",
+    "source_note": "Chevreul 1839; Rood's Modern Chromatics French ed. 1881"
+  },
+  {
+    "id": "ART-078",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › GEORGES SEURAT (1859-1891) - Scientific Color: Died at 31, unfinished \"The Circus\"",
+    "verdict": "VERIFIED",
+    "final_text": "Seurat died on 29 March 1891, aged 31, probably of diphtheria, while his unfinished The Circus hung at the Salon des Indépendants; it is now at Orsay.",
+    "source_url": "https://en.wikipedia.org/wiki/The_Circus_(Seurat)",
+    "source_note": "Wikipedia: unfinished, shown at Indépendants, died 29 March"
+  },
+  {
+    "id": "ART-079",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre: \"At the Moulin Rouge\" (1892-95)",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In At the Moulin Rouge (1892-95, Art Institute of Chicago) the strip with the acid-green face at right was cut off, perhaps to help it sell, and reattached by 1914; Lautrec stands small at the back.",
+    "source_url": "https://www.artic.edu/artworks/61128/at-the-moulin-rouge",
+    "source_note": "AIC: strip cut off and reattached by 1914"
+  },
+  {
+    "id": "ART-080",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre: \"Jane Avril\" posters - invented modern poster art",
+    "verdict": "CORRECTED",
+    "final_text": "Lautrec did not invent the poster (Chéret made the Moulin Rouge's 1889 opening poster); his first, Moulin Rouge: La Goulue, hit Paris streets in 1891 in an estimated 1,000-3,000 copies.",
+    "source_url": "https://www.moma.org/collection/works/188979",
+    "source_note": "MoMA: first poster, 1891, 1,000-3,000 impressions"
+  },
+  {
+    "id": "ART-081",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre: Aristocrat with genetic disorder (short legs)",
+    "verdict": "CORRECTED",
+    "final_text": "Lautrec's parents were first cousins; he broke his left femur in May 1878 and the right in 1879, probably due to pycnodysostosis; adult height about 1.54 m, on 70 cm legs.",
+    "source_url": "https://hekint.org/2017/01/25/henri-de-toulouse-lautrec-and-medicine-a-triumph-over-infirmity/",
+    "source_note": "Hektoen: cousins, femur fractures, pycnodysostosis, height"
+  },
+  {
+    "id": "ART-082",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre: Captured Parisian nightlife, prostitutes, dancers",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Lautrec's Elles (1896), twelve prints of brothel women waking, washing and dressing, published by Gustave Pellet in 100 copies, flopped because it refused to be erotic.",
+    "source_url": "https://en.wikipedia.org/wiki/Elles_(series)",
+    "source_note": "Wikipedia: 1896, Pellet, edition of 100, sold poorly"
+  },
+  {
+    "id": "ART-083",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre: Died at 36 from alcoholism",
+    "verdict": "CORRECTED",
+    "final_text": "After an 1899 breakdown and months in a sanatorium, Lautrec died on 9 September 1901 at his family's Château de Malromé, aged 36, of alcoholism and syphilis.",
+    "source_url": "https://www.biography.com/artists/henri-de-toulouse-lautrec",
+    "source_note": "Biography: 9 Sept 1901, Malromé, alcoholism and syphilis"
+  },
+  {
+    "id": "ART-084",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL SIGNAC (1863-1935) - Seurat's Heir: Continued Pointillism after Seurat's death",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Signac carried Neo-Impressionism on after Seurat's death, serving as President of the Société des Artistes Indépendants from 1908 until his own death in 1935.",
+    "source_url": "https://en.wikipedia.org/wiki/Paul_Signac",
+    "source_note": "Wikipedia: Indépendants president 1908 until death"
+  },
+  {
+    "id": "ART-085",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL SIGNAC (1863-1935) - Seurat's Heir: \"The Port of Saint-Tropez\" - Mediterranean light",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Signac sailed his 11-metre boat Olympia, named after Manet's painting, and from 1892 based it at the little port of Saint-Tropez, which he is credited with 'discovering'.",
+    "source_url": "https://en.wikipedia.org/wiki/Paul_Signac",
+    "source_note": "Wikipedia: boat Olympia 1891, Saint-Tropez from 1892"
+  },
+  {
+    "id": "ART-086",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › PAUL SIGNAC (1863-1935) - Seurat's Heir: Theoretical writings on color",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Signac's treatise D'Eugène Delacroix au néo-impressionnisme, serialised in La Revue blanche and published as a book in 1899, was dedicated to Seurat and later read from Matisse to Kandinsky.",
+    "source_url": "https://research-repository.st-andrews.ac.uk/handle/10023/13241",
+    "source_note": "Revue blanche serial, 1899 book, Seurat dedication"
+  },
+  {
+    "id": "ART-087",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › THE ART MARKET HISTORY: Paul Durand-Ruel: dealer who saved Impressionists, bought 1,500 Monets",
+    "verdict": "CORRECTED",
+    "final_text": "Between 1891 and 1922 Paul Durand-Ruel bought about 12,000 pictures: some 1,500 Renoirs, over 1,000 Monets, 800 Pissarros and around 400 each by Degas, Sisley and Cassatt.",
+    "source_url": "https://www.apollo-magazine.com/paul-durand-ruel-gambler-discoverer-inventor",
+    "source_note": "Apollo/National Gallery: 12,000 works, 1,000+ Monets"
+  },
+  {
+    "id": "ART-088",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › THE ART MARKET HISTORY: Ambroise Vollard: Gauguin's dealer, also Cézanne, Picasso",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Vollard bought some 150 Cézannes for his first show in 1895 and gave Picasso his first Paris show in 1901; from about 1900 he advanced Gauguin 300 francs a month for 25 paintings a year.",
+    "source_url": "https://en.wikipedia.org/wiki/Ambroise_Vollard",
+    "source_note": "1895 Cézanne, 1901 Picasso, Gauguin contract terms"
+  },
+  {
+    "id": "ART-089",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › THE ART MARKET HISTORY: Theo van Gogh: Vincent's brother, dealer at Goupil & Cie",
+    "verdict": "CORRECTED",
+    "final_text": "Theo van Gogh ran the 19 boulevard Montmartre branch of Boussod, Valadon & Cie, Goupil's successors, where from about 1884 he showed and sold the Impressionists.",
+    "source_url": "https://en.wikipedia.org/wiki/Montmartre_(Van_Gogh_series)",
+    "source_note": "Boussod et Valadon, 19 bd Montmartre, Impressionists"
+  },
+  {
+    "id": "ART-090",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › THE ART MARKET HISTORY: Artists died poor, dealers got rich decades later",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Durand-Ruel himself nearly went under first: 'Without America, I would have been lost, ruined, after having bought so many Monets and Renoirs. The two exhibitions there in 1886 saved me.'",
+    "source_url": "https://en.wikipedia.org/wiki/Paul_Durand-Ruel",
+    "source_note": "Durand-Ruel quote: 1886 American exhibitions saved him"
+  },
+  {
+    "id": "ART-091",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › THE ART MARKET HISTORY: Impressionist prices: then 100-500 francs, now $50-300M+",
+    "verdict": "CORRECTED",
+    "final_text": "In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.",
+    "source_url": "https://en.wikipedia.org/wiki/Le_D%C3%A9jeuner_sur_l%27herbe",
+    "source_note": "Faure 2,600 francs 1878; Card Players $250M 2011"
+  },
+  {
+    "id": "ART-092",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1863: Salon des Refusés - rejected artists exhibit",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In 1863 Napoleon III decreed the Salon des Refusés at the Palais de l'Industrie after the jury refused about 2,217 of over 5,000 paintings; more than a thousand people a day came.",
+    "source_url": "https://en.wikipedia.org/wiki/Salon_des_Refus%C3%A9s",
+    "source_note": "Wikipedia: decree, 2,217 rejected, 1,000+ visitors daily"
+  },
+  {
+    "id": "ART-093",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1874: First Impressionist Exhibition, Nadar's studio",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The first Impressionist show ran 15 April-15 May 1874 at Nadar's studio, 35 boulevard des Capucines: 30 artists, 165 works, 1 franc entry, about 3,500 visitors.",
+    "source_url": "https://fr.wikipedia.org/wiki/Premi%C3%A8re_exposition_des_peintres_impressionnistes",
+    "source_note": "French Wikipedia: address, dates, 165 works, 3,500 visitors"
+  },
+  {
+    "id": "ART-094",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1886: Eighth (final) Impressionist Exhibition",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The eighth and last Impressionist exhibition ran 15 May-15 June 1886; Seurat's La Grande Jatte made it a watershed, and Fénéon named the new style néo-impressionnisme.",
+    "source_url": "https://fr.wikipedia.org/wiki/Expositions_impressionnistes",
+    "source_note": "Dates 15 May-15 June 1886; Grande Jatte debut"
+  },
+  {
+    "id": "ART-095",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1886: Van Gogh arrives in Paris, meets everyone",
+    "verdict": "CORRECTED",
+    "final_text": "Van Gogh reached Paris in March 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.",
+    "source_url": "https://en.wikipedia.org/wiki/Vincent_van_Gogh",
+    "source_note": "Wikipedia: March 1886, rue Lepic, Cormon, Gauguin Nov 1887"
+  },
+  {
+    "id": "ART-096",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1888: Gauguin visits Van Gogh in Arles",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Gauguin reached Arles in late October 1888 and stayed about nine weeks at the Yellow House, leaving after the evening of 23 December, when Vincent cut off his ear.",
+    "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+    "source_note": "Wikipedia: nine weeks, late Oct, 23 Dec crisis"
+  },
+  {
+    "id": "ART-097",
+    "original": "ART HISTORY - Complete Guide to Impressionism and Beyond › KEY DATES: 1891: Gauguin sails for Tahiti",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Gauguin sailed for Tahiti on 1 April 1891, paid for by a February 1891 Hôtel Drouot sale of his works, boosted by two enthusiastic articles by Octave Mirbeau.",
+    "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+    "source_note": "Wikipedia: 1 April 1891; Drouot sale; Mirbeau articles"
+  }
+]

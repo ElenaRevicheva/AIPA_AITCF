@@ -1,0 +1,218 @@
+[
+ {
+  "id": "ATU-001",
+  "original": "Atuona is the main village on Hiva Oa, the second-largest island in the Marquesas archipelago",
+  "verdict": "VERIFIED",
+  "final_text": "Atuona is the main village of Hiva Oa, the second-largest Marquesas island (about 320 sq km), and the administrative centre of the southern Marquesas.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Second largest Marquesas island, 320 km2; Atuona admin centre"
+ },
+ {
+  "id": "ATU-002",
+  "original": "Located in French Polynesia, 1,400 km northeast of Tahiti",
+  "verdict": "VERIFIED",
+  "final_text": "Atuona lies in French Polynesia, about 1,400 km northeast of Tahiti; Britannica puts the Marquesas group as a whole about 1,200 km away.",
+  "source_url": "https://www.britannica.com/place/Marquesas-Islands",
+  "source_note": "Britannica: Marquesas 1,200 km NE of Tahiti"
+ },
+ {
+  "id": "ATU-003",
+  "original": "Coordinates: 9°48'S, 139°02'W - literally the edge of the world",
+  "verdict": "VERIFIED",
+  "final_text": "Atuona sits at about 9°48'S, 139°02'W, on the south coast of Hiva Oa.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Coordinates 9°48′11″S 139°2′23″W"
+ },
+ {
+  "id": "ATU-004",
+  "original": "Population: ~2,000 people, mostly Polynesian Marquesans",
+  "verdict": "VERIFIED",
+  "final_text": "Atuona had 1,993 inhabitants at the 2022 census, most of them Marquesan.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Population 1,993 (2022)"
+ },
+ {
+  "id": "ATU-005",
+  "original": "The name \"Hiva Oa\" means \"long ridgeback\" in Marquesan",
+  "verdict": "VERIFIED",
+  "final_text": "In local Marquesan tradition, the name Hiva Oa means long ridge.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Local mythology: Hiva Oa means long ridge"
+ },
+ {
+  "id": "ATU-006",
+  "original": "Dramatic volcanic peaks rising from the Pacific - Mount Temetiu (1,276m) dominates",
+  "verdict": "CORRECTED",
+  "final_text": "Mount Temetiu, the island summit at about 1,213 m (sources range up to 1,276 m), towers over Atuona and the western end of the Bay of Traitors.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Wikipedia gives 1,213 m; Hiva Oa page 1,269 m"
+ },
+ {
+  "id": "ATU-007",
+  "original": "Lush valleys with breadfruit, mango, coconut palms, hibiscus",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Hiva Oa is called the Garden of the Marquesas; its people live largely on breadfruit, coconut, yam and taro they grow themselves.",
+  "source_url": "https://www.tahititourisme.com/in-the-footsteps-of-gauguin-and-brel-in-hiva-oa/",
+  "source_note": "Nickname Garden of the Marquesas; subsistence crops per Wikipedia"
+ },
+ {
+  "id": "ATU-008",
+  "original": "Black sand beaches, hidden coves, ancient stone tikis in the jungle",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki over 2.4 m tall, the largest in Polynesia.",
+  "source_url": "https://en.wikipedia.org/wiki/Puamau",
+  "source_note": "Takai over 2.4 m, largest tiki in Polynesia"
+ },
+ {
+  "id": "ATU-009",
+  "original": "Constant trade winds, tropical humidity, sudden rain showers",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Atuona sits on a small inlet, Vevau in Marquesan, on the north shore of Ta'a Oa, the wide bay the French call Baie des Traitres; the rocky islet Hanakee guards it.",
+  "source_url": "https://en.wikipedia.org/wiki/Ta%CA%BBa_%CA%BBOa",
+  "source_note": "Bay names, Vevau inlet, Hanakee islet"
+ },
+ {
+  "id": "ATU-010",
+  "original": "The light here is different - golden, soft, the light Gauguin sought",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "The bay at Atuona, Ta'aoa or the Bay of Traitors, lies inside the crater of the old volcano that built this side of Hiva Oa.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Ta'aoa bay is in the crater of the volcano"
+ },
+ {
+  "id": "ATU-011",
+  "original": "Smell of frangipani, salt air, wood smoke from copra drying",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "Copra, dried coconut meat, is the cash export of Hiva Oa, produced alongside a subsistence economy of breadfruit, coconut, yam and taro.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Economy: subsistence crops plus copra for export"
+ },
+ {
+  "id": "ATU-012",
+  "original": "Marquesan culture: tattoo tradition (oldest in Polynesia), wood carving, tapa cloth",
+  "verdict": "CORRECTED",
+  "final_text": "Marquesan tattoo, patutiki, could cover whole bodies; in 1897-98 German physician Karl von den Steinen recorded hundreds of its motifs as colonisation was ending the practice.",
+  "source_url": "https://en.wikipedia.org/wiki/Culture_of_the_Marquesas_Islands",
+  "source_note": "Whole-body tattoo; von den Steinen 1897-98; oldest claim dropped"
+ },
+ {
+  "id": "ATU-013",
+  "original": "The \"Pua\" - traditional feast with roasted pig, poi, breadfruit",
+  "verdict": "CORRECTED",
+  "final_text": "Marquesan feasts were ko'ika; their staple was ma, breadfruit paste fermented in deep pits for long storage and eaten as popoi.",
+  "source_url": "https://evols.library.manoa.hawaii.edu/items/ade0b27b-d0e7-465b-9e77-d443970c542d",
+  "source_note": "Feasts called ko'ika, not pua; ma fermented breadfruit"
+ },
+ {
+  "id": "ATU-014",
+  "original": "Catholic church (where Gauguin is buried) mixed with ancient beliefs in \"mana\" (spiritual power)",
+  "verdict": "CORRECTED",
+  "final_text": "Gauguin is buried not in a church but in the hillside Calvary (Calvaire) cemetery above Atuona; he had bought his house plot from the Catholic mission.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Calvary Cemetery overlooks town; land bought from Church"
+ },
+ {
+  "id": "ATU-015",
+  "original": "Time moves differently - \"Polynesian time\" - nothing is rushed",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Atuona was once the seat of government for all the Marquesas, a role later taken by Taiohae on Nuku Hiva.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Former Marquesas capital, replaced by Taioha'e"
+ },
+ {
+  "id": "ATU-016",
+  "original": "The locals say: \"Kaoha nui\" (great love) as greeting",
+  "verdict": "CORRECTED",
+  "final_text": "The everyday Marquesan greeting is kaoha, used much as aloha in Hawaii; kaoha nui (nui, great) is the warmer, fuller form.",
+  "source_url": "https://farandawayadventures.com/marquesas-greeting/",
+  "source_note": "Kaoha = hello/welcome; nui adds warmth"
+ },
+ {
+  "id": "ATU-017",
+  "original": "Art is life here - every house has carvings, every body has tattoos",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The Matavaa, the Awakening, a Marquesas arts festival founded in 1987 by the Motu Haka federation, rotates among the six inhabited islands, Hiva Oa among them.",
+  "source_url": "https://tahititourisme.pf/en-pf/islands-and-archipelagos/marquesas-islands/feel-the-mana-at-the-marquesas-islands-arts-festival/",
+  "source_note": "Created 1987 by Motu Haka; rotates six islands"
+ },
+ {
+  "id": "ATU-018",
+  "original": "His \"Maison du Jouir\" (House of Pleasure) - now reconstructed museum",
+  "verdict": "VERIFIED",
+  "final_text": "The Maison du Jouir (House of Pleasure) was rebuilt in Atuona as part of the Paul Gauguin Cultural Center, completed in 2003.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Paul Gauguin Cultural Center completed 2003"
+ },
+ {
+  "id": "ATU-019",
+  "original": "Original was bamboo and palm fronds, decorated with his explicit carvings",
+  "verdict": "CORRECTED",
+  "final_text": "The original was a two-storey thatched house on stilts; its carved door panels, inscribed Maison du Jouir, Soyez mysterieuses and Soyez amoureuses, are now in the Musee d'Orsay.",
+  "source_url": "https://www.musee-orsay.fr/it/opere/maison-du-jouir-15286",
+  "source_note": "Orsay: cabin on stilts, carved inscribed panels"
+ },
+ {
+  "id": "ATU-020",
+  "original": "He lived there 1901-1903, painting his final masterpieces",
+  "verdict": "VERIFIED",
+  "final_text": "He lived at Atuona from September 1901 until May 1903; Riders on the Beach and Contes barbares, both 1902 and now in the Museum Folkwang, Essen, were painted there.",
+  "source_url": "https://nga.gov.au/audio-learning-tours/gauguins-world/stop/312",
+  "source_note": "Arrived Sept 1901; Folkwang holds both 1902 works"
+ },
+ {
+  "id": "ATU-021",
+  "original": "Died May 8, 1903 at 54 - syphilis, morphine addiction, broken heart",
+  "verdict": "CORRECTED",
+  "final_text": "He died at Atuona on 8 May 1903, aged 54, cause still debated; teeth dug from his well in 2000 held no mercury, the usual syphilis cure of his day.",
+  "source_url": "https://hyperallergic.com/posthumous-prognosis-for-supposedly-syphilitic-gauguin-via-his-teeth",
+  "source_note": "Broken heart unverifiable; teeth DNA 90-99%, no mercury"
+ },
+ {
+  "id": "ATU-022",
+  "original": "His grave overlooks the bay he painted so many times",
+  "verdict": "CORRECTED",
+  "final_text": "His grave of unhewn pinkish stones in Calvary cemetery looks over Atuona Bay; a bronze cast of his Oviri was set on it on 29 March 1973; Jacques Brel lies a few metres away.",
+  "source_url": "https://en.wikipedia.org/wiki/Oviri",
+  "source_note": "Oviri bronze erected 29 March 1973; Brel nearby"
+ },
+ {
+  "id": "ATU-023",
+  "original": "From Paris: 30+ hours - Paris → Los Angeles → Tahiti → Hiva Oa",
+  "verdict": "CORRECTED",
+  "final_text": "From Paris, Air Tahiti Nui flies to Papeete via Los Angeles, its only Paris stopover since Seattle was dropped in January 2025; Air Tahiti then flies on to Hiva Oa.",
+  "source_url": "https://www.voyages-d-affaires.com/en/air-tahiti-nui-paris-seattle-2",
+  "source_note": "Paris route refocused via LA; 30+ hours unsourced"
+ },
+ {
+  "id": "ATU-024",
+  "original": "From Tahiti: 3.5-hour flight on small ATR-72 plane",
+  "verdict": "CORRECTED",
+  "final_text": "From Papeete, Air Tahiti ATR 72s fly to Hiva Oa in well over 3 hours, among the longest legs on its network.",
+  "source_url": "https://aeroroutes.com/eng/230713-vtdec23nhv",
+  "source_note": "Papeete-Hiva Oa exceeds 3 hours scheduled"
+ },
+ {
+  "id": "ATU-025",
+  "original": "Or by cargo ship \"Aranui 5\" - 14-day voyage through all Marquesas",
+  "verdict": "VERIFIED",
+  "final_text": "By sea: the Aranui 5, a passenger-freighter in service since December 2015, makes a 14-day loop from Papeete through the six inhabited Marquesas, Hiva Oa included.",
+  "source_url": "https://www.cruisemapper.com/ships/Aranui-5-1103?tab=review",
+  "source_note": "Cargo cruise since Dec 2015; 14-day itinerary"
+ },
+ {
+  "id": "ATU-026",
+  "original": "The airport is tiny, carved into a mountain",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Hiva Oa-Atuona airport, also called Jacques Brel airport, sits on the Tepuna plateau above town, with a single asphalt runway 1,215 m long.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Runway 1,215 m; Brel name and plateau per Kupi"
+ },
+ {
+  "id": "ATU-027",
+  "original": "Landing feels like arriving at the end of the earth",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Jacques Brel, who sailed in in 1975, used his light plane Jojo to fly the sick to Nuku Hiva and fetch mail and medicine; Jojo now sits in the Espace Jacques Brel hangar.",
+  "source_url": "https://www.tahititourisme.com/in-the-footsteps-of-gauguin-and-brel-in-hiva-oa/",
+  "source_note": "Brel 1975, Jojo flights, displayed in hangar"
+ }
+]
