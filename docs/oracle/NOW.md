@@ -141,6 +141,10 @@ git log keeps the record.
   and `💾 saved` was proven by the card file. The test card was deleted.
 - **Deal-aware (7 Oct):** "prep me for <company>" reads the job's HubSpot deal through the NEW read-only `cto-aipa/scripts/hs-deal-prep.cjs`
   (scp'd to Oracle, a new file; tested on Addepto: brief, technical and role defense, letters). Core questions test that posting's stated requirements.
+- **Voice (7 Oct):** OpenClaw built-in TTS ON in TAGGED mode (`messages.tts`: edge, en-US-AriaNeural, -5%; no key). The skill ends every message
+  with `[[tts:text]]polished answer + next question[[/tts:text]]` → Telegram voice note + full text. Gateway restarted 16:50:15 UTC, health 200,
+  telegram provider started; config diff vs `openclaw.json.pre-tts` = only `messages`. **Voice delivery is unproven until her first real session**: check the
+  `/tmp/openclaw/openclaw-<date>.log` tts lines.
 - **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
