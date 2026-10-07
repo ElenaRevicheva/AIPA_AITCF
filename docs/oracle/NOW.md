@@ -425,11 +425,15 @@ git log keeps the record.
   Elena decides: make the missing frames (and how 30 is redesigned) or cut to 4:30, before motion starts.
   **7 Oct (Venice topped up $77 — her last money; budget every call):** k09 flower removed (nano edit, $0.23; original
   `img/k09_flower_1007.jpg`). Glitch stills: G1+G4 REJECTED (Kira is a lesbian — no Kira/Ule sex scene). Venice "uncensored"
-  `qwen-edit-uncensored` = porn gloss + wrong cast → REJECTED, never use it for this film. Realism test on G8: nano + grok REFUSED
+  `qwen-edit-uncensored` first judged by me as porn gloss — BUT Elena then APPROVED 3 of its stills (see below), so it stays usable. Realism test on G8: nano + grok REFUSED
   (final), flux-2-max tame, **Seedream V5 Pro edit WINS** ($0.08, real photo look, cast held). G2s G3s G5s G6s G7s G8s k11gs made on
   Seedream, each with ONE surreal detail (Elena: "always something from another reality"). Sheet is PRIVATE (laptop
   Pictures/Atuona-film9-private + Oracle img/) — erotic stills never go into the public repo. Ledger Venice $26.02.
-  **Elena's move:** approve/reject the 7 Seedream stills; then 4:30 cut + motion plan (4K hero shots + O3 Pro).
+  **APPROVED by Elena (from screenshots):** G6 = Seedream `G6s` · G7 = qwen `G7` · G8 = qwen `G8_clean` (AP watermark inpainted
+  locally, original kept) · k11 = qwen `k11g` (now `img/k11.jpg`; old `k11_pre_1007.jpg`). Recorded in plan.json `glitch_approved`.
+  Everything else rejected. Her earlier "ugly, all rejected" was about the OLD bake-off image she opened, not the qwen set.
+  qwen stills are 1352x760 (k11 as a motion start frame may need an upscale). Venice ledger ~$26.
+  **Elena's move:** 4:30 cut + motion plan (4K hero shots + O3 Pro); missing frames 15, 31, 30-redesign.
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
