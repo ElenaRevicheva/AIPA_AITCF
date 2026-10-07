@@ -901,7 +901,7 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 or systemd | e.g. `dragontrade` or `algom-alpha` | Add HTTP health or process check | — | — | — |
 | 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd | `vibejobhunter` | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) | — | — | — |
 | 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter-web` | `http://127.0.0.1:8080/health` (FastAPI: CTO `/api/tech-update`, `/health`) | [aideazz.xyz](https://aideazz.xyz) | [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` |
-| 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` | — | — | — |
+| 7 | **OpenClaw Vibejob Shortlist** ⚠️ *7 Oct 2026: not on Oracle. No `~/openclaw-vibejob-shortlist`, no `openclaw-gateway` unit, no laptop clone* | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` | — | — | — |
 | 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` | — | — | — |
 | 8.1 | **Sprint Briefing (Sprinter)** *(CTO AIPA — AWS)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (`src/sprint-briefing/`); packaging workspace `D:\aideazz\SprintBriefingAgent` | Private Telegram (Sprint Briefing audio) | AWS Lambda | `sprint-briefing-agent` | CloudWatch `/aws/lambda/sprint-briefing-agent` · EventBridge schedule `cron(0 13 * * ? *)` (~8:00 America/Panama) | — | — | **Sprinter:** Lambda/SAM workspace — not an Oracle systemd/PM2 process (see [AILA symphony §8.1](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md)) |
 | 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` | [atuona.xyz](https://atuona.xyz) | [atuona](https://github.com/ElenaRevicheva/atuona) | *Local clone `D:ideazztuona`; deploy site from GitHub `main` only (4everland)* |
@@ -1090,7 +1090,33 @@ Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.git
 
 **Cloud agent loop:** fix → push product repo `main` → (optional) merge AIPA_AITCF registry → phone → Actions → product.
 
-#### EspaLuz bots — sync status (June 30, 2026, verified live)
+#### Fleet sync status — laptop / GitHub / Oracle (7 Oct 2026, verified live)
+
+Checked repo by repo against this doc's own tables. **Running code is what counts.** A checkout can lag on purpose.
+
+| # | Product | Oracle (path · process) | Oracle vs GitHub | Laptop vs GitHub |
+|---|---------|-------------------------|------------------|------------------|
+| 1 | EspaLuz WhatsApp | `~/EspaLuzWhatsApp` · `espaluz-whatsapp` active | **11 behind, on purpose** (see ⛔ below) | in sync |
+| 2 | EspaLuz Telegram | `~/EspaLuzFamilybot` · `espaluz-familybot` + `espaluz-payments-webhook` active | **7 behind, on purpose** (see ⛔ below) | in sync |
+| 3 | EspaLuz Influencer | `~/EspaLuz_Influencer` · active | in sync `62f4c82` | in sync |
+| 4 | Algom Alpha | `~/dragontrade-agent` · PM2 `dragontrade-main`, `dragontrade-dashboard`, `algom-stream`, `algom-poll` | 3 behind (PII-hygiene commits only, "no runtime change") | in sync |
+| 5+6 | VJH + CMO | `~/VibeJobHunterAIPA_AIMCF` · `vibejobhunter`, `vibejobhunter-web` active | in sync `83d8d04` | in sync |
+| 7 | OpenClaw | **neither the folder nor the `openclaw-gateway` unit exists** on Oracle; no laptop clone either | — | — |
+| 8+9 | CTO AIPA + Atuona | `~/cto-aipa` · PM2 `cto-aipa` | **all 93 `dist/*.js` = a build of main** (CRLF-only diffs) and so are the cron scripts. The checkout lags on purpose (3 stranded Atlas lead commits + dirty tree = the pull-refusal guard; see NOW.md 6 Oct) | in sync |
+| 11 | Atlas Shifted | `~/whitespace` · PM2 `whitespace` | in sync `7842c75` (the uncommitted 7 Sep `atlas-capture-cron.sh` was committed 7 Oct) | in sync |
+| 13 | Ops dashboard | `/var/www/ops` (static) | byte-identical to the laptop `dist/` | in sync |
+| — | aideazz.xyz | `~/aideazz` (wiki/blog push clone, branch `main`) | ff'd to `347c0cd` | in sync |
+
+> ⛔ **Never `git pull` EspaLuzWhatsApp / EspaLuzFamilybot / dragontrade-agent on Oracle.** The commits they lack are the Sep 2026
+> DataVendor PII cleanup. They **untrack** live runtime files (subscribers, trials, sessions, the 180 MB WhatsApp session store), and a
+> pull deletes untracked-in-commit files from disk. Their code half reads DB credentials and subscriber ids from env vars that Oracle's
+> `.env` may not have. The bots run correctly on the old code. If the new code is ever wanted, follow the June 30 pattern below
+> (backup → code-only → restore runtime JSON), and check the env vars first.
+>
+> **Duplicate clone (violates "one clone per repo"):** `~/EspaLuzWhatsApp_backup_jan23_prefix` has the same remote as #1 and is 60 behind.
+> No process uses it. Left in place (never-wipe rule); remove only with Elena's go after a backup.
+
+#### EspaLuz bots — sync status (June 30, 2026, verified live) — *superseded by the 7 Oct table above*
 
 | Layer | WhatsApp (#1) | Telegram (#2) |
 |-------|---------------|---------------|
