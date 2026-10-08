@@ -463,7 +463,8 @@ git log keeps the record.
   (qwen weaker: CGI glows, navy hair). Surreal fixes by nano edit: M1f = a bronze walking-figure sculpture stands beside Mila
   (not the planned shadow), M5f = Mila semi-transparent like a ghost (not in the window). Picks: M1f (alt M1s), M2s, M3s
   (craquelure works), M4s (ultramarine pigment works), M5f. Private sheet: Pictures/Atuona-film9-private/
-  mila_jean_sequence_2026-10-08.jpg. Venice ledger $28.11 (~$3.30 of her $77 spent). **Elena's move:** approve; and still
+  mila_jean_sequence_2026-10-08.jpg. Venice ledger $28.11 (~$3.30 of her $77 spent). **8 Oct: Mila APPROVED; Jean-Marc REJECTED**
+  ("a beautiful Jean - french man but much more charismatic") → recast via `wf_cea7bc47-cf5`, then re-render M1-M4. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
