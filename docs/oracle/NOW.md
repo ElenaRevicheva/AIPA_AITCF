@@ -500,12 +500,13 @@ git log keeps the record.
   M1_M2_30_31_10ab_impressionist. Venice ledger $32.15. **ALL 39 FRAMES APPROVED 8 Oct** → official files `img/M1..M5.jpg`,
   `k10a`, `k10b`, `k30`, `k31` (+ earlier); final 4:30 order in plan.json `final_frames_4m30`. Realism pass run on the 26 older
   frames (`<frame>_real.jpg`, $2.08, replaces nothing yet).
-  🔴 **8 Oct ~20:46 UTC — ORACLE FROZEN BY THE FILM #9 PREVIEW BUILD (Claude Code's fault).** The final dissolve chain
-  decoded ~45 full-HD inputs in ONE ffmpeg → the 12 GB box ran out of memory; SSH + every web endpoint time out, so all bots
-  are down. No OCI keys on the laptop; Elena is on her phone. Self-recovery backstop: the build's own 2 h ffmpeg timeout
-  (~22:46 UTC) kills it. **Next session: verify every service in RESILIENCE §"All 11 AI Agents" before ANY work.** Fix
-  committed: `scripts/atuona-film9.mjs` now dissolves in batches of 6 and refuses to start under 2.5 GB free. **Rule: no
-  heavy render on Oracle without a memory guard — it is the box the live bots run on.**
+  ✅ **8 Oct 20:46–21:41 UTC — Oracle frozen ~55 min by the film #9 preview build (Claude Code's fault) — RECOVERED.**
+  One ffmpeg decoding ~45 full-HD inputs reached 9.2 GB RSS on the 12 GB box (no swap); the kernel OOM-killed it
+  (`dmesg: Out of memory: Killed process (ffmpeg)`), no reboot (uptime 148 d). Verified 21:42: PM2 all online, EspaLuz ×3 +
+  VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. Doc drift: `openclaw-gateway.service` does not exist
+  (OpenClaw answers on :18789) — fix the RESILIENCE row. **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
+  with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
+  never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
   **8 Oct evening — COMPILE IN PROGRESS (Claude Code).** Elena: "move on with video compilation", "all the frames already
   approved by me should stay", text = ONE sharp stanza per shot from her own poems, emotional fit, atmospheric English; music =
   DEEP HOUSE underground (memory `feedback_atuona_film_style`). **Approved assets: memory `project_atuona_film9_approved_assets`
@@ -514,7 +515,7 @@ git log keeps the record.
   ($44.66, Venice left **$15.69**), QC `docs/atuona/film9_stanza_work/qc_first_pass.json` → choices `clip_choice.json` (PASS / TRIM
   / REVIEW for her eye / REJECT → $0 still-motion from her approved frame: 7, 20, 22, 25, 26, 30, 34, + 35 base). Stanzas: 39
   picked by 3 curators + editor, all 39 quotes code-verified against `content/poems.json` (32 poems, 17 RU / 22 EN,
-  `picks_verified.json`); RU translation workflow running. Compile = `scripts/atuona-film9.mjs` (1080p/24, `PREVIEW=1` fast cut),
+  `picks_verified.json`); translations done + critic fixes (`stanzas_final.json`). **Preview (5:24) built on the laptop and SENT to Elena's Telegram 21:44 UTC** (`render_local/work/preview.mp4`, phone copy 44 MB). Compile = `scripts/atuona-film9.mjs` (1080p/24, `PREVIEW=1` fast cut),
   voice `scripts/atuona-film9-vo.py` (Kira/marin), cut via `docs/atuona/film9_stanza_work/build_cut.py`. Music
   `music/film9_deephouse.mp3` (ElevenLabs, measured 118 BPM). **Elena's move after the preview:** the REVIEW clips + stanzas.
   The 8 Oct morning text doc (`FILM9_ONSCREEN_TEXT_2026-10-08.md`) is SUPERSEDED by the stanza approach.

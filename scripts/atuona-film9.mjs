@@ -12,28 +12,38 @@
 //                 node film9.mjs --publish                                    (copies the verified final into films/out)
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 const execFileP0 = promisify(execFile);
 
-const BASE = '/home/ubuntu/atuona-film9';
-const W = BASE + '/work', CLIPS = BASE + '/clips', VODIR = BASE + '/vo', IMG = BASE + '/img';
+// FILM9_BASE / FILM9_WORK: run the same build on the laptop (8 Oct: a heavy render on Oracle froze the bots' box).
+// Inputs are read from BASE (clips/, stillclips/, img/, music/, cut.json); everything written goes to WORK (work files + vo/).
+const BASE = process.env.FILM9_BASE || '/home/ubuntu/atuona-film9';
+const WORK = process.env.FILM9_WORK || BASE;
+const W = WORK + '/work', CLIPS = BASE + '/clips', VODIR = WORK + '/vo', IMG = BASE + '/img';
 const OUTDIR = '/home/ubuntu/cto-aipa/data/atuona/films/out';
-const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
-const MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
+const FONT = process.env.FILM9_FONT || '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
+const MONO = process.env.FILM9_MONO || '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
+// file paths INSIDE a filter string: on Windows 'C:/x' breaks the filter parser (':' separates options), so ffmpeg runs in
+// W and the filter gets paths relative to it
+const WIN = process.platform === 'win32';
+const fp = f => WIN ? path.relative(W, f).split(path.sep).join('/') : f;
+// ffmpeg 7+/8 (the laptop's) shapes text with HarfBuzz and draws the line break as a box glyph; Oracle's ffmpeg 6 does not
+const TS = WIN ? ':text_shaping=0' : '';
 const VW = 1920, VH = 1080, FPS = 24;
 // PREVIEW=1: the same cut in minutes — no motion interpolation (frames repeat in slow-mo), fastest x264; writes work/preview.mp4
 const PREVIEW = process.env.PREVIEW === '1';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.12, GLITCH_XF = 0.1, GLITCH_D = 1.2;
-const CUT = JSON.parse(fs.readFileSync(BASE + '/cut.json', 'utf8'));
+const CUT = JSON.parse(fs.readFileSync(process.env.FILM9_CUT || BASE + '/cut.json', 'utf8'));
 const MUSIC = path.join(BASE, CUT.music);
 const SLUG = CUT.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const OUTRO_SUB = 'atuona.xyz // Paradise.js  ·  by Kira Velerevich';
 
-const LOG = BASE + '/ffmpeg-commands.log';
+const LOG = WORK + '/ffmpeg-commands.log';
 async function execFileP(cmd, args, opts) {
   fs.appendFileSync(LOG, cmd + ' ' + args.map(a => /[\s\[\];,']/.test(a) ? `'${a}'` : a).join(' ') + '\n\n');
-  return execFileP0(cmd, args, opts);
+  return execFileP0(cmd, args, WIN ? { cwd: W, ...opts } : opts);
 }
 const caps = s => (s || '').toUpperCase();
 const track = s => caps(s).split('').join(' ');
@@ -72,18 +82,18 @@ function balanced(text, maxCols) {
 function textDraw(lines, clipDur, opaque) {
   const fo = (clipDur - 1.0).toFixed(2);
   const alpha = opaque ? '1' : `if(lt(t,0.7),t/0.7,if(gt(t,${fo}),max(0,(${clipDur.toFixed(2)}-t)/1.0),1))`;
-  return `,drawtext=fontfile=${FONT}:textfile=${lines}:expansion=none:fontcolor=white:fontsize=${STANZA_SIZE}:line_spacing=13:text_align=C:x=0:y=h-text_h-39:box=1:boxw=${VW}:boxborderw=33|0|39|0:boxcolor=black@0.42:shadowcolor=black@0.6:shadowx=0:shadowy=1:alpha='${alpha}'`;
+  return `,drawtext=fontfile=${fp(FONT)}:textfile=${fp(lines)}:expansion=none${TS}:fontcolor=white:fontsize=${STANZA_SIZE}:line_spacing=13:text_align=C:x=0:y=h-text_h-39:box=1:boxw=${VW}:boxborderw=33|0|39|0:boxcolor=black@0.42:shadowcolor=black@0.6:shadowx=0:shadowy=1:alpha='${alpha}'`;
 }
 async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgVideo, noFadeIn, serifBody) {
   let draw;
   if (serifBody) {   // 1c: a line of hers on black, serif like the stanzas
     const bFile = outFile + '_b.txt'; fs.writeFileSync(bFile, spread(serifBody, 60));
-    draw = `drawtext=fontfile=${FONT}:textfile=${bFile}:expansion=none:fontcolor=white:fontsize=40:line_spacing=16:text_align=C:x=(w-text_w)/2:y=(h-text_h)/2`;
+    draw = `drawtext=fontfile=${fp(FONT)}:textfile=${fp(bFile)}:expansion=none${TS}:fontcolor=white:fontsize=40:line_spacing=16:text_align=C:x=(w-text_w)/2:y=(h-text_h)/2`;
   } else {
     const tFile = outFile + '_t.txt'; fs.writeFileSync(tFile, track(titleRaw));
     const size = Math.min(titleSize, Math.floor(1770 / (track(titleRaw).length * 0.602)));
-    draw = `drawtext=fontfile=${MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=${size}:x=(w-text_w)/2:y=(h-text_h)/2-39`;
-    if (subRaw && subRaw.trim()) wrap(caps(subRaw), 56, 2).split('\n').forEach((line, k) => { const sFile = `${outFile}_s${k}.txt`; fs.writeFileSync(sFile, line); draw += `,drawtext=fontfile=${MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=30:x=(w-text_w)/2:y=(h/2)+60+${k * 50}`; });
+    draw = `drawtext=fontfile=${fp(MONO)}:textfile=${fp(tFile)}:expansion=none${TS}:fontcolor=white:fontsize=${size}:x=(w-text_w)/2:y=(h-text_h)/2-39`;
+    if (subRaw && subRaw.trim()) wrap(caps(subRaw), 56, 2).split('\n').forEach((line, k) => { const sFile = `${outFile}_s${k}.txt`; fs.writeFileSync(sFile, line); draw += `,drawtext=fontfile=${fp(MONO)}:textfile=${fp(sFile)}:expansion=none${TS}:fontcolor=0xBBBBBB:fontsize=30:x=(w-text_w)/2:y=(h/2)+60+${k * 50}`; });
   }
   const fades = `${noFadeIn ? '' : 'fade=t=in:st=0:d=0.8,'}fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;   // noFadeIn: frame 0 = the card (gallery poster)
   if (bgVideo) {
@@ -215,9 +225,10 @@ async function main() {
   // for a long while. So the chain runs in batches of CHUNK segments (near-lossless intermediates), then the batches are
   // dissolved together — never more than CHUNK decoders alive — and it refuses to start when the box is short of memory.
   const CHUNK = 6;
-  const memAvailMB = () => Math.round(+(fs.readFileSync('/proc/meminfo', 'utf8').match(/MemAvailable:\s+(\d+)/) || [0, 0])[1] / 1024);
+  const memAvailMB = () => WIN ? Math.round(os.freemem() / 1048576)
+    : Math.round(+(fs.readFileSync('/proc/meminfo', 'utf8').match(/MemAvailable:\s+(\d+)/) || [0, 0])[1] / 1024);
   async function chain(files, ds, joins, out, last) {
-    if (memAvailMB() < 2500) throw new Error(`only ${memAvailMB()} MB free — not starting a dissolve chain (the bots share this box)`);
+    if (memAvailMB() < (WIN ? 800 : 2500)) throw new Error(`only ${memAvailMB()} MB free — not starting a dissolve chain (the bots share this box)`);
     if (files.length === 1) { fs.copyFileSync(files[0], out); return ds[0]; }
     const inputs = files.flatMap(f => ['-i', f]); let fc = '', vlab = '0:v', alab = '0:a', merged = ds[0];
     for (let k = 1; k < files.length; k++) { const D = joins[k], ofs = Math.max(0, merged - D).toFixed(3); fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${D}:offset=${ofs}[vc${k}];[${alab}][${k}:a]acrossfade=d=${D}[ac${k}];`; vlab = `vc${k}`; alab = `ac${k}`; merged += ds[k] - D; }
@@ -249,7 +260,14 @@ async function main() {
   mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9,asplit=2[vsc][vmix];`;
   mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`;
   const mixIn = ['-i', body, '-i', MUSIC]; voAt.forEach(v => mixIn.push('-i', v.file));
-  if ((await dur(MUSIC)) < LEN) throw new Error(`music ${(await dur(MUSIC)).toFixed(1)}s is shorter than the film ${LEN.toFixed(1)}s`);
+  // music shorter than the film: crossfade the track into itself from its 60 s mark (a steady groove loops cleanly), never cut out
+  if ((await dur(MUSIC)) < LEN) {
+    const ext = path.join(W, 'music_extended.m4a');
+    await execFileP('ffmpeg', ['-y', '-v', 'error', '-i', MUSIC, '-i', MUSIC, '-filter_complex', '[1:a]atrim=start=60,asetpts=PTS-STARTPTS[b];[0:a][b]acrossfade=d=4[a]', '-map', '[a]', '-c:a', 'aac', '-b:a', '256k', ext], { maxBuffer: 1 << 26 });
+    mixIn[3] = ext;
+    process.stderr.write(`music ${(await dur(MUSIC)).toFixed(1)}s < film ${LEN.toFixed(1)}s -> extended by a 4 s self-crossfade
+`);
+  }
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
   fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map(p => ({ shot: p.it.sid, clip: p.it.clip, poem: p.it.poem, start: +segStart(seqOf[p.it.sid]).toFixed(2), dur: +p.d.toFixed(2), slow: +p.factor.toFixed(3), vo_at: p.vd ? +(segStart(seqOf[p.it.sid]) + LEAD).toFixed(2) : null, glitch_after: p.it.glitch_after || null })), null, 1));
   console.log(`DONE ${final} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(1)}s, ${plan.length} shots, ${voAt.length} voice lines) — verify, then: node film9.mjs --publish`);

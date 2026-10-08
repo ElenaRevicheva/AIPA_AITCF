@@ -3,20 +3,21 @@
 # (vo/<sid>.mp3) from cut.json's English stanza, unchanged (" / " becomes a line break = a short pause).
 import json, os, re, subprocess
 
-ENV = open("/home/ubuntu/cto-aipa/.env").read()
+ENV = open(os.environ.get("FILM9_ENV", "/home/ubuntu/cto-aipa/.env"), encoding="utf-8").read()   # laptop: another repo's .env
 KEY = re.search(r"^OPENAI_API_KEY=(.*)$", ENV, re.M).group(1).strip().strip('"')
-CUT = json.load(open("cut.json", encoding="utf-8"))
+CUT = json.load(open(os.environ.get("FILM9_CUT", "cut.json"), encoding="utf-8"))
+VO = os.environ.get("FILM9_VO", "vo")
 VOICES = {
     "kira": ("marin", "A Russian woman in her thirties, speaking English with a slight Russian accent. Low, husky, unhurried, "
                       "very close to the microphone, almost a whisper that could break. Raw emotion held back by pride; a poet "
                       "saying her own lines, not performing them. Never sweet, never theatrical, never cheerful. Let each line "
                       "break land as a short pause."),
 }
-os.makedirs("vo", exist_ok=True)
+os.makedirs(VO, exist_ok=True)
 for it in CUT["items"]:
     if it.get("card") or not it.get("stanza"):
         continue
-    out = f"vo/{it['sid']}.mp3"
+    out = f"{VO}/{it['sid']}.mp3"
     if not (os.path.exists(out) and os.path.getsize(out) > 2000):
         voice, instr = VOICES[it.get("voice", "kira")]
         text = "\n".join(l.strip() for l in it["stanza"].split(" / "))
