@@ -130,6 +130,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔴 8 Oct — webhook.aideazz.xyz (Oracle) NOT RESPONDING · plan for businesses with no website awaiting Elena's go
+- **Seen from the laptop ~UTC afternoon:** `/cto/v1/visibility` and `/cto/health` timed out (HTTP 000, 30–60 s); aideazz.xyz 200.
+  SSH: TCP connected, `timed out during banner exchange`, so the box is up but hung (memory or load?). Not investigated further (no access granted
+  this session). **Next agent: check uptime/free/pm2 before assuming any Oracle cron ran today.**
+- **Question:** can the Visibility API serve no-website businesses (Instagram/WhatsApp/Maps)? Answer + plan:
+  `docs/selling/NO_WEBSITE_BUSINESSES_AUDIT_2026-10-08.md`. Today it would grade Google's or Instagram's page instead of the business.
+  Step A ($0, detect social/Maps links → honest "no owned website" diagnosis) and Step B (paid entity mode) are **NOT built**; both wait for Elena.
+
 ### ✅ 7 Oct — Morning brief "stale again" after the 6 Oct cleanup: 3 generators switched off inside existing machinery
 - **Not stale data — live generators.** (1) VJH filed every Boardy email as a new `[HIRING-VJH-LEAD]` deal (17), and reply-radar
   re-noted all 17 per email → always "NEW today". (2) The brief's lead list had no age limit (53/100 rows 2–4 months old) and 48 of
