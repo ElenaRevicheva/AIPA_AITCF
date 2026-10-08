@@ -512,7 +512,10 @@ git log keeps the record.
   (OpenClaw answers on :18789) — fix the RESILIENCE row. **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
-  **8 Oct evening — COMPILE IN PROGRESS (Claude Code).** Elena: "move on with video compilation", "all the frames already
+  **8 Oct ~22:30 UTC — Elena watched the preview: "film is ugly. Music is ugly. Only few shots are more or less good."**
+  Music + voice ON HOLD by her word. ALL film #9 material collected for her: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\`
+  (916 files, 4.8 GB, README + MD5SUMS; stanzas doc in 01_STANZAS). **Elena's move:** which shots are good. Nothing to build.
+  **8 Oct evening — COMPILE (superseded by the verdict above; kept for the record).** Elena: "move on with video compilation", "all the frames already
   approved by me should stay", text = ONE sharp stanza per shot from her own poems, emotional fit, atmospheric English; music =
   DEEP HOUSE underground (memory `feedback_atuona_film_style`). **Approved assets: memory `project_atuona_film9_approved_assets`
   + md5 manifest `docs/atuona/FILM9_APPROVED_MANIFEST_2026-10-08.json`; 2nd copy verified on the laptop
