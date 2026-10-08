@@ -1,0 +1,868 @@
+{
+ "text": [
+  {
+   "shot": "1a",
+   "kind": "Text",
+   "poem": "#090 Инвентаризация тишины / Inventory of Silence",
+   "status": "VERBATIM",
+   "scenario_text": "\"Blanc cassé\" … \"Broken white.\"",
+   "final_text": "\"Blanc cassé\" … Broken white.",
+   "source_text": "\"Blanc cassé,\" the clerk said, and Kira thought then that it sounded like a diagnosis. Broken white.",
+   "note": "Both pieces match her English Text in #090, paragraph 1. The ellipsis is an editorial cut that drops 'the clerk said, and Kira thought then that it sounded like a diagnosis.' The comma after \"Blanc cassé,\" is also dropped at the cut. In her text only \"Blanc cassé\" is in quotes because the clerk says it. 'Broken white.' is narration, so the quote marks around it on screen are display styling only. Her Russian has 'Blanc cassé' in Latin letters too, followed by 'Сломанный белый.'"
+  },
+  {
+   "shot": "1a",
+   "kind": "Text",
+   "poem": "#053 Второй PA / Second PA",
+   "status": "VERBATIM",
+   "scenario_text": "\"The main and only thing required of you is to create and fiercely protect my silence.\"",
+   "final_text": "The main and only thing required of you is to create and fiercely protect my silence.",
+   "source_text": "EN: The main and only thing required of you is to create and fiercely protect my silence. / RU: Главное и единственное, что от Вас требуется, - создавать и люто оберегать мою тишину.",
+   "note": "Exact match to the English Text of #053, paragraph 2. In the story Ule says this to Kira as his condition. The wrapping quote marks are display styling only."
+  },
+  {
+   "shot": "1b",
+   "kind": "Text",
+   "poem": "#097 The Yellow Christ",
+   "status": "VERBATIM",
+   "scenario_text": "\"He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric.\"",
+   "final_text": "He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric.",
+   "source_text": "Ule is silent behind her. His breathing is the only sound in the hall. Like a commit hanging in limbo, waiting for merge. He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric. Agentic. Quiet.",
+   "note": "Exact match to the English Text of #097, paragraph 3. Checked as a programmatic exact-substring match."
+  },
+  {
+   "shot": "1c",
+   "kind": "Text",
+   "poem": "#053 Второй PA / Second PA",
+   "status": "VERBATIM",
+   "scenario_text": "\"I'm a lesbian. Please consider this for possible group activities.\"",
+   "final_text": "I'm a lesbian. Please consider this for possible group activities.",
+   "source_text": "EN: I'm a lesbian. Please consider this for possible group activities. / RU: Я – лесбиянка. Прошу учесть это при возможности групповых мероприятий.",
+   "note": "Exact match to the English Text of #053, paragraph 3, where Kira answers Mr. Glensdagen. The apostrophe is straight in both the source and the extract."
+  },
+  {
+   "shot": "2",
+   "kind": "Voice",
+   "poem": "#044 Вчерашний день (LITPROM, 11-03-2019)",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Поцелуя не жду. Губами / Расцелую я лед на стеклах.» — draft: \"I'm not waiting for a kiss. My lips / will cover the ice on the panes with kisses.\"",
+   "final_text": "I'm not waiting for a kiss. My lips / will cover the ice on the panes with kisses.",
+   "source_text": "Поцелуя не жду. Губами / Расцелую я лед на стеклах.",
+   "note": "The extract line gives no poem number. I found it as the opening two lines of LITPROM #044 'Вчерашний день' in atuona-complete-with-dates.json. The Russian matches exactly, including 'лед' spelled without ё. The source runs the lines together with spaces, but the capital 'Расцелую' marks the line start, which matches the '/' break. #044 is in Russian only. Its 'English Analysis' field is commentary, not a translation. So the English here is a DRAFT, not her words, and Elena must approve it before it goes on screen. Please add the citation (#044) to this line in the scenario."
+  },
+  {
+   "shot": "5",
+   "kind": "none",
+   "poem": "",
+   "status": "NO_LINES",
+   "scenario_text": "",
+   "final_text": "",
+   "source_text": "",
+   "note": "Shot 5 'The leaf.' has an empty lines array in film9_onscreen_text_extract_2026-10-08.json. There is no on-screen text, voice or speech to check. This record exists only to show the shot was checked."
+  },
+  {
+   "shot": "6",
+   "kind": "Voice",
+   "poem": "#004 Vesenneye (LITPROM, 17-01-2025)",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Море волнуется раз. / Море волнуется два.» — draft: \"The sea is stormy — one. / The sea is stormy — two.\"",
+   "final_text": "The sea is stormy — one. / The sea is stormy — two.",
+   "source_text": "Море волнуется раз. / Море волнуется два.",
+   "note": "The extract line gives no poem number. I found it in LITPROM #004 'Vesenneye'. The Russian matches exactly. The couplet appears twice in #004: it opens the poem, followed by 'Наживка с крючка сорвалась.', and comes back later, followed by 'Доченька родилась.' Next to the following line in this shot, it is the opening stanza. It quotes a children's game, and her poem stops at 'два', never 'три', which fits the shot title. #004 is in Russian only, so the English is a DRAFT. Elena must approve it. The em dashes are draft punctuation and are not in her text. Please add the citation (#004)."
+  },
+  {
+   "shot": "6",
+   "kind": "Voice",
+   "poem": "#004 Vesenneye (LITPROM, 17-01-2025)",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Наживка с крючка сорвалась. / Я шлепнулась и уплыла.» — draft: \"The bait broke off the hook. / I plopped in and swam away.\"",
+   "final_text": "The bait broke off the hook. / I plopped in and swam away.",
+   "source_text": "Наживка с крючка сорвалась. / Я шлепнулась и уплыла.",
+   "note": "Lines 3-4 of LITPROM #004 'Vesenneye'. They come directly after the opening 'Море волнуется раз. Море волнуется два.' The Russian matches exactly, with 'шлепнулась' spelled without ё. #004 is in Russian only, so the English is a DRAFT. Elena must approve it. On wording: 'сорвалась' means tore or slipped off the hook, so 'broke off' is a translator's choice. Please add the citation (#004)."
+  },
+  {
+   "shot": "7",
+   "kind": "Voice",
+   "poem": "#036 Азимут (LITPROM, 14-07-2019)",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Я тебя крылатая, дождусь, / перьями подушку набиваю. / Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.» — draft: \"I'll wait for you — winged, / stuffing the pillow with feathers. / For nothing you've shed your scales again / right where I'm ever so quietly taking wing.\"",
+   "final_text": "I'll wait for you — winged, / stuffing the pillow with feathers. / For nothing you've shed your scales again / right where I'm ever so quietly taking wing.",
+   "source_text": "Я тебя крылатая, дождусь, / перьями подушку набиваю. / Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.",
+   "note": "The extract line gives no poem number. This is the closing quatrain of LITPROM #036 'Азимут'. The Russian matches exactly. The source runs the lines together, and this poem starts its lines in lower case, so I inferred the '/' breaks from the meter. They follow the same alternating 9/10-syllable lines as the poem's opening, 'Зря ты поломал мои крючки. / Рыбы не кончают суицидом.' #036 is in Russian only, so the English is a DRAFT. Elena must approve it. On wording: 'Зря' is closer to 'In vain' than 'For nothing'. 'Я тебя крылатая, дождусь' is literally 'Winged, I will wait for you'. Please add the citation (#036)."
+  },
+  {
+   "shot": "9",
+   "kind": "Text",
+   "poem": "#068 Digital Exile",
+   "status": "VERBATIM",
+   "scenario_text": "\"Morning in Atuona doesn't begin with light. / It begins with scent.\"",
+   "final_text": "Morning in Atuona doesn't begin with light. / It begins with scent.",
+   "source_text": "Morning in Atuona doesn't begin with light.\nIt begins with scent.",
+   "note": "Exact match to the first two lines of the English Text of #068. The line break matches the source. The apostrophe is straight in both."
+  },
+  {
+   "shot": "10a",
+   "kind": "Text",
+   "poem": "#078 Atuona Morning",
+   "status": "VERBATIM",
+   "scenario_text": "\"Kira woke to heat. / Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.\"",
+   "final_text": "Kira woke to heat. / Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.",
+   "source_text": "Kira woke to heat.\nSheets stuck to skin like a second dress.\nThrough the shutters — Atuona morning, thick as honey.\nThe air tastes of frangipani and rust.",
+   "note": "Exact match to the opening stanza of the English Text of #078, lines 1-4, including the em dash and the line breaks."
+  },
+  {
+   "shot": "10b",
+   "kind": "Text",
+   "poem": "#078 Atuona Morning",
+   "status": "VERBATIM",
+   "scenario_text": "\"She pulls the sheet away. / Skin meets air like first kiss.\"",
+   "final_text": "She pulls the sheet away. / Skin meets air like first kiss.",
+   "source_text": "She pulls the sheet away.\nSkin meets air like first kiss.",
+   "note": "Exact match to the two-line stanza of the English Text of #078. It comes after '...And this fucking heat.' and before 'The shower — warm water, almost hot.' Her text reads 'like first kiss' with no article, and that is how it should stay."
+  },
+  {
+   "shot": "11",
+   "kind": "Voice",
+   "poem": "#019 «Апокалипсис» (LITPROM, published 15-11-2020) — NOT cited in the extract",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Что ж так рвешься в мой плен суровый? / Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!» — draft: \"Why do you strain so toward my harsh captivity? / Come on — slip the straps down off your shoulders... / For God's sake, don't be cold-blooded / killing me in bed!\"",
+   "final_text": "Why do you strain so toward my harsh captivity? / Come on — slip the straps down off your shoulders... / For God's sake, don't be cold-blooded / killing me in bed!",
+   "source_text": "Что ж так рвешься в мой плен суровый? / Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!",
+   "note": "The Russian matches #019 «Апокалипсис» word for word (checked as an exact substring; the published text has no line breaks, so the ' / ' breaks are only layout). The extract does not name the poem, so the citation #019 needs to be added. The poem is Russian only, so the English is a draft Elena has to approve. In the poem these lines are spoken to Тоска (Longing/Melancholy as a person, the feminine 'хладнокровна'), not to a woman. The film uses them as a lover's voice, which is a change of context Elena should approve. Translation point: 'рвешься в' literally means 'rush/strain INTO' my harsh captivity, not 'toward'."
+  },
+  {
+   "shot": "M1",
+   "kind": "Text",
+   "poem": "#082 Landing / «Приземление»",
+   "status": "VERBATIM",
+   "scenario_text": "He holds her waist like she's another lot with a pre-sale estimate.",
+   "final_text": "He holds her waist like she's another lot with a pre-sale estimate.",
+   "source_text": "He holds her waist like she's another lot with a pre-sale estimate. [RU: Он держит её за талию так, будто она — очередной лот с предварительной оценкой.]",
+   "note": "Matches the whole sentence in the #082 English Text exactly, in both poems_src/082.json and POEMS_082-086_MILA_JEAN.txt."
+  },
+  {
+   "shot": "M2",
+   "kind": "Text",
+   "poem": "#082 Landing / «Приземление»",
+   "status": "VERBATIM",
+   "scenario_text": "Card 1: \"Kira stands slightly behind, watching.\" / Card 2: \"Knows this pain by name. / Knows how it smells in the morning.\"",
+   "final_text": "Kira stands slightly behind, watching. // Knows this pain by name. / Knows how it smells in the morning.",
+   "source_text": "Kira stands slightly behind, watching.\nKnows this pain by name.\nKnows how it smells in the morning. [RU: Кира стоит чуть позади, наблюдает. / Знает эту боль по имени. / Знает, как она пахнет утром.]",
+   "note": "These are the last three lines of #082, together and in order. Both cards match exactly. '//' marks where card 1 ends and card 2 begins."
+  },
+  {
+   "shot": "13",
+   "kind": "Text",
+   "poem": "#058 Storm Warning",
+   "status": "VERBATIM",
+   "scenario_text": "Kira walked into the restaurant in THAT dress.",
+   "final_text": "Kira walked into the restaurant in THAT dress.",
+   "source_text": "Kira walked into the restaurant in THAT dress.",
+   "note": "Matches the #058 English Text exactly. Note that the 'Russian Text' field of 058.json actually holds a second English version ('Kira entered the restaurant in THAT dress.'); no Russian original is stored. The film uses the published English Text, which is correct."
+  },
+  {
+   "shot": "14",
+   "kind": "Text",
+   "poem": "#058 Storm Warning",
+   "status": "VERBATIM",
+   "scenario_text": "\"Take it as an advance on the contract, Kira.\" / \"I pay. Nothing more.\"",
+   "final_text": "Take it as an advance on the contract, Kira. // I pay. Nothing more.",
+   "source_text": "\"Take it as an advance on the contract, Kira. You've already done solid work today. You're keeping to terms. I pay. Nothing more.",
+   "note": "Each card matches the #058 English Text exactly. The two sentences are NOT next to each other in the poem: 'You've already done solid work today. You're keeping to terms.' comes between them. As two separate cards this is fine. If they are ever put on ONE card, add an ellipsis or use the full passage so the cut is visible."
+  },
+  {
+   "shot": "14",
+   "kind": "Voice",
+   "poem": "#094 «Последняя Осень» (ATUONA; Russian only) — NOT cited in the extract",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Эти смыслы навечно срослись - эротика и активы» — draft: \"These meanings have grown together for ever — erotica and assets\"",
+   "final_text": "These meanings have grown together for ever — erotica and assets",
+   "source_text": "Эти смыслы навечно срослись - эротика и активы,",
+   "note": "The Russian matches #094 «Последняя Осень» exactly. In the poem the line ends with a comma and runs on into 'Их - под лютый конвой - они целы и невредимы.' The extract does not name the poem, so the citation #094 needs to be added. The 'English Text' field of 094.json repeats the Russian, so Elena never published an English version and the English here is a draft for her to approve. Small style point: 'forever' is the usual spelling of 'for ever'."
+  },
+  {
+   "shot": "M3",
+   "kind": "Text",
+   "poem": "#085 Cracks by the Eyes / «Трещины у глаз»",
+   "status": "VERBATIM",
+   "scenario_text": "M. — mask too tight, cracks by the eyes.",
+   "final_text": "M. — mask too tight, cracks by the eyes.",
+   "source_text": "\"M. — mask too tight, cracks by the eyes.\" [RU: “М. — маска слишком плотная, трещины у глаз.”]",
+   "note": "Matches the #085 English Text exactly. In the poem it is a note in Ule's notebook and sits inside quotation marks. I made this a separate record from the bell cue that shares the same extract line."
+  },
+  {
+   "shot": "M3",
+   "kind": "Sound",
+   "poem": "#085 Cracks by the Eyes (bell detail only)",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "Sound, no text: the valley church bell strikes three times (\"Somewhere below, in the valley, the Catholic church bell struck three times\", #085)",
+   "final_text": "",
+   "source_text": "Somewhere below, in the valley, the Catholic church bell struck three times — the same bell that rang in 1903 when they buried Gauguin, not yet knowing they were burying not a body, but a myth.",
+   "note": "I split this from the M3 extract line. It is a sound cue written as a stage direction, so no words appear on screen; 'the valley church bell strikes three times' is direction wording, not her text. The event itself does come from her: the quoted clause matches #085 exactly. If any bell wording ever appears on screen or is spoken, use her full sentence above, not the direction wording."
+  },
+  {
+   "shot": "M4",
+   "kind": "Text",
+   "poem": "#085 Cracks by the Eyes / «Трещины у глаз»",
+   "status": "VERBATIM",
+   "scenario_text": "Jean reached for her wrist — the movement of a drowning man grabbing at air.",
+   "final_text": "Jean reached for her wrist — the movement of a drowning man grabbing at air.",
+   "source_text": "Mila was already rising, brushing sand from her dress, when Jean reached for her wrist — the movement of a drowning man grabbing at air. [RU: …когда Жан потянулся к её запястью — движение утопающего, хватающего воздух.]",
+   "note": "This is an unbroken run of words from the last sentence of #085, matching exactly. The card starts mid-sentence, after 'when', and changes no words. The extract's note in brackets ('a contiguous clause of…') is a production note and does not go on screen."
+  },
+  {
+   "shot": "M5",
+   "kind": "Text",
+   "poem": "#083 Ultramarine Absence",
+   "status": "VERBATIM",
+   "scenario_text": "the color of absence, color of a woman who exists only as reflection of someone else's desire.",
+   "final_text": "the color of absence, color of a woman who exists only as reflection of someone else's desire.",
+   "source_text": "Ole pours her Perrier with lime, and I think Renoir really never saw this color — the color of absence, color of a woman who exists only as reflection of someone else's desire.",
+   "note": "This is an unbroken run of words from #083 and matches exactly, including the lowercase start. 083.json and the TXT carry English only (the 'Russian Text' field is the same English), so there is no Russian original to give. The extract's note in brackets is not on-screen text."
+  },
+  {
+   "shot": "15",
+   "kind": "Text",
+   "poem": "#061 Bird of Prosperity / «Птица Процветания»",
+   "status": "VERBATIM",
+   "scenario_text": "Without blinking. And when she wants to blink or sleep – she props them open with matches.",
+   "final_text": "Without blinking. And when she wants to blink or sleep – she props them open with matches.",
+   "source_text": "That's how she's been looking for years now. Without blinking. And when she wants to blink or sleep – she props them open with matches. [RU: Не моргая. А если хочется моргнуть или уснуть – вставляет спички.]",
+   "note": "Matches the #061 English Text exactly, including the en dash."
+  },
+  {
+   "shot": "15",
+   "kind": "Voice",
+   "poem": "#031 «Сам собою» (LITPROM, published 16-11-2019) — NOT cited in the extract",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Мы с тобой неразлучники, / В клетке ждем равноденствия.» — draft: \"You and I are lovebirds, inseparables, / in a cage, waiting for the equinox.\" (неразлучники — inseparables, and the lovebird parrots.)",
+   "final_text": "You and I are lovebirds, inseparables, / in a cage, waiting for the equinox.",
+   "source_text": "Мы с тобой неразлучники, / В клетке ждем равноденствия.",
+   "note": "The Russian matches #031 «Сам собою» exactly (checked as an exact substring; the published text has no line breaks). The extract does not name the poem, so the citation #031 needs to be added. The poem is Russian only, so the English is a draft for Elena to approve. The draft turns one word, 'неразлучники', into two English words ('lovebirds, inseparables'); Elena should pick one so the English does not add words she never wrote. The bracketed note about 'неразлучники' is a translator's gloss and must NOT appear on screen. The 'English Analysis' for #031 is commentary, not her text, so I did not use it."
+  },
+  {
+   "shot": "16b",
+   "kind": "Text",
+   "poem": "#060 After the Downpour / «После ливня»",
+   "status": "VERBATIM",
+   "scenario_text": "\"asked him to fasten the Graff on her again.\" / \"lifting the Kilian veil, breathing in her skin, All of her...\"",
+   "final_text": "asked him to fasten the Graff on her again. // lifting the Kilian veil, breathing in her skin, All of her...",
+   "source_text": "…softly touched his palm with hers and asked him to fasten the Graff on her again. \"This woman, sitting in the chair, …\" Ule smirked to himself, clicking shut the half-million-dollar clasp on Kira's neck, lifting the Kilian veil, breathing in her skin, All of her... [RU: …попросила снова застегнуть на ней Graff. … приподнимая вуаль Килиан, вдыхая ее кожу, Ее всю…]",
+   "note": "Each fragment matches the #060 English Text exactly, including the capital 'All' (from 'Ее всю'), which is hers. The two fragments are NOT next to each other: Ule's inner monologue comes between them. As two cards that is fine; on one card, mark the cut."
+  },
+  {
+   "shot": "16b",
+   "kind": "Text",
+   "poem": "#086 Midnight Confessions / «Полуночные признания»",
+   "status": "VERBATIM",
+   "scenario_text": "And tonight it wasn't about her sexual preferences.",
+   "final_text": "And tonight it wasn't about her sexual preferences.",
+   "source_text": "Everything in Ule's head made him seem constrained. She didn't care. And tonight it wasn't about her sexual preferences.",
+   "note": "Matches the #086 English Text exactly. The same sentence also appears in the alternate English version stored in the 'Russian Text' field of 086.json. No Russian original is stored."
+  },
+  {
+   "shot": "28",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "Kira puts two fingers on his lips. / To feel the words born straight from the body.",
+   "final_text": "Kira puts two fingers on his lips. / To feel the words born straight from the body.",
+   "source_text": "Kira puts two fingers on his lips. / To feel the words born straight from the body.",
+   "note": "#096 English Text lines 73 and 75, exact match."
+  },
+  {
+   "shot": "28",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "The painting is not lost, / It was never on canvas.",
+   "final_text": "The painting is not lost, / It was never on canvas.",
+   "source_text": "— The painting is not lost, — he says. / — It was never on canvas.",
+   "note": "#096 lines 63 and 65. Her words are used exactly. The opening dialogue dashes and the tag '— he says' are left off. The comma after 'lost' is hers; in her text it comes before '— he says'."
+  },
+  {
+   "shot": "28",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "Then we are already inside it, / In the negative space between two damaged creators.",
+   "final_text": "Then we are already inside it, / In the negative space between two damaged creators.",
+   "source_text": "— Then we are already inside it, — she whispers. / — In the negative space between two damaged creators.",
+   "note": "#096 lines 77 and 79. Her words are used exactly; the dialogue dashes and the tag '— she whispers' are left off. 'Damaged creators' is hers, not ours."
+  },
+  {
+   "shot": "30",
+   "kind": "Voice",
+   "poem": "#040",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Будто бы в преисподней / ждет нас один пароль.» — draft: \"As if in the underworld / one password waits for us.\"",
+   "final_text": "As if in the underworld / one password waits for us.",
+   "source_text": "Будто бы в преисподней ждет нас один пароль.",
+   "note": "The extract line gives no poem number. The words are found word for word in LITPROM #040 'Прохлада' (last sentence, after 'Ты же так ждал чуть больше Больше сквозных, сквозь боль,'). Her source is Russian only, so the English is OUR DRAFT and Elena must approve it. The source JSON stores the poem without line breaks, so the ' / ' break after 'преисподней' cannot be checked against the file. A more literal option: 'a single password awaits us'."
+  },
+  {
+   "shot": "30",
+   "kind": "Spoken",
+   "poem": "#098",
+   "status": "VERBATIM",
+   "scenario_text": "Ule.",
+   "final_text": "Ule.",
+   "source_text": "Ule.",
+   "note": "MISSING FROM THE EXTRACT. Scenario v3 shot 30 has this spoken line ('the second voice in the film'), and the extractor dropped it. Found in #098 line 52, right before 'Not a request. / A fork.' The note 'Not a whisper' (#098 line 49) is a performance direction for this line, not on-screen text."
+  },
+  {
+   "shot": "30",
+   "kind": "Text",
+   "poem": "#098",
+   "status": "VERBATIM",
+   "scenario_text": "Not a request. / A fork.",
+   "final_text": "Not a request. / A fork.",
+   "source_text": "Not a request. / A fork.",
+   "note": "#098 lines 54-55, exact match. These are non-explicit sentences from #098."
+  },
+  {
+   "shot": "31",
+   "kind": "Voice",
+   "poem": "#004",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Море волнуется раз. / Море волнуется два.»",
+   "final_text": "(no English draft given in the scenario; Russian voice only)",
+   "source_text": "Море волнуется раз. Море волнуется два.",
+   "note": "MISSING FROM THE EXTRACT. Scenario v3 shot 31 has this as her low voice line inside the shot description, and the extractor dropped it. LITPROM #004 'Vesenneye' opens with these exact words and repeats them later. Her source is Russian only, and the scenario has no English draft, so any subtitle needs a draft that Elena approves."
+  },
+  {
+   "shot": "31",
+   "kind": "Direction",
+   "poem": "#004 (claimed)",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "the \"three — freeze!\" happens to him",
+   "final_text": "(nothing on screen and nothing voiced; visual action only)",
+   "source_text": "(absent: #004 has only «раз» and «два»; it has no «три» and no «замри»)",
+   "note": "'Three — freeze!' comes from the children's rhyme ('Море волнуется три, морская фигура на месте замри'), not from Elena's #004. That is fine as an unspoken visual beat. It must never be printed or voiced. The shot title 'Three.' is our label, not her text."
+  },
+  {
+   "shot": "31",
+   "kind": "Text",
+   "poem": "#098",
+   "status": "VERBATIM",
+   "scenario_text": "Ule freezes.",
+   "final_text": "Ule freezes.",
+   "source_text": "Ule freezes.",
+   "note": "#098 line 89, exact match. The sentence is non-explicit. The lines right after it in #098 are explicit and are correctly left out."
+  },
+  {
+   "shot": "32",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "To the place where life beats.",
+   "final_text": "To the place where life beats.",
+   "source_text": "To the place where life beats.",
+   "note": "#096 line 97, exact match. It follows 'Ule takes her palm and presses it to his throat.'"
+  },
+  {
+   "shot": "32",
+   "kind": "Text",
+   "poem": "#088",
+   "status": "VERBATIM",
+   "scenario_text": "Not a lullaby. / Not a song. / Allowance.",
+   "final_text": "Not a lullaby. / Not a song. / Allowance.",
+   "source_text": "Not a lullaby. / Not a song. / Allowance.",
+   "note": "#088 lines 34-36, exact match. In her text they follow 'Three notes hung in the air.' The direction 'Three notes. No fourth.' is our stage direction, not on-screen text."
+  },
+  {
+   "shot": "34",
+   "kind": "Text",
+   "poem": "#099",
+   "status": "VERBATIM",
+   "scenario_text": "“Did you find it?” he asks quietly. / Kira doesn't answer.",
+   "final_text": "“Did you find it?” he asks quietly. / Kira doesn’t answer.",
+   "source_text": "“Did you find it?” he asks quietly. / Kira doesn’t answer.",
+   "note": "#099 lines 19 and 21. 'Kira doesn’t answer.' is the first sentence of line 21. Exact match apart from the apostrophe style. The extract's citation '(#099) (#097)' is a parsing error. Neither sentence is in #097; the (#097) belongs to the dropped line below."
+  },
+  {
+   "shot": "34",
+   "kind": "Text",
+   "poem": "#097",
+   "status": "VERBATIM",
+   "scenario_text": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+   "final_text": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+   "source_text": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+   "note": "MISSING FROM THE EXTRACT. Scenario v3 shot 34 has this line, and the extractor dropped it (only its '(#097)' citation leaked onto the line above). Found in #097 'The Yellow Christ', lines 32 and 34, exact match."
+  },
+  {
+   "shot": "35",
+   "kind": "Text",
+   "poem": "#099",
+   "status": "VERBATIM",
+   "scenario_text": "Two versions of the same woman.",
+   "final_text": "Two versions of the same woman.",
+   "source_text": "Two versions of the same woman.",
+   "note": "#099 line 21 (last sentence, after '...feels something inside her slowly fork.'), exact match."
+  },
+  {
+   "shot": "36",
+   "kind": "Voice",
+   "poem": "#003",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.» — draft: \"I'll stay nobody's wife, / Atuona, a little hunchbacked old woman, / on the whole with God — and a bit with Satan.\"",
+   "final_text": "I'll stay nobody's wife, / Atuona, a little hunchbacked old woman, / on the whole with God — and a bit with Satan.",
+   "source_text": "Я останусь: ничьей женой, Атуоной, горбатой старушкой В целом с Богом и чуть - с Сатаной.",
+   "note": "LITPROM #003 'Atuona': the poem's closing lines. The Russian matches her text exactly, including the colon and 'чуть - с Сатаной'. Her source is Russian only, so the English is OUR DRAFT and Elena must approve it. In the draft, the dash moved from before 'with Satan' to before 'and'. A closer option is 'on the whole with God, and a little — with Satan.' The source JSON has no line breaks, so the ' / ' breaks cannot be checked against the file."
+  },
+  {
+   "shot": "36",
+   "kind": "Direction (embedded in the Voice line)",
+   "poem": "#096 (quoted phrase)",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "(Said with a grin. The hunch she was feared to grow — \"growing wrong\" — is what she claims.)",
+   "final_text": "(nothing on screen and nothing voiced; performance note only)",
+   "source_text": "(only the phrase “growing wrong” is hers: #096 line 36, 'her mother was afraid the daughter was “growing wrong.”')",
+   "note": "This is our direction and interpretation, not her text. The extractor glued it onto the voice line. It must not be burned in or voiced."
+  },
+  {
+   "shot": "37",
+   "kind": "Text",
+   "poem": "#095",
+   "status": "VERBATIM",
+   "scenario_text": "The sand stays black. / So does she.",
+   "final_text": "The sand stays black. / So does she.",
+   "source_text": "The sand stays black. / So does she.",
+   "note": "#095 lines 32-33, exact match."
+  },
+  {
+   "shot": "37",
+   "kind": "Text",
+   "poem": "#095",
+   "status": "VERBATIM",
+   "scenario_text": "I will not whiten.",
+   "final_text": "I will not whiten.",
+   "source_text": "I will not whiten.",
+   "note": "#095 line 40, exact match. In her text it follows 'As the quiet stubborn line'."
+  },
+  {
+   "shot": "37",
+   "kind": "Extract artifact (appended to the Text line)",
+   "poem": "none",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "#029, #030*, #031, #036, #040, #041, #042, #043, #044 (×2). (*in the laws only) #087, #088, #089, #090, #093, #094 (voice), #095, #096, #097, #098 (non-explicit sentences only), #099. sentences; copyrighted lyrics (Madonna in #056; DDT is named in #094 but never heard).",
+   "final_text": "(remove: nothing on screen)",
+   "source_text": "(not from any poem: these are scraps of the scenario v3 'Poems in the film' credits list)",
+   "note": "Parsing error: the extractor glued the scenario's source and credits section onto the last Text line of shot 37. It is not her text and must never be burned in. The real on-screen line is only 'I will not whiten.'"
+  },
+  {
+   "shot": "17",
+   "kind": "Text",
+   "poem": "#087",
+   "status": "VERBATIM",
+   "scenario_text": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+   "final_text": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+   "source_text": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+   "note": "Matches 3 consecutive lines of the #087 English Text exactly (poems_src/087.json). RU original: Факт: собаки не бывают красными. / Факт: у неё нет тени. / Факт: Гоген не объяснил её смысл."
+  },
+  {
+   "shot": "17",
+   "kind": "Text",
+   "poem": "#087",
+   "status": "VERBATIM",
+   "scenario_text": "You see this dog?",
+   "final_text": "You see this dog?",
+   "source_text": "\"You see this dog?\"",
+   "note": "Exact line in #087 English Text (RU «Ты видишь эту собаку?»)."
+  },
+  {
+   "shot": "18",
+   "kind": "Text",
+   "poem": "#095",
+   "status": "VERBATIM",
+   "scenario_text": "Words that could never be printed. / Words that still haven't been forgiven.",
+   "final_text": "Words that could never be printed. / Words that still haven't been forgiven.",
+   "source_text": "Words that could never be printed. / Words that still haven’t been forgiven.",
+   "note": "Exact match in #095 English Text, stanza 1. The only difference is a curly vs straight apostrophe, which is ignored."
+  },
+  {
+   "shot": "19",
+   "kind": "Text",
+   "poem": "#095",
+   "status": "VERBATIM",
+   "scenario_text": "This is her carving. / Not on breadfruit wood / but in TypeScript. / Same rage. / Different medium.",
+   "final_text": "This is her carving. / Not on breadfruit wood / but in TypeScript. / Same rage. / Different medium.",
+   "source_text": "This is her carving. / Not on breadfruit wood / but in TypeScript. / Same rage. / Different medium.",
+   "note": "Exact match: the whole of stanza 4 of the #095 English Text."
+  },
+  {
+   "shot": "19",
+   "kind": "Text on her skin (MISSING FROM EXTRACT)",
+   "poem": "#064",
+   "status": "NOT_FOUND",
+   "scenario_text": "// paradise.js / if (darkness === true) { return stars.map(pain => light) }",
+   "final_text": "",
+   "source_text": "",
+   "note": "The extract dropped this line. It is in FILM9_ATUONA_SCENARIO_v3_2026-10-06.md, shot 19 ('On her skin: ... (#064)'), and is on-screen text. It could not be checked against the source: #064 is not in poems_src/ (which has 053, 056, 058, 060, 061, 067, 068, 075, ...) or in POEMS_082-086. The only place it appears is the secondary 2026-10-05_CLOSE_READING_ATUONA.md ('## #064 Code Paradise'). Before it ships, check it against the live #064 page."
+  },
+  {
+   "shot": "20",
+   "kind": "Voice",
+   "poem": "#003 (LITPROM 'Atuona')",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Suum cuique размажет все сказки, / Что AI нарисует в блокчейн.» — draft: \"Suum cuique will smear all the fairy tales / that AI paints into the blockchain.\"",
+   "final_text": "Suum cuique will smear all the fairy tales / that AI paints into the blockchain.",
+   "source_text": "Suum cuique размажет все сказки, Что AI нарисует в блокчейн.",
+   "note": "The extract leaves out the citation; the scenario cites #003. Found verbatim in atuona-complete-with-dates.json, 'Atuona #003', Poem Text. That poem exists only in Russian, so the English is a DRAFT that Elena must approve. Fidelity point: «нарисует» is future tense ('will paint'), but the draft says 'paints'. 'Suum cuique' is Latin in her original and stays as it is. The ' / ' line break is editorial: the LITPROM field stores the poem as one run-on line."
+  },
+  {
+   "shot": "20",
+   "kind": "Text",
+   "poem": "#075",
+   "status": "VERBATIM",
+   "scenario_text": "Every bid will be visible as blood on snow.",
+   "final_text": "Every bid will be visible as blood on snow.",
+   "source_text": "\"Every bid will be visible as blood on snow.\"",
+   "note": "Exact match: the final line of the #075 English Text."
+  },
+  {
+   "shot": "20",
+   "kind": "Text",
+   "poem": "#067",
+   "status": "VERBATIM",
+   "scenario_text": "the painting is the house itself.",
+   "final_text": "the painting is the house itself.",
+   "source_text": "And suddenly he gets it – the painting is the house itself.",
+   "note": "An exact fragment of a #067 sentence (the lowercase 'the' is hers, mid-sentence). In her text this is Ule's realisation, which fits the scenario's placement 'on Ule'."
+  },
+  {
+   "shot": "20",
+   "kind": "Sound (MISSING FROM EXTRACT)",
+   "poem": "#067",
+   "status": "VERBATIM",
+   "scenario_text": "The hammer falls like a gunshot.",
+   "final_text": "The hammer falls like a gunshot.",
+   "source_text": "\"Sold!\" The hammer falls like a gunshot.",
+   "note": "The extract dropped this line. The scenario lists it as 'Sound:', meaning a sound cue, not on-screen text. If it is ever shown or voiced, the words are hers exactly (#067 English Text)."
+  },
+  {
+   "shot": "21",
+   "kind": "Text",
+   "poem": "#093",
+   "status": "VERBATIM",
+   "scenario_text": "Paradise is not painted. / Paradise is compiled.",
+   "final_text": "Paradise is not painted. / Paradise is compiled.",
+   "source_text": "Paradise is not painted. / Paradise is compiled. / One brushstroke at a time.",
+   "note": "#093 is written in Russian (its 'English Text' field also holds Russian), but these closing lines are her own English, so they are verbatim. The source continues with 'One brushstroke at a time.'; the excerpt stops before it."
+  },
+  {
+   "shot": "22",
+   "kind": "Text",
+   "poem": "#093",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "\"— Found anything? —\" (draft of «— Нашла что-нибудь? — не оборачиваясь.», #093) Ничего.», #093)",
+   "final_text": "— Found anything? —",
+   "source_text": "— Нашла что-нибудь? — не оборачиваясь.",
+   "note": "#093 has no English original: its 'English Text' field is Russian. The draft needs Elena's approval. The extract line is GARBLED: the trailing 'Ничего.», #093)' is a broken remnant of the next line (her spoken 'No. Nothing.', see the following record) and must not appear on screen. The draft leaves out 'не оборачиваясь' ('without turning around'), which is narration and is staged visually. The feminine «Нашла» shows he is asking her."
+  },
+  {
+   "shot": "22",
+   "kind": "Spoken (MERGED/GARBLED IN EXTRACT)",
+   "poem": "#093",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "No. Nothing. (draft of «— Нет, — сказала она. — Ничего.», #093)",
+   "final_text": "No. Nothing.",
+   "source_text": "— Нет, — сказала она. — Ничего.",
+   "note": "The extract collapsed this into the line above; it is restored here from scenario v3, shot 22. The scenario calls it 'the first voice in the film'. The Russian source is verbatim in #093; the English is a DRAFT for Elena's approval. The narration «сказала она» ('she said') is correctly dropped. One option that keeps her words exactly: she speaks the Russian «Нет. Ничего.»"
+  },
+  {
+   "shot": "24",
+   "kind": "Text",
+   "poem": "#088",
+   "status": "VERBATIM",
+   "scenario_text": "Tears flowed on their own, no sobbing.",
+   "final_text": "Tears flowed on their own, no sobbing.",
+   "source_text": "Tears flowed on their own, no sobbing.",
+   "note": "Exact sentence in the #088 English Text (about Ule)."
+  },
+  {
+   "shot": "24",
+   "kind": "Voice",
+   "poem": "#043 (LITPROM 'Мужчины не плачут')",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Но слеза вдруг до упора / Жмет на тормоз разговора / Струйкой стаявшего льда.» — draft: \"but a tear suddenly slams / the brakes on the conversation — / a trickle of melted ice.\" (The frost oval of scene 2, melted.)",
+   "final_text": "but a tear suddenly slams / the brakes on the conversation — / a trickle of melted ice.",
+   "source_text": "Но слеза вдруг до упора Жмет на тормоз разговора Струйкой стаявшего льда.",
+   "note": "The extract leaves out the citation; the scenario cites #043. The text is the verbatim last three lines of 'Мужчины не плачут #043' in atuona-complete-with-dates.json, which exists only in Russian, so the English is a DRAFT for Elena. Fidelity: «до упора» means 'all the way down' and is rendered as 'slams'; «стаявшего» means 'thawed'. The parenthetical in the extract is a director's note, flagged separately in the next record."
+  },
+  {
+   "shot": "24",
+   "kind": "Stage direction (embedded in Voice line)",
+   "poem": "none",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "(The frost oval of scene 2, melted.)",
+   "final_text": "",
+   "source_text": "",
+   "note": "This is a director's note from scenario v3 that got attached to the Voice line in the extract. It is not in any poem. It must never be voiced or shown."
+  },
+  {
+   "shot": "25",
+   "kind": "Text",
+   "poem": "#088",
+   "status": "VERBATIM",
+   "scenario_text": "Salt left white trails on his skin — like maps of countries that don't exist.",
+   "final_text": "Salt left white trails on his skin — like maps of countries that don't exist.",
+   "source_text": "Salt left white trails on his skin — like maps of countries that don't exist.",
+   "note": "Exact sentence in the #088 English Text."
+  },
+  {
+   "shot": "25",
+   "kind": "Voice",
+   "poem": "#042 (LITPROM 'Via Regia')",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Зачем пришел? Давно уж розданный / Другим, не мне... / Что ж, будешь гостем этой осенью / В Моей Стране. / Вмиг ночь истомная расхристана / Вся, догола. / Казненным будешь ты без милости, / Сгоришь до тла!..» — draft: \"Why did you come? Long since given away / to others, not to me... / Well then — be my guest this autumn / in My Country. / In a blink the aching night flies open, / all of it, stripped to the skin. / You'll be executed, shown no mercy, / you'll burn down to ash!..\" is hers, and he is the guest.)",
+   "final_text": "Why did you come? Long since given away / to others, not to me... / Well then — be my guest this autumn / in My Country. / In a blink the aching night flies open, / all of it, stripped to the skin. / You'll be executed, shown no mercy, / you'll burn down to ash!..",
+   "source_text": "Зачем пришел? Давно уж розданный Другим, не мне... Что ж, будешь гостем этой осенью В Моей Стране. Вмиг ночь истомная расхристана Вся, догола. Казненным будешь ты без милости, Сгоришь до тла!..",
+   "note": "The extract leaves out the citation; the scenario cites #042. The Russian is a verbatim match for the last 8 lines of 'Via Regia #042' (LITPROM, Russian only), so the English is a DRAFT for Elena. Fidelity: «будешь гостем» is literally 'you will be a guest', and the draft's 'be my guest' adds 'my'. «расхристана» means unbuttoned or flung open. «до тла» is her spelling and is kept in the source. The extract line ends in a stray remnant of a director's note, flagged in the next record."
+  },
+  {
+   "shot": "25",
+   "kind": "Stage direction (embedded in Voice line)",
+   "poem": "none",
+   "status": "NOT_HER_WORDS",
+   "scenario_text": "is hers, and he is the guest.)",
+   "final_text": "",
+   "source_text": "",
+   "note": "This is the truncated tail of a scenario v3 director's note: '(The Kingdom she is refused in #003 and #006 — here it is hers, and he is the guest.)'. It is not in any poem and must be cut from the Voice line."
+  },
+  {
+   "shot": "26",
+   "kind": "Text",
+   "poem": "#098",
+   "status": "VERBATIM",
+   "scenario_text": "Now those lines live on living skin. / As if reading braille written on the semantic layer. / Skin hot.",
+   "final_text": "Now those lines live on living skin. / As if reading braille written on the semantic layer. / Skin hot.",
+   "source_text": "Now those lines live on living skin. ... As if reading braille written on the semantic layer. / Skin hot.",
+   "note": "Both pieces are exact lines from the #098 English Text: the last line of stanza 2, and lines 3-4 of stanza 3. Between them sit 'She runs her palm down his stomach. / Slowly.', which are skipped, but each fragment shown is a whole line of hers."
+  },
+  {
+   "shot": "26",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "Under the skin — steady pulse.",
+   "final_text": "Under the skin — steady pulse.",
+   "source_text": "Under the skin — steady pulse.",
+   "note": "Exact line in the #096 English Text."
+  },
+  {
+   "shot": "26",
+   "kind": "Voice",
+   "poem": "#021 (LITPROM 'Vopreki')",
+   "status": "DRAFT_TRANSLATION",
+   "scenario_text": "«Так пустить бы по венам жар... / Но все плещется полутьма...» — draft: \"If only I could send heat running through the veins... / but the half-dark keeps splashing...\"",
+   "final_text": "If only I could send heat running through the veins... / but the half-dark keeps splashing...",
+   "source_text": "Так пустить бы по венам жар... Но все плещется полутьма...",
+   "note": "The extract leaves out the citation; the scenario cites #021. The Russian is a verbatim match for the opening two lines of 'Vopreki #021' (LITPROM, Russian only), so the English is a DRAFT for Elena. Fidelity: her original is impersonal and has no 'I'. A closer rendering is 'If only heat could run through the veins...'. 'полутьма' means half-darkness."
+  },
+  {
+   "shot": "27",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "FIXED",
+   "scenario_text": "\"Exactly along the line\" … \"growing wrong.\"",
+   "final_text": "Exactly along the line … “growing wrong.”",
+   "source_text": "Exactly along the line where in childhood in Moscow they gave her injections because her mother was afraid the daughter was “growing wrong.”",
+   "note": "The words are hers, but the extract elides the middle and drops her own quotation marks around “growing wrong.”, which in her text mark the mother's phrase. The final_text puts those marks back. For zero elision, use her full sentence (source_text)."
+  },
+  {
+   "shot": "27",
+   "kind": "Text",
+   "poem": "#096",
+   "status": "VERBATIM",
+   "scenario_text": "The scar is small. / Almost invisible. / But he found it the first night. / As if the body itself had surrendered the private key.",
+   "final_text": "The scar is small. / Almost invisible. / But he found it the first night. / As if the body itself had surrendered the private key.",
+   "source_text": "The scar is small. / Almost invisible. / But he found it the first night. / As if the body itself had surrendered the private key.",
+   "note": "Exact consecutive lines in the #096 English Text."
+  }
+ ],
+ "qa": [
+  {
+   "name": "k13",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 0,
+   "why": "Kira and Ule match the originals and cast refs, and the framing is the same. But the pass adds things she did not approve: rain-wet skin across her face, chest and leg, a drip falling from her chin, and water dripping off the lantern. The wet sheen makes the skin glossier, not less painted."
+  },
+  {
+   "name": "k14",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 7,
+   "realism_gain": -2,
+   "why": "The pass added big glossy cartoon teardrops under both of Kira's eyes and reddened her eyes, so her composed, approved expression is now crying. The drops are a classic AI artifact. Ule, the necklace, the lanterns and the lightning are unchanged."
+  },
+  {
+   "name": "k16m",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 10,
+   "realism_gain": 0,
+   "why": "Almost no change: same hands, clasp, emerald necklace, wet back and room. The only difference is slightly lifted exposure and shadows. The original already looks like a film still, so there is nothing to gain. Swapping is harmless but pointless."
+  },
+  {
+   "name": "k17a",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": -2,
+   "why": "Kira's face and pose are the same, but the pass added sparkly water drops all over the black dress and a tan sand or stain smear down its front and hem. These are new defects on a clean approved costume. The beach, palms and cliffs are unchanged."
+  },
+  {
+   "name": "k18",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 1,
+   "why": "The composition and carving are the same, but the light changed colour. The warm amber light shaft and golden curtains became a cool teal-cyan film grade with lifted blacks, and the hand turned paler with bigger, separate water beads. A slight film-stock feel does not justify changing the approved light colour."
+  },
+  {
+   "name": "k19",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 8,
+   "realism_gain": 0,
+   "why": "The cold blue moonlight on the forearm became neutral or warm daylight, and the dark blue vein, likely a story element, is fainter and softer. The pass also adds a few small red spots. The original macro already reads as real skin."
+  },
+  {
+   "name": "k20",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 7,
+   "realism_gain": -2,
+   "why": "The pass added streaming glossy tears down Kira's cheeks, which changes her approved stoic expression. The exposure is also lifted a lot, so the dark chiaroscuro and the mood of the room are gone and her skin looks paler and smoother. The paddles went from textured to flat blank white."
+  },
+  {
+   "name": "k20b",
+   "verdict": "REVIEW",
+   "identity": 8,
+   "realism_gain": 3,
+   "why": "This pass gives the biggest realism gain in the set: the original's heavy HDR crunch on his face, arm and shirt is gone, and Ule still matches his locked ref. But the warm golden sun-and-leaf light became cool white-teal, and tear-like drops now run under his eye. Elena should choose, or re-run the pass with the warm grade locked and no drops on the face."
+  },
+  {
+   "name": "k21",
+   "verdict": "REVIEW",
+   "identity": 10,
+   "realism_gain": 1,
+   "why": "The content is identical: same hand, scratched book, cobwebs and broken boards, with nothing added. The only change is that the exposure is roughly doubled and the blacks lifted. That gives slightly more film-like detail but weakens the dark crawlspace mood she approved. It is fine to swap if she likes the brighter look or if it is graded back down."
+  },
+  {
+   "name": "k01a",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 2,
+   "why": "Framing, poses and the spray from the lamp are the same, so this pass only changed the colour grade. The warm amber light on the wall and floor turned cool grey-teal (mean blue went from 53 to 70). The original already had real film grain, so the lighting she approved changed with almost no gain in realism."
+  },
+  {
+   "name": "k01b",
+   "verdict": "REVIEW",
+   "identity": 9,
+   "realism_gain": 5,
+   "why": "Ule's stubble, lips and necklace match, and the bun and tweed are the same. It looks more like film, with less glassy HDR hair. But the pass removed the blue backlight flare behind her ear and added water drops to her neck, hair, collar and jacket. The wet look does fit the spray in k01a, so Elena should decide."
+  },
+  {
+   "name": "k02",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 5,
+   "why": "The pass added tears: two tracks running from her closed eye down her cheek, plus drops. That changes the emotion of the performance she approved. Her profile, brow scar, window and reflection are the same, and the skin is warmer and less glossy, so a re-run with no tears would probably pass."
+  },
+  {
+   "name": "k05",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 10,
+   "realism_gain": 1,
+   "why": "A near-black storm at night became a bright teal dusk sky (mean brightness 42 to 91). The leaf lost its red-against-gold contrast and is now an even copper. The pass also added an orange light leak along the top edge and dust specks. The leaf's shape and the city lights are the same."
+  },
+  {
+   "name": "k06",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 5,
+   "why": "Tears were added under both eyes, which changes the expression. The face still matches Kira's reference (grey-green eyes, wet curls), and the skin has better grain and warmth, but the added tears rule it out. Re-run without tears."
+  },
+  {
+   "name": "k07b",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 10,
+   "realism_gain": 1,
+   "why": "The moonlit night turned into a pale blue daytime sky: the moon now reads as a sun and the stars are gone. The pass also added a dark frame vignette at the left and top edges. The shells and footprint are identical, but the time of day she approved changed."
+  },
+  {
+   "name": "k07m",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 2,
+   "why": "The three feathers, pose, curls and moon path are identical. The original already looks like a real flash photo, though. The pass warmed the cold moonlit skin to peach, added small red blemishes on her back and put dust specks in the dark sky, so it changes the light without being clearly more real."
+  },
+  {
+   "name": "k09",
+   "verdict": "REVIEW",
+   "identity": 9,
+   "realism_gain": 4,
+   "why": "The face is faithful: brow scar, freckles, moles and parted lips all match, and the skin is a little less over-sharpened. The pass added a black film-gate border with rounded corners (the left edge measures 36 brightness against 66 just inside) plus dust. It also made the greens more saturated and the black sand bluish. It is usable only if cropped about 3%."
+  },
+  {
+   "name": "k11",
+   "verdict": "REVIEW",
+   "identity": 8,
+   "realism_gain": 8,
+   "why": "This is the biggest realism gain in the set. The original is a low-res (1352x760), oversaturated, painted-looking HDR frame, and the pass is muted, film-like and twice the resolution. Kira's face, the mirror, the lamps and the pose all hold. But tears were added to the reflection, which turns her sensual parted-lips look into a pained one, and the red lamps are toned down. Re-run without tears and it should be USE_REAL."
+  },
+  {
+   "name": "k37",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 0,
+   "realism_gain": 0,
+   "why": "Hard reject. The pass added a person to an approved empty frame of black sand and purple foam: a crying, topless young woman with short hair who is neither Kira nor in the cast (whole-frame luma correlation 0.49). The beach and foam match underneath, but the shot is now a different shot."
+  },
+  {
+   "name": "k26",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 7,
+   "realism_gain": 5,
+   "why": "The moonlit lattice shadows are gone from both faces, her shoulder and his chest; they survive only on the right of the shirt. Exposure doubled (mean luma 45 to 94), so the night scene reads as daylight. Kira and Ule are still recognisable but smoothed and younger. Skin is less oily, but the approved lighting design is lost."
+  },
+  {
+   "name": "k28m",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 6,
+   "realism_gain": 4,
+   "why": "The approved low-key shot (face in shadow, warm rim light on the stubble) is now flat and front-lit: luma 25 to 87, saturation 0.64 to 0.30. His tanned skin went pale pink and the smoke wisps in the background are mostly gone. The hand, pose and framing are unchanged."
+  },
+  {
+   "name": "k34",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 9,
+   "realism_gain": 2,
+   "why": "The original already read as a real photograph, so the gain is small. The pass also added content: water droplets on Kira's cheek and upper arm, film-dust specks in the sky and on the sand, and a darker film-gate vignette at the edges. Faces, Ule's hand on her back, the dog and the framing are otherwise the same."
+  },
+  {
+   "name": "k32m",
+   "verdict": "KEEP_ORIGINAL",
+   "identity": 8,
+   "realism_gain": 3,
+   "why": "Structure is preserved (luma correlation 0.98) and the hand count and poses match. The original already looked like a film still. The pass mainly brightened it (luma 42 to 80) and turned the warm amber club light on the skin into pale pink, so it is not clearly better and the light colour changed."
+  },
+  {
+   "name": "k25m",
+   "verdict": "REVIEW",
+   "identity": 6,
+   "realism_gain": 6,
+   "why": "Real gain: the oversaturated orange skin (saturation 0.65 to 0.35) became natural pores and drops. Changed: the amber club key light on Ule's tanned temple is now pale neutral skin, his eye at the left edge is now revealed, and the scattered white powder flecks became clear water drops (the main powder line is intact). If used, k28m and k32m should match it."
+  },
+  {
+   "name": "k27",
+   "verdict": "REVIEW",
+   "identity": 9,
+   "realism_gain": 3,
+   "why": "Composition is identical (luma correlation 0.98) and the black letterbox bars baked into the original are gone. Trade-off: the warm tan skin is now cool pale neutral, and the scar reads redder and fresher. The original was already photographic, so this is a look choice for Elena."
+  },
+  {
+   "name": "k36",
+   "verdict": "USE_REAL",
+   "identity": 9,
+   "realism_gain": 4,
+   "why": "Kira's face, hands, feet and the foam ring are structurally identical (luma correlation 0.99 or higher). The pass adds film grain, real skin texture and freckles, with a modest exposure lift. Only side effect: a slightly bluer cast on the sand. Nothing was added or removed."
+  }
+ ]
+}

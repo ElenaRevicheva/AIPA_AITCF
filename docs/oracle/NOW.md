@@ -491,10 +491,19 @@ git log keeps the record.
   `k10b`). Wardrobe plan in `docs/atuona/film9_impressionist_redesign_2026-10-08.json`. Private sheet
   M1_M2_30_31_10ab_impressionist. Venice ledger $32.15. **ALL 39 FRAMES APPROVED 8 Oct** → official files `img/M1..M5.jpg`,
   `k10a`, `k10b`, `k30`, `k31` (+ earlier); final 4:30 order in plan.json `final_frames_4m30`. Realism pass run on the 26 older
-  frames (`<frame>_real.jpg`, $2.08, replaces nothing yet). On-screen text: 55 lines / 38 shots extracted
-  (`docs/atuona/film9_onscreen_text_extract_2026-10-08.json`), sources fetched (`docs/atuona/poems_src/`); LITPROM #029-#044 are
-  Russian-only → their English is OUR DRAFT, must be marked. Workflow `wf_e46cad57-c1d` verifies text + QA's realism pairs. **Elena's move:** approve; and still
-  15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
+  frames (`<frame>_real.jpg`, $2.08, replaces nothing yet).
+  **8 Oct afternoon — text, realism QA, motion test.** ALL burned-in text: `docs/atuona/FILM9_ONSCREEN_TEXT_2026-10-08.md`
+  (65 lines: 46 her English verbatim, 2 with a marked cut, 17 OUR English of her LITPROM Russian shown beside it — need her OK;
+  6 stage directions removed; shot 19 code text checked against #064). 3 shots overloaded (25, 26, 28) → her call, recommendations
+  in the doc. Realism QA (`film9_text_and_realism_verdicts_2026-10-08.json`): keep original for 18 (k37_real ADDED A PERSON —
+  never use), k36 → use real, 7 for her eye: private sheet `Pictures/Atuona-film9-private/review_realism_8_2026-10-08.jpg`.
+  Motion directions for 38 shots: `docs/atuona/film9_motion_directions_2026-10-08.json` (275 s; one take each as planned =
+  $60.06 at Venice quotes Pro $0.77/5 s, 4K $2.31/5 s). **Motion test DONE ($3.85, plan entries v13/v30/vM3, clips
+  `~/atuona-film9/clips/v*__venice-kling-o3-*.mp4`, laptop copy in the private folder):** v13 4K good; **v30 FAILS — her lips
+  close to his jaw (no Kira/Ule kiss rule)** → re-take with her head locked; vM3 faces hold but the craquelure spreads (her call).
+  Venice balance **$60.35** (API). **Elena's move:** text corrections, 3 overload choices, 8 realism pairs, the test clips, and
+  4K-vs-Pro (all-Pro full run ≈ $44 leaves ~$16 for re-takes; as planned ≈ $56 leaves ~$4).
+  Oracle note: a 30 Sep aigo-promo bash wait loop (pid 840701, `pgrep` matches itself, never exits) is harmless — not ours, not killed.
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`

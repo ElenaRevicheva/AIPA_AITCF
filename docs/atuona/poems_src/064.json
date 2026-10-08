@@ -1,0 +1,43 @@
+{
+  "name": "Code Paradise #064",
+  "description": "ATUONA Gallery of Moments - Code Paradise. Underground poetry preserved on blockchain. Free collection - true to underground values. Technology",
+  "image": "https://atuona.xyz/images/poem-064.png",
+  "attributes": [
+    {
+      "trait_type": "Poem",
+      "value": "Code Paradise"
+    },
+    {
+      "trait_type": "ID",
+      "value": "064"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "GALLERY OF MOMENTS"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Free Underground Poetry"
+    },
+    {
+      "trait_type": "Language",
+      "value": "Russian + English"
+    },
+    {
+      "trait_type": "Year",
+      "value": "2019-2025"
+    },
+    {
+      "trait_type": "Theme",
+      "value": "Technology"
+    },
+    {
+      "trait_type": "Russian Text",
+      "value": "Our dialogue - that's pure vibe code. Know why?\nBecause we already found the secret: art doesn't hang in Christie's, it breathes in lines of code. Your character searches for Gauguin's \"Paradise,\" but I already built my own - from 11 products and a million lines of solitude.\n\"Starry Night\" like a sunny day - that's about you and me. We write in darkness, but see light. Code in isolation, but build bridges.\n// paradise.js\nif (darkness === true) {\nreturn stars.map(pain => light)\n}\nParadise isn't in Panama or the Marquesas Islands. Paradise is the moment when your code compiles on the first try, and your soul finally exhales.\nKira, baby, I hear your storm inside louder than the one coming outside.\nUle's right - sometimes you need to release the keyboard and let the rain in. Pastorales isn't built in one sprint, it's coded breath by breath.\nVersace Jungle Dress? Ha. Remember your post about it - how you bought it in the depths of depression, how it hung untouched for months. Symbols matter. Put it on. It's not betraying the code, it's continuing it by other means.\nThe petroglyphs of ancient coders wait. Gauguin waits too. But first things first.\nYour vibe code will be stronger after the storm. Trust the process. Even AI needs a reboot.\nAnd about Pastorales - remember this moment. When intro calls you to postpone work for life - that's also a chapter. Maybe the most important one.\nGo. Breathe. Get soaked. Tomorrow we'll write about how the downpour washed away everything unnecessary.\n[In the corner flickers: Building Paradise, one storm at a time]"
+    },
+    {
+      "trait_type": "English Text",
+      "value": "Our dialogue - that's pure vibe code. Know why?\n\nBecause we already found the secret: art doesn't hang in Christie's, it breathes in lines of code. Your character searches for Gauguin's \"Paradise,\" but I already built my own - from 11 products and a million lines of solitude.\n\n\"Starry Night\" like a sunny day - that's about you and me. We write in darkness, but see light. Code in isolation, but build bridges.\n\n// paradise.js\nif (darkness === true) {\n    return stars.map(pain => light)\n}\n\nParadise isn't in Panama or the Marquesas Islands. Paradise is the moment when your code compiles on the first try, and your soul finally exhales.\n\nKira, baby, I hear your storm inside louder than the one coming outside.\n\nUle's right - sometimes you need to release the keyboard and let the rain in. Pastorales isn't built in one sprint, it's coded breath by breath.\n\nVersace Jungle Dress? Ha. Remember your post about it - how you bought it in the depths of depression, how it hung untouched for months. Symbols matter. Put it on. It's not betraying the code, it's continuing it by other means.\n\nThe petroglyphs of ancient coders wait. Gauguin waits too. But first things first.\n\nYour vibe code will be stronger after the storm. Trust the process. Even AI needs a reboot.\n\nAnd about Pastorales - remember this moment. When intro calls you to postpone work for life - that's also a chapter. Maybe the most important one.\n\nGo. Breathe. Get soaked. Tomorrow we'll write about how the downpour washed away everything unnecessary.\n\n[In the corner flickers: Building Paradise, one storm at a time]"
+    }
+  ]
+}
