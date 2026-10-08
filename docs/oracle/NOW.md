@@ -464,7 +464,12 @@ git log keeps the record.
   (not the planned shadow), M5f = Mila semi-transparent like a ghost (not in the window). Picks: M1f (alt M1s), M2s, M3s
   (craquelure works), M4s (ultramarine pigment works), M5f. Private sheet: Pictures/Atuona-film9-private/
   mila_jean_sequence_2026-10-08.jpg. Venice ledger $28.11 (~$3.30 of her $77 spent). **8 Oct: Mila APPROVED; Jean-Marc REJECTED**
-  ("a beautiful Jean - french man but much more charismatic") → recast via `wf_cea7bc47-cf5`, then re-render M1-M4. **Elena's move:** approve; and still
+  ("a beautiful Jean - french man but much more charismatic") → recast via `wf_cea7bc47-cf5`, then re-render M1-M4.
+  **8 Oct later:** white-French Jean candidates rejected → Jean = "french man with black roots": 4 looks J1-J4 on Seedream
+  (`img/cast_jean3_j1..4`, sheet `docs/atuona/film9_jean_blackroots_2026-10-08.jpg`). Ule = #2 `img/ule.jpg` (ule_m2g) confirmed.
+  **REALISM STANDARD (blind panel 3/3, `wf_f0ea3308-723`):** Seedream V5 Pro edit + fixed realism instruction (clear tears,
+  matte skin, muted film colour) beats nano, Flux, film-emulation and the original. Applied to 15/22/24 → `k15s_real`,
+  `k22_real`, `k24_real` (private sheet realism_pass_15_22_24). Plan: every frame goes through this pass before motion. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
