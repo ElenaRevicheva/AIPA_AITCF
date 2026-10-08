@@ -479,7 +479,10 @@ git log keeps the record.
   DREADLOCKS → `cast_jean7_l1..l3`. **Elena picked L3** → `img/jean.jpg` (old one `jean_rejected_1008.jpg`). M1-M4 re-rendered
   with him (`M1j..M4j`, Seedream; prompts' old stone-grey suit → white linen); Seedream drew M1's bronze figure itself (the nano
   `M1jf` edit was redundant). Sheet `docs/atuona/film9_mila_jean_sequence_v2_2026-10-08.jpg`. Venice ledger $31.59 (~$6.80 spent).
-  **Elena's move:** approve M1-M5 v2 + 15/30/31 (+ realism-pass 15/22/24); then realism pass on all frames, then motion. **Elena's move:** approve; and still
+  **8 Oct verdict:** M3j M4j M5f APPROVED · M2 good but Jean in luxurious bohemian collector/crypto-trader clothes, Mila changes
+  clothes through the film, Mila NOT skinny · M1 REJECTED. **RULE (memory `feedback_atuona_surrealism_is_impressionism`):
+  surrealism = impressionist colour/emotion/glitch/atmosphere/poetic association, NEVER creatures/props.** Redesign of M1, M2,
+  15, 30, 31 + wardrobe plan in workflow `wf_5482a0d3-4ae` ($0). Then realism pass on all frames, then motion. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
