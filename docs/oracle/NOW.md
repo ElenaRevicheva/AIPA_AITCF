@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-08 23:30 | Brief "NEW" = deal's own activity; 19 own-address echo deals → closedlost (AUTO-SWEEP label) | cto-aipa src/hubspot-client.ts + src/lead-triage.ts + their dist/; pm2 cto-aipa restart; 19 HubSpot deals | 10e7f8d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
