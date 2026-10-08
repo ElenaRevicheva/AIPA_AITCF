@@ -482,7 +482,9 @@ git log keeps the record.
   **8 Oct verdict:** M3j M4j M5f APPROVED · M2 good but Jean in luxurious bohemian collector/crypto-trader clothes, Mila changes
   clothes through the film, Mila NOT skinny · M1 REJECTED. **RULE (memory `feedback_atuona_surrealism_is_impressionism`):
   surrealism = impressionist colour/emotion/glitch/atmosphere/poetic association, NEVER creatures/props.** Redesign of M1, M2,
-  15, 30, 31 + wardrobe plan in workflow `wf_5482a0d3-4ae` ($0). Then realism pass on all frames, then motion. **Elena's move:** approve; and still
+  15, 30, 31 + wardrobe plan in workflow `wf_5482a0d3-4ae` ($0). Then realism pass on all frames, then motion.
+  **APPROVED 8 Oct (realism pass):** 22 → `img/k22.jpg`, 24 → `img/k24.jpg`, 15 (keeps its birdcage — her call) → `img/k15.jpg`;
+  pre-realism originals `k22_pre_real_1008.jpg`, `k24_pre_real_1008.jpg`. Still pending: 30, 31 (impressionist versions coming). **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
