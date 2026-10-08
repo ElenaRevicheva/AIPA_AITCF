@@ -484,7 +484,12 @@ git log keeps the record.
   surrealism = impressionist colour/emotion/glitch/atmosphere/poetic association, NEVER creatures/props.** Redesign of M1, M2,
   15, 30, 31 + wardrobe plan in workflow `wf_5482a0d3-4ae` ($0). Then realism pass on all frames, then motion.
   **APPROVED 8 Oct (realism pass):** 22 → `img/k22.jpg`, 24 → `img/k24.jpg`, 15 (keeps its birdcage — her call) → `img/k15.jpg`;
-  pre-realism originals `k22_pre_real_1008.jpg`, `k24_pre_real_1008.jpg`. Still pending: 30, 31 (impressionist versions coming). **Elena's move:** approve; and still
+  pre-realism originals `k22_pre_real_1008.jpg`, `k24_pre_real_1008.jpg`. Still pending: 30, 31 (impressionist versions coming).
+  **Impressionist redesign rendered 8 Oct** (Seedream, $0.40): `M1i` (no statue; Mila faded-blue knit, healthier; Jean emerald
+  velvet + Gauguin-print silk + gold), `M2i` (approved frame, only the couple's clothes), `k30i` (lilac dawn light instead of
+  frost), `k31i` (sea-light on frozen Ule instead of hanging drops); shots 10a/10b from #078 made (`k10a_nf` flower removed,
+  `k10b`). Wardrobe plan in `docs/atuona/film9_impressionist_redesign_2026-10-08.json`. Private sheet
+  M1_M2_30_31_10ab_impressionist. Venice ledger $32.15 (~$7.40 spent). **Elena's move:** approve these 7. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
