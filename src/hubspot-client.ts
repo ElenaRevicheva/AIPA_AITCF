@@ -1926,6 +1926,11 @@ export interface ActionableDeal {
   pipeline: string;
   amount?: string;
   lastModified: string;
+  // Latest of the deal's own createdate, notes_last_updated (its own notes/emails/tasks) and the date
+  // it entered its current stage.
+  // NOT hs_lastmodifieddate: HubSpot bumps that on every deal sharing a contact whenever an email is
+  // logged on the contact (8 Oct 2026: one Boardy email to aipa@ re-dated 19 dead deals to "NEW").
+  lastActivity: string;
 }
 
 /**
@@ -1968,25 +1973,38 @@ export async function getActionableHubSpotDeals(opts: {
   try {
     const body = {
       filterGroups: [{ filters }],
-      properties: ['dealname', 'dealstage', 'pipeline', 'amount', 'hs_lastmodifieddate'],
+      properties: ['dealname', 'dealstage', 'pipeline', 'amount', 'hs_lastmodifieddate',
+        'createdate', 'notes_last_updated', 'hs_v2_date_entered_current_stage'],
       sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
-      limit,
+      // Over-fetch (search max = 200), then rank by the deal's OWN activity: a burst of rollup bumps
+      // must not push genuinely active deals out of the top `limit` (19 of 25 slots on 8 Oct 2026).
+      limit: 200,
     };
     const resp = await hsPost<{ results: Array<{ id: string; properties: Record<string, string> }> }>(
       '/crm/v3/objects/deals/search',
       body,
     );
+    const ms = (s?: string) => {
+      const t = !s ? 0 : /^\d+$/.test(s) ? Number(s) : new Date(s).getTime();
+      return Number.isFinite(t) ? t : 0;
+    };
     return (resp?.results || []).map(r => {
+      // A stage move counts too ("They replied" set by a watcher that edits an existing note).
+      const act = Math.max(ms(r.properties.createdate), ms(r.properties.notes_last_updated),
+        ms(r.properties.hs_v2_date_entered_current_stage));
       const out: ActionableDeal = {
         id: r.id,
         dealname: r.properties.dealname || '(unnamed)',
         stage: r.properties.dealstage || '',
         pipeline: r.properties.pipeline || '',
         lastModified: r.properties.hs_lastmodifieddate || '',
+        lastActivity: act > 0 ? new Date(act).toISOString() : '',
       };
       if (r.properties.amount) out.amount = r.properties.amount;
       return out;
-    });
+    })
+      .sort((a, b) => ms(b.lastActivity) - ms(a.lastActivity))
+      .slice(0, limit);
   } catch {
     return [];
   }

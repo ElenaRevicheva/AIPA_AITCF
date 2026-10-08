@@ -489,7 +489,8 @@ function isTestRow(r: any): boolean {
 // what's NEW today separately from what's still in play vs what's aging.
 // Without buckets, the same 10 deals can show identically for a week and
 // the operator stops reading the message.
-function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastModified: string; amount?: string }>): { section: string; counts: { newToday: number; active: number; aging: number }; pipelineUsd: number } {
+// Oct 8 2026: freshness = the deal's OWN activity (lastActivity), not hs_lastmodifieddate — see ActionableDeal.
+function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastActivity: string; amount?: string }>): { section: string; counts: { newToday: number; active: number; aging: number }; pipelineUsd: number } {
   const stageHint = (stage: string): string =>
     stage === 'qualifiedtobuy' ? '🔥' :
     stage === 'contractsent'   ? '💬' :
@@ -507,7 +508,7 @@ function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastM
   let pipelineUsd = 0;
 
   for (const d of deals) {
-    const t = d.lastModified ? new Date(d.lastModified).getTime() : 0;
+    const t = d.lastActivity ? new Date(d.lastActivity).getTime() : 0;
     const ageMs = t > 0 && Number.isFinite(t) ? now - t : -1;
     const days = ageMs >= 0 ? Math.floor(ageMs / DAY) : -1;
     let bucket: Bucket;
