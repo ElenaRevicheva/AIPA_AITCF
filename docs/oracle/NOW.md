@@ -130,10 +130,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🔴 8 Oct — webhook.aideazz.xyz (Oracle) NOT RESPONDING · plan for businesses with no website awaiting Elena's go
-- **Seen from the laptop ~UTC afternoon:** `/cto/v1/visibility` and `/cto/health` timed out (HTTP 000, 30–60 s); aideazz.xyz 200.
-  SSH: TCP connected, `timed out during banner exchange`, so the box is up but hung (memory or load?). Not investigated further (no access granted
-  this session). **Next agent: check uptime/free/pm2 before assuming any Oracle cron ran today.**
+### 🔴 8 Oct — Oracle hung ~21:00 UTC, recovered by itself (NOT rebooted, uptime 148 d) · 🚨 DISK 100% FULL (120 MB free)
+- **Seen:** webhook HTTP 000 for 60 s, SSH `timed out during banner exchange`. At 22:20 UTC: back, load avg `0.01, 0.09, 8.30`, RAM 2.9/12 GB used, all
+  PM2 apps online, `/cto/v1/visibility` 200. **Likely cause (inferred from timestamps, not proven):** the film #9 compile on the 1-OCPU box,
+  `~/atuona-film9/work/pv_seg_*.mp4` 20:50–20:52 → `body.mp4` (391 MB) 20:54 UTC.
+- **Disk `/` 44G/45G.** Biggest: `/tmp` 4.0G (`vjh-test-20261006` 1.3G, `demucs_*` ~1.1G, `atuona-hd` 604M), `~/aigo-*` promo dirs ~7.3G, film7/8/9 ~5G,
+  `~/.pm2/logs` 807M, `/var/log` 1.9G. **Nothing deleted, waiting for Elena's go.** Film #9 approved assets: never touch (memory `project_atuona_film9_approved_assets`).
+- **Health-check noise:** `/var/log/oracle-health.log` (212 MB) logs `espaluz-webhook not active, restarting...` every 5 min; `espaluz-webhook.log` 290 MB.
+- **Next agent: check `df -h /` before any render or deploy.** A full disk makes writes fail silently (SQLite, logs, caches).
 - **Question:** can the Visibility API serve no-website businesses (Instagram/WhatsApp/Maps)? Answer + plan:
   `docs/selling/NO_WEBSITE_BUSINESSES_AUDIT_2026-10-08.md`. Today it would grade Google's or Instagram's page instead of the business.
   Step A ($0, detect social/Maps links → honest "no owned website" diagnosis) and Step B (paid entity mode) are **NOT built**; both wait for Elena.
