@@ -475,7 +475,8 @@ git log keeps the record.
   gaze, quiet tailored elegance), no identifying features (no facial scarring): `img/cast_jean4_r1..r3` (one original man,
   3 settings), sheet `docs/atuona/film9_jean_register_2026-10-08.jpg`. Elena asked for Seal himself → declined (no real-person
   likeness); she chose "R-man pushed further" → `cast_jean5_p1..p3`, then "make him more bastardy" → `cast_jean6_b1..b3`
-  (sheets film9_jean_pushed / film9_jean_bastard). **Elena's move:** pick Jean (B1/B2/B3 or P1-P3). **Elena's move:** approve; and still
+  (sheets film9_jean_pushed / film9_jean_bastard). Elena: thin/tall/bald "not our way" → NEW: sexy, physically masculine,
+  DREADLOCKS → `cast_jean7_l1..l3` (sheet `docs/atuona/film9_jean_locs_2026-10-08.jpg`). **Elena's move:** pick L1/L2/L3. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
