@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-07 21:30 | Stale-brief fixes A–E (Boardy loop, brief 3-day leads, X alert weekly) | VJH src/autonomous/response_detector.py; cto-aipa src/lead-triage.ts + dist/lead-triage.js; Oracle data/reply-radar-ignore.txt; dragontrade-agent .env; 17 Boardy deals in HubSpot | 0b97fd2 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,22 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 7 Oct — Morning brief "stale again" after the 6 Oct cleanup: 3 generators switched off inside existing machinery
+- **Not stale data — live generators.** (1) VJH filed every Boardy email as a new `[HIRING-VJH-LEAD]` deal (17), and reply-radar
+  re-noted all 17 per email → always "NEW today". (2) The brief's lead list had no age limit (53/100 rows 2–4 months old) and 48 of
+  the last 49 rows were hn_hiring companies posting jobs. (3) DragonTrade X-credits alert twice a day (credits really $0).
+- **A** VJH blocklist + `"boardy.ai"` (`fbff8da`, git pull, vibejobhunter restarted 21:14 UTC). **B** `@boardy.ai` in Oracle
+  `data/reply-radar-ignore.txt` (backup in ~/backups). **C** 17 Boardy deals MERGED (HubSpot merge — irreversible, nothing lost,
+  110 notes kept) → deal 65824159009 `[PARTNER-MANUAL] Boardy intros…` at appointmentscheduled (off the action list). Natalia 8 Oct
+  CANCELLED by Boardy; Danny 13 Oct on. **D** brief = leads ≤3 days, hn_hiring → Monitor (`0ef0515`; dist/database.js +
+  dist/lead-triage.js scp'd, `pm2 restart cto-aipa` 22:19:36 > files 22:19:33; live brief Act Today 35 → 0). **E** DragonTrade
+  `ALERT_COOLDOWN_H=168` in .env + alerts.mjs reads it at fire time (index.js imports alerts before dotenv — the .env value was
+  ignored; `0e6849d`, restarted 00:58 UTC 8 Oct). Next X alert ≥ 14 Oct 17:21 UTC. Backups `~/_session-backups/{brief-3day,x-alert-weekly}-20261007/`.
+- **OPEN (Elena decides):** 19 more pre-30-Sep `[HIRING-VJH-LEAD] … @ Aideazz` deals (own-domain copies: portfolio inquiries,
+  Fermatix, a REAL Hospital CIMA client reply) sit in contractsent and fill the brief's "NEW today" whenever touched; something
+  touched all 19 at 21:08 UTC (not reply-radar, not hs-watch-manual-emails) — unidentified. hs-watch-manual-emails is hitting
+  HubSpot 429 rate limits. reply-radar alerts fail on Resend 422 (newline in subject).
 
 ### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
 - **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/sources.sh, which reads LIVE: `outlook.txt` = a mechanical extract of
