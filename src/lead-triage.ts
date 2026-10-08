@@ -558,8 +558,18 @@ function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastM
 
 export async function buildDailyBrief(): Promise<string | null> {
   const leads = await getTriagedLeads(undefined, 100);
-  // Filter out test/demo entries that slipped in from form testing
-  const rows = (leads as any[]).filter(r => !isTestRow(r));
+  // Filter out test/demo entries that slipped in from form testing.
+  // Oct 7 2026 (Elena, after the stale-message cleanup): the brief shows only leads classified in the
+  // last 3 days — the table has no age limit, so 2–4-month-old rows were filling every bucket.
+  const BRIEF_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
+  const rows = (leads as any[]).filter(r => {
+    if (isTestRow(r)) return false;
+    const t = r[10] ? new Date(r[10]).getTime() : 0;
+    return Number.isFinite(t) && t > 0 && Date.now() - t <= BRIEF_MAX_AGE_MS;
+  });
+  // Hacker News "who's hiring" companies are posting JOBS, not buying growth systems (7 Oct: 48 of
+  // the last 49 rows). They never go to Act Today; they stay visible under Monitor.
+  const isJobPoster = (r: any) => String(r[11] || '').toLowerCase() === 'hn_hiring';
 
   // MAY 25 2026: HubSpot-enriched brief — return null when nothing actionable.
   // Old behavior sent "No real signals yet" every day to the operator. Bad noise.
@@ -594,9 +604,9 @@ export async function buildDailyBrief(): Promise<string | null> {
     ].filter(Boolean).join('\n');
   }
 
-  const urgent = rows.filter((r: any) => r[4] >= 4);    // urgency
-  const thisWeek = rows.filter((r: any) => r[4] === 3);
-  const monitor = rows.filter((r: any) => r[4] <= 2);
+  const urgent = rows.filter((r: any) => r[4] >= 4 && !isJobPoster(r));    // urgency
+  const thisWeek = rows.filter((r: any) => r[4] === 3 && !isJobPoster(r));
+  const monitor = rows.filter((r: any) => r[4] <= 2 || isJobPoster(r));
 
   const top = urgent[0] || thisWeek[0];
   const topLine = top

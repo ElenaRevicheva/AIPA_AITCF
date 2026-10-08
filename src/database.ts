@@ -3134,7 +3134,13 @@ async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
     const result = await connection.execute(
       `SELECT RAWTOHEX(id), source_table, source_ref_id, signal_type, urgency,
               deal_value, status, one_line_summary, source_name, source_email,
-              classified_at
+              classified_at,
+              -- Oct 7 2026: [11] = the prospect's source (hn_hiring, github, places_…) so the morning
+              -- brief can keep "companies posting jobs" out of Act Today. Appended last: callers that
+              -- read r[0..10] are unchanged.
+              (SELECT t.source FROM outreach_targets t
+                WHERE lead_triage.source_table = 'outreach_targets'
+                  AND RAWTOHEX(t.id) = lead_triage.source_ref_id) AS target_source
        FROM lead_triage
        WHERE 1=1 ${where}
        -- May 24 2026: hide leads already pushed to HubSpot (HubSpot becomes
