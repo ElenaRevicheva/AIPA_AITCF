@@ -489,7 +489,11 @@ git log keeps the record.
   velvet + Gauguin-print silk + gold), `M2i` (approved frame, only the couple's clothes), `k30i` (lilac dawn light instead of
   frost), `k31i` (sea-light on frozen Ule instead of hanging drops); shots 10a/10b from #078 made (`k10a_nf` flower removed,
   `k10b`). Wardrobe plan in `docs/atuona/film9_impressionist_redesign_2026-10-08.json`. Private sheet
-  M1_M2_30_31_10ab_impressionist. Venice ledger $32.15 (~$7.40 spent). **Elena's move:** approve these 7. **Elena's move:** approve; and still
+  M1_M2_30_31_10ab_impressionist. Venice ledger $32.15. **ALL 39 FRAMES APPROVED 8 Oct** → official files `img/M1..M5.jpg`,
+  `k10a`, `k10b`, `k30`, `k31` (+ earlier); final 4:30 order in plan.json `final_frames_4m30`. Realism pass run on the 26 older
+  frames (`<frame>_real.jpg`, $2.08, replaces nothing yet). On-screen text: 55 lines / 38 shots extracted
+  (`docs/atuona/film9_onscreen_text_extract_2026-10-08.json`), sources fetched (`docs/atuona/poems_src/`); LITPROM #029-#044 are
+  Russian-only → their English is OUR DRAFT, must be marked. Workflow `wf_e46cad57-c1d` verifies text + QA's realism pairs. **Elena's move:** approve; and still
   15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.

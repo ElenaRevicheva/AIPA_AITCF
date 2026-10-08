@@ -1,0 +1,43 @@
+{
+  "name": "Секретная Выставка #095",
+  "description": "ATUONA Gallery of Moments - Секретная Выставка. Underground poetry preserved on blockchain. Free collection - true to underground values. Art",
+  "image": "https://atuona.xyz/images/poem-095.png",
+  "attributes": [
+    {
+      "trait_type": "Poem",
+      "value": "Секретная Выставка"
+    },
+    {
+      "trait_type": "ID",
+      "value": "095"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "GALLERY OF MOMENTS"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Free Underground Poetry"
+    },
+    {
+      "trait_type": "Language",
+      "value": "Russian + English"
+    },
+    {
+      "trait_type": "Year",
+      "value": "2019-2025"
+    },
+    {
+      "trait_type": "Theme",
+      "value": "Art"
+    },
+    {
+      "trait_type": "Russian Text",
+      "value": "Возьми малоизвестный факт из Maison du Jouir: Paul Gauguin вырезал на деревянных косяках дома не только эротику, но и дерзкие насмешки над миссионерами и колониальной властью — то, что нельзя было ни напечатать, ни простить.\n\nВозьми Turbine Hall — пустое индустриальное нутро бывшей электростанции, где когда-то ревели турбины, а теперь стоит тишина, способная проглотить любой крик.\n\nИ соедини это с augmented building через Cursor: когда в четвёртом часу ночи заставляешь агента переписывать одну функцию пятнадцать раз, пока она наконец не начинает дышать, — это тот же самый бунт, только вырезанный уже не в дереве, а в TypeScript.\n\nИ посреди этого Turbine Hall собственной жизни стоит Кира. Она не умеет молчать. Вместо лозунгов она оставляет следы в коде и на холсте — своё тихое, упрямое «я не сдамся». Оно приходит не как манифест. Оно выглядит как баг-репорт, отправленный в четыре утра. Как очередной commit без свидетелей. Как чёрный вулканический песок Маркизских островов, который сколько ни смывай океаном, никогда не становится белым."
+    },
+    {
+      "trait_type": "English Text",
+      "value": "The secret exhibition\n\nIn the doorframes of Maison du Jouir  \nGauguin didn’t only carve cunt and cock.  \nHe cut insults into the wood  \nsharp enough to make the bishop sweat  \nand the colonial clerk reach for his pistol.  \nWords that could never be printed.  \nWords that still haven’t been forgiven.\n\nKira stands inside the Turbine Hall of her own life  \nwhere the turbines once screamed  \nand now the silence is so complete  \nit could swallow a scream whole  \nand ask for more.\n\nShe doesn’t speak in manifestos.  \nShe leaves traces.  \nA function rewritten fifteen times at 4 a.m.  \nuntil the code finally breathes.  \nA commit with no witnesses.  \nA bug report that feels like a middle finger.  \n\nThis is her carving.  \nNot on breadfruit wood  \nbut in TypeScript.  \nSame rage.  \nDifferent medium.\n\nShe walks the black volcanic sand of the Marquesas  \nthat the Pacific keeps trying to bleach  \nand never succeeds.  \nThe sand stays black.  \nSo does she.\n\nHer rebellion doesn’t arrive loud.  \nIt arrives as another sleepless deploy.  \nAs an augmented building that suddenly works.  \nAs the quiet stubborn line  \n\nI will not whiten."
+    }
+  ]
+}

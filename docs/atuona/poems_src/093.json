@@ -1,0 +1,43 @@
+{
+  "name": "Алгоритм голода #093",
+  "description": "ATUONA Gallery of Moments - Алгоритм голода. Underground poetry preserved on blockchain. Free collection - true to underground values. Journey",
+  "image": "https://atuona.xyz/images/poem-093.png",
+  "attributes": [
+    {
+      "trait_type": "Poem",
+      "value": "Алгоритм голода"
+    },
+    {
+      "trait_type": "ID",
+      "value": "093"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "GALLERY OF MOMENTS"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Free Underground Poetry"
+    },
+    {
+      "trait_type": "Language",
+      "value": "Russian + English"
+    },
+    {
+      "trait_type": "Year",
+      "value": "2019-2025"
+    },
+    {
+      "trait_type": "Theme",
+      "value": "Journey"
+    },
+    {
+      "trait_type": "Russian Text",
+      "value": "Кира нашла его в подвале Maison du Jouir. Не картину — тетрадь.\n\nМолескин, чёрный, разбухший от влаги. На обложке выцарапано: \"Paradise.sol\"\n\nУле был наверху с экспертом из Wildenstein — они сканировали стены ультрафиолетом, искали призраков. Она спустилась за водой и увидела: между гнилыми досками что-то торчит. \n\nРаскрыла. Почерк не Гогена — слишком мелкий, слишком аккуратный. Английский с вкраплениями кода:\n\n\"Day 47. The smart contract is almost ready. If Paradise cannot be painted, it can be deployed. Immutable. Trustless. Forever on chain.\"\n\nЧто за бред?\n\nСледующая страница: диаграмма. Стрелки, блоки, надписи: \"mint Paradise\", \"burn the physical\", \"consensus mechanism = collective hallucination\".\n\n\"Day 73. Paul doesn't know I'm using his studio at night. He thinks I'm just another colonial administrator. But I see what he sees. Paradise is not a place. It's a protocol.\"\n\nКира перелистывала дальше. Формулы. Sketches каких-то механизмов. И снова текст:\n\n\"The Impressionists were right about one thing — light is data. Monet's haystacks = same input, different parameters. But they were cowards. Still painting for walls, for collectors, for mortality. What if we could paint directly into consciousness? Bypass the canvas entirely?\"\n\nВ животе засосало. Не от голода — от узнавания.\n\n\"Day 109. Found it in Charles Morice's papers. 'Le royaume de l'or.' Not gold — code. The Tahitians always knew. Mana = distributed power. No single point of failure. Paul is dying, but his Paradise will live forever. Not on canvas. On the network.\"\n\nПоследняя запись:\n\n\"May 8, 1903. Today Paul dies. Today Paradise deploys. \nrequire(msg.sender == creator);\nrequire(block.timestamp >= deathTime);\nemit ParadiseUnlocked(eternity);\"\n\nНаверху раздались шаги. Голос эксперта:\n— Rien. Ничего. Только копии, подделки.\n\nКира сунула тетрадь под куртку. Сердце колотилось как mining rig.\n\nПоднялась наверх. Уле стоял у окна, смотрел на яхту \"Paradise.exe\". \n\n— Нашла что-нибудь? — не оборачиваясь.\n\n— Нет, — сказала она. — Ничего.\n\nВ кармане молескин жёг как uranium. 1903 год. За шесть лет до рождения Сатоши Накамото должен был появиться его прадед. За сто лет до биткоина кто-то уже думал о распределённом рае.\n\nНочью она снова откроет тетрадь. Прочитает имя на последней странице. Узнает, кто писал эти записи в доме умирающего художника.\n\nНо это будет ночью.\n\nСейчас — только тяжесть секрета под рёбрами. The weight of knowing. И где-то там, в коде, который написан за век до изобретения компьютеров, дышит что-то живое.\n\nParadise is not painted.\nParadise is compiled.\nOne brushstroke at a time."
+    },
+    {
+      "trait_type": "English Text",
+      "value": "Кира нашла его в подвале Maison du Jouir. Не картину — тетрадь.\n\nМолескин, чёрный, разбухший от влаги. На обложке выцарапано: \"Paradise.sol\"\n\nУле был наверху с экспертом из Wildenstein — они сканировали стены ультрафиолетом, искали призраков. Она спустилась за водой и увидела: между гнилыми досками что-то торчит. \n\nРаскрыла. Почерк не Гогена — слишком мелкий, слишком аккуратный. Английский с вкраплениями кода:\n\n\"Day 47. The smart contract is almost ready. If Paradise cannot be painted, it can be deployed. Immutable. Trustless. Forever on chain.\"\n\nЧто за бред?\n\nСледующая страница: диаграмма. Стрелки, блоки, надписи: \"mint Paradise\", \"burn the physical\", \"consensus mechanism = collective hallucination\".\n\n\"Day 73. Paul doesn't know I'm using his studio at night. He thinks I'm just another colonial administrator. But I see what he sees. Paradise is not a place. It's a protocol.\"\n\nКира перелистывала дальше. Формулы. Sketches каких-то механизмов. И снова текст:\n\n\"The Impressionists were right about one thing — light is data. Monet's haystacks = same input, different parameters. But they were cowards. Still painting for walls, for collectors, for mortality. What if we could paint directly into consciousness? Bypass the canvas entirely?\"\n\nВ животе засосало. Не от голода — от узнавания.\n\n\"Day 109. Found it in Charles Morice's papers. 'Le royaume de l'or.' Not gold — code. The Tahitians always knew. Mana = distributed power. No single point of failure. Paul is dying, but his Paradise will live forever. Not on canvas. On the network.\"\n\nПоследняя запись:\n\n\"May 8, 1903. Today Paul dies. Today Paradise deploys. \nrequire(msg.sender == creator);\nrequire(block.timestamp >= deathTime);\nemit ParadiseUnlocked(eternity);\"\n\nНаверху раздались шаги. Голос эксперта:\n— Rien. Ничего. Только копии, подделки.\n\nКира сунула тетрадь под куртку. Сердце колотилось как mining rig.\n\nПоднялась наверх. Уле стоял у окна, смотрел на яхту \"Paradise.exe\". \n\n— Нашла что-нибудь? — не оборачиваясь.\n\n— Нет, — сказала она. — Ничего.\n\nВ кармане молескин жёг как uranium. 1903 год. За шесть лет до рождения Сатоши Накамото должен был появиться его прадед. За сто лет до биткоина кто-то уже думал о распределённом рае.\n\nНочью она снова откроет тетрадь. Прочитает имя на последней странице. Узнает, кто писал эти записи в доме умирающего художника.\n\nНо это будет ночью.\n\nСейчас — только тяжесть секрета под рёбрами. The weight of knowing. И где-то там, в коде, который написан за век до изобретения компьютеров, дышит что-то живое.\n\nParadise is not painted.\nParadise is compiled.\nOne brushstroke at a time."
+    }
+  ]
+}

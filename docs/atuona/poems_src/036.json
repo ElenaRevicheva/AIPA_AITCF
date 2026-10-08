@@ -1,0 +1,31 @@
+{
+  "name": "Underground Poem #036",
+  "description": "ATUONA Gallery of Moments - Underground Poem 036. Raw, unfiltered poetry preserved on blockchain. Free collection - true to underground values. Part of the 45-piece collection spanning addiction recovery, family trauma, spiritual rebellion, and human consciousness.",
+  "image": "https://atuona.xyz/images/poem-036.png",
+  "attributes": [
+    {
+      "trait_type": "Poem",
+      "value": "Underground Poem 036"
+    },
+    {
+      "trait_type": "ID",
+      "value": "036"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "GALLERY OF MOMENTS"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Free Underground Poetry"
+    },
+    {
+      "trait_type": "Language",
+      "value": "Mixed"
+    },
+    {
+      "trait_type": "Year",
+      "value": "2019-2025"
+    }
+  ]
+}
