@@ -455,7 +455,11 @@ git log keeps the record.
   **Elena 7 Oct: 4:30 CUT — YES** (drops 3, 4, 8, 12, 16a, 23, 29, 33). Shots 15, 30, 31 = "adult scenes very hot and sexy
   with surrealistic stuff in underground aesthetic Atuona style" — within: Kira is a lesbian (no Kira/Ule sex, "recognition not
   seduction"), no frontal nudity / no sex act. Designing via workflow `wf_2060fb0a-224` (2 designers + 1 judge per shot, $0),
-  then generation on qwen + seedream (her two approved engines). **Open:** motion plan (4K hero + O3 Pro).
+  then generation on qwen + seedream (her two approved engines). **Rendered 7 Oct** (`img/k15q|s`, `k30q|s`, `k31q|s`, $0.36):
+  Seedream wins all 3 (cast held, realistic; 15 built a literal birdcage instead of its shadow); qwen missed the cast. Private
+  sheet: laptop Pictures/Atuona-film9-private/shots_15_30_31_2026-10-07.jpg. **Elena's move:** approve/reject. Mila & Jean-Marc
+  sequence (#082-#086, full texts `docs/atuona/POEMS_082-086_MILA_JEAN.txt`) designing in `wf_c17e329c-ec2`. Venice ledger ~$26.4.
+  **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
