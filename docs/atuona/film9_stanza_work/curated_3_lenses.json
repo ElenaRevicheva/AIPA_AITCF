@@ -1,0 +1,4026 @@
+[
+ {
+  "curator": "inner-voice",
+  "slots": [
+   {
+    "slot": "1a",
+    "feeling": "two people held apart by a silence they both chose",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 32,
+      "l_to": 33,
+      "lang": "en",
+      "source_quote": "silence is not the absence of sound. / It is when both know what to say and choose not to.",
+      "est_en_words": 19,
+      "why": "Two figures at opposite ends of a blank lit wall, neither stepping closer: the voice of a silence that is chosen, not empty."
+     },
+     {
+      "poem": "089",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "It's presence. Like Malevich's white — not emptiness but all colors at once.",
+      "est_en_words": 12,
+      "why": "The broken-white wall felt from inside: the blank is not absence but everything held back, which is what the two of them carry."
+     },
+     {
+      "poem": "090",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "\"Blanc cassé,\" the clerk said, and Kira thought then that it sounded like a diagnosis. Broken white.",
+      "est_en_words": 17,
+      "why": "The colour of the wall heard as a diagnosis: a cold, clinical opening to a contract that will break."
+     }
+    ]
+   },
+   {
+    "slot": "1b",
+    "feeling": "heat of a breath that never becomes a touch",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric.",
+      "est_en_words": 21,
+      "why": "Exactly what her skin feels at the nape: heat through cloth, a gap that never closes. Nearness without seduction."
+     },
+     {
+      "poem": "021",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Так пустить бы по венам жар... / Но все плещется полутьма... / Ты - наверное - Божий дар. / Я - наверное - \"Я сама\".",
+      "est_en_words": 23,
+      "why": "Her inner voice as his breath reaches her: the wish for heat, and the proud self-sufficiency that keeps her still.",
+      "gist_en": "If only I could send heat through my veins... / but the half-dark keeps lapping... / You are, perhaps, a gift from God. / I am, perhaps, 'I'll do it myself.'"
+     },
+     {
+      "poem": "077",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "His hands on the Gauguin catalogue, long fingers sliding across the reproduction of Nevermore (1897), and she feels... not attraction, something more dangerous. Recognition.",
+      "est_en_words": 24,
+      "why": "Names the bond precisely: not attraction, recognition, and the danger she feels with him this close."
+     }
+    ]
+   },
+   {
+    "slot": "2",
+    "feeling": "a kiss given to ice because no one is expected",
+    "candidates": [
+     {
+      "poem": "044",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Поцелуя не жду. Губами / Расцелую я лед на стеклах.",
+      "est_en_words": 12,
+      "why": "Literally her gesture at the frosted pane, and the loneliness under it: she expects no kiss, so she gives one to the cold.",
+      "gist_en": "I'm not waiting for a kiss. With my lips / I will kiss the ice on the windowpanes."
+     },
+     {
+      "poem": "038",
+      "l_from": 3,
+      "l_to": 5,
+      "lang": "ru",
+      "source_quote": "Впитались слезы в стекло. / И что-то вдруг вытекло. / Это верно, душа, вылилась неспеша.",
+      "est_en_words": 17,
+      "why": "The meltwater running down the glass becomes her own soul seeping out, quietly.",
+      "gist_en": "Tears soaked into the glass. / And something suddenly ran out. / That must be the soul, pouring out slowly."
+     },
+     {
+      "poem": "047",
+      "l_from": 10,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "You'll feel Eternity. She'll touch your lips, / grow warmer, and your word will forget belonging.",
+      "est_en_words": 15,
+      "why": "Something touches her lips and grows warmer, the way the frost melts into a clear oval under her mouth."
+     }
+    ]
+   },
+   {
+    "slot": "5",
+    "feeling": "a burnt soul lifting off, glowing as it goes",
+    "candidates": [
+     {
+      "poem": "094",
+      "l_from": 34,
+      "l_to": 34,
+      "lang": "ru",
+      "source_quote": "А мне - благодать. Догорать. Догорать.",
+      "est_en_words": 6,
+      "why": "The ember-veined leaf rising through the storm: burning out felt as grace, not loss. Short and sharp.",
+      "gist_en": "And for me, a blessing. To burn down. To burn down."
+     },
+     {
+      "poem": "094",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Плавно кружатся листья к нам в раскаленную плазму.",
+      "est_en_words": 10,
+      "why": "A leaf glowing like an ember against a black sky: almost literal, and the heat is emotional.",
+      "gist_en": "The leaves slowly whirl down to us into the red-hot plasma."
+     },
+     {
+      "poem": "037",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Нам любые дороги дороги - / Там, где ты опять готов родиться.",
+      "est_en_words": 13,
+      "why": "A single leaf rising instead of falling: departure felt as a second birth.",
+      "gist_en": "Every road is dear to us, / the one where you are ready to be born again."
+     }
+    ]
+   },
+   {
+    "slot": "6",
+    "feeling": "letting go into dark water, eyes open, a dare",
+    "candidates": [
+     {
+      "poem": "054",
+      "l_from": 2,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "One day I'll drown / In cool silence / And drift to sleep.",
+      "est_en_words": 11,
+      "why": "Her floating stillness and the slip under: drowning not as panic but as cool silence and sleep."
+     },
+     {
+      "poem": "004",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Море волнуется раз. / Море волнуется два. / Наживка с крючка сорвалась. / Я шлепнулась и уплыла.",
+      "est_en_words": 18,
+      "why": "The children's game played on a black sea: she breaks loose before 'freeze' and slips away under the water.",
+      "gist_en": "The sea is stirring, one. / The sea is stirring, two. / The bait tore off the hook. / I flopped in and swam away."
+     },
+     {
+      "poem": "021",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "\"Я люблю\" - шум немой реки, / Дважды топящей всех готовых.",
+      "est_en_words": 12,
+      "why": "An aphorism with a wound in it: water that takes the ones who are ready, as she goes under.",
+      "gist_en": "'I love you' is the noise of a mute river / that drowns twice everyone who is ready."
+     }
+    ]
+   },
+   {
+    "slot": "7m",
+    "feeling": "wings not yet grown; a waiting body",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Я тебя крылатая, дождусь, / перьями подушку набиваю.",
+      "est_en_words": 9,
+      "why": "Three wet feathers on her shoulder blade: half-grown wings, and patient waiting in her still back.",
+      "gist_en": "Winged, I will wait for you, / stuffing a pillow with feathers."
+     },
+     {
+      "poem": "016",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Дожить, чтоб наголо отдаться / Кому-то в шкуре без брони.",
+      "est_en_words": 12,
+      "why": "Her bare back rising from the sea: skin without armour, the vulnerability she both fears and wants.",
+      "gist_en": "To live long enough to give yourself, stripped bare, / to someone, in a skin without armour."
+     },
+     {
+      "poem": "019",
+      "l_from": 26,
+      "l_to": 26,
+      "lang": "ru",
+      "source_quote": "Стая птиц, что ты раньше не встретил.",
+      "est_en_words": 9,
+      "why": "The feathers as traces of something unknown that passed over her: strange, light, a little uncanny.",
+      "gist_en": "A flock of birds you have never met before."
+     }
+    ]
+   },
+   {
+    "slot": "7",
+    "feeling": "a shed skin left on the sand; someone has gone",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 11,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.",
+      "est_en_words": 13,
+      "why": "The pearl scales and the lone footprint: what was shed is left behind, and whoever left it has already lifted off.",
+      "gist_en": "In vain you shed your scales again / there, where I am quietly taking off."
+     },
+     {
+      "poem": "036",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Зря ты поломал мои крючки. Рыбы не кончают суицидом. / Бабочки, попавшие в сачки, крылья свои сбросят паразитам.",
+      "est_en_words": 22,
+      "why": "Scales and wings as proof of survival: a bitter, sharp turn that makes the empty beach feel like aftermath.",
+      "gist_en": "You broke my fishhooks for nothing. Fish don't commit suicide. / Butterflies caught in nets will shed their wings to the parasites."
+     },
+     {
+      "poem": "038",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Снова твои следы высохли без воды.",
+      "est_en_words": 8,
+      "why": "The footprint in the sand: absence in one line, someone who was here and is gone.",
+      "gist_en": "Again your footprints dried up without water."
+     }
+    ]
+   },
+   {
+    "slot": "9",
+    "feeling": "breathing the island in before seeing it",
+    "candidates": [
+     {
+      "poem": "068",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Morning in Atuona doesn't begin with light. / It begins with scent.",
+      "est_en_words": 11,
+      "why": "She breathes in with lowered lids: scent before light, which is exactly this shot."
+     },
+     {
+      "poem": "073",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Like the desert learned to cry flowers despite itself.",
+      "est_en_words": 9,
+      "why": "Steam off the black sand tinted like scent: a hard landscape that learned to bloom anyway, as she does."
+     },
+     {
+      "poem": "089",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "Outside the Pacific breathed its ancient rhythm — inhale, exhale, without emphasis.",
+      "est_en_words": 11,
+      "why": "Her one slow breath matched to the ocean's: calm, no drama, the body syncing with the island."
+     }
+    ]
+   },
+   {
+    "slot": "10a",
+    "feeling": "slow, heavy heat; a body as a canvas for light",
+    "candidates": [
+     {
+      "poem": "078",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Kira woke to heat. / Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.",
+      "est_en_words": 27,
+      "why": "The honey stripe on her shoulder and the half-open eyes: waking into heat, honey and a faint taste of rust."
+     },
+     {
+      "poem": "081",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Light breaks against silk, runs over skin like Renoir's brush in The Bathers. / Each touch commits to the body. No rollback.",
+      "est_en_words": 21,
+      "why": "Light running over her skin like a brushstroke, every touch of it irreversible."
+     },
+     {
+      "poem": "085",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Renoir in his last years painted with brushes tied to his arthritis-twisted fingers. / Pain didn't leave — it became part of the light.",
+      "est_en_words": 22,
+      "why": "The pale forehead scar in warm light: pain that has not left but has become part of the light."
+     }
+    ]
+   },
+   {
+    "slot": "10b",
+    "feeling": "skin answering the air; a first, private touch",
+    "candidates": [
+     {
+      "poem": "078",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Skin meets air like first kiss.",
+      "est_en_words": 6,
+      "why": "The fine hairs lifting on her shoulder blade: skin meeting air, intimate with no one else there."
+     },
+     {
+      "poem": "081",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "The body stays. / The light moves.",
+      "est_en_words": 6,
+      "why": "Her stillness under the moving stripe of light: the film's own rule spoken as her calm."
+     },
+     {
+      "poem": "078",
+      "l_from": 43,
+      "l_to": 43,
+      "lang": "en",
+      "source_quote": "The fabric falls like forgiveness.",
+      "est_en_words": 5,
+      "why": "The white sheet over her: softness, release, a fabric that forgives."
+     }
+    ]
+   },
+   {
+    "slot": "11",
+    "feeling": "the double dares to undress what she holds back",
+    "candidates": [
+     {
+      "poem": "019",
+      "l_from": 9,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Что ж так рвешься в мой плен суровый? / Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!",
+      "est_en_words": 30,
+      "why": "The still woman speaking to her freer reflection as it lowers a strap: longing addressed as a seductive double.",
+      "gist_en": "Why are you straining into my harsh captivity? / Come on, slip the straps down off your shoulders... / For God's sake, don't be cold-blooded / when you kill me in bed!"
+     },
+     {
+      "poem": "078",
+      "l_from": 34,
+      "l_to": 37,
+      "lang": "en",
+      "source_quote": "But here, in this light... / She sees what Gauguin might have painted. / Not Vogue beautiful. / Human beautiful.",
+      "est_en_words": 17,
+      "why": "The mirror shows daylight while she stands in red night: she sees herself as a painter would, human rather than Vogue."
+     },
+     {
+      "poem": "065",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "You know how it is - sometimes the masterpiece hides in the mirror.",
+      "est_en_words": 12,
+      "why": "The mirror holds the other version of her: the real work hides there."
+     }
+    ]
+   },
+   {
+    "slot": "M1",
+    "feeling": "watching a woman held like property",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He holds her waist like she's another lot with a pre-sale estimate.",
+      "est_en_words": 12,
+      "why": "His palm on Mila's waist as Kira watches from behind: the owner's hold, seen through a collector's eye."
+     },
+     {
+      "poem": "085",
+      "l_from": 21,
+      "l_to": 21,
+      "lang": "en",
+      "source_quote": "\"J. — looks at her like the last ticket out of hell.\"",
+      "est_en_words": 11,
+      "why": "The way he walks her down the jetty: not love, escape. She is his way out."
+     },
+     {
+      "poem": "033",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "ru",
+      "source_quote": "Продаешься, я - не продаюсь.",
+      "est_en_words": 5,
+      "why": "Kira's silent verdict as the couple approaches: a hard line between herself and what she sees.",
+      "gist_en": "You sell yourself. I am not for sale."
+     }
+    ]
+   },
+   {
+    "slot": "M2",
+    "feeling": "recognising another woman's pain without a word",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 13,
+      "l_to": 14,
+      "lang": "en",
+      "source_quote": "Knows this pain by name. / Knows how it smells in the morning.",
+      "est_en_words": 12,
+      "why": "Kira's held gaze while his fingers tighten on Mila's wrist behind her: she knows this pain by name."
+     },
+     {
+      "poem": "059",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Плачут ночные лисицы. / Слезы их мне знакомы.",
+      "est_en_words": 9,
+      "why": "Recognition between women: Kira hears Mila's silent crying because it was once her own.",
+      "gist_en": "The night vixens are crying. / I know their tears."
+     },
+     {
+      "poem": "082",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "She extends her hand — thin fingers, nude Dior manicure, Cartier Love bracelet with scratches that tell a story better than any words.",
+      "est_en_words": 22,
+      "why": "The bangle at the gripped wrist: the scratches tell what Mila cannot say."
+     }
+    ]
+   },
+   {
+    "slot": "13",
+    "feeling": "walking into the storm, armoured in the dress",
+    "candidates": [
+     {
+      "poem": "045",
+      "l_from": 5,
+      "l_to": 6,
+      "lang": "ru",
+      "source_quote": "Ей - ни тени сомненья, / В том, что шаг станет твердым.",
+      "est_en_words": 13,
+      "why": "Her steady walk toward the lens through wind and rain: certainty in every step.",
+      "gist_en": "Not a shadow of doubt / that the step will be firm."
+     },
+     {
+      "poem": "020",
+      "l_from": 11,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Сегодня я у руля, / Иконы свои смоля.",
+      "est_en_words": 9,
+      "why": "She owns the storm: in command, and slightly blasphemous about it.",
+      "gist_en": "Today I'm at the helm, / tarring my own icons."
+     },
+     {
+      "poem": "058",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "On Kira it was devastating.",
+      "est_en_words": 5,
+      "why": "The dress as a weapon: short and sharp, the effect she walks in with."
+     }
+    ]
+   },
+   {
+    "slot": "14",
+    "feeling": "being fastened, priced and kept, and enduring it",
+    "candidates": [
+     {
+      "poem": "094",
+      "l_from": 30,
+      "l_to": 31,
+      "lang": "ru",
+      "source_quote": "Эти смыслы навечно срослись - эротика и активы, / Их - под лютый конвой - они целы и невредимы.",
+      "est_en_words": 20,
+      "why": "Emeralds closing on her throat while she stares at the lens: desire and capital fused, guarded like a convoy.",
+      "gist_en": "These meanings have grown together forever: the erotic and the assets. / Put them under fierce escort and they stay whole and unharmed."
+     },
+     {
+      "poem": "086",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "I've searched for them all my life. I'd buy them from her for my collection.",
+      "est_en_words": 15,
+      "why": "His inner voice as he fastens the clasp: he looks at her as a collector, not a lover."
+     },
+     {
+      "poem": "052",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Ule was generous only with exhibits for his collections. Otherwise he was deaf and mute to any creature with veins filled with hot blood.",
+      "est_en_words": 24,
+      "why": "Gift as acquisition: his generosity goes only to exhibits, and the necklace makes her one."
+     }
+    ]
+   },
+   {
+    "slot": "M3",
+    "feeling": "a perfect face cracking like old varnish",
+    "candidates": [
+     {
+      "poem": "085",
+      "l_from": 20,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "\"M. — mask too tight, cracks by the eyes.\"",
+      "est_en_words": 8,
+      "why": "The craquelure at Mila's eye under his studying gaze: the mask is too tight and it shows."
+     },
+     {
+      "poem": "041",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "ru",
+      "source_quote": "Я тебя не найду: страждет холст под невзрачною маской...",
+      "est_en_words": 12,
+      "why": "She is a canvas under examination, and the real woman cannot be found under the mask.",
+      "gist_en": "I won't find you: the canvas is suffering under a drab mask..."
+     },
+     {
+      "poem": "029",
+      "l_from": 20,
+      "l_to": 20,
+      "lang": "ru",
+      "source_quote": "Ты - роль без роли.",
+      "est_en_words": 5,
+      "why": "The model's emptiness in one line: a part performed with no self left inside it.",
+      "gist_en": "You are a role without a role."
+     }
+    ]
+   },
+   {
+    "slot": "M4",
+    "feeling": "slipping away; his hand closes on air",
+    "candidates": [
+     {
+      "poem": "011",
+      "l_from": 5,
+      "l_to": 6,
+      "lang": "ru",
+      "source_quote": "Что было, то было. / Теперь ты учись, Ничей.",
+      "est_en_words": 10,
+      "why": "She rises and leaves him grasping empty air: the cold, final turn of someone walking out.",
+      "gist_en": "What was, was. / Now it's your turn to learn, Nobody's man."
+     },
+     {
+      "poem": "045",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Застегнувшись с запАхом, / Шла Душа с Карнавала.",
+      "est_en_words": 9,
+      "why": "Her quiet exit in white silk: leaving the carnival with dignity intact.",
+      "gist_en": "Buttoned up, wrapped tight, / the Soul was walking away from the Carnival."
+     },
+     {
+      "poem": "040",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Если ушло - не надо. / Если простить - прости.",
+      "est_en_words": 9,
+      "why": "The hand closing on nothing: the answer to grasping is letting go.",
+      "gist_en": "If it has gone, let it go. / If you forgive, forgive."
+     }
+    ]
+   },
+   {
+    "slot": "M5",
+    "feeling": "a woman fading into her own reflection",
+    "candidates": [
+     {
+      "poem": "085",
+      "l_from": 22,
+      "l_to": 22,
+      "lang": "en",
+      "source_quote": "Mila caught his gaze and smiled slightly — that smile people wear when they've already decided on their own disappearance.",
+      "est_en_words": 19,
+      "why": "Mila half-transparent in the window, looking back: the smile of someone who has already chosen to disappear."
+     },
+     {
+      "poem": "073",
+      "l_from": 24,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "Violet in the desert — / that's her in high fashion. / Too fragile for this industry, / but stubbornly alive.",
+      "est_en_words": 17,
+      "why": "The fragile model glowing on the window seat: too delicate for her world, still alive."
+     },
+     {
+      "poem": "083",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "I watch her bare feet — white as the dress, like she's never known sun.",
+      "est_en_words": 14,
+      "why": "Her bare feet and the shoes left on the floor: a woman white as a ghost, untouched by daylight."
+     }
+    ]
+   },
+   {
+    "slot": "15",
+    "feeling": "a sleepless vigil, staring the beast down",
+    "candidates": [
+     {
+      "poem": "061",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "And when she wants to blink or sleep – she props them open with matches. Otherwise the sleeping Beast will wake and want meat again.",
+      "est_en_words": 24,
+      "why": "The match burning at her open eye in the cage: the unblinking vigil that keeps her addiction asleep."
+     },
+     {
+      "poem": "031",
+      "l_from": 40,
+      "l_to": 43,
+      "lang": "ru",
+      "source_quote": "Только миг, где попутчики, / Только миг, где рассветились. / Мы с тобой неразлучники, / В клетке ждем равноденствия.",
+      "est_en_words": 21,
+      "why": "The two of them locked in the cage, waiting: bound by the waiting, not by romance.",
+      "gist_en": "Only a moment where we are fellow travellers, / only a moment where we dawned. / You and I are inseparables, / waiting in a cage for the equinox."
+     },
+     {
+      "poem": "059",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Ночь — интересный период. / Нету ни сна. Ни яви.",
+      "est_en_words": 10,
+      "why": "The storm-lit stillness between them: the in-between of insomnia, neither dream nor waking.",
+      "gist_en": "Night is an interesting time. / There is no sleep. No waking."
+     }
+    ]
+   },
+   {
+    "slot": "16b",
+    "feeling": "asking again for what she refused by day",
+    "candidates": [
+     {
+      "poem": "046",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Принадлежность дневных сомнений / Принимает ночной оборот / И протягивает решенье / Снова задом, да, наперёд.",
+      "est_en_words": 17,
+      "why": "She asked him to fasten it again: night reverses the day's resolve, and she knows it.",
+      "gist_en": "The daytime doubts / take a nighttime turn / and hand over the decision / back to front, yes, all over again."
+     },
+     {
+      "poem": "077",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "Fashion is body language we choose each morning. But what if the body itself becomes canvas?",
+      "est_en_words": 16,
+      "why": "Jewels on a wet bare back: the body turned into the canvas a collector works on."
+     },
+     {
+      "poem": "016",
+      "l_from": 5,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Печалиться повремени! / Хоть бой в висок куранты - вьюгой.. / Себя ты отдала подругой, / В ответ - растраченные дни.",
+      "est_en_words": 21,
+      "why": "A fastening that costs her: what she gave and what came back. The bitter calm in her shoulders.",
+      "gist_en": "Hold off on grieving! / Though the clock strikes the temple like a blizzard... / You gave yourself away as a friend, / and got squandered days in return."
+     }
+    ]
+   },
+   {
+    "slot": "17",
+    "feeling": "seeing something that should not be there",
+    "candidates": [
+     {
+      "poem": "087",
+      "l_from": 23,
+      "l_to": 25,
+      "lang": "en",
+      "source_quote": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+      "est_en_words": 15,
+      "why": "Her eyes lifting to the empty beach where a shadowless red dog appears: impossible facts, calmly stated."
+     },
+     {
+      "poem": "087",
+      "l_from": 44,
+      "l_to": 47,
+      "lang": "en",
+      "source_quote": "the painting isn't there. / It remains in the gap / between what is / and what the artist decided to see.",
+      "est_en_words": 19,
+      "why": "She looks at what the island lets her see: the real thing lives in the gap between fact and vision."
+     },
+     {
+      "poem": "046",
+      "l_from": 27,
+      "l_to": 28,
+      "lang": "ru",
+      "source_quote": "В бою до конца за почести / Прикоснуться к иной реальности.",
+      "est_en_words": 13,
+      "why": "Hard noon on black sand, then the gaze to the right: the push to touch another reality.",
+      "gist_en": "Fighting to the end for the honour / of touching another reality."
+     }
+    ]
+   },
+   {
+    "slot": "18",
+    "feeling": "touching words cut too deep to forgive",
+    "candidates": [
+     {
+      "poem": "095",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Words that could never be printed. / Words that still haven’t been forgiven.",
+      "est_en_words": 12,
+      "why": "Her fingertips in the carved grooves: rage and taboo cut into the wood, still unforgiven."
+     },
+     {
+      "poem": "018",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Ржавые мифы по лезвию. / Тупится новая бритва.",
+      "est_en_words": 9,
+      "why": "Old carving and a sharp edge: myths cut into wood, a blade dulled by them.",
+      "gist_en": "Rusty myths along the blade. / The new razor goes blunt."
+     },
+     {
+      "poem": "098",
+      "l_from": 12,
+      "l_to": 12,
+      "lang": "en",
+      "source_quote": "As if reading braille written on the semantic layer.",
+      "est_en_words": 9,
+      "why": "Fingertips gliding along the relief as if reading: touch as a way of reading what is hidden."
+     }
+    ]
+   },
+   {
+    "slot": "19",
+    "feeling": "blood as ink; the vein becomes a line of code",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Like the keyboard of Cursor at three in the morning when code is no longer code but the continuation of a vein.",
+      "est_en_words": 22,
+      "why": "Light running along her vein where code will be composited: the code is her bloodstream."
+     },
+     {
+      "poem": "095",
+      "l_from": 20,
+      "l_to": 23,
+      "lang": "en",
+      "source_quote": "This is her carving. / Not on breadfruit wood / but in TypeScript. / Same rage.",
+      "est_en_words": 13,
+      "why": "Her forearm as the carving surface: the same rage as the wood, a new medium."
+     },
+     {
+      "poem": "021",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Так пустить бы по венам жар... / Но все плещется полутьма...",
+      "est_en_words": 13,
+      "why": "The cool blue vein waiting for warmth: longing felt in the blood itself.",
+      "gist_en": "If only I could send heat through my veins... / but the half-dark keeps lapping..."
+     }
+    ]
+   },
+   {
+    "slot": "20",
+    "feeling": "the smell of fear in a room of buyers",
+    "candidates": [
+     {
+      "poem": "067",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "The hall reeks of expensive perfume and fear. Yes, fear – she's learned to smell it over the years.",
+      "est_en_words": 18,
+      "why": "She sits still among drifting paddles: what she senses in the room is fear dressed as money."
+     },
+     {
+      "poem": "067",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Like I'm at a funeral, she thinks. Maybe I am.",
+      "est_en_words": 10,
+      "why": "Her inner voice, in black, in the third row: the sale feels like mourning."
+     },
+     {
+      "poem": "075",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "\"Every bid will be visible as blood on snow.\"",
+      "est_en_words": 9,
+      "why": "Crimson spreading over white paddles: every bid as blood on snow."
+     }
+    ]
+   },
+   {
+    "slot": "20b",
+    "feeling": "a man sensing the secret under his palm",
+    "candidates": [
+     {
+      "poem": "067",
+      "l_from": 9,
+      "l_to": 9,
+      "lang": "en",
+      "source_quote": "And suddenly he gets it – the painting is the house itself.",
+      "est_en_words": 11,
+      "why": "His palm on the wall as old colours bloom under it: the moment he understands where paradise is."
+     },
+     {
+      "poem": "070",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "The air smelled not of tropical flowers — it smelled of time.",
+      "est_en_words": 11,
+      "why": "Dust in the sunbeam and a fresco surfacing: the room breathes time rather than scent."
+     },
+     {
+      "poem": "066",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "He didn't hire her for work — he hired a mirror.",
+      "est_en_words": 10,
+      "why": "His wary look back over his shoulder: what he really hired her for is something he does not say."
+     }
+    ]
+   },
+   {
+    "slot": "21",
+    "feeling": "finding a secret, and its weight",
+    "candidates": [
+     {
+      "poem": "093",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "ru",
+      "source_quote": "В животе засосало. Не от голода — от узнавания.",
+      "est_en_words": 10,
+      "why": "Her hand drawing the swollen notebook out of the light: the jolt of recognising what she has found.",
+      "gist_en": "Her stomach clenched. Not from hunger, from recognition."
+     },
+     {
+      "poem": "084",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Knows exactly where I turned — and where I never came back.",
+      "est_en_words": 11,
+      "why": "Someone wrote her road map: the notebook knows where she turned and never came back."
+     },
+     {
+      "poem": "093",
+      "l_from": 28,
+      "l_to": 29,
+      "lang": "en",
+      "source_quote": "Paradise is not painted. / Paradise is compiled.",
+      "est_en_words": 7,
+      "why": "The notebook's thesis in two short lines: paradise is not painted, it is compiled."
+     }
+    ]
+   },
+   {
+    "slot": "22",
+    "feeling": "after the lie: what cannot be taken back",
+    "candidates": [
+     {
+      "poem": "068",
+      "l_from": 53,
+      "l_to": 56,
+      "lang": "en",
+      "source_quote": "Some messages aren't notifications. / They're commits. / And once confirmed, / there's no rollback.",
+      "est_en_words": 12,
+      "why": "Ule at the rain window after her 'Nothing': a lie that, once said, has no rollback."
+     },
+     {
+      "poem": "025",
+      "l_from": 26,
+      "l_to": 26,
+      "lang": "ru",
+      "source_quote": "Ты - не Авель, но и я - не Каин,",
+      "est_en_words": 10,
+      "why": "Betrayal and its refusal in one line: they wound each other, but neither is the murderer.",
+      "gist_en": "You are not Abel, but I am not Cain either."
+     },
+     {
+      "poem": "028",
+      "l_from": 20,
+      "l_to": 21,
+      "lang": "ru",
+      "source_quote": "Что-то где-то тихо потерялось. / Это мне отселе не уснуть.",
+      "est_en_words": 12,
+      "why": "His still watch over the night bay: something went missing, and sleep will not come.",
+      "gist_en": "Something somewhere has quietly been lost. / From here on, it's me who cannot sleep."
+     }
+    ]
+   },
+   {
+    "slot": "24",
+    "feeling": "the man who never cries, crying",
+    "candidates": [
+     {
+      "poem": "043",
+      "l_from": 17,
+      "l_to": 20,
+      "lang": "ru",
+      "source_quote": "\"Не заплачу никогда...\", / Но слеза вдруг до упора / Жмет на тормоз разговора / Струйкой стаявшего льда.",
+      "est_en_words": 20,
+      "why": "A single tear on Ule's still face: the vow broken without a sound.",
+      "gist_en": "'I'll never cry...' / but a tear suddenly slams / the brake on the conversation, all the way down, / in a trickle of melted ice."
+     },
+     {
+      "poem": "088",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "Tears flowed on their own, no sobbing. Just data streaming down the face.",
+      "est_en_words": 13,
+      "why": "His tears with no sobbing and no frown: crying as something that simply runs, like data."
+     },
+     {
+      "poem": "055",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "Personally, I prefer to drown silently. Kira, the rains have long burned my dreams with ice...",
+      "est_en_words": 16,
+      "why": "Ule's own inner voice: silent drowning, dreams burned by rain and ice."
+     }
+    ]
+   },
+   {
+    "slot": "25",
+    "feeling": "a light, costly touch that reads another's grief",
+    "candidates": [
+     {
+      "poem": "006",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Здравствуй, друг, мне бы к тебе прикоснуться легонько, чуть-чуть, / Но так дорого стоит это тепло, выше всяких валют,",
+      "est_en_words": 23,
+      "why": "Her fingertip on his salt trail: a friend's touch, light and expensive. Recognition, not romance.",
+      "gist_en": "Hello, friend, I'd like to touch you, lightly, just a little, / but this warmth costs so much, more than any currency,"
+     },
+     {
+      "poem": "088",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Ule wiped his face. Salt left white trails on his skin — like maps of countries that don't exist.",
+      "est_en_words": 18,
+      "why": "Her fingertip follows the white salt line as if reading a map of countries that don't exist."
+     },
+     {
+      "poem": "042",
+      "l_from": 5,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Зачем пришел? Давно уж розданный / Другим, не мне... / Что ж, будешь гостем этой осенью / В Моей Стране.",
+      "est_en_words": 22,
+      "why": "She lets him into her inner country, as a guest, not a possession.",
+      "gist_en": "Why have you come? Given away long ago / to others, not to me... / Well then, this autumn you'll be a guest / in My Country."
+     }
+    ]
+   },
+   {
+    "slot": "26",
+    "feeling": "a steady pulse under the palm; held, not possessed",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 5,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Palm still on Ule’s chest. / Under the skin — steady pulse. / Not consensus. / Just proof that the chain still holds.",
+      "est_en_words": 19,
+      "why": "Her palm flat on his chest under drifting moon-lace: the pulse as proof that what binds them still holds."
+     },
+     {
+      "poem": "098",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Moonlight from the Maison du Jouir window falls across his chest exactly along the lines Gauguin once carved into the lintel.",
+      "est_en_words": 21,
+      "why": "Carved light lying across his chest: Gauguin's lines laid on living skin."
+     },
+     {
+      "poem": "044",
+      "l_from": 9,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Сладких снов недосмотренных стая / Все кружит, приземляясь на лицах... / Мы друг друга с тобой листая, / Тихо сгинули в экспозициях.",
+      "est_en_words": 25,
+      "why": "The moon-lace drifting over their faces like landing dreams: two still faces turning into an exhibition.",
+      "gist_en": "A flock of sweet, unfinished dreams / keeps circling, landing on our faces... / Leafing through each other, / we quietly vanished into the exhibits."
+     }
+    ]
+   },
+   {
+    "slot": "27",
+    "feeling": "an old wound found by a precise touch",
+    "candidates": [
+     {
+      "poem": "024",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "И ни со зла, и никак. / Просто некая точность - / Словно старый наждак, / Мне истерший кожу.",
+      "est_en_words": 20,
+      "why": "The fingertip tracing her scar: precision that hurts without cruelty, skin worn by time.",
+      "gist_en": "Not out of malice, not in any way. / Just a certain precision, / like old sandpaper / that wore my skin away."
+     },
+     {
+      "poem": "096",
+      "l_from": 18,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "Not down. / Not up. / Exactly along the line where in childhood in Moscow they gave her injections because her mother was afraid the daughter was “growing wrong.”",
+      "est_en_words": 27,
+      "why": "Names the scar's origin: the childhood fear that she was 'growing wrong', traced exactly."
+     },
+     {
+      "poem": "097",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Same broken neckline. Same shoulder twisted in childhood and never reset.",
+      "est_en_words": 11,
+      "why": "A body carrying its childhood injury: the line along her spine as the mark that never healed straight."
+     }
+    ]
+   },
+   {
+    "slot": "28",
+    "feeling": "words born in the body that never sound",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 39,
+      "l_to": 40,
+      "lang": "en",
+      "source_quote": "Kira puts two fingers on his lips. / To feel the words born straight from the body.",
+      "est_en_words": 16,
+      "why": "Her two fingers on his moving lips: she feels the words before they are spoken."
+     },
+     {
+      "poem": "041",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "И не будем шептать лесть без фабулы и без развязки. / Лишь нелепая брань пресно звякнет в глухой суете.",
+      "est_en_words": 23,
+      "why": "The silenced mouth: no sweet words allowed, only what slips out.",
+      "gist_en": "And we won't whisper flattery with no plot and no ending. / Only a clumsy curse will clink, flat, in the deaf bustle."
+     },
+     {
+      "poem": "089",
+      "l_from": 14,
+      "l_to": 14,
+      "lang": "en",
+      "source_quote": "Not hesitation. Interruption from within.",
+      "est_en_words": 5,
+      "why": "His lips forming words that stop: not doubt, something inside him breaking off the sentence."
+     }
+    ]
+   },
+   {
+    "slot": "30",
+    "feeling": "one word that opens everything",
+    "candidates": [
+     {
+      "poem": "040",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "ru",
+      "source_quote": "Будто бы в преисподней ждет нас один пароль.",
+      "est_en_words": 10,
+      "why": "Her breath on his throat as she says his name: the name is the password.",
+      "gist_en": "As if, in the underworld, one password is waiting for us."
+     },
+     {
+      "poem": "098",
+      "l_from": 64,
+      "l_to": 65,
+      "lang": "en",
+      "source_quote": "This time there is no question in his name. / Only consensus.",
+      "est_en_words": 11,
+      "why": "His name spoken without a question: agreement, not plea."
+     },
+     {
+      "poem": "098",
+      "l_from": 44,
+      "l_to": 45,
+      "lang": "en",
+      "source_quote": "Not a request. / A fork.",
+      "est_en_words": 5,
+      "why": "Saying his name as a turning point: not asking, choosing a path."
+     }
+    ]
+   },
+   {
+    "slot": "31",
+    "feeling": "a touch suspended; the freeze",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 35,
+      "l_to": 36,
+      "lang": "en",
+      "source_quote": "Ule does not kiss. / He looks.",
+      "est_en_words": 6,
+      "why": "His hand stopped at her jaw: he does not kiss, he looks. Recognition held in the air."
+     },
+     {
+      "poem": "004",
+      "l_from": 17,
+      "l_to": 18,
+      "lang": "ru",
+      "source_quote": "Море волнуется раз. / Море волнуется два.",
+      "est_en_words": 8,
+      "why": "The storm sea in the window and the stopped hand: the children's game counts, and 'three, freeze' happens to him.",
+      "gist_en": "The sea is stirring, one. / The sea is stirring, two."
+     },
+     {
+      "poem": "088",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Three notes, repeat. Three notes, silence.",
+      "est_en_words": 6,
+      "why": "The hand that stops short of her jaw: a phrase that never reaches its fourth note, held in suspense."
+     }
+    ]
+   },
+   {
+    "slot": "32",
+    "feeling": "permission to go on living",
+    "candidates": [
+     {
+      "poem": "088",
+      "l_from": 12,
+      "l_to": 12,
+      "lang": "en",
+      "source_quote": "More like — allowance. That tomorrow will happen, and you'll be in it.",
+      "est_en_words": 12,
+      "why": "Her palm on his pulse: not hope, just the permission that tomorrow will come and they will be in it."
+     },
+     {
+      "poem": "096",
+      "l_from": 52,
+      "l_to": 52,
+      "lang": "en",
+      "source_quote": "Where it is no longer possible to lie to yourself.",
+      "est_en_words": 10,
+      "why": "Under her fingers, his pulse: the place where lying stops."
+     },
+     {
+      "poem": "088",
+      "l_from": 18,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "Not a lullaby. / Not a song. / Allowance.",
+      "est_en_words": 7,
+      "why": "The steady pulse as an unfinished melody: not a song, an allowance."
+     }
+    ]
+   },
+   {
+    "slot": "34",
+    "feeling": "standing beside someone as a witness",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 17,
+      "l_to": 18,
+      "lang": "en",
+      "source_quote": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+      "est_en_words": 15,
+      "why": "His palm resting on the small of her back as they look at the sea: not a lover, a witness."
+     },
+     {
+      "poem": "097",
+      "l_from": 19,
+      "l_to": 21,
+      "lang": "en",
+      "source_quote": "You already found her, he says. / Who? / The one who was supposed to die instead of you.",
+      "est_en_words": 17,
+      "why": "The quiet after: he recognises the one she survived for, and the dawn says the rest."
+     },
+     {
+      "poem": "003",
+      "l_from": 41,
+      "l_to": 42,
+      "lang": "ru",
+      "source_quote": "Может встретимся, статься, однажды, / Перекурим в лиловый рассвет,",
+      "est_en_words": 10,
+      "why": "Lilac dawn on black sand, two people side by side: a quiet promise between companions.",
+      "gist_en": "Maybe we'll meet someday, who knows, / and smoke together into the lilac dawn,"
+     }
+    ]
+   },
+   {
+    "slot": "35",
+    "feeling": "two versions of one woman; a fork",
+    "candidates": [
+     {
+      "poem": "099",
+      "l_from": 12,
+      "l_to": 12,
+      "lang": "en",
+      "source_quote": "Two versions of the same woman.",
+      "est_en_words": 6,
+      "why": "The composite shows her twice: the line names it plainly."
+     },
+     {
+      "poem": "097",
+      "l_from": 14,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Time no longer flows. / It branches.",
+      "est_en_words": 6,
+      "why": "Two Kiras on the sand: time branching instead of flowing."
+     },
+     {
+      "poem": "003",
+      "l_from": 23,
+      "l_to": 23,
+      "lang": "ru",
+      "source_quote": "Все, что сдохло во мне, в ком-то живо,",
+      "est_en_words": 10,
+      "why": "One self lets the other go on: the double as survival.",
+      "gist_en": "All that died in me lives on in someone else."
+     }
+    ]
+   },
+   {
+    "slot": "36",
+    "feeling": "walking out of the ring, belonging to no one",
+    "candidates": [
+     {
+      "poem": "003",
+      "l_from": 45,
+      "l_to": 48,
+      "lang": "ru",
+      "source_quote": "Закольцуешься чьим-то мужем. / Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.",
+      "est_en_words": 23,
+      "why": "She steps out of the closed ring of foam: others close the ring, she stays nobody's wife, at peace with God and a little with the devil.",
+      "gist_en": "You'll loop yourself into being someone's husband. / I will remain: nobody's wife, / Atuona, a hunchbacked old woman, / on the whole with God, and a little with Satan."
+     },
+     {
+      "poem": "040",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Если ушло - не надо. / Если простить - прости. / Я - та иная Прохлада, / Что на твоем пути.",
+      "est_en_words": 20,
+      "why": "Her calm walk toward the lens: she is the cool presence in your path, asking for nothing.",
+      "gist_en": "If it has gone, let it go. / If you forgive, forgive. / I am that other Coolness / that lies on your path."
+     },
+     {
+      "poem": "032",
+      "l_from": 22,
+      "l_to": 23,
+      "lang": "ru",
+      "source_quote": "Я уже не твоя послушница. / И не твой этот день Рождения.",
+      "est_en_words": 14,
+      "why": "Leaving the ring as a rebirth: she belongs to herself now.",
+      "gist_en": "I'm no longer your novice. / And this birthday isn't yours."
+     }
+    ]
+   },
+   {
+    "slot": "37",
+    "feeling": "erasure and return; everything starts again",
+    "candidates": [
+     {
+      "poem": "035",
+      "l_from": 1,
+      "l_to": 3,
+      "lang": "ru",
+      "source_quote": "Все закончится одиночеством. / Снова. / И с него же начнется.",
+      "est_en_words": 12,
+      "why": "Foam whitens the black sand, pulls back, and it is black again: the cycle of ending and beginning.",
+      "gist_en": "Everything will end in loneliness. / Again. / And it will begin with it too."
+     },
+     {
+      "poem": "047",
+      "l_from": 12,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "Something will happen, spill like ocean / over granite's endless shore.",
+      "est_en_words": 10,
+      "why": "The thin sheet of foam spilling over the shore and drawing back: something happening and withdrawing."
+     },
+     {
+      "poem": "054",
+      "l_from": 8,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "And ripples on the water / Glide like a pendulum— / They're not my enemies!",
+      "est_en_words": 13,
+      "why": "The ripples sliding in and out like a pendulum: the sea is not her enemy."
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "curator": "sharpest",
+  "slots": [
+   {
+    "slot": "1a",
+    "feeling": "charged silence across an empty white hall",
+    "candidates": [
+     {
+      "poem": "095",
+      "l_from": 11,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "and now the silence is so complete / it could swallow a scream whole / and ask for more.",
+      "est_en_words": 17,
+      "why": "The empty gallery as a silence that swallows a scream; the two figures standing apart are held inside it."
+     },
+     {
+      "poem": "078",
+      "l_from": 45,
+      "l_to": 48,
+      "lang": "en",
+      "source_quote": "But it's a different silence. / Charged, like air before storm. / Between them — the unnamed. / Growing, like gravity between galaxies.",
+      "est_en_words": 19,
+      "why": "Names the charged, unnamed pull across the gap between them, without either of them stepping closer."
+     },
+     {
+      "poem": "089",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Like Malevich's white — not emptiness but all colors at once.",
+      "est_en_words": 10,
+      "why": "The breathing off-white wall, a colour that doesn't exist, read as fullness rather than void."
+     }
+    ]
+   },
+   {
+    "slot": "1b",
+    "feeling": "heat without touch, held breath",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric.",
+      "est_en_words": 21,
+      "why": "The whole shot is the gap that never closes: warmth through tweed, no contact."
+     },
+     {
+      "poem": "006",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Здравствуй, друг, мне бы к тебе прикоснуться легонько, чуть-чуть, / Но так дорого стоит это тепло, выше всяких валют,",
+      "est_en_words": 23,
+      "gist_en": "Hello, friend, I'd like to touch you lightly, just barely, but this warmth costs so much, more than any currency.",
+      "why": "Wanting to touch and the price of warmth: restraint in an art-and-money world."
+     },
+     {
+      "poem": "068",
+      "l_from": 49,
+      "l_to": 50,
+      "lang": "en",
+      "source_quote": "His breath is hot, uneven — / like transactions in an overloaded network.",
+      "est_en_words": 11,
+      "why": "His breath at her ear, hot and uneven, in her underground code idiom."
+     }
+    ]
+   },
+   {
+    "slot": "2",
+    "feeling": "a kiss given to cold glass",
+    "candidates": [
+     {
+      "poem": "044",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Поцелуя не жду. Губами / Расцелую я лед на стеклах.",
+      "est_en_words": 12,
+      "gist_en": "I don't wait for a kiss. With my lips / I will kiss the ice on the windowpanes.",
+      "why": "Exactly the gesture: her lips to the frost instead of to a mouth."
+     },
+     {
+      "poem": "011",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "ru",
+      "source_quote": "Холодные пустыни теплых чувств.",
+      "est_en_words": 5,
+      "gist_en": "Cold deserts of warm feelings.",
+      "why": "Frost and warmth in one wound-line; the melting oval on cold glass."
+     },
+     {
+      "poem": "038",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Впитались слезы в стекло. / И что-то вдруг вытекло.",
+      "est_en_words": 10,
+      "gist_en": "Tears soaked into the glass. / And something suddenly leaked out.",
+      "why": "Meltwater running down the pane as grief leaking through."
+     }
+    ]
+   },
+   {
+    "slot": "5",
+    "feeling": "burning, letting go, rising",
+    "candidates": [
+     {
+      "poem": "094",
+      "l_from": 33,
+      "l_to": 34,
+      "lang": "ru",
+      "source_quote": "И листья вальсировать будут порознь. / А мне - благодать. Догорать. Догорать.",
+      "est_en_words": 13,
+      "gist_en": "Leaves will waltz apart. / For me: grace. Burn down. Burn down.",
+      "why": "A single ember-leaf waltzing alone; burning down as grace."
+     },
+     {
+      "poem": "094",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Плавно кружатся листья к нам в раскаленную плазму.",
+      "est_en_words": 10,
+      "gist_en": "Leaves drift smoothly toward us into the red-hot plasma.",
+      "why": "The glowing veins of a leaf turning through storm light."
+     },
+     {
+      "poem": "042",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Рябины зябнущие грозди. / Закат в золе.",
+      "est_en_words": 8,
+      "gist_en": "Shivering rowan clusters. / Sunset in ash.",
+      "why": "Ash and fire in the sky, compressed to five words."
+     }
+    ]
+   },
+   {
+    "slot": "6",
+    "feeling": "calm defiance, then surrender to the deep",
+    "candidates": [
+     {
+      "poem": "004",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Море волнуется раз. / Море волнуется два. / Наживка с крючка сорвалась. / Я шлепнулась и уплыла.",
+      "est_en_words": 18,
+      "gist_en": "The sea is restless, one. / The sea is restless, two. / The bait tore off the hook. / I flopped down and swam away.",
+      "why": "The children's sea game that never reaches 'freeze': she slips the hook and goes under on her own terms."
+     },
+     {
+      "poem": "054",
+      "l_from": 11,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "When I drown, / All those who aren't friends, / I'll drag down with me.",
+      "est_en_words": 13,
+      "why": "Her unblinking stare before she sinks: drowning as a threat, not a defeat."
+     },
+     {
+      "poem": "021",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "\"Я люблю\" - шум немой реки, / Дважды топящей всех готовых.",
+      "est_en_words": 12,
+      "gist_en": "'I love' is the noise of a mute river / that drowns twice everyone who is ready.",
+      "why": "Black water closing over her face as the silence of love."
+     }
+    ]
+   },
+   {
+    "slot": "7m",
+    "feeling": "wings drying on wet skin",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Я тебя крылатая, дождусь, / перьями подушку набиваю.",
+      "est_en_words": 9,
+      "gist_en": "Winged, I will wait for you, / stuffing a pillow with feathers.",
+      "why": "Three white feathers on the shoulder blade: winged, waiting, half-risen."
+     },
+     {
+      "poem": "078",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "Salt from yesterday's tears, today's sweat. / All the same ocean.",
+      "est_en_words": 10,
+      "why": "Water streaming off her back: tears, sweat and sea become one."
+     },
+     {
+      "poem": "098",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Every breath a gas fee the body pays just to stay here.",
+      "est_en_words": 12,
+      "why": "One slow breath lifting her back, priced in her code idiom."
+     }
+    ]
+   },
+   {
+    "slot": "7",
+    "feeling": "something shed on the sand, a trace left behind",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 11,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.",
+      "est_en_words": 13,
+      "gist_en": "In vain you shed your scales again / right where I am quietly taking flight.",
+      "why": "The shed scales on black sand, answering the feathers of the shot before."
+     },
+     {
+      "poem": "095",
+      "l_from": 14,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "She doesn’t speak in manifestos. / She leaves traces.",
+      "est_en_words": 8,
+      "why": "A lone footprint holding the moon: she leaves traces, not statements."
+     },
+     {
+      "poem": "038",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Скоро холодный пот. Скоро - больной черед. / Снова твои следы высохли без воды.",
+      "est_en_words": 16,
+      "gist_en": "Soon the cold sweat. Soon the sick turn. / Again your footprints have dried without water.",
+      "why": "A footprint and its water: a trace that will not stay."
+     }
+    ]
+   },
+   {
+    "slot": "9",
+    "feeling": "waking by scent before light",
+    "candidates": [
+     {
+      "poem": "068",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Morning in Atuona doesn't begin with light. / It begins with scent.",
+      "est_en_words": 11,
+      "why": "Exactly what the shot shows: she breathes the island in before she sees it."
+     },
+     {
+      "poem": "092",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Copra rotting in the sun. Earth digesting itself.",
+      "est_en_words": 8,
+      "why": "The island's scent with its underground edge: paradise as a living stomach."
+     },
+     {
+      "poem": "063",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "ATUONA breathes deep, like the ocean before sunset.",
+      "est_en_words": 8,
+      "why": "Her one deep breath mirrored by the island's."
+     }
+    ]
+   },
+   {
+    "slot": "10a",
+    "feeling": "heat, honeyed half-waking",
+    "candidates": [
+     {
+      "poem": "078",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Kira woke to heat. / Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.",
+      "est_en_words": 27,
+      "why": "Heat, shutters, honey light: the frame in her own words, with frangipani and rust."
+     },
+     {
+      "poem": "050",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "Here the sun stops you, suddenly spilling shamelessly across your face and palms. Mood like an out-of-tune clarinet.",
+      "est_en_words": 18,
+      "why": "The stripe of sun spilling over skin, and the off-key mood of waking."
+     },
+     {
+      "poem": "044",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Сладких снов недосмотренных стая / Все кружит, приземляясь на лицах...",
+      "est_en_words": 12,
+      "gist_en": "A flock of sweet, unfinished dreams / keeps circling, landing on faces...",
+      "why": "Dreams still landing on her face as she half-wakes."
+     }
+    ]
+   },
+   {
+    "slot": "10b",
+    "feeling": "exposed tenderness, skin answering light",
+    "candidates": [
+     {
+      "poem": "081",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "The body stays. / The light moves.",
+      "est_en_words": 6,
+      "why": "Her aphorism and the law of this film: she stays still and the light travels."
+     },
+     {
+      "poem": "078",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Skin meets air like first kiss.",
+      "est_en_words": 6,
+      "why": "Skin meeting air and light as a first touch."
+     },
+     {
+      "poem": "016",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Дожить, чтоб наголо отдаться / Кому-то в шкуре без брони.",
+      "est_en_words": 12,
+      "gist_en": "To live long enough to give yourself up bare / to someone, in a hide without armour.",
+      "why": "A sleeping back without armour, offered to the light."
+     }
+    ]
+   },
+   {
+    "slot": "11",
+    "feeling": "the other self undressing; longing as a seducer",
+    "candidates": [
+     {
+      "poem": "019",
+      "l_from": 10,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!",
+      "est_en_words": 20,
+      "gist_en": "Come, let the straps slip from your shoulders... / For God's sake, don't be cold-blooded / while killing me in bed!",
+      "why": "Longing personified slipping a strap: the reflection does what the body won't."
+     },
+     {
+      "poem": "065",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "You know how it is - sometimes the masterpiece hides in the mirror.",
+      "est_en_words": 12,
+      "why": "The mirror holds a daylight paradise the red room does not."
+     },
+     {
+      "poem": "087",
+      "l_from": 45,
+      "l_to": 47,
+      "lang": "en",
+      "source_quote": "It remains in the gap / between what is / and what the artist decided to see.",
+      "est_en_words": 15,
+      "why": "The gap between the still woman and her moving reflection."
+     }
+    ]
+   },
+   {
+    "slot": "M1",
+    "feeling": "arrival as possession, a woman priced",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He holds her waist like she's another lot with a pre-sale estimate.",
+      "est_en_words": 12,
+      "why": "His flat palm on her waist, read as an auction appraisal."
+     },
+     {
+      "poem": "042",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Что ж, будешь гостем этой осенью / В Моей Стране.",
+      "est_en_words": 12,
+      "gist_en": "Well then, you'll be a guest this autumn / in My Country.",
+      "why": "Kira's cold welcome to the intruders landing on her island."
+     },
+     {
+      "poem": "083",
+      "l_from": 5,
+      "l_to": 5,
+      "lang": "en",
+      "source_quote": "It's about power. Owning what no one else can buy.",
+      "est_en_words": 10,
+      "why": "Names the collector's appetite walking toward us."
+     }
+    ]
+   },
+   {
+    "slot": "M2",
+    "feeling": "recognising a captive's pain, cold watching",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 12,
+      "l_to": 14,
+      "lang": "en",
+      "source_quote": "Kira stands slightly behind, watching. / Knows this pain by name. / Knows how it smells in the morning.",
+      "est_en_words": 17,
+      "why": "Kira in front, the tightening grip behind: she knows this pain by its smell."
+     },
+     {
+      "poem": "079",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Living round the clock with the Beast in a cage, other beasts outside didn't scare her.",
+      "est_en_words": 16,
+      "why": "Her steady gaze toward a predator: she has faced a worse beast."
+     },
+     {
+      "poem": "033",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "ru",
+      "source_quote": "Продаешься, я - не продаюсь.",
+      "est_en_words": 5,
+      "gist_en": "You sell yourself; I am not for sale.",
+      "why": "The bought woman behind, the unbought one in front."
+     }
+    ]
+   },
+   {
+    "slot": "13",
+    "feeling": "defiant entrance through a storm",
+    "candidates": [
+     {
+      "poem": "064",
+      "l_from": 9,
+      "l_to": 9,
+      "lang": "en",
+      "source_quote": "Kira, baby, I hear your storm inside louder than the one coming outside.",
+      "est_en_words": 13,
+      "why": "She walks into the storm carrying a louder one inside."
+     },
+     {
+      "poem": "045",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Застегнувшись с запАхом, / Шла Душа с Карнавала.",
+      "est_en_words": 9,
+      "gist_en": "Buttoned up and wrapped tight, / the Soul walked home from the Carnival.",
+      "why": "A soul walking out of the carnival, unhurried, eyes forward."
+     },
+     {
+      "poem": "078",
+      "l_from": 23,
+      "l_to": 24,
+      "lang": "en",
+      "source_quote": "Front row applauded. / Nobody knew she was dying inside.",
+      "est_en_words": 9,
+      "why": "The runway walk: applause outside, dying inside."
+     }
+    ]
+   },
+   {
+    "slot": "14",
+    "feeling": "adorned and bought, poise under lightning",
+    "candidates": [
+     {
+      "poem": "081",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Light breaks against silk, runs over skin like Renoir's brush in The Bathers. / Each touch commits to the body. No rollback.",
+      "est_en_words": 21,
+      "why": "Rain-light running over her skin like a brush; every touch binding."
+     },
+     {
+      "poem": "044",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Ты - фартовый. Ходи тузами. / Я - врагами. Пускай не мешают.",
+      "est_en_words": 12,
+      "gist_en": "You're the lucky one. Lead with aces. / I lead with enemies. Let them stay out of my way.",
+      "why": "The power game of the necklace: his luck, her enemies."
+     },
+     {
+      "poem": "061",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Addiction like a fat stain on silk lingerie.",
+      "est_en_words": 8,
+      "why": "Luxury with a stain under it; the sober woman inside the glamour."
+     }
+    ]
+   },
+   {
+    "slot": "M3",
+    "feeling": "a mask cracking under appraisal",
+    "candidates": [
+     {
+      "poem": "090",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Slowly killing the canvas from inside. Beauty with a self-destruct timer.",
+      "est_en_words": 11,
+      "why": "The craquelure by her eye: beauty cracking like old varnish."
+     },
+     {
+      "poem": "085",
+      "l_from": 20,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "M. — mask too tight, cracks by the eyes.",
+      "est_en_words": 8,
+      "why": "Ule's note on Mila, exactly the crack at the corner of her eye."
+     },
+     {
+      "poem": "073",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "Too fragile for this industry, / but stubbornly alive.",
+      "est_en_words": 8,
+      "why": "A fragile model under a collector's gaze, still alive."
+     }
+    ]
+   },
+   {
+    "slot": "M4",
+    "feeling": "slipping away, his hand closing on air",
+    "candidates": [
+     {
+      "poem": "009",
+      "l_from": 14,
+      "l_to": 16,
+      "lang": "ru",
+      "source_quote": "Уходит и Она / Без Веры и Надежды / Излюблена до Дна.",
+      "est_en_words": 13,
+      "gist_en": "She leaves too, / without Faith or Hope, / loved down to the dregs.",
+      "why": "Mila rising and going: used up, and leaving anyway."
+     },
+     {
+      "poem": "036",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "ru",
+      "source_quote": "Зря ты поломал мои крючки. Рыбы не кончают суицидом.",
+      "est_en_words": 12,
+      "gist_en": "You broke my hooks for nothing. Fish don't commit suicide.",
+      "why": "His grasp misses: the catch slips the hook."
+     },
+     {
+      "poem": "042",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "И гнутся, разгораясь, звезды / К нагой земле.",
+      "est_en_words": 9,
+      "gist_en": "And the stars bend, flaring, / toward the naked earth.",
+      "why": "First stars over the black sand as she rises."
+     }
+    ]
+   },
+   {
+    "slot": "M5",
+    "feeling": "a woman fading in and out like a reflection",
+    "candidates": [
+     {
+      "poem": "085",
+      "l_from": 24,
+      "l_to": 24,
+      "lang": "en",
+      "source_quote": "On an island where time flows like molasses, the hour of disappearance is always now — between sunset and first star, when shadows grow longer than memory.",
+      "est_en_words": 26,
+      "why": "The woman in the window flickering out: the hour of disappearance is always now."
+     },
+     {
+      "poem": "083",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Somewhere beyond the window the ocean breathes ultramarine that wasn't on the impressionists' palette — too expensive, too pure, undiluted by turpentine.",
+      "est_en_words": 21,
+      "why": "The ultramarine night sea beyond the glass, a colour no palette held."
+     },
+     {
+      "poem": "019",
+      "l_from": 27,
+      "l_to": 28,
+      "lang": "ru",
+      "source_quote": "Век свечи, чтоб скорей растопиться, / Растекается в вязком моменте.",
+      "est_en_words": 12,
+      "gist_en": "A candle's lifetime, hurrying to melt, / spills out into a viscous moment.",
+      "why": "The candle flicker that makes her breathe in and out of being."
+     }
+    ]
+   },
+   {
+    "slot": "15",
+    "feeling": "a stare-down with the beast, sober vigilance",
+    "candidates": [
+     {
+      "poem": "061",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Kira had to build a comfortable cage for two, step inside, sit down across from Him and look Him in the eyes.",
+      "est_en_words": 22,
+      "why": "The cage, the two chairs, the unblinking stare: her sobriety in one sentence."
+     },
+     {
+      "poem": "061",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Without blinking. And when she wants to blink or sleep – she props them open with matches.",
+      "est_en_words": 16,
+      "why": "The burning match held at her open eye."
+     },
+     {
+      "poem": "025",
+      "l_from": 12,
+      "l_to": 13,
+      "lang": "ru",
+      "source_quote": "Так давно не плавилась душонка / У прямого, ясного огня.",
+      "est_en_words": 12,
+      "gist_en": "It's been so long since my little soul melted / at a straight, clear flame.",
+      "why": "The single match flame and what it melts in her."
+     }
+    ]
+   },
+   {
+    "slot": "16b",
+    "feeling": "being fastened, a gift that binds",
+    "candidates": [
+     {
+      "poem": "047",
+      "l_from": 8,
+      "l_to": 9,
+      "lang": "en",
+      "source_quote": "One day pearl stems will wrap around you whole. / Like rings on fingers – nectars of their sweet resin.",
+      "est_en_words": 18,
+      "why": "Jewels closing around the neck as something that will wrap her whole."
+     },
+     {
+      "poem": "029",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Как ты, висячая, на мне, / Выдергивала нити из под кожи,",
+      "est_en_words": 13,
+      "gist_en": "How you, hanging on me, / pulled threads from under my skin.",
+      "why": "The necklace hanging on her, pulling at the skin."
+     },
+     {
+      "poem": "014",
+      "l_from": 8,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "В моей железной нежности.",
+      "est_en_words": 5,
+      "gist_en": "In my iron tenderness.",
+      "why": "His precise fingers on the metal clasp: tenderness made of iron."
+     }
+    ]
+   },
+   {
+    "slot": "17",
+    "feeling": "exposed noon stillness, the island's indifference",
+    "candidates": [
+     {
+      "poem": "080",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Not blue. It's turquoise mixed with morphine — the turquoise of morphine dreams, when pain retreats but clarity stays sharp as a blade.",
+      "est_en_words": 22,
+      "why": "The hard white noon and trembling air: pain withdrawn, clarity like a blade."
+     },
+     {
+      "poem": "092",
+      "l_from": 9,
+      "l_to": 9,
+      "lang": "en",
+      "source_quote": "Locals say the island chooses who to keep. Spits out the rest.",
+      "est_en_words": 12,
+      "why": "A lone woman on an empty beach, waiting to see if she is kept."
+     },
+     {
+      "poem": "057",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Unknown how many hours Kira spent there, in the embrace of that very polyphony of silence.",
+      "est_en_words": 16,
+      "why": "Her stillness on the sand as the island's silence."
+     }
+    ]
+   },
+   {
+    "slot": "18",
+    "feeling": "reading forbidden words carved in warm wood",
+    "candidates": [
+     {
+      "poem": "095",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Words that could never be printed. / Words that still haven’t been forgiven.",
+      "est_en_words": 12,
+      "why": "Her fingertips in Gauguin's grooves: the unprintable carving."
+     },
+     {
+      "poem": "088",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "The wood was warm — like a memory card storing someone else's temperature.",
+      "est_en_words": 12,
+      "why": "The honeyed wood holding another's warmth under her touch."
+     },
+     {
+      "poem": "017",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Мойры шарят по окнам, / Пряжу ткут в занавесках,",
+      "est_en_words": 10,
+      "gist_en": "The Fates rummage along the windows, / weaving yarn into the curtains.",
+      "why": "The breathing curtains behind her as the Fates at work."
+     }
+    ]
+   },
+   {
+    "slot": "19",
+    "feeling": "life and code running in a cold vein",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Like the keyboard of Cursor at three in the morning when code is no longer code but the continuation of a vein.",
+      "est_en_words": 22,
+      "why": "Code composited along her vein: her own line for exactly that."
+     },
+     {
+      "poem": "021",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Так пустить бы по венам жар... / Но все плещется полутьма... / Ты - наверное - Божий дар. / Я - наверное - \"Я сама\".",
+      "est_en_words": 23,
+      "gist_en": "If only heat could run through my veins... / but the half-dark keeps lapping... / You are, perhaps, a gift from God. / I am, perhaps, 'I'll do it myself.'",
+      "why": "Cold blue light on the vein, longing for heat, and her stubborn self-reliance."
+     },
+     {
+      "poem": "076",
+      "l_from": 30,
+      "l_to": 30,
+      "lang": "en",
+      "source_quote": "When the soul is distributed — between servers, markets, and memory.",
+      "est_en_words": 10,
+      "why": "The soul spread through a pulse, like the code along the vein."
+     }
+    ]
+   },
+   {
+    "slot": "20",
+    "feeling": "cold calm in a feeding frenzy; the price in blood",
+    "candidates": [
+     {
+      "poem": "075",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "Every bid will be visible as blood on snow.",
+      "est_en_words": 9,
+      "why": "The crimson spreading over the white paddles: her exact image."
+     },
+     {
+      "poem": "008",
+      "l_from": 1,
+      "l_to": 3,
+      "lang": "ru",
+      "source_quote": "Фасады лопнули. / В надрыве стены. / Мы дружно хлопали, Вскрывая вены,",
+      "est_en_words": 13,
+      "gist_en": "The facades burst. / The walls are torn. / All together we applauded, slitting our veins.",
+      "why": "The applauding room as collective bleeding."
+     },
+     {
+      "poem": "083",
+      "l_from": 18,
+      "l_to": 18,
+      "lang": "en",
+      "source_quote": "Pastorales is consensus between those who understand: immortality costs exactly what you're willing to pay for someone else's agony.",
+      "est_en_words": 19,
+      "why": "The auction as a market in someone else's agony."
+     }
+    ]
+   },
+   {
+    "slot": "20b",
+    "feeling": "a painting surfacing in the wall",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "But today the paint refuses to stay inside its lines.",
+      "est_en_words": 10,
+      "why": "Gauguin's colours seeping up through the stains of the plaster."
+     },
+     {
+      "poem": "041",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "ru",
+      "source_quote": "Я тебя не найду: страждет холст под невзрачною маской...",
+      "est_en_words": 12,
+      "gist_en": "I will not find you: a canvas suffers under a drab mask...",
+      "why": "The painting hidden under the plaster, beneath his hand."
+     },
+     {
+      "poem": "092",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "An honest attempt to recreate what never was.",
+      "est_en_words": 8,
+      "why": "The fresco that surfaces and sinks back: what never was."
+     }
+    ]
+   },
+   {
+    "slot": "21",
+    "feeling": "a secret found and hidden",
+    "candidates": [
+     {
+      "poem": "093",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "ru",
+      "source_quote": "В животе засосало. Не от голода — от узнавания.",
+      "est_en_words": 10,
+      "gist_en": "Her stomach clenched. Not from hunger, from recognition.",
+      "why": "Finding the swollen notebook: recognition, not discovery."
+     },
+     {
+      "poem": "093",
+      "l_from": 27,
+      "l_to": 27,
+      "lang": "ru",
+      "source_quote": "Сейчас — только тяжесть секрета под рёбрами.",
+      "est_en_words": 8,
+      "gist_en": "Now, only the weight of a secret under the ribs.",
+      "why": "Drawing it out of the light, she keeps it to herself."
+     },
+     {
+      "poem": "091",
+      "l_from": 23,
+      "l_to": 23,
+      "lang": "en",
+      "source_quote": "You'll find what you're looking for. But it won't be what you expect.",
+      "est_en_words": 13,
+      "why": "The find that is not the painting she hunted."
+     }
+    ]
+   },
+   {
+    "slot": "22",
+    "feeling": "an unanswered night, solitude at the window",
+    "candidates": [
+     {
+      "poem": "055",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "Kira, the rains have long burned my dreams with ice...",
+      "est_en_words": 10,
+      "why": "Ule at the rain window: his own line about rain and frozen dreams."
+     },
+     {
+      "poem": "096",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Night did not ask permission. / It simply stopped pretending.",
+      "est_en_words": 9,
+      "why": "Night at the open casement, no longer pretending."
+     },
+     {
+      "poem": "086",
+      "l_from": 5,
+      "l_to": 5,
+      "lang": "en",
+      "source_quote": "And Nobody up there hears you anymore.",
+      "est_en_words": 7,
+      "why": "Far lights smearing on the bay, nobody listening."
+     }
+    ]
+   },
+   {
+    "slot": "24",
+    "feeling": "a hard man cracking, one tear",
+    "candidates": [
+     {
+      "poem": "043",
+      "l_from": 17,
+      "l_to": 20,
+      "lang": "ru",
+      "source_quote": "\"Не заплачу никогда...\", / Но слеза вдруг до упора / Жмет на тормоз разговора / Струйкой стаявшего льда.",
+      "est_en_words": 20,
+      "gist_en": "'I'll never cry...' / but a tear suddenly presses / the brake on the conversation all the way, / a trickle of melted ice.",
+      "why": "From her poem 'Men Don't Cry': one tear, and the melting-ice shimmer on his cheek."
+     },
+     {
+      "poem": "073",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Like the desert learned to cry flowers despite itself.",
+      "est_en_words": 9,
+      "why": "A dry, hard face that learned to cry despite itself."
+     },
+     {
+      "poem": "088",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "Just data streaming down the face. Salt water returning to the ocean.",
+      "est_en_words": 12,
+      "why": "His tear, no sobbing, running down the old trail."
+     }
+    ]
+   },
+   {
+    "slot": "25",
+    "feeling": "reading his grief like a map",
+    "candidates": [
+     {
+      "poem": "088",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Ule wiped his face. Salt left white trails on his skin — like maps of countries that don't exist.",
+      "est_en_words": 18,
+      "why": "Her fingertip on the salt trail: maps of countries that don't exist."
+     },
+     {
+      "poem": "085",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Renoir in his last years painted with brushes tied to his arthritis-twisted fingers. / Pain didn't leave — it became part of the light.",
+      "est_en_words": 22,
+      "why": "Pain kept and turned into light, like the crimson pulsing over the skin."
+     },
+     {
+      "poem": "024",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "И ни со зла, и никак. / Просто некая точность - / Словно старый наждак, / Мне истерший кожу.",
+      "est_en_words": 20,
+      "gist_en": "Not out of malice, not anyhow. / Just a certain precision, / like old sandpaper / that has worn my skin away.",
+      "why": "The salt line read with precision: grief that wears the skin."
+     }
+    ]
+   },
+   {
+    "slot": "26",
+    "feeling": "two witnesses held in moonlight; recognition",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 5,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Palm still on Ule’s chest. / Under the skin — steady pulse. / Not consensus. / Just proof that the chain still holds.",
+      "est_en_words": 19,
+      "why": "Her palm on his chest, the pulse at his throat: proof, not romance."
+     },
+     {
+      "poem": "098",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Moonlight from the Maison du Jouir window falls across his chest exactly along the lines Gauguin once carved into the lintel.",
+      "est_en_words": 21,
+      "why": "The carved moonlight lace lying across his chest."
+     },
+     {
+      "poem": "006",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Эта дикая пустошь в твоих глазах есть Простой Абсолют.",
+      "est_en_words": 12,
+      "gist_en": "This wild wasteland in your eyes is a Simple Absolute.",
+      "why": "Both gazes on the lens, a wasteland in the eyes."
+     }
+    ]
+   },
+   {
+    "slot": "27",
+    "feeling": "being known by an old wound",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 18,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "Not down. / Not up. / Exactly along the line where in childhood in Moscow they gave her injections because her mother was afraid the daughter was “growing wrong.”",
+      "est_en_words": 27,
+      "why": "His fingertip along the scar, and the childhood wound it came from."
+     },
+     {
+      "poem": "097",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "Paradise is when pain stops pretending to be accidental.",
+      "est_en_words": 9,
+      "why": "The pale scar as pain that no longer pretends to be an accident."
+     },
+     {
+      "poem": "092",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "The road to Atuona isn't a road. It's a scar on the island's body that refuses to heal.",
+      "est_en_words": 18,
+      "why": "The scar on her back echoed by the island's own scar."
+     }
+    ]
+   },
+   {
+    "slot": "28",
+    "feeling": "words that must not be spoken",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 39,
+      "l_to": 40,
+      "lang": "en",
+      "source_quote": "Kira puts two fingers on his lips. / To feel the words born straight from the body.",
+      "est_en_words": 16,
+      "why": "Two fingers on his moving lips, feeling the words before they sound."
+     },
+     {
+      "poem": "098",
+      "l_from": 32,
+      "l_to": 33,
+      "lang": "en",
+      "source_quote": "silence is not the absence of sound. / It is when both know what to say and choose not to.",
+      "est_en_words": 19,
+      "why": "The contract's silence in her own definition."
+     },
+     {
+      "poem": "018",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Ржавые мифы по лезвию. / Тупится новая бритва. / Сродни с ума сошествию / Моим губам молитва.",
+      "est_en_words": 18,
+      "gist_en": "Rusty myths along the blade. / The new razor is going dull. / Like going out of my mind, / a prayer on my lips.",
+      "why": "A prayer held on lips that cannot speak it."
+     }
+    ]
+   },
+   {
+    "slot": "30",
+    "feeling": "a name breathed like a password",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 63,
+      "l_to": 65,
+      "lang": "en",
+      "source_quote": "Ule. / This time there is no question in his name. / Only consensus.",
+      "est_en_words": 12,
+      "why": "The one name in the film, voiced off-face, as agreement rather than question."
+     },
+     {
+      "poem": "040",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Я - та иная Прохлада, / Что на твоем пути.",
+      "est_en_words": 10,
+      "gist_en": "I am that other Coolness / that lies across your path.",
+      "why": "The cool lilac-white light where her breath falls on his throat."
+     },
+     {
+      "poem": "040",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "ru",
+      "source_quote": "Будто бы в преисподней ждет нас один пароль.",
+      "est_en_words": 10,
+      "gist_en": "As if in the underworld a single password waits for us.",
+      "why": "His name as the password between them."
+     }
+    ]
+   },
+   {
+    "slot": "31",
+    "feeling": "a reach frozen in the air; restraint",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 35,
+      "l_to": 36,
+      "lang": "en",
+      "source_quote": "Ule does not kiss. / He looks.",
+      "est_en_words": 6,
+      "why": "His hand stopped at her jaw: no kiss, only looking."
+     },
+     {
+      "poem": "045",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Но раз встав на колени, / Ты навеки разодран.",
+      "est_en_words": 10,
+      "gist_en": "But once you have gone down on your knees, / you are torn apart forever.",
+      "why": "Ule kneeling, his hand stopped in the air."
+     },
+     {
+      "poem": "098",
+      "l_from": 29,
+      "l_to": 30,
+      "lang": "en",
+      "source_quote": "Not from pleasure. / From recognition.",
+      "est_en_words": 5,
+      "why": "The film's law: recognition, not seduction."
+     }
+    ]
+   },
+   {
+    "slot": "32",
+    "feeling": "truth at the pulse",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 52,
+      "l_to": 52,
+      "lang": "en",
+      "source_quote": "Where it is no longer possible to lie to yourself.",
+      "est_en_words": 10,
+      "why": "Her palm pressed to his throat, where lying is no longer possible."
+     },
+     {
+      "poem": "046",
+      "l_from": 35,
+      "l_to": 35,
+      "lang": "ru",
+      "source_quote": "Тут Сердце - Театр без зрителей.",
+      "est_en_words": 6,
+      "gist_en": "Here the Heart is a theatre without an audience.",
+      "why": "The empty salon behind, a heart beating for no audience."
+     },
+     {
+      "poem": "098",
+      "l_from": 71,
+      "l_to": 71,
+      "lang": "en",
+      "source_quote": "Something that must hold weight.",
+      "est_en_words": 5,
+      "why": "The pressed palm that holds."
+     }
+    ]
+   },
+   {
+    "slot": "34",
+    "feeling": "witness, not lover; dawn after the storm",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 17,
+      "l_to": 18,
+      "lang": "en",
+      "source_quote": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+      "est_en_words": 15,
+      "why": "His palm on the small of her back, and her own line saying what it is: not a lover."
+     },
+     {
+      "poem": "087",
+      "l_from": 22,
+      "l_to": 24,
+      "lang": "en",
+      "source_quote": "a red dog. / Fact: dogs aren't red. / Fact: it has no shadow.",
+      "est_en_words": 12,
+      "why": "The red dog that casts no shadow, as she wrote it from Arearea."
+     },
+     {
+      "poem": "003",
+      "l_from": 41,
+      "l_to": 42,
+      "lang": "ru",
+      "source_quote": "Может встретимся, статься, однажды, / Перекурим в лиловый рассвет,",
+      "est_en_words": 10,
+      "gist_en": "Maybe we'll meet someday, who knows, / and smoke into the lilac dawn,",
+      "why": "The lilac dawn they stand in, two who stay apart."
+     }
+    ]
+   },
+   {
+    "slot": "35",
+    "feeling": "two selves, a fork",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 57,
+      "l_to": 57,
+      "lang": "en",
+      "source_quote": "Both things are happening at once.",
+      "est_en_words": 6,
+      "why": "Two versions of the same woman, at once."
+     },
+     {
+      "poem": "097",
+      "l_from": 21,
+      "l_to": 21,
+      "lang": "en",
+      "source_quote": "The one who was supposed to die instead of you.",
+      "est_en_words": 10,
+      "why": "One of the two is the woman who should have died."
+     },
+     {
+      "poem": "097",
+      "l_from": 14,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Time no longer flows. / It branches.",
+      "est_en_words": 6,
+      "why": "Her life forking into two branches on the sand."
+     }
+    ]
+   },
+   {
+    "slot": "36",
+    "feeling": "walking out of the ring whole: nobody's wife",
+    "candidates": [
+     {
+      "poem": "003",
+      "l_from": 45,
+      "l_to": 48,
+      "lang": "ru",
+      "source_quote": "Закольцуешься чьим-то мужем. / Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.",
+      "est_en_words": 23,
+      "gist_en": "You'll loop yourself into being someone's husband. / I will remain: nobody's wife, / Atuona, a hunched old woman, / on the whole with God, and a little with Satan.",
+      "why": "She steps out of the closed ring ('loop yourself' is a ring verb in Russian): nobody's wife, Atuona."
+     },
+     {
+      "poem": "065",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Atuona is a state of being. When you stop running FROM and start running TO.",
+      "est_en_words": 15,
+      "why": "Walking toward us, unhurried: at last running to."
+     },
+     {
+      "poem": "090",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "The earth still held yesterday's rain — moisture seeped black between her toes like printer's ink.",
+      "est_en_words": 15,
+      "why": "Bare feet on wet black sand, her story still being printed."
+     }
+    ]
+   },
+   {
+    "slot": "37",
+    "feeling": "the sea breathing; erasure and return",
+    "candidates": [
+     {
+      "poem": "088",
+      "l_from": 12,
+      "l_to": 12,
+      "lang": "en",
+      "source_quote": "More like — allowance. That tomorrow will happen, and you'll be in it.",
+      "est_en_words": 12,
+      "why": "The last foam slides back and the sand gleams again: allowance."
+     },
+     {
+      "poem": "089",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "Outside the Pacific breathed its ancient rhythm — inhale, exhale, without emphasis.",
+      "est_en_words": 11,
+      "why": "The sheet of foam coming in and drawing back, without emphasis."
+     },
+     {
+      "poem": "035",
+      "l_from": 1,
+      "l_to": 3,
+      "lang": "ru",
+      "source_quote": "Все закончится одиночеством. / Снова. / И с него же начнется.",
+      "est_en_words": 12,
+      "gist_en": "Everything will end in loneliness. / Again. / And begin from it, too.",
+      "why": "An empty beach where the end and the beginning are one wave."
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "curator": "arc",
+  "slots": [
+   {
+    "slot": "1a",
+    "feeling": "cold distance; a contract of silence across a lit void",
+    "candidates": [
+     {
+      "poem": "095",
+      "l_from": 11,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "and now the silence is so complete / it could swallow a scream whole / and ask for more.",
+      "est_en_words": 17,
+      "why": "Opens the long poem on its law: a silence total enough to swallow a scream, over two still bodies at opposite ends of an empty gallery (her Turbine Hall passage). It returns at 28 (silence defined) and 32 (no more lying)."
+     },
+     {
+      "poem": "011",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Холодные пустыни теплых чувств. / Ты плюнул - я ответила: Научусь.",
+      "gist_en": "Cold deserts of warm feelings. You spat; I answered: I'll learn.",
+      "est_en_words": 12,
+      "why": "The film's thesis in one aphorism: a cold contract with warm feeling held at a distance, and 'I'll learn' is her accepting the terms. From 'Nobody's', which rhymes with 'nobody's wife' at 36."
+     },
+     {
+      "poem": "006",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Мне тебя не обнять, я на нижней земле, ты на верхней, нет места в твоем Королевстве,",
+      "gist_en": "I can't hold you: I'm on the lower ground, you're on the upper; there is no room in your Kingdom.",
+      "est_en_words": 21,
+      "why": "Two figures who cannot cross the floor between them. The refused Kingdom is answered at 25 if her 'guest in My Country' (#042) is used there. Note: #006 is rank 1 at 1b."
+     }
+    ]
+   },
+   {
+    "slot": "1b",
+    "feeling": "almost-touch; heat across a gap that never closes",
+    "candidates": [
+     {
+      "poem": "006",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Здравствуй, друг, мне бы к тебе прикоснуться легонько, чуть-чуть, / Но так дорого стоит это тепло, выше всяких валют,",
+      "gist_en": "Hello, friend, I'd like to touch you, lightly, just barely, but this warmth costs so much, more than any currency.",
+      "est_en_words": 23,
+      "why": "Exactly the breath that never becomes a touch, addressed to a 'friend', not a lover. It prices the warmth the way the contract does, starting a money thread that returns at 14 and 20."
+     },
+     {
+      "poem": "097",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric.",
+      "est_en_words": 21,
+      "why": "Literal and exact for the macro: heat through tweed, no contact; recognition, not seduction. Note: #097 is rank 1 at 19 and 34."
+     },
+     {
+      "poem": "073",
+      "l_from": 5,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Ambrette and Jamaican pepper / don't warm — / only promise heat.",
+      "est_en_words": 9,
+      "why": "Scent as a promise that never pays out: the heat-haze in the gap told as perfume notes. Short, sensual, unromantic."
+     }
+    ]
+   },
+   {
+    "slot": "2",
+    "feeling": "longing with no one to kiss; ice that melts and freezes back",
+    "candidates": [
+     {
+      "poem": "044",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Поцелуя не жду. Губами / Расцелую я лед на стеклах.",
+      "gist_en": "I don't wait for a kiss. With my lips I'll cover the ice on the panes with kisses.",
+      "est_en_words": 12,
+      "why": "Her own image of this exact gesture: pride and longing, the kiss given to cold glass and her own reflection. The ice comes back melted as Ule's tear at 24."
+     },
+     {
+      "poem": "018",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Сродни с ума сошествию / Моим губам молитва.",
+      "gist_en": "Akin to going out of one's mind: a prayer on my lips.",
+      "est_en_words": 9,
+      "why": "Lips on frosted glass with eyes closed, like a near-mad prayer. Short and sharp."
+     },
+     {
+      "poem": "048",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "The thaw at the end of January had behaved deceitfully, as usual.",
+      "est_en_words": 12,
+      "why": "The clear oval melts and the frost creeps back: a thaw that lies. Cold and wry, and it plants the lie that comes at 22."
+     }
+    ]
+   },
+   {
+    "slot": "5",
+    "feeling": "a burnt soul lifting off; grace in burning out",
+    "candidates": [
+     {
+      "poem": "094",
+      "l_from": 33,
+      "l_to": 34,
+      "lang": "ru",
+      "source_quote": "И листья вальсировать будут порознь. / А мне - благодать. Догорать. Догорать.",
+      "gist_en": "And the leaves will waltz apart. And for me, grace. To burn down. To burn down.",
+      "est_en_words": 13,
+      "why": "One ember-veined leaf parting from everything: 'Last Autumn' makes the rise a calm, defiant burning-out. The match at 15 answers it ('burn without burning down', if #031 is chosen there)."
+     },
+     {
+      "poem": "014",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Несвоевременные радости, / Жги, малыш, то, что осталось нам.",
+      "gist_en": "Untimely joys: burn, baby, whatever we have left.",
+      "est_en_words": 10,
+      "why": "Reckless and tender at once: the leaf is what is left, and it burns."
+     },
+     {
+      "poem": "042",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Рябины зябнущие грозди. / Закат в золе.",
+      "gist_en": "Shivering clusters of rowan. Sunset in ash.",
+      "est_en_words": 8,
+      "why": "Pure image, ember-red against a storm sky; cold and burnt in very few words."
+     }
+    ]
+   },
+   {
+    "slot": "6",
+    "feeling": "surrender by choice; going under into cool silence",
+    "candidates": [
+     {
+      "poem": "054",
+      "l_from": 2,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "One day I'll drown / In cool silence / And drift to sleep.",
+      "est_en_words": 11,
+      "why": "Kira's own verse in the novel. Her unblinking gaze, then the slip under, is this exact wish without fear, and 'cool silence' carries the contract into the sea."
+     },
+     {
+      "poem": "021",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "\"Я люблю\" - шум немой реки, / Дважды топящей всех готовых.",
+      "gist_en": "'I love' is the noise of a mute river that drowns, twice, everyone who is ready.",
+      "est_en_words": 12,
+      "why": "Love as dark water that takes the willing. Sharp and fatal, matched to the black sea closing over her face."
+     },
+     {
+      "poem": "055",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "Art is an ocean where people drown trying to save themselves, but it's hopeless.",
+      "est_en_words": 14,
+      "why": "Ule's creed from the flight, drowning as the only way to feel art, ties the sea to the hunt. Note: #055 is rank 1 at 22."
+     }
+    ]
+   },
+   {
+    "slot": "7m",
+    "feeling": "rising with borrowed wings; fragile rebirth",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Я тебя крылатая, дождусь, / перьями подушку набиваю.",
+      "gist_en": "Winged, I will wait for you, stuffing the pillow with feathers.",
+      "est_en_words": 9,
+      "why": "Three wet feathers where wings would be: waiting, half-flown. Its second half lands on the scales at 7, so the two shots read as one stanza."
+     },
+     {
+      "poem": "078",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "Salt from yesterday's tears, today's sweat. / All the same ocean.",
+      "est_en_words": 10,
+      "why": "Water streaming off her shoulder blade, grief and heat dissolved into one sea; plants the salt that becomes his tear-trails at 25. Note: #078 is rank 1 at 10a and 10b."
+     },
+     {
+      "poem": "016",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Дожить, чтоб наголо отдаться / Кому-то в шкуре без брони.",
+      "gist_en": "To live long enough to give yourself up, bare, to someone, in a skin with no armour.",
+      "est_en_words": 12,
+      "why": "A bare back with no armour: vulnerability as the price of rising from the water."
+     }
+    ]
+   },
+   {
+    "slot": "7",
+    "feeling": "a shed self on the sand; the trace of someone gone",
+    "candidates": [
+     {
+      "poem": "036",
+      "l_from": 11,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.",
+      "gist_en": "In vain you've shed your scales again, right where I am quietly taking wing.",
+      "est_en_words": 13,
+      "why": "The scales lie just where she rose, his old skin left behind as she lifts. It completes the 7m stanza."
+     },
+     {
+      "poem": "095",
+      "l_from": 14,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "She doesn’t speak in manifestos. / She leaves traces.",
+      "est_en_words": 8,
+      "why": "A footprint holding the moon and a heap of scales: no statement, only traces. Quiet, defiant, standalone. Note: #095 is rank 1 at 1a and 18."
+     },
+     {
+      "poem": "038",
+      "l_from": 2,
+      "l_to": 3,
+      "lang": "ru",
+      "source_quote": "Снова твои следы высохли без воды. / Впитались слезы в стекло.",
+      "gist_en": "Again your footprints have dried without water. Tears have soaked into the glass.",
+      "est_en_words": 13,
+      "why": "Footprint and absence; 'tears soaked into glass' reaches back to the frost kiss at 2."
+     }
+    ]
+   },
+   {
+    "slot": "9",
+    "feeling": "senses waking; scent before light",
+    "candidates": [
+     {
+      "poem": "068",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Morning in Atuona doesn't begin with light. / It begins with scent.",
+      "est_en_words": 11,
+      "why": "Exactly what the frame does: one deep breath, steam tinted like frangipani, morning arriving through the nose."
+     },
+     {
+      "poem": "070",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "The air smelled not of tropical flowers — it smelled of time.",
+      "est_en_words": 11,
+      "why": "Turns the visible scent into something older and stranger: the other reality felt through the air she breathes."
+     },
+     {
+      "poem": "063",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "ATUONA breathes deep, like the ocean before sunset.",
+      "est_en_words": 8,
+      "why": "The island breathing with her; short and calm, it puts the place's name inside the breath."
+     }
+    ]
+   },
+   {
+    "slot": "10a",
+    "feeling": "slow heat; light touching skin like honey",
+    "candidates": [
+     {
+      "poem": "078",
+      "l_from": 2,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.",
+      "est_en_words": 23,
+      "why": "Honey through the shutters, skin, heat, the taste of air: the frame in her own words, sensual without one explicit word, and 'rust' keeps it underground."
+     },
+     {
+      "poem": "004",
+      "l_from": 25,
+      "l_to": 28,
+      "lang": "ru",
+      "source_quote": "Ну же, зайчата, скорей / Прыгайте в рваный рюкзак, / С вами за столько морей / Светлее чужбины мрак.",
+      "gist_en": "Come on, little sun-flecks, quick, jump into the torn backpack; with you, across so many seas, the dark of a foreign land is lighter.",
+      "est_en_words": 21,
+      "why": "Sun-flecks as small companions in exile: the light warming a fugitive's shoulder far from home. Tender and specific."
+     },
+     {
+      "poem": "044",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "ru",
+      "source_quote": "Сладких снов недосмотренных стая / Все кружит, приземляясь на лицах...",
+      "gist_en": "A flock of sweet, unfinished dreams keeps circling, landing on faces...",
+      "est_en_words": 12,
+      "why": "The gold dust motes turning in the beam become half-watched dreams settling on her half-open eyes."
+     }
+    ]
+   },
+   {
+    "slot": "10b",
+    "feeling": "skin answering the air; tenderness",
+    "candidates": [
+     {
+      "poem": "078",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Skin meets air like first kiss.",
+      "est_en_words": 6,
+      "why": "The fine hairs lift gold in the light: the body's first kiss, answering the kiss refused on glass at 2."
+     },
+     {
+      "poem": "081",
+      "l_from": 9,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "The body stays. / The light moves.",
+      "est_en_words": 6,
+      "why": "The film's law, said where it is most literally true: she does not move, the honey stripe does."
+     },
+     {
+      "poem": "067",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "But for now – it's beautiful.",
+      "est_en_words": 5,
+      "why": "A small, fragile mercy before the storm; quiet enough for a four-second hold."
+     }
+    ]
+   },
+   {
+    "slot": "11",
+    "feeling": "the double; a reflection that dares what she will not",
+    "candidates": [
+     {
+      "poem": "030",
+      "l_from": 29,
+      "l_to": 32,
+      "lang": "ru",
+      "source_quote": "Что, сползая до нитки, не голая, / Не сердечная и не вгревшая / Ни тепла и ни вечного холода, / Остаюсь я навеки застывшая.",
+      "gist_en": "Slipping down to the last thread, yet not naked; neither warm-hearted nor ever warmed by heat or by eternal cold, I stay frozen forever.",
+      "est_en_words": 27,
+      "why": "The strap slips in the mirror, the silk never falls, the woman in the room stays frozen: one stanza describes both women at once, never explicit."
+     },
+     {
+      "poem": "019",
+      "l_from": 9,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Что ж так рвешься в мой плен суровый? / Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!",
+      "gist_en": "Why do you strain so into my harsh captivity? Come on, slip the straps down off your shoulders... For God's sake, don't be cold-blooded, killing me in bed!",
+      "est_en_words": 30,
+      "why": "Literally the strap. In her poem it is Longing who is undressed, which suits a reflection with a will of its own. Sits at the 30-word maximum."
+     },
+     {
+      "poem": "065",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "en",
+      "source_quote": "You know how it is - sometimes the masterpiece hides in the mirror.",
+      "est_en_words": 12,
+      "why": "Lighter and sly: the painting they hunt is the woman in the glass. It plants the 'two versions' of 35."
+     }
+    ]
+   },
+   {
+    "slot": "M1",
+    "feeling": "ownership on display; glamour as possession",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "He holds her waist like she's another lot with a pre-sale estimate.",
+      "est_en_words": 12,
+      "why": "The flat palm on her waist as an auction estimate: cold and exact, it brings the market onto the jetty."
+     },
+     {
+      "poem": "029",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Я вижу, как ты крутишься, душа, / Пока Господь тебя благорассудит.",
+      "gist_en": "I see you spinning, soul, while God makes up His mind about you.",
+      "est_en_words": 13,
+      "why": "From her runway poem: a model turning under judgement, seen from Kira's shoulder."
+     },
+     {
+      "poem": "059",
+      "l_from": 15,
+      "l_to": 16,
+      "lang": "ru",
+      "source_quote": "Сложное было детство. / Сложнее — семейное счастье.",
+      "gist_en": "Childhood was hard. Harder still: family happiness.",
+      "est_en_words": 8,
+      "why": "Wry and cutting about the engaged couple's entrance; short enough for the five-second shot."
+     }
+    ]
+   },
+   {
+    "slot": "M2",
+    "feeling": "recognising a captive; a watcher who knows this pain",
+    "candidates": [
+     {
+      "poem": "082",
+      "l_from": 13,
+      "l_to": 14,
+      "lang": "en",
+      "source_quote": "Knows this pain by name. / Knows how it smells in the morning.",
+      "est_en_words": 12,
+      "why": "Kira's lit eyes in front, the tightening wrist-grip behind: she recognises captivity because she has lived it. Her addiction thread surfaces again at 15."
+     },
+     {
+      "poem": "079",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Living round the clock with the Beast in a cage, other beasts outside didn't scare her.",
+      "est_en_words": 16,
+      "why": "Turns her stillness into strength facing the predator, and foreshadows the cage at 15."
+     },
+     {
+      "poem": "030",
+      "l_from": 25,
+      "l_to": 26,
+      "lang": "ru",
+      "source_quote": "Я тихонько молчу, улыбаючись, / Сберегаю свои красноречия.",
+      "gist_en": "I keep quietly silent, smiling, saving up my eloquence.",
+      "est_en_words": 9,
+      "why": "Mila's poised smile and Kira's held gaze in one line: silence as a weapon both women use."
+     }
+    ]
+   },
+   {
+    "slot": "13",
+    "feeling": "power walking into the storm; entrance as defiance",
+    "candidates": [
+     {
+      "poem": "064",
+      "l_from": 9,
+      "l_to": 9,
+      "lang": "en",
+      "source_quote": "Kira, baby, I hear your storm inside louder than the one coming outside.",
+      "est_en_words": 13,
+      "why": "The frame shows the outer storm; the line names the louder one inside her as she walks, eyes on the lens."
+     },
+     {
+      "poem": "017",
+      "l_from": 25,
+      "l_to": 26,
+      "lang": "ru",
+      "source_quote": "Навещу-ка ублюдков / Я непрошеным гостем,",
+      "gist_en": "I think I'll drop in on the bastards as an uninvited guest,",
+      "est_en_words": 7,
+      "why": "Swagger at exactly target length; her profanity used once, as an entrance."
+     },
+     {
+      "poem": "045",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Застегнувшись с запАхом, / Шла Душа с Карнавала.",
+      "gist_en": "Buttoned up, wrapped tight across, the Soul walked from the Carnival.",
+      "est_en_words": 9,
+      "why": "A walk with dignity through chaos; plants the carnival of masks that cracks at M3."
+     }
+    ]
+   },
+   {
+    "slot": "14",
+    "feeling": "adorned and bought; a clasp that seals the contract",
+    "candidates": [
+     {
+      "poem": "081",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Light breaks against silk, runs over skin like Renoir's brush in The Bathers. / Each touch commits to the body. No rollback.",
+      "est_en_words": 21,
+      "why": "Rain-light runs over her skin like brushwork and the clasp closes: every touch commits, no rollback. Transaction and painting in one."
+     },
+     {
+      "poem": "094",
+      "l_from": 30,
+      "l_to": 31,
+      "lang": "ru",
+      "source_quote": "Эти смыслы навечно срослись - эротика и активы, / Их - под лютый конвой - они целы и невредимы.",
+      "gist_en": "These meanings have fused forever: erotica and assets. Put them under fierce escort, and they stay whole and unharmed.",
+      "est_en_words": 20,
+      "why": "The necklace as an advance on the contract: desire and money welded, her composure 'whole and unharmed' under his hands. Note: #094 is rank 1 at 5."
+     },
+     {
+      "poem": "032",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Я давно не люблю на сдачу. / Просто сдачу за три рубля.",
+      "gist_en": "I stopped loving for small change long ago. Just change, three roubles' worth.",
+      "est_en_words": 14,
+      "why": "A bitter counter-voice to the diamonds: she won't be paid in change. It cuts the glamour."
+     }
+    ]
+   },
+   {
+    "slot": "M3",
+    "feeling": "a mask cracking; beauty as a damaged canvas",
+    "candidates": [
+     {
+      "poem": "090",
+      "l_from": 17,
+      "l_to": 17,
+      "lang": "en",
+      "source_quote": "Slowly killing the canvas from inside. Beauty with a self-destruct timer.",
+      "est_en_words": 11,
+      "why": "The craquelure at Mila's eye as varnish failing on a masterpiece: her line for paint that destroys itself."
+     },
+     {
+      "poem": "085",
+      "l_from": 20,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "M. — mask too tight, cracks by the eyes.",
+      "est_en_words": 8,
+      "why": "Ule's note on Mila, literal to the frame; short and clinical. Note: #085 is rank 1 at M5."
+     },
+     {
+      "poem": "008",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Фасады лопнули. / В надрыве стены.",
+      "gist_en": "The facades have burst. The walls are strained to tearing.",
+      "est_en_words": 7,
+      "why": "Two blunt lines: the façade of a face giving way."
+     }
+    ]
+   },
+   {
+    "slot": "M4",
+    "feeling": "slipping out of a grip; a hand closing on air",
+    "candidates": [
+     {
+      "poem": "016",
+      "l_from": 11,
+      "l_to": 12,
+      "lang": "ru",
+      "source_quote": "Ты как-то, детка, не случалась... / Случись теперь из западни.",
+      "gist_en": "Somehow, baby, you never quite happened... Happen now, out of the trap.",
+      "est_en_words": 12,
+      "why": "Mila rising and leaving her colour behind while his hand closes on nothing: an escape spoken as a blessing."
+     },
+     {
+      "poem": "042",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "И гнутся, разгораясь, звезды / К нагой земле.",
+      "gist_en": "And the stars, flaring up, bend down to the naked earth.",
+      "est_en_words": 9,
+      "why": "The first stars above, ultramarine dust settling on black sand: beauty falling to earth as it slips away."
+     },
+     {
+      "poem": "073",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "Too fragile for this industry, / but stubbornly alive.",
+      "est_en_words": 8,
+      "why": "The model who walks out of his reach: fragile, unbought, alive."
+     }
+    ]
+   },
+   {
+    "slot": "M5",
+    "feeling": "a woman fading like a reflection; absence",
+    "candidates": [
+     {
+      "poem": "085",
+      "l_from": 22,
+      "l_to": 22,
+      "lang": "en",
+      "source_quote": "Mila caught his gaze and smiled slightly — that smile people wear when they've already decided on their own disappearance.",
+      "est_en_words": 19,
+      "why": "The woman in the window breathing in and out of transparency: the smile of someone who has already chosen to vanish."
+     },
+     {
+      "poem": "019",
+      "l_from": 27,
+      "l_to": 28,
+      "lang": "ru",
+      "source_quote": "Век свечи, чтоб скорей растопиться, / Растекается в вязком моменте.",
+      "gist_en": "A candle's lifetime, hurrying to melt, spreads out into a viscous moment.",
+      "est_en_words": 12,
+      "why": "Built on the candle whose flicker makes her appear and fade: time melting, a moment that won't hold."
+     },
+     {
+      "poem": "083",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "en",
+      "source_quote": "Somewhere beyond the window the ocean breathes ultramarine that wasn't on the impressionists' palette — too expensive, too pure, undiluted by turpentine.",
+      "est_en_words": 21,
+      "why": "The ultramarine night sea beyond the glass, a colour too pure to buy; an exact match for the background."
+     }
+    ]
+   },
+   {
+    "slot": "15",
+    "feeling": "vigilance; staring down the Beast in a cage for two",
+    "candidates": [
+     {
+      "poem": "061",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "Kira had to build a comfortable cage for two, step inside, sit down across from Him and look Him in the eyes.",
+      "est_en_words": 22,
+      "why": "The cage, the two facing chairs, eyes that must not close: her sobriety image, with the Beast as the true opponent, not Ule. At target length."
+     },
+     {
+      "poem": "031",
+      "l_from": 20,
+      "l_to": 23,
+      "lang": "ru",
+      "source_quote": "Убегая, не прячусь я, / Мы от силы не прячемся, / Лишь горим, не сгораючи, / Лишь горючее плавится",
+      "gist_en": "Running, I don't hide; we don't hide from strength; we only burn without burning down; only the fuel melts.",
+      "est_en_words": 21,
+      "why": "The match burns at her open eye and never shortens: 'burning without burning down'. Callback to the leaf's 'to burn down' at 5."
+     },
+     {
+      "poem": "025",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "ru",
+      "source_quote": "Ты - не Авель, но и я - не Каин, / Вместе нам с тобой не заодно.",
+      "gist_en": "You're not Abel, but I'm not Cain either; together, you and I are still not on one side.",
+      "est_en_words": 18,
+      "why": "A duel of stares between equals: no romance, no truce."
+     }
+    ]
+   },
+   {
+    "slot": "16b",
+    "feeling": "a ritual asked for again; scent made visible",
+    "candidates": [
+     {
+      "poem": "003",
+      "l_from": 37,
+      "l_to": 39,
+      "lang": "ru",
+      "source_quote": "Повторяя глотки Килиана / Из пригоршней Её волос, / Я Ей, миленький, так и не стану.",
+      "gist_en": "Repeating sips of Kilian from handfuls of Her hair, I'll never become Her, darling.",
+      "est_en_words": 18,
+      "why": "Perfume shimmering as heat-haze over her shoulder. Kilian is Kira's scent in the novel, and 'Her' keeps Kira's desire pointed at women. From 'Atuona', the title poem, which closes the film at 36."
+     },
+     {
+      "poem": "025",
+      "l_from": 12,
+      "l_to": 13,
+      "lang": "ru",
+      "source_quote": "Так давно не плавилась душонка / У прямого, ясного огня.",
+      "gist_en": "It's been so long since my small soul melted by a straight, clear fire.",
+      "est_en_words": 12,
+      "why": "Emerald light like sea water and warmth returning to the skin; small, tender, unsentimental."
+     },
+     {
+      "poem": "077",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "Fashion is body language we choose each morning. But what if the body itself becomes canvas?",
+      "est_en_words": 16,
+      "why": "The necklace on wet skin, light moving like paint: the body becomes the canvas, which is the motif of the film's second half."
+     }
+    ]
+   },
+   {
+    "slot": "17",
+    "feeling": "glare and solitude; seeing what isn't there",
+    "candidates": [
+     {
+      "poem": "068",
+      "l_from": 29,
+      "l_to": 31,
+      "lang": "en",
+      "source_quote": "Pink sand that never existed. / Horses that were never on Hiva Oa. / Everything invented.",
+      "est_en_words": 14,
+      "why": "Black sand at hard noon and a figure to be composited in: her line on Gauguin's invented beach makes the unreal arrival felt before it is seen."
+     },
+     {
+      "poem": "087",
+      "l_from": 23,
+      "l_to": 25,
+      "lang": "en",
+      "source_quote": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+      "est_en_words": 15,
+      "why": "If the composite is the red dog: her flat, strange declaration of the shadowless dog, exact to the plate."
+     },
+     {
+      "poem": "050",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "Here the sun stops you, suddenly spilling shamelessly across your face and palms.",
+      "est_en_words": 13,
+      "why": "From her glossy column, raw sun that halts you: she lifts her eyes into the glare and stops."
+     }
+    ]
+   },
+   {
+    "slot": "18",
+    "feeling": "touching what can't be forgiven; history under the fingertips",
+    "candidates": [
+     {
+      "poem": "095",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Words that could never be printed. / Words that still haven’t been forgiven.",
+      "est_en_words": 12,
+      "why": "Her fingers in the grooves: Gauguin's insults cut into the wood and still unforgiven. Exact length."
+     },
+     {
+      "poem": "088",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "The wood was warm — like a memory card storing someone else's temperature.",
+      "est_en_words": 12,
+      "why": "Wood warm with someone else's heat: the honey sunbeam as stored body warmth."
+     },
+     {
+      "poem": "080",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "the most immortal works are born from the most mortal among us.",
+      "est_en_words": 12,
+      "why": "An aphorism for the carving: immortal work by mortal hands."
+     }
+    ]
+   },
+   {
+    "slot": "19",
+    "feeling": "the vein as a line of script; a pulse under cold light",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "Like the keyboard of Cursor at three in the morning when code is no longer code but the continuation of a vein.",
+      "est_en_words": 22,
+      "why": "Code composited along the vein: 'no longer code but the continuation of a vein' is the shot itself, making her code her blood."
+     },
+     {
+      "poem": "021",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Так пустить бы по венам жар... / Но все плещется полутьма...",
+      "gist_en": "If only heat could be sent running through the veins... but the half-dark keeps splashing...",
+      "est_en_words": 13,
+      "why": "Cold blue-white light sliding along the vein: longing for heat, getting dusk."
+     },
+     {
+      "poem": "096",
+      "l_from": 6,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Under the skin — steady pulse. / Not consensus. / Just proof that the chain still holds.",
+      "est_en_words": 14,
+      "why": "The faint pulse at the wrist under the composited code: life as the chain that still holds. Note: #096 is rank 1 at 32."
+     }
+    ]
+   },
+   {
+    "slot": "20",
+    "feeling": "a market of fear; red ink spreading in snow",
+    "candidates": [
+     {
+      "poem": "067",
+      "l_from": 3,
+      "l_to": 3,
+      "lang": "en",
+      "source_quote": "Fear of losing, fear of overpaying, fear of missing out. Collectors clutch their paddles like life preservers.",
+      "est_en_words": 17,
+      "why": "Paddles drifting like a tide, everyone gripping theirs: fear made visible, while she alone sits still."
+     },
+     {
+      "poem": "075",
+      "l_from": 10,
+      "l_to": 10,
+      "lang": "en",
+      "source_quote": "Every bid will be visible as blood on snow.",
+      "est_en_words": 9,
+      "why": "Crimson spreading over white paddles is this exact image; Kira's prophecy for Pastorales."
+     },
+     {
+      "poem": "074",
+      "l_from": 59,
+      "l_to": 60,
+      "lang": "en",
+      "source_quote": "Impressionists died poor. / Dealers built names on their mistakes.",
+      "est_en_words": 9,
+      "why": "The cold arithmetic behind the bidding room; short and damning."
+     }
+    ]
+   },
+   {
+    "slot": "20b",
+    "feeling": "a painting buried in the walls; colour surfacing and sinking",
+    "candidates": [
+     {
+      "poem": "041",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "ru",
+      "source_quote": "Я тебя не найду: страждет холст под невзрачною маской...",
+      "gist_en": "I will not find you: the canvas is suffering under a drab mask...",
+      "est_en_words": 12,
+      "why": "Gauguin's colours bloom in the stained plaster, then sink: a canvas under a mask, and a search that won't end in finding. The mask echoes M3."
+     },
+     {
+      "poem": "097",
+      "l_from": 1,
+      "l_to": 1,
+      "lang": "en",
+      "source_quote": "But today the paint refuses to stay inside its lines.",
+      "est_en_words": 10,
+      "why": "Colour leaking through plaster and refusing its borders; sharp and standalone. Note: #097 is rank 1 at 19 and 34."
+     },
+     {
+      "poem": "087",
+      "l_from": 26,
+      "l_to": 27,
+      "lang": "en",
+      "source_quote": "He uses color not as description, / but as declaration.",
+      "est_en_words": 9,
+      "why": "Ochre, rose and deep green rising as a statement: Gauguin's method under Ule's palm."
+     }
+    ]
+   },
+   {
+    "slot": "21",
+    "feeling": "a secret claimed; the weight of knowing",
+    "candidates": [
+     {
+      "poem": "093",
+      "l_from": 11,
+      "l_to": 11,
+      "lang": "ru",
+      "source_quote": "В животе засосало. Не от голода — от узнавания.",
+      "gist_en": "Her stomach dropped. Not from hunger: from recognition.",
+      "est_en_words": 10,
+      "why": "From the notebook chapter itself, without the plot: the gut-drop of recognising what she holds. 'Recognition' is the word the film turns on at 26."
+     },
+     {
+      "poem": "035",
+      "l_from": 12,
+      "l_to": 13,
+      "lang": "ru",
+      "source_quote": "Память куплена, / Но не продана -",
+      "gist_en": "Memory: bought, but not sold.",
+      "est_en_words": 7,
+      "why": "The notebook as memory she will not sell, drawn out of the light. At target length, and it cuts against the auction at 20."
+     },
+     {
+      "poem": "046",
+      "l_from": 29,
+      "l_to": 30,
+      "lang": "ru",
+      "source_quote": "Только все это - мелким почерком, / Водостоком в ливневки катится.",
+      "gist_en": "Only all of it, in small handwriting, rolls down the drainpipe into the storm drains.",
+      "est_en_words": 12,
+      "why": "Small handwriting, rot and damp: the swollen notebook as everything that nearly washed away."
+     }
+    ]
+   },
+   {
+    "slot": "22",
+    "feeling": "loneliness at a rainy window; the lie hanging in the air",
+    "candidates": [
+     {
+      "poem": "055",
+      "l_from": 6,
+      "l_to": 6,
+      "lang": "en",
+      "source_quote": "Kira, the rains have long burned my dreams with ice...",
+      "est_en_words": 10,
+      "why": "Ule's own line over Ule alone in the rain: dreams burned with ice, linking back to the frost at 2."
+     },
+     {
+      "poem": "053",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "We manage to be liars in simple answers.",
+      "est_en_words": 8,
+      "why": "Right after her 'No. Nothing.': the lie named as a skill they share. Her own column line from the day she was hired."
+     },
+     {
+      "poem": "031",
+      "l_from": 6,
+      "l_to": 7,
+      "lang": "ru",
+      "source_quote": "Только тихо безмолвствуя, / Жру свое одиночество.",
+      "gist_en": "Only keeping quietly silent, I devour my loneliness.",
+      "est_en_words": 8,
+      "why": "Closed mouth, slow breath, nobody enters: silence as a meal of loneliness."
+     }
+    ]
+   },
+   {
+    "slot": "24",
+    "feeling": "a man's silent tears; ice melting",
+    "candidates": [
+     {
+      "poem": "043",
+      "l_from": 17,
+      "l_to": 20,
+      "lang": "ru",
+      "source_quote": "\"Не заплачу никогда...\", / Но слеза вдруг до упора / Жмет на тормоз разговора / Струйкой стаявшего льда.",
+      "gist_en": "'I will never cry...', but a tear suddenly slams the brakes on the conversation, all the way, a trickle of thawed ice.",
+      "est_en_words": 20,
+      "why": "Her poem 'Men Don't Cry' on the single tear that wells: no sobbing, just thawed ice. It closes the frost-kiss circle from 2, at target length."
+     },
+     {
+      "poem": "059",
+      "l_from": 1,
+      "l_to": 2,
+      "lang": "ru",
+      "source_quote": "Плачут ночные лисицы. / Слезы их мне знакомы.",
+      "gist_en": "The night foxes are crying. I know their tears.",
+      "est_en_words": 9,
+      "why": "Wild animals weeping in the dark: recognition through tears, not pity."
+     },
+     {
+      "poem": "073",
+      "l_from": 2,
+      "l_to": 2,
+      "lang": "en",
+      "source_quote": "Like the desert learned to cry flowers despite itself.",
+      "est_en_words": 9,
+      "why": "Tears as a hard man's unlikely flowering; English and short."
+     }
+    ]
+   },
+   {
+    "slot": "25",
+    "feeling": "tenderness reading grief like a map",
+    "candidates": [
+     {
+      "poem": "088",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Salt left white trails on his skin — like maps of countries that don't exist.",
+      "est_en_words": 14,
+      "why": "Her fingertip on the salt line: the map of countries that don't exist. Exact and luminous."
+     },
+     {
+      "poem": "047",
+      "l_from": 4,
+      "l_to": 5,
+      "lang": "en",
+      "source_quote": "Tender hands untouched by fatigue, / daily scars not yet stitched into warm cheeks.",
+      "est_en_words": 13,
+      "why": "From her oldest poem: a tender hand and scars not yet stitched into warm cheeks. Gentle and strange."
+     },
+     {
+      "poem": "042",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Что ж, будешь гостем этой осенью / В Моей Стране.",
+      "gist_en": "Well then, you will be a guest this autumn in My Country.",
+      "est_en_words": 12,
+      "why": "The map becomes her country, with him as its guest; it answers the refused Kingdom of 1a (#006) if both are used."
+     }
+    ]
+   },
+   {
+    "slot": "26",
+    "feeling": "recognition, not seduction; two damaged people seen",
+    "candidates": [
+     {
+      "poem": "077",
+      "l_from": 5,
+      "l_to": 5,
+      "lang": "en",
+      "source_quote": "It's the moment when someone sees through your careful construction straight to your trembling core.",
+      "est_en_words": 15,
+      "why": "Both faces open to the lens as moonlight lace drifts: being seen through to the trembling core is the film's 'recognition'."
+     },
+     {
+      "poem": "040",
+      "l_from": 5,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "В этих ума изувечьях, / В этих безумствах чувств, / Мы же давно искалечены, / Но я к тебе вернусь.",
+      "gist_en": "In these maimings of the mind, in these madnesses of feeling, we were crippled long ago, but I will come back to you.",
+      "est_en_words": 22,
+      "why": "Two damaged creators side by side, at target length; a return without romance. The same poem gives the password at 30."
+     },
+     {
+      "poem": "006",
+      "l_from": 4,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Эта дикая пустошь в твоих глазах есть Простой Абсолют.",
+      "gist_en": "This wild wasteland in your eyes is a Simple Absolute.",
+      "est_en_words": 12,
+      "why": "Held gazes, no blinking: the emptiness in his eyes as something absolute. Echoes 1b's 'Hello, friend'. Note: #006 is rank 1 at 1b."
+     }
+    ]
+   },
+   {
+    "slot": "27",
+    "feeling": "an old wound found and seen; healed",
+    "candidates": [
+     {
+      "poem": "024",
+      "l_from": 1,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "И ни со зла, и никак. / Просто некая точность - / Словно старый наждак, / Мне истерший кожу.",
+      "gist_en": "Not out of malice, not in any way. Just a certain precision, like old sandpaper that has worn my skin away.",
+      "est_en_words": 20,
+      "why": "One fingertip tracing an old, pale line with precision: hurt without blame, long healed. Tactile and exact."
+     },
+     {
+      "poem": "085",
+      "l_from": 8,
+      "l_to": 8,
+      "lang": "en",
+      "source_quote": "Pain didn't leave — it became part of the light.",
+      "est_en_words": 9,
+      "why": "Honey light travelling across the scar: pain kept and turned into light."
+     },
+     {
+      "poem": "032",
+      "l_from": 18,
+      "l_to": 19,
+      "lang": "ru",
+      "source_quote": "Ты прости. Я, наверное, лечена. / Не залечена до бессилия.",
+      "gist_en": "Forgive me. I've been treated, I suppose, but not treated into helplessness.",
+      "est_en_words": 12,
+      "why": "A healed scar that is not a weakness; dry and proud."
+     }
+    ]
+   },
+   {
+    "slot": "28",
+    "feeling": "silence as speech; words that never sound",
+    "candidates": [
+     {
+      "poem": "098",
+      "l_from": 32,
+      "l_to": 33,
+      "lang": "en",
+      "source_quote": "silence is not the absence of sound. / It is when both know what to say and choose not to.",
+      "est_en_words": 19,
+      "why": "His lips forming words under her fingers that never sound: her definition of the film's silence, answering the swallowed scream of 1a. Non-explicit lines from #098."
+     },
+     {
+      "poem": "099",
+      "l_from": 7,
+      "l_to": 7,
+      "lang": "en",
+      "source_quote": "The words fall like failed bids, never reaching the floor.",
+      "est_en_words": 10,
+      "why": "Words that never land; calls back the auction at 20."
+     },
+     {
+      "poem": "012",
+      "l_from": 12,
+      "l_to": 14,
+      "lang": "ru",
+      "source_quote": "На луну не полезем больше - / Нет там кайфов - / Только пахучий уж очень дымок от вчерашних слов.",
+      "gist_en": "We won't climb to the moon any more; there's no high up there, only the very pungent smoke of yesterday's words.",
+      "est_en_words": 21,
+      "why": "Faint smoke drifting behind, and words reduced to the smoke of yesterday; wry and melancholy."
+     }
+    ]
+   },
+   {
+    "slot": "30",
+    "feeling": "a name as a password; the silence breaks",
+    "candidates": [
+     {
+      "poem": "040",
+      "l_from": 15,
+      "l_to": 15,
+      "lang": "ru",
+      "source_quote": "Будто бы в преисподней ждет нас один пароль.",
+      "gist_en": "As if, in the underworld, a single password waits for us.",
+      "est_en_words": 10,
+      "why": "His name breathed onto the lit throat: the one word that opens the door. The same poem as 26."
+     },
+     {
+      "poem": "098",
+      "l_from": 64,
+      "l_to": 65,
+      "lang": "en",
+      "source_quote": "This time there is no question in his name. / Only consensus.",
+      "est_en_words": 11,
+      "why": "His name said as certainty, not a plea. Note: #098 is rank 1 at 28."
+     },
+     {
+      "poem": "068",
+      "l_from": 53,
+      "l_to": 56,
+      "lang": "en",
+      "source_quote": "Some messages aren't notifications. / They're commits. / And once confirmed, / there's no rollback.",
+      "est_en_words": 12,
+      "why": "A word that cannot be taken back: once said, no rollback. Note: #068 is rank 1 at 9 and 17."
+     }
+    ]
+   },
+   {
+    "slot": "31",
+    "feeling": "the freeze; restraint at the edge",
+    "candidates": [
+     {
+      "poem": "074",
+      "l_from": 50,
+      "l_to": 53,
+      "lang": "en",
+      "source_quote": "Between compile and run / there's a second. / Pure. / Naked.",
+      "est_en_words": 9,
+      "why": "His hand stopped in the air at her jaw: the held second before anything happens. Her poetics for a near-still take."
+     },
+     {
+      "poem": "045",
+      "l_from": 7,
+      "l_to": 8,
+      "lang": "ru",
+      "source_quote": "Но раз встав на колени, / Ты навеки разодран.",
+      "gist_en": "But once you've gone down on your knees, you are torn apart forever.",
+      "est_en_words": 10,
+      "why": "He kneels and stops: the cost of kneeling, said without romance."
+     },
+     {
+      "poem": "020",
+      "l_from": 15,
+      "l_to": 16,
+      "lang": "ru",
+      "source_quote": "Частушки, обеты, треп... / Воспользуюсь правилом \"Стоп\".",
+      "gist_en": "Ditties, vows, idle talk... I'll invoke the rule of 'Stop'.",
+      "est_en_words": 8,
+      "why": "The stopped hand as a self-imposed rule; wry, and as binding as the contract."
+     }
+    ]
+   },
+   {
+    "slot": "32",
+    "feeling": "life beating under her palm; no more lying",
+    "candidates": [
+     {
+      "poem": "096",
+      "l_from": 52,
+      "l_to": 52,
+      "lang": "en",
+      "source_quote": "Where it is no longer possible to lie to yourself.",
+      "est_en_words": 10,
+      "why": "Her palm pressed to his pulse: the place where the lie of 22 cannot survive."
+     },
+     {
+      "poem": "088",
+      "l_from": 18,
+      "l_to": 20,
+      "lang": "en",
+      "source_quote": "Not a lullaby. / Not a song. / Allowance.",
+      "est_en_words": 7,
+      "why": "The pulse as the three-note cell: not a love song, but allowance. Note: #088 is rank 1 at 25."
+     },
+     {
+      "poem": "021",
+      "l_from": 3,
+      "l_to": 4,
+      "lang": "ru",
+      "source_quote": "Ты - наверное - Божий дар. / Я - наверное - \"Я сама\".",
+      "gist_en": "You are, probably, a gift from God. I am, probably, 'I'll do it myself'.",
+      "est_en_words": 10,
+      "why": "Two kinds of strength meeting at a pulse; equals, not lovers."
+     }
+    ]
+   },
+   {
+    "slot": "34",
+    "feeling": "stillness afterwards; a witness, not a lover; lilac peace",
+    "candidates": [
+     {
+      "poem": "097",
+      "l_from": 17,
+      "l_to": 18,
+      "lang": "en",
+      "source_quote": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+      "est_en_words": 15,
+      "why": "The palm on the small of her back as in the frame, with the film's rule spelled out: not a lover, a witness."
+     },
+     {
+      "poem": "003",
+      "l_from": 41,
+      "l_to": 42,
+      "lang": "ru",
+      "source_quote": "Может встретимся, статься, однажды, / Перекурим в лиловый рассвет,",
+      "gist_en": "Maybe, as it happens, we'll meet one day and smoke together into the lilac dawn,",
+      "est_en_words": 10,
+      "why": "Exactly the lilac dawn, two people side by side with nothing more than companionship. Note: #003 is rank 1 at 16b and 36, so use at most two of the three."
+     },
+     {
+      "poem": "002",
+      "l_from": 15,
+      "l_to": 16,
+      "lang": "ru",
+      "source_quote": "Нету лучше собаки на свете. / Звонко лаяла, молча любя.",
+      "gist_en": "There's no better dog in the world. She barked out loud and loved in silence.",
+      "est_en_words": 12,
+      "why": "The red dog sitting still between them, and love that stays silent: the contract of silence turned into tenderness."
+     }
+    ]
+   },
+   {
+    "slot": "35",
+    "feeling": "the fork; one woman split in two",
+    "candidates": [
+     {
+      "poem": "099",
+      "l_from": 12,
+      "l_to": 12,
+      "lang": "en",
+      "source_quote": "Two versions of the same woman.",
+      "est_en_words": 6,
+      "why": "The composite itself, in her words, at target length."
+     },
+     {
+      "poem": "097",
+      "l_from": 14,
+      "l_to": 15,
+      "lang": "en",
+      "source_quote": "Time no longer flows. / It branches.",
+      "est_en_words": 6,
+      "why": "The fork as time branching; more poetic than literal. Note: #097 is rank 1 at 19 and 34."
+     },
+     {
+      "poem": "070",
+      "l_from": 13,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "Wave. Particle. Wave. Particle.",
+      "est_en_words": 4,
+      "why": "One woman in two states at once, in the rhythm of the surf; from her quantum chapter."
+     }
+    ]
+   },
+   {
+    "slot": "36",
+    "feeling": "walking out of the ring; nobody's wife, self-possessed",
+    "candidates": [
+     {
+      "poem": "003",
+      "l_from": 45,
+      "l_to": 48,
+      "lang": "ru",
+      "source_quote": "Закольцуешься чьим-то мужем. / Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.",
+      "gist_en": "You'll ring yourself in as someone's husband. I will remain nobody's wife, Atuona, a hunchbacked little old woman, on the whole with God, and a little with Satan.",
+      "est_en_words": 23,
+      "why": "She walks out of a closed ring of foam while the poem says 'you'll be ringed in as a husband; I stay nobody's wife': the last stanza of the title poem over the title shot."
+     },
+     {
+      "poem": "094",
+      "l_from": 22,
+      "l_to": 23,
+      "lang": "ru",
+      "source_quote": "Снова жирная клякса на твоей репутации, / И отбеливать ты ее этой осенью не готов.",
+      "gist_en": "Again a fat blot on your reputation, and this autumn you are not ready to whiten it.",
+      "est_en_words": 18,
+      "why": "Black linen and black sand, refusing to bleach: it reaches 'I will not whiten' without reusing the film #8 line. Note: #094 is rank 1 at 5."
+     },
+     {
+      "poem": "032",
+      "l_from": 22,
+      "l_to": 23,
+      "lang": "ru",
+      "source_quote": "Я уже не твоя послушница. / И не твой этот день Рождения.",
+      "gist_en": "I am no longer your novice. And this birthday is not yours.",
+      "est_en_words": 14,
+      "why": "Calm independence as she steps forward: a rebirth that belongs only to her."
+     }
+    ]
+   },
+   {
+    "slot": "37",
+    "feeling": "the sand stays black; the cycle returns",
+    "candidates": [
+     {
+      "poem": "035",
+      "l_from": 1,
+      "l_to": 3,
+      "lang": "ru",
+      "source_quote": "Все закончится одиночеством. / Снова. / И с него же начнется.",
+      "gist_en": "Everything will end in loneliness. Again. And it will begin from it, too.",
+      "est_en_words": 12,
+      "why": "Foam whitens the sand, draws back, and the sand is black again: an ending that loops the film back to 1a's silence, as the gallery loop does."
+     },
+     {
+      "poem": "068",
+      "l_from": 40,
+      "l_to": 41,
+      "lang": "en",
+      "source_quote": "Is the world still here? / Am I still here?",
+      "est_en_words": 9,
+      "why": "After the foam retreats the black sand gleams again, as if checking that reality survived."
+     },
+     {
+      "poem": "047",
+      "l_from": 12,
+      "l_to": 13,
+      "lang": "en",
+      "source_quote": "Something will happen, spill like ocean / over granite's endless shore.",
+      "est_en_words": 10,
+      "why": "From her oldest poem (2001), the sea spilling over a shore: eternity at the waterline as a quiet last word."
+     }
+    ]
+   }
+  ]
+ }
+]

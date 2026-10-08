@@ -1,0 +1,704 @@
+[
+ {
+  "slot": "1a",
+  "poem": "095",
+  "title": "The Secret Exhibition",
+  "l_from": 11,
+  "l_to": 13,
+  "lang": "en",
+  "source_quote": "and now the silence is so complete / it could swallow a scream whole / and ask for more.",
+  "est_en_words": 17,
+  "why": "Two still bodies at opposite ends of a blank lit wall: a silence so complete it could swallow a scream. It states the film's contract as a feeling, and her definition of that silence answers it at 28.",
+  "alt": {
+   "poem": "089",
+   "l_from": 4,
+   "l_to": 4,
+   "lang": "en",
+   "source_quote": "It's presence. Like Malevich's white — not emptiness but all colors at once."
+  }
+ },
+ {
+  "slot": "1b",
+  "poem": "006",
+  "title": "Первоснежье",
+  "l_from": 1,
+  "l_to": 2,
+  "lang": "ru",
+  "source_quote": "Здравствуй, друг, мне бы к тебе прикоснуться легонько, чуть-чуть, / Но так дорого стоит это тепло, выше всяких валют,",
+  "est_en_words": 23,
+  "why": "His breath at her nape never becomes a touch. She calls him 'friend', not lover, and prices the warmth above any currency, so recognition and the art-money world arrive in one breath.",
+  "alt": {
+   "poem": "097",
+   "l_from": 3,
+   "l_to": 3,
+   "lang": "en",
+   "source_quote": "He does not touch her. He simply stands close enough that she feels the heat of his body through the fabric."
+  }
+ },
+ {
+  "slot": "2",
+  "poem": "044",
+  "title": "Вчерашний день",
+  "l_from": 1,
+  "l_to": 2,
+  "lang": "ru",
+  "source_quote": "Поцелуя не жду. Губами / Расцелую я лед на стеклах.",
+  "est_en_words": 12,
+  "why": "This is her own image of the exact gesture: she expects no kiss, so she kisses the frost. The pride and loneliness are both here, and the ice returns as Ule's thawed tear at 24.",
+  "alt": {
+   "poem": "038",
+   "l_from": 3,
+   "l_to": 5,
+   "lang": "ru",
+   "source_quote": "Впитались слезы в стекло. / И что-то вдруг вытекло. / Это верно, душа, вылилась неспеша."
+  }
+ },
+ {
+  "slot": "5",
+  "poem": "094",
+  "title": "Последняя Осень",
+  "l_from": 34,
+  "l_to": 34,
+  "lang": "ru",
+  "source_quote": "А мне - благодать. Догорать. Догорать.",
+  "est_en_words": 7,
+  "why": "A single leaf with ember veins rises through the storm. Burning out reads as grace, not loss, and the line is short enough for a 4-second shot.",
+  "alt": {
+   "poem": "042",
+   "l_from": 1,
+   "l_to": 2,
+   "lang": "ru",
+   "source_quote": "Рябины зябнущие грозди. / Закат в золе."
+  }
+ },
+ {
+  "slot": "6",
+  "poem": "054",
+  "title": "I'll Drown",
+  "l_from": 2,
+  "l_to": 4,
+  "lang": "en",
+  "source_quote": "One day I'll drown / In cool silence / And drift to sleep.",
+  "est_en_words": 11,
+  "why": "Kira's own verse from the novel. Her unblinking gaze, then the slip under, is drowning without panic, and 'cool silence' carries the contract's silence into the sea.",
+  "alt": {
+   "poem": "004",
+   "l_from": 1,
+   "l_to": 4,
+   "lang": "ru",
+   "source_quote": "Море волнуется раз. / Море волнуется два. / Наживка с крючка сорвалась. / Я шлепнулась и уплыла."
+  }
+ },
+ {
+  "slot": "7m",
+  "poem": "078",
+  "title": "Atuona Morning",
+  "l_from": 26,
+  "l_to": 27,
+  "lang": "en",
+  "source_quote": "Salt from yesterday's tears, today's sweat. / All the same ocean.",
+  "est_en_words": 9,
+  "why": "Water streams off her back as she rises with three feathers: grief and heat dissolve into one sea. It plants the salt that becomes Ule's tear trails at 25.",
+  "alt": {
+   "poem": "037",
+   "l_from": 7,
+   "l_to": 8,
+   "lang": "ru",
+   "source_quote": "Нам любые дороги дороги - / Там, где ты опять готов родиться."
+  }
+ },
+ {
+  "slot": "7",
+  "poem": "036",
+  "title": "Азимут",
+  "l_from": 11,
+  "l_to": 12,
+  "lang": "ru",
+  "source_quote": "Зря ты снова сбросил чешую / там, где я тихонечко взлетаю.",
+  "est_en_words": 13,
+  "why": "Pearl scales and a lone footprint holding the moon. Something was shed right where she quietly takes flight, which answers the feathers of 7m: drowning, then rebirth, then flight.",
+  "alt": {
+   "poem": "038",
+   "l_from": 2,
+   "l_to": 2,
+   "lang": "ru",
+   "source_quote": "Снова твои следы высохли без воды."
+  }
+ },
+ {
+  "slot": "9",
+  "poem": "068",
+  "title": "Digital Exile",
+  "l_from": 1,
+  "l_to": 2,
+  "lang": "en",
+  "source_quote": "Morning in Atuona doesn't begin with light. / It begins with scent.",
+  "est_en_words": 11,
+  "why": "One slow breath with lowered lids while the steam takes on a frangipani tint. Scent comes before light, exactly what the shot does.",
+  "alt": {
+   "poem": "063",
+   "l_from": 10,
+   "l_to": 10,
+   "lang": "en",
+   "source_quote": "ATUONA breathes deep, like the ocean before sunset."
+  }
+ },
+ {
+  "slot": "10a",
+  "poem": "078",
+  "title": "Atuona Morning",
+  "l_from": 2,
+  "l_to": 4,
+  "lang": "en",
+  "source_quote": "Sheets stuck to skin like a second dress. / Through the shutters — Atuona morning, thick as honey. / The air tastes of frangipani and rust.",
+  "est_en_words": 23,
+  "why": "The honey stripe from the shutters on her shoulder, heat and half-open eyes: the frame in her own words. It is sensual without one explicit word, and 'rust' keeps it underground.",
+  "alt": {
+   "poem": "004",
+   "l_from": 25,
+   "l_to": 28,
+   "lang": "ru",
+   "source_quote": "Ну же, зайчата, скорей / Прыгайте в рваный рюкзак, / С вами за столько морей / Светлее чужбины мрак."
+  }
+ },
+ {
+  "slot": "10b",
+  "poem": "081",
+  "title": "Light Commits",
+  "l_from": 9,
+  "l_to": 10,
+  "lang": "en",
+  "source_quote": "The body stays. / The light moves.",
+  "est_en_words": 6,
+  "why": "The film's visual law spoken where it is most literally true: she does not move, the honey light does. It is calm and aphoristic, sized for 4.5 seconds.",
+  "alt": {
+   "poem": "067",
+   "l_from": 17,
+   "l_to": 17,
+   "lang": "en",
+   "source_quote": "But for now – it's beautiful."
+  }
+ },
+ {
+  "slot": "11",
+  "poem": "019",
+  "title": "Апокалипсис",
+  "l_from": 10,
+  "l_to": 12,
+  "lang": "ru",
+  "source_quote": "Ну же, с плеч приспусти бретели... / Ради Бога, не будь хладнокровна, / Убивая меня в постели!",
+  "est_en_words": 20,
+  "why": "The reflection draws a strap down while the woman in the red room stays frozen. In her poem it is Longing, a woman, who is told to undress, so the double dares what Kira holds back. It is never explicit, and Ule is absent.",
+  "alt": {
+   "poem": "030",
+   "l_from": 29,
+   "l_to": 32,
+   "lang": "ru",
+   "source_quote": "Что, сползая до нитки, не голая, / Не сердечная и не вгревшая / Ни тепла и ни вечного холода, / Остаюсь я навеки застывшая."
+  }
+ },
+ {
+  "slot": "M1",
+  "poem": "082",
+  "title": "Landing",
+  "l_from": 3,
+  "l_to": 3,
+  "lang": "en",
+  "source_quote": "He holds her waist like she's another lot with a pre-sale estimate.",
+  "est_en_words": 12,
+  "why": "His flat palm on Mila's waist as the couple walks the jetty toward Kira's shoulder, read as an auction appraisal. The market arrives with them.",
+  "alt": {
+   "poem": "033",
+   "l_from": 15,
+   "l_to": 15,
+   "lang": "ru",
+   "source_quote": "Продаешься, я - не продаюсь."
+  }
+ },
+ {
+  "slot": "M2",
+  "poem": "059",
+  "title": "Ночные лисицы",
+  "l_from": 1,
+  "l_to": 2,
+  "lang": "ru",
+  "source_quote": "Плачут ночные лисицы. / Слезы их мне знакомы.",
+  "est_en_words": 9,
+  "why": "Kira's held gaze in front while his ringed fingers tighten on Mila's wrist behind. Recognition between women, without a word: she knows these tears because they were hers.",
+  "alt": {
+   "poem": "079",
+   "l_from": 17,
+   "l_to": 17,
+   "lang": "en",
+   "source_quote": "Living round the clock with the Beast in a cage, other beasts outside didn't scare her."
+  }
+ },
+ {
+  "slot": "13",
+  "poem": "017",
+  "title": "Guest",
+  "l_from": 25,
+  "l_to": 26,
+  "lang": "ru",
+  "source_quote": "Навещу-ка ублюдков / Я непрошеным гостем,",
+  "est_en_words": 7,
+  "why": "An unhurried walk through the storm, eyes on the lens, into the dinner where the necklace waits. It is swagger at exactly target length, and her one profanity in the film, used as an entrance.",
+  "alt": {
+   "poem": "045",
+   "l_from": 3,
+   "l_to": 4,
+   "lang": "ru",
+   "source_quote": "Застегнувшись с запАхом, / Шла Душа с Карнавала."
+  }
+ },
+ {
+  "slot": "14",
+  "poem": "094",
+  "title": "Последняя Осень",
+  "l_from": 30,
+  "l_to": 31,
+  "lang": "ru",
+  "source_quote": "Эти смыслы навечно срослись - эротика и активы, / Их - под лютый конвой - они целы и невредимы.",
+  "est_en_words": 20,
+  "why": "The clasp closes in lightning while she stares into the lens. Desire and capital are fused like the 'advance on the contract', and her composure stays 'whole and unharmed' under escort.",
+  "alt": {
+   "poem": "081",
+   "l_from": 3,
+   "l_to": 4,
+   "lang": "en",
+   "source_quote": "Light breaks against silk, runs over skin like Renoir's brush in The Bathers. / Each touch commits to the body. No rollback."
+  }
+ },
+ {
+  "slot": "M3",
+  "poem": "090",
+  "title": "Инвентаризация тишины",
+  "l_from": 17,
+  "l_to": 17,
+  "lang": "en",
+  "source_quote": "Slowly killing the canvas from inside. Beauty with a self-destruct timer.",
+  "est_en_words": 11,
+  "why": "The craquelure at Mila's eye catches the sunset like old varnish while he studies her as a canvas: beauty failing from inside. It is sharp and stands alone.",
+  "alt": {
+   "poem": "085",
+   "l_from": 20,
+   "l_to": 20,
+   "lang": "en",
+   "source_quote": "\"M. — mask too tight, cracks by the eyes.\""
+  }
+ },
+ {
+  "slot": "M4",
+  "poem": "016",
+  "title": "Повремени",
+  "l_from": 11,
+  "l_to": 12,
+  "lang": "ru",
+  "source_quote": "Ты как-то, детка, не случалась... / Случись теперь из западни.",
+  "est_en_words": 12,
+  "why": "Mila rises and shakes her colour onto the sand while his hand closes on air. The escape is spoken to her as a blessing: you never quite happened, so happen now, out of the trap.",
+  "alt": {
+   "poem": "011",
+   "l_from": 5,
+   "l_to": 6,
+   "lang": "ru",
+   "source_quote": "Что было, то было. / Теперь ты учись, Ничей."
+  }
+ },
+ {
+  "slot": "M5",
+  "poem": "085",
+  "title": "Cracks Around the Eyes",
+  "l_from": 22,
+  "l_to": 22,
+  "lang": "en",
+  "source_quote": "Mila caught his gaze and smiled slightly — that smile people wear when they've already decided on their own disappearance.",
+  "est_en_words": 19,
+  "why": "The woman in the window breathes in and out of transparency, looking back at us. It is the smile of someone who has already chosen to vanish, and it closes the arrival block.",
+  "alt": {
+   "poem": "019",
+   "l_from": 27,
+   "l_to": 28,
+   "lang": "ru",
+   "source_quote": "Век свечи, чтоб скорей растопиться, / Растекается в вязком моменте."
+  }
+ },
+ {
+  "slot": "15",
+  "poem": "061",
+  "title": "Bird of Prosperity",
+  "l_from": 1,
+  "l_to": 1,
+  "lang": "en",
+  "source_quote": "Kira had to build a comfortable cage for two, step inside, sit down across from Him and look Him in the eyes.",
+  "est_en_words": 22,
+  "why": "The cage, the two facing chairs and the unblinking stare: her sobriety image, exactly at target length. 'Him' is the Beast, so Ule reads as an opponent across the table, never a lover.",
+  "alt": {
+   "poem": "061",
+   "l_from": 1,
+   "l_to": 1,
+   "lang": "en",
+   "source_quote": "And when she wants to blink or sleep – she props them open with matches. Otherwise the sleeping Beast will wake and want meat again."
+  }
+ },
+ {
+  "slot": "16b",
+  "poem": "003",
+  "title": "Atuona",
+  "l_from": 37,
+  "l_to": 39,
+  "lang": "ru",
+  "source_quote": "Повторяя глотки Килиана / Из пригоршней Её волос, / Я Ей, миленький, так и не стану.",
+  "est_en_words": 18,
+  "why": "Her perfume is visible as heat haze while he closes the clasp again. In the novel, Kilian is the scent he breathes in, and 'Her' keeps Kira's desire with women. 'I'll never become Her, darling' refuses him. It is the first of two stanzas from the title poem.",
+  "alt": {
+   "poem": "046",
+   "l_from": 1,
+   "l_to": 4,
+   "lang": "ru",
+   "source_quote": "Принадлежность дневных сомнений / Принимает ночной оборот / И протягивает решенье / Снова задом, да, наперёд."
+  }
+ },
+ {
+  "slot": "17",
+  "poem": "087",
+  "title": "Red Dog",
+  "l_from": 23,
+  "l_to": 25,
+  "lang": "en",
+  "source_quote": "Fact: dogs aren't red. / Fact: it has no shadow. / Fact: Gauguin never explained its meaning.",
+  "est_en_words": 15,
+  "why": "Hard noon, and she lifts her eyes to the empty beach where the shadowless red dog will be composited. Impossible facts, stated flatly, let the other reality in.",
+  "alt": {
+   "poem": "068",
+   "l_from": 29,
+   "l_to": 31,
+   "lang": "en",
+   "source_quote": "Pink sand that never existed. / Horses that were never on Hiva Oa. / Everything invented."
+  }
+ },
+ {
+  "slot": "18",
+  "poem": "095",
+  "title": "The Secret Exhibition",
+  "l_from": 7,
+  "l_to": 8,
+  "lang": "en",
+  "source_quote": "Words that could never be printed. / Words that still haven’t been forgiven.",
+  "est_en_words": 12,
+  "why": "Her fingertips read the carved grooves in honey light. Gauguin's insults in the wood are still unforgiven. Exact length, and not the passage burned in film #8.",
+  "alt": {
+   "poem": "088",
+   "l_from": 13,
+   "l_to": 13,
+   "lang": "en",
+   "source_quote": "The wood was warm — like a memory card storing someone else's temperature."
+  }
+ },
+ {
+  "slot": "19",
+  "poem": "097",
+  "title": "The Yellow Christ",
+  "l_from": 7,
+  "l_to": 7,
+  "lang": "en",
+  "source_quote": "Like the keyboard of Cursor at three in the morning when code is no longer code but the continuation of a vein.",
+  "est_en_words": 22,
+  "why": "Cool light slides along the vein where code is composited: her code is her bloodstream. The carving of 18 passes into her own medium.",
+  "alt": {
+   "poem": "021",
+   "l_from": 1,
+   "l_to": 2,
+   "lang": "ru",
+   "source_quote": "Так пустить бы по венам жар... / Но все плещется полутьма..."
+  }
+ },
+ {
+  "slot": "20",
+  "poem": "067",
+  "title": "Fear of Collectors",
+  "l_from": 3,
+  "l_to": 3,
+  "lang": "en",
+  "source_quote": "The hall reeks of expensive perfume and fear. Yes, fear – she's learned to smell it over the years.",
+  "est_en_words": 18,
+  "why": "She sits still in the third row while the paddles drift like a tide and bleed crimson. What she smells in the room is fear dressed as money. It echoes the perfume of 16b and M2's 'knows how it smells'.",
+  "alt": {
+   "poem": "075",
+   "l_from": 10,
+   "l_to": 10,
+   "lang": "en",
+   "source_quote": "Every bid will be visible as blood on snow."
+  }
+ },
+ {
+  "slot": "20b",
+  "poem": "041",
+  "title": "Русый хвост",
+  "l_from": 1,
+  "l_to": 1,
+  "lang": "ru",
+  "source_quote": "Я тебя не найду: страждет холст под невзрачною маской...",
+  "est_en_words": 12,
+  "why": "Gauguin's colours surface in the stained plaster under Ule's palm, then sink back: a canvas suffering under a drab mask, and a search that will not end in finding.",
+  "alt": {
+   "poem": "087",
+   "l_from": 26,
+   "l_to": 27,
+   "lang": "en",
+   "source_quote": "He uses color not as description, / but as declaration."
+  }
+ },
+ {
+  "slot": "21",
+  "poem": "093",
+  "title": "Алгоритм голода",
+  "l_from": 11,
+  "l_to": 11,
+  "lang": "ru",
+  "source_quote": "В животе засосало. Не от голода — от узнавания.",
+  "est_en_words": 10,
+  "why": "From the notebook chapter itself: as she draws the swollen notebook out of the light, the gut drops. 'Not from hunger — from recognition' brings the film's key word in through the body.",
+  "alt": {
+   "poem": "093",
+   "l_from": 27,
+   "l_to": 27,
+   "lang": "ru",
+   "source_quote": "Сейчас — только тяжесть секрета под рёбрами."
+  }
+ },
+ {
+  "slot": "22",
+  "poem": "053",
+  "title": "The Second PA",
+  "l_from": 2,
+  "l_to": 2,
+  "lang": "en",
+  "source_quote": "We manage to be liars in simple answers.",
+  "est_en_words": 8,
+  "why": "Ule alone at the rain window right after her spoken 'No. Nothing.' The lie is named as something they both know how to do. A sharp turn, the low point before the tears.",
+  "alt": {
+   "poem": "055",
+   "l_from": 6,
+   "l_to": 6,
+   "lang": "en",
+   "source_quote": "Kira, the rains have long burned my dreams with ice..."
+  }
+ },
+ {
+  "slot": "24",
+  "poem": "043",
+  "title": "Мужчины не плачут",
+  "l_from": 17,
+  "l_to": 20,
+  "lang": "ru",
+  "source_quote": "\"Не заплачу никогда...\", / Но слеза вдруг до упора / Жмет на тормоз разговора / Струйкой стаявшего льда.",
+  "est_en_words": 20,
+  "why": "From her poem 'Men Don't Cry': one tear wells on a still face and the vow breaks without a sob. The tear is thawed ice, closing the frost-kiss circle from 2, at target length.",
+  "alt": {
+   "poem": "073",
+   "l_from": 2,
+   "l_to": 2,
+   "lang": "en",
+   "source_quote": "Like the desert learned to cry flowers despite itself."
+  }
+ },
+ {
+  "slot": "25",
+  "poem": "088",
+  "title": "Three Notes",
+  "l_from": 15,
+  "l_to": 15,
+  "lang": "en",
+  "source_quote": "Salt left white trails on his skin — like maps of countries that don't exist.",
+  "est_en_words": 14,
+  "why": "Her fingertip travels the white salt line as if reading a map. Tenderness that reads grief, not romance; the salt planted at 7m comes home.",
+  "alt": {
+   "poem": "042",
+   "l_from": 5,
+   "l_to": 8,
+   "lang": "ru",
+   "source_quote": "Зачем пришел? Давно уж розданный / Другим, не мне... / Что ж, будешь гостем этой осенью / В Моей Стране."
+  }
+ },
+ {
+  "slot": "26",
+  "poem": "096",
+  "title": "Nocturnal Silence",
+  "l_from": 5,
+  "l_to": 8,
+  "lang": "en",
+  "source_quote": "Palm still on Ule’s chest. / Under the skin — steady pulse. / Not consensus. / Just proof that the chain still holds.",
+  "est_en_words": 19,
+  "why": "Her palm flat on his chest under drifting moon-lace, the pulse at his throat, both gazes on the lens. It is proof of life, explicitly 'not consensus': two damaged people seen, not seduced.",
+  "alt": {
+   "poem": "077",
+   "l_from": 5,
+   "l_to": 5,
+   "lang": "en",
+   "source_quote": "It's the moment when someone sees through your careful construction straight to your trembling core."
+  }
+ },
+ {
+  "slot": "27",
+  "poem": "024",
+  "title": "Сгоревший",
+  "l_from": 1,
+  "l_to": 4,
+  "lang": "ru",
+  "source_quote": "И ни со зла, и никак. / Просто некая точность - / Словно старый наждак, / Мне истерший кожу.",
+  "est_en_words": 20,
+  "why": "One fingertip traces the pale healed scar: a precision that hurts without malice, skin worn smooth like old sandpaper. Tactile and exact; not the #024 lines used in film #7.",
+  "alt": {
+   "poem": "085",
+   "l_from": 7,
+   "l_to": 8,
+   "lang": "en",
+   "source_quote": "Renoir in his last years painted with brushes tied to his arthritis-twisted fingers. / Pain didn't leave — it became part of the light."
+  }
+ },
+ {
+  "slot": "28",
+  "poem": "098",
+  "title": "Stillness",
+  "l_from": 32,
+  "l_to": 33,
+  "lang": "en",
+  "source_quote": "silence is not the absence of sound. / It is when both know what to say and choose not to.",
+  "est_en_words": 19,
+  "why": "His lips form words under her two fingers that never sound. This is her own definition of the film's silence, and it answers the swallowed scream of 1a. Non-explicit lines.",
+  "alt": {
+   "poem": "096",
+   "l_from": 39,
+   "l_to": 40,
+   "lang": "en",
+   "source_quote": "Kira puts two fingers on his lips. / To feel the words born straight from the body."
+  }
+ },
+ {
+  "slot": "30",
+  "poem": "040",
+  "title": "Прохлада",
+  "l_from": 15,
+  "l_to": 15,
+  "lang": "ru",
+  "source_quote": "Будто бы в преисподней ждет нас один пароль.",
+  "est_en_words": 10,
+  "why": "His name is voiced off-face while her breath brightens the lilac light on his throat. A name as the one password waiting in the underworld: a key, not a plea.",
+  "alt": {
+   "poem": "068",
+   "l_from": 53,
+   "l_to": 56,
+   "lang": "en",
+   "source_quote": "Some messages aren't notifications. / They're commits. / And once confirmed, / there's no rollback."
+  }
+ },
+ {
+  "slot": "31",
+  "poem": "098",
+  "title": "Stillness",
+  "l_from": 35,
+  "l_to": 36,
+  "lang": "en",
+  "source_quote": "Ule does not kiss. / He looks.",
+  "est_en_words": 6,
+  "why": "His hand stopped in the air at her jaw, sea-light ending at his fingertips. The film's rule, recognition not seduction, said at its most tempting moment: no kiss, only looking.",
+  "alt": {
+   "poem": "045",
+   "l_from": 7,
+   "l_to": 8,
+   "lang": "ru",
+   "source_quote": "Но раз встав на колени, / Ты навеки разодран."
+  }
+ },
+ {
+  "slot": "32",
+  "poem": "096",
+  "title": "Nocturnal Silence",
+  "l_from": 52,
+  "l_to": 52,
+  "lang": "en",
+  "source_quote": "Where it is no longer possible to lie to yourself.",
+  "est_en_words": 10,
+  "why": "His hand presses her palm to his pulse. This is the place where lying stops, and it answers the lie of 22.",
+  "alt": {
+   "poem": "088",
+   "l_from": 12,
+   "l_to": 12,
+   "lang": "en",
+   "source_quote": "More like — allowance. That tomorrow will happen, and you'll be in it."
+  }
+ },
+ {
+  "slot": "34",
+  "poem": "097",
+  "title": "The Yellow Christ",
+  "l_from": 17,
+  "l_to": 18,
+  "lang": "en",
+  "source_quote": "Ule places his palm on the small of her back. / Not a lover. A witness.",
+  "est_en_words": 15,
+  "why": "His palm rests on the small of her back as they face the lilac dawn. Her own line names the relationship once and for all: not a lover, a witness.",
+  "alt": {
+   "poem": "002",
+   "l_from": 15,
+   "l_to": 16,
+   "lang": "ru",
+   "source_quote": "Нету лучше собаки на свете. / Звонко лаяла, молча любя."
+  }
+ },
+ {
+  "slot": "35",
+  "poem": "070",
+  "title": "Quantum Shift",
+  "l_from": 13,
+  "l_to": 13,
+  "lang": "en",
+  "source_quote": "Wave. Particle. Wave. Particle.",
+  "est_en_words": 4,
+  "why": "Two Kiras in one composite: one woman in two states at once, in the rhythm of the surf. It reads as glitch, not as a caption of what we already see.",
+  "alt": {
+   "poem": "099",
+   "l_from": 12,
+   "l_to": 12,
+   "lang": "en",
+   "source_quote": "Two versions of the same woman."
+  }
+ },
+ {
+  "slot": "36",
+  "poem": "003",
+  "title": "Atuona",
+  "l_from": 45,
+  "l_to": 48,
+  "lang": "ru",
+  "source_quote": "Закольцуешься чьим-то мужем. / Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.",
+  "est_en_words": 23,
+  "why": "She steps out of the closed ring of foam. 'You'll ring yourself in as someone's husband; I remain nobody's wife, Atuona' is the last stanza of the title poem over the title shot: self-possessed, with God and a little with Satan.",
+  "alt": {
+   "poem": "032",
+   "l_from": 22,
+   "l_to": 23,
+   "lang": "ru",
+   "source_quote": "Я уже не твоя послушница. / И не твой этот день Рождения."
+  }
+ },
+ {
+  "slot": "37",
+  "poem": "035",
+  "title": "Подмостки",
+  "l_from": 1,
+  "l_to": 3,
+  "lang": "ru",
+  "source_quote": "Все закончится одиночеством. / Снова. / И с него же начнется.",
+  "est_en_words": 12,
+  "why": "Foam whitens the black sand, draws back, and the sand is black again. An ending that is also a beginning, which loops the film back to the silence of 1a.",
+  "alt": {
+   "poem": "089",
+   "l_from": 13,
+   "l_to": 13,
+   "lang": "en",
+   "source_quote": "Outside the Pacific breathed its ancient rhythm — inhale, exhale, without emphasis."
+  }
+ }
+]

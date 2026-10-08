@@ -1,0 +1,180 @@
+{
+ "_note": "8 Oct 2026, first cut. Every shot starts from the frame Elena approved. Kling clips: PASS as is; TRIM = QC's last clean second (trim) or a window that ends on the beat (end); REVIEW = used as rendered, Elena judges in the cut. REJECT = still-motion from the approved frame (stillclips/sm_*.mp4, $0, face locked) — the Kling clips stay on disk. QC: qc_first_pass.json (first pass + 7 second looks).",
+ "1a": {
+  "clip": "v1a__venice-kling-o3-pro.mp4",
+  "end": 10.0,
+  "qc": "PASS; window ends on the lilac turn"
+ },
+ "1b": {
+  "clip": "v1b__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: his breath shows as white vapour (breath or smoke?)"
+ },
+ "2": {
+  "clip": "v2__venice-kling-o3-pro.mp4",
+  "end": 10.0,
+  "qc": "REVIEW: the frontal reflection meets her face (her own reflection or another woman?)"
+ },
+ "5": {
+  "clip": "v5__venice-kling-o3-pro.mp4",
+  "trim": 3.5,
+  "qc": "TRIM 3.5 (the leaf changes after), played reversed"
+ },
+ "6": {
+  "clip": "v6__venice-kling-o3-pro.mp4",
+  "end": 9.0,
+  "qc": "REVIEW: her face shows under the surface after 9 s; cut at 9 s"
+ },
+ "7m": {
+  "clip": "v7m__venice-kling-o3-pro.mp4",
+  "qc": "PASS (three feathers hold)"
+ },
+ "7": {
+  "clip": "../stillclips/sm_k07b.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (pearl flakes float in the footprint) -> still-motion"
+ },
+ "9": {
+  "clip": "v9__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "10a": {
+  "clip": "v10a__venice-kling-o3-pro.mp4",
+  "trim": 6.25,
+  "qc": "TRIM 6.25 (second look: the honey stripe turns flat mustard after)"
+ },
+ "10b": {
+  "clip": "v10b__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "11": {
+  "clip": "v11__venice-kling-o3-pro.mp4",
+  "trim": 6.2,
+  "qc": "REJECT after 6.25 s (real Kira's strap slips, then exposure) -> clean 0-6.2 s only"
+ },
+ "M1": {
+  "clip": "vM1__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: Jean-Marc's smirk becomes a toothy grin"
+ },
+ "M2": {
+  "clip": "vM2__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: Kira's face a little narrower; Jean-Marc looks down at Mila's wrist"
+ },
+ "13": {
+  "clip": "v13__venice-kling-o3-4k.mp4",
+  "trim": 3.5,
+  "qc": "TRIM 3.5 (a second slit opens after)"
+ },
+ "14": {
+  "clip": "v14__venice-kling-o3-pro.mp4",
+  "trim": 4.4,
+  "qc": "REJECT after ~4.5 s (Ule's face drifts, head drops to her hair) -> clean 0-4.4 s, the clasp is in it"
+ },
+ "M3": {
+  "clip": "vM3__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: the cracks spread and darken (Elena's call: 'mask too tight, cracks by the eyes')"
+ },
+ "M4": {
+  "clip": "vM4__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: on screen his closing fist lines up over her hand"
+ },
+ "M5": {
+  "clip": "vM5__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "15": {
+  "clip": "v15__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: Ule's mouth opens and closes (speech?)"
+ },
+ "16b": {
+  "clip": "v16b__venice-kling-o3-pro.mp4",
+  "trim": 7.5,
+  "qc": "TRIM 7.5 (flat green wash after)"
+ },
+ "17": {
+  "clip": "v17__venice-kling-o3-pro.mp4",
+  "qc": "PASS; red dog keyed in"
+ },
+ "18": {
+  "clip": "v18__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "19": {
+  "clip": "v19__venice-kling-o3-pro.mp4",
+  "trim": 5.0,
+  "qc": "TRIM 5.0 (a dark dot on the vein after, could read as a puncture)"
+ },
+ "20": {
+  "clip": "../stillclips/sm_k20.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (paddles turn into plastic red objects) -> still-motion"
+ },
+ "20b": {
+  "clip": "v20b__venice-kling-o3-pro.mp4",
+  "trim": 3.4,
+  "qc": "TRIM 3.4 (second look)"
+ },
+ "21": {
+  "clip": "v21__venice-kling-o3-pro.mp4",
+  "trim": 3.7,
+  "qc": "TRIM 3.7 (the notebook morphs after)"
+ },
+ "22": {
+  "clip": "../stillclips/sm_k22.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (Ule mouths words from 0.6 s) -> still-motion"
+ },
+ "24": {
+  "clip": "v24__venice-kling-o3-pro.mp4",
+  "qc": "REVIEW: Ule's look hardens into a glare"
+ },
+ "25": {
+  "clip": "../stillclips/sm_k25m.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (salt line thickens into paste) -> still-motion"
+ },
+ "26": {
+  "clip": "../stillclips/sm_k26.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (both faces drift from 2.5 s) -> still-motion"
+ },
+ "27": {
+  "clip": "v27__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "28": {
+  "clip": "v28__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "30": {
+  "clip": "../stillclips/sm_k30.mp4",
+  "slow": 1.0,
+  "qc": "v30: her eyes close at his jaw (REVIEW); v30b: her nose in his beard (REJECT) -> still-motion, her eyes open: recognition"
+ },
+ "31": {
+  "clip": "v31__venice-kling-o3-pro.mp4",
+  "qc": "PASS (second look at full resolution overturned the reject)"
+ },
+ "32": {
+  "clip": "v32__venice-kling-o3-pro.mp4",
+  "qc": "PASS"
+ },
+ "34": {
+  "clip": "../stillclips/sm_k34.mp4",
+  "slow": 1.0,
+  "qc": "REJECT (his hand strokes her back: a lover, not a witness) -> still-motion"
+ },
+ "36": {
+  "clip": "v36__venice-kling-o3-pro.mp4",
+  "trim": 4.0,
+  "qc": "REJECT after 4 s (her lips part, smile) -> clean 0-4.0 s"
+ },
+ "35": {
+  "clip": "../stillclips/sm_k36.mp4",
+  "qc": "composite of 36 (double exposure) built on the still-motion of k36"
+ },
+ "37": {
+  "clip": "v37__venice-kling-o3-pro.mp4",
+  "trim": 3.1,
+  "qc": "TRIM 3.1 (the take must END on black sand; a new surge comes after)"
+ }
+}

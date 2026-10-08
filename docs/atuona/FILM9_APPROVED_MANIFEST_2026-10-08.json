@@ -1,0 +1,621 @@
+{
+ "made": "2026-10-08",
+ "dir": "oracle:~/atuona-film9",
+ "rule": "Elena-approved assets of film #9 ATUONA. Never overwrite, rename or delete; a new version gets a NEW name.",
+ "frames": [
+  {
+   "file": "img/k01a.jpg",
+   "md5": "c6b6b93c22c775b6ff8f21e118e8ea81",
+   "bytes": 281593,
+   "role": "shot 1a",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k01b.jpg",
+   "md5": "7a9bf8e9113c1df5ad9d808900808521",
+   "bytes": 624273,
+   "role": "shot 1b",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k02.jpg",
+   "md5": "1ff73c7a3e0c2effb6efc7f27f5fd55b",
+   "bytes": 605035,
+   "role": "shot 2",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k05.jpg",
+   "md5": "23fce88d974e30525c2b996989a2d75e",
+   "bytes": 270518,
+   "role": "shot 5",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k06.jpg",
+   "md5": "303e057636905f847265a8759b2e7e03",
+   "bytes": 6080922,
+   "role": "shot 6",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k07b.jpg",
+   "md5": "f35cf771210b082f9ba78f5df5e0a94b",
+   "bytes": 657904,
+   "role": "shot 7",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k07m.jpg",
+   "md5": "04472ea553620b6f4220b9476b4f0b57",
+   "bytes": 1559346,
+   "role": "shot 7",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k09.jpg",
+   "md5": "5c2316d0664cd30f9c7f3bbdcccda863",
+   "bytes": 425552,
+   "role": "shot 9",
+   "same_bytes_as": [
+    "k09_noflower"
+   ]
+  },
+  {
+   "file": "img/k10a.jpg",
+   "md5": "dfeef18e871268f1db2c3b843fa98feb",
+   "bytes": 222914,
+   "role": "shot 10a",
+   "same_bytes_as": [
+    "k10a_nf"
+   ]
+  },
+  {
+   "file": "img/k10b.jpg",
+   "md5": "149628166e6763d18948f772155a752b",
+   "bytes": 244100,
+   "role": "shot 10b",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k11.jpg",
+   "md5": "30810dd765c829dd2b7b2899bb7dc7bc",
+   "bytes": 120437,
+   "role": "shot 11",
+   "same_bytes_as": [
+    "k11g"
+   ]
+  },
+  {
+   "file": "img/M1.jpg",
+   "md5": "7ded72f051fc3a0f248d39c8a30fd82a",
+   "bytes": 378255,
+   "role": "shot M1",
+   "same_bytes_as": [
+    "M1i"
+   ]
+  },
+  {
+   "file": "img/M2.jpg",
+   "md5": "c1d57f8201f5cc617190924bfb023418",
+   "bytes": 285641,
+   "role": "shot M2",
+   "same_bytes_as": [
+    "M2i"
+   ]
+  },
+  {
+   "file": "img/k13.jpg",
+   "md5": "075f890082007bc4f667657bbdfbb18b",
+   "bytes": 683189,
+   "role": "shot 13",
+   "same_bytes_as": [
+    "k13_dusk_1006"
+   ]
+  },
+  {
+   "file": "img/k14.jpg",
+   "md5": "56a444e7ea215a68fe8dd7be8637af67",
+   "bytes": 528607,
+   "role": "shot 14",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/M3.jpg",
+   "md5": "4b584a26d033851459e739ac246a92b4",
+   "bytes": 264714,
+   "role": "shot M3",
+   "same_bytes_as": [
+    "M3j"
+   ]
+  },
+  {
+   "file": "img/M4.jpg",
+   "md5": "0d238fd1d1d94b4d22de474519514a86",
+   "bytes": 267985,
+   "role": "shot M4",
+   "same_bytes_as": [
+    "M4j"
+   ]
+  },
+  {
+   "file": "img/M5.jpg",
+   "md5": "29be5072f073b32d784ce02ed274f0c6",
+   "bytes": 270654,
+   "role": "shot M5",
+   "same_bytes_as": [
+    "M5f"
+   ]
+  },
+  {
+   "file": "img/k15.jpg",
+   "md5": "ff0ab6b981bff936c94810ff94c77ff1",
+   "bytes": 501350,
+   "role": "shot 15",
+   "same_bytes_as": [
+    "k15s_real"
+   ]
+  },
+  {
+   "file": "img/k16m.jpg",
+   "md5": "26755cfd1957b27c3c61c5636dc954a4",
+   "bytes": 478588,
+   "role": "shot 16b",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k17a.jpg",
+   "md5": "aca118d4aa7c8e18cec40b2bb28f2699",
+   "bytes": 1694684,
+   "role": "shot 17",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k17b.jpg",
+   "md5": "2ad565040fdb23ef9b7a1c4cf19b1933",
+   "bytes": 457375,
+   "role": "shot 17-key",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k18.jpg",
+   "md5": "7001a88e0aeccf74b037466956b258ba",
+   "bytes": 505913,
+   "role": "shot 18",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k19.jpg",
+   "md5": "e19795c36e00e95ce8ed1dbcdd9e5de8",
+   "bytes": 455937,
+   "role": "shot 19",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k20.jpg",
+   "md5": "3880caf831e10a86b8781c07df61dbf9",
+   "bytes": 225729,
+   "role": "shot 20",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k20b.jpg",
+   "md5": "38d27f47698e222bec5c6f032fd3c02c",
+   "bytes": 459889,
+   "role": "shot 20",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k21.jpg",
+   "md5": "3d432e1788e901a32b4fc7b85ddc141e",
+   "bytes": 318919,
+   "role": "shot 21",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k22.jpg",
+   "md5": "2ce11e7540d7fbba37509b0bf4272d7b",
+   "bytes": 381101,
+   "role": "shot 22",
+   "same_bytes_as": [
+    "k22_real"
+   ]
+  },
+  {
+   "file": "img/k24.jpg",
+   "md5": "3d6679a947a132fcb131978cc5eef030",
+   "bytes": 378155,
+   "role": "shot 24",
+   "same_bytes_as": [
+    "k24_real"
+   ]
+  },
+  {
+   "file": "img/k25m.jpg",
+   "md5": "3cd128a19e63d48e534c7e0aa79a9c90",
+   "bytes": 425233,
+   "role": "shot 25",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k26.jpg",
+   "md5": "0a64dc8a093907c5ab1a7ddcbf086e03",
+   "bytes": 447800,
+   "role": "shot 26",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k27.jpg",
+   "md5": "e49b097b8ba821af3d84829c8a24809e",
+   "bytes": 6062967,
+   "role": "shot 27",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k28m.jpg",
+   "md5": "332b5aa4e378eddc1c7dfa103b9e5833",
+   "bytes": 426732,
+   "role": "shot 28",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k30.jpg",
+   "md5": "fe32c1bdd8fe120bbec852e06ee8e52c",
+   "bytes": 346849,
+   "role": "shot 30",
+   "same_bytes_as": [
+    "k30i"
+   ]
+  },
+  {
+   "file": "img/k31.jpg",
+   "md5": "99694403bee627d4fb880cb940c974d7",
+   "bytes": 347709,
+   "role": "shot 31",
+   "same_bytes_as": [
+    "k31i"
+   ]
+  },
+  {
+   "file": "img/k32m.jpg",
+   "md5": "79d4e5cadd4f948afc2c88b498f10a96",
+   "bytes": 483434,
+   "role": "shot 32",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k34.jpg",
+   "md5": "cbc36d5f41fd246600403782a59fcc26",
+   "bytes": 679389,
+   "role": "shot 34",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k36.jpg",
+   "md5": "981b436129bc6bd9836a2024e28b5d39",
+   "bytes": 5891909,
+   "role": "shot 36",
+   "same_bytes_as": []
+  },
+  {
+   "file": "img/k37.jpg",
+   "md5": "5439a91d633558e2f7dac08e5285710f",
+   "bytes": 596809,
+   "role": "shot 37",
+   "same_bytes_as": []
+  }
+ ],
+ "cast": [
+  {
+   "file": "img/kira.jpg",
+   "md5": "d2256fa2c235876e90262fac8a5648ed",
+   "bytes": 412776,
+   "role": "cast: kira",
+   "same_bytes_as": [
+    "kira_words_a"
+   ]
+  },
+  {
+   "file": "img/ule.jpg",
+   "md5": "8193dcc0daccb9588111cd82609fd508",
+   "bytes": 6636934,
+   "role": "cast: ule",
+   "same_bytes_as": [
+    "ule_m2g"
+   ]
+  },
+  {
+   "file": "img/mila.jpg",
+   "md5": "8ce2cae7db2291718d884f661630c11d",
+   "bytes": 415338,
+   "role": "cast: mila",
+   "same_bytes_as": [
+    "cast_mila_s"
+   ]
+  },
+  {
+   "file": "img/jean.jpg",
+   "md5": "5a67d1d3b497769e4e16e8a850d7f3e6",
+   "bytes": 422123,
+   "role": "cast: jean",
+   "same_bytes_as": [
+    "cast_jean7_l3"
+   ]
+  }
+ ],
+ "glitch": [
+  {
+   "file": "img/G6s.jpg",
+   "md5": "eb9379904b78a9271c0dc6a373e1753a",
+   "bytes": 233829,
+   "role": "glitch insert G6 (approved 7 Oct)",
+   "same_bytes_as": [],
+   "surreal": "storm sea inside the emerald"
+  },
+  {
+   "file": "img/G7.jpg",
+   "md5": "0a769149777ebd610494c09a846dd22f",
+   "bytes": 90701,
+   "role": "glitch insert G7 (approved 7 Oct)",
+   "same_bytes_as": [],
+   "surreal": "water reflects a day sky under the night moon"
+  },
+  {
+   "file": "img/G8_clean.jpg",
+   "md5": "0f95177f0fd5ddd192dfa8e5cc492279",
+   "bytes": 211103,
+   "role": "glitch insert G8 (approved 7 Oct)",
+   "same_bytes_as": [],
+   "surreal": "in the mirror she is alone"
+  }
+ ],
+ "clips": [
+  {
+   "file": "clips/v10a__venice-kling-o3-pro.mp4",
+   "md5": "c26c1459cc72bc333bf62e5c531ad15e",
+   "bytes": 9118374
+  },
+  {
+   "file": "clips/v10b__venice-kling-o3-pro.mp4",
+   "md5": "0cbb6326b762c9f20edb058b09077ca5",
+   "bytes": 5177966
+  },
+  {
+   "file": "clips/v11__venice-kling-o3-pro.mp4",
+   "md5": "fd2231666206ef28150ce76593b74bc5",
+   "bytes": 15643351
+  },
+  {
+   "file": "clips/v13__venice-kling-o3-4k.mp4",
+   "md5": "43dc71a7f51f23172e45a4373433442b",
+   "bytes": 23139512
+  },
+  {
+   "file": "clips/v14__venice-kling-o3-pro.mp4",
+   "md5": "3861f06dd64c200c6f320f4064422694",
+   "bytes": 20082078
+  },
+  {
+   "file": "clips/v15__venice-kling-o3-pro.mp4",
+   "md5": "bf8ec090bcff2bca4f7496f3ec825585",
+   "bytes": 23021720
+  },
+  {
+   "file": "clips/v16b__venice-kling-o3-pro.mp4",
+   "md5": "bf6b8e4e8ce84ccc1bc62da29a2d128e",
+   "bytes": 18275144
+  },
+  {
+   "file": "clips/v17__venice-kling-o3-pro.mp4",
+   "md5": "ec16ce540cad47cc3b15ec9b426fffde",
+   "bytes": 17145494
+  },
+  {
+   "file": "clips/v18__venice-kling-o3-pro.mp4",
+   "md5": "5923e4ba83b4c57e284b6690ddb10c7c",
+   "bytes": 8897519
+  },
+  {
+   "file": "clips/v19__venice-kling-o3-pro.mp4",
+   "md5": "8f9fe500d7073da8c7e1edbf950dd990",
+   "bytes": 9098732
+  },
+  {
+   "file": "clips/v1a__venice-kling-o3-pro.mp4",
+   "md5": "f3d36d745bbe814fca0c69ead0ec2299",
+   "bytes": 9984045
+  },
+  {
+   "file": "clips/v1b__venice-kling-o3-pro.mp4",
+   "md5": "79006c4b9db570ed7e73bf63593ceebb",
+   "bytes": 22637932
+  },
+  {
+   "file": "clips/v20__venice-kling-o3-pro.mp4",
+   "md5": "42cd9c983437021c337be133bc97b8d8",
+   "bytes": 15429257
+  },
+  {
+   "file": "clips/v20b__venice-kling-o3-pro.mp4",
+   "md5": "6a13be13482fbeb972a61533ea7ac0a4",
+   "bytes": 14596873
+  },
+  {
+   "file": "clips/v21__venice-kling-o3-pro.mp4",
+   "md5": "121cfee97f3589b0e855dbb0efeeb458",
+   "bytes": 7661869
+  },
+  {
+   "file": "clips/v22__venice-kling-o3-pro.mp4",
+   "md5": "22ae8baed593cf59f7eb7cece9b703d9",
+   "bytes": 10150067
+  },
+  {
+   "file": "clips/v24__venice-kling-o3-pro.mp4",
+   "md5": "224dd31e59b7bef6421f9b5fd9970c21",
+   "bytes": 15677287
+  },
+  {
+   "file": "clips/v25__venice-kling-o3-pro.mp4",
+   "md5": "aad3a7d7f653639b27e08820190ef8a3",
+   "bytes": 16785450
+  },
+  {
+   "file": "clips/v26__venice-kling-o3-pro.mp4",
+   "md5": "e060a29e556082e7ce9a8da366baf263",
+   "bytes": 24522928
+  },
+  {
+   "file": "clips/v27__venice-kling-o3-pro.mp4",
+   "md5": "17d6b8ea15a39a8fc513ae681f03ac85",
+   "bytes": 23129523
+  },
+  {
+   "file": "clips/v28__venice-kling-o3-pro.mp4",
+   "md5": "6d922bbb7862652fbc50973d739f9afd",
+   "bytes": 13535167
+  },
+  {
+   "file": "clips/v2__venice-kling-o3-pro.mp4",
+   "md5": "a78d642a4ad99a25c27874085704975e",
+   "bytes": 21184219
+  },
+  {
+   "file": "clips/v30__venice-kling-o3-pro.mp4",
+   "md5": "35ebb73c7aae2c86fc60d5951d9c80ab",
+   "bytes": 9797576
+  },
+  {
+   "file": "clips/v30b__venice-kling-o3-pro.mp4",
+   "md5": "8c68caf7ab7d9ef9ec39406697ea3b13",
+   "bytes": 9725340
+  },
+  {
+   "file": "clips/v31__venice-kling-o3-pro.mp4",
+   "md5": "7e6b27e1576360b5dfe18cebb628348d",
+   "bytes": 8096418
+  },
+  {
+   "file": "clips/v32__venice-kling-o3-pro.mp4",
+   "md5": "7814104718c612d63b4dda091249ed85",
+   "bytes": 7193735
+  },
+  {
+   "file": "clips/v34__venice-kling-o3-pro.mp4",
+   "md5": "fefd22cee27522248917899050d53ff8",
+   "bytes": 13013800
+  },
+  {
+   "file": "clips/v36__venice-kling-o3-pro.mp4",
+   "md5": "325f39cf30f4073bf4d87263203d0ecc",
+   "bytes": 13485250
+  },
+  {
+   "file": "clips/v37__venice-kling-o3-pro.mp4",
+   "md5": "29cd523d5eac031805961a07d13560df",
+   "bytes": 10556919
+  },
+  {
+   "file": "clips/v5__venice-kling-o3-pro.mp4",
+   "md5": "b8e8f40be2445d2910e90cba1e843f9b",
+   "bytes": 5633073
+  },
+  {
+   "file": "clips/v6__venice-kling-o3-pro.mp4",
+   "md5": "365d5a4ec8f30bb1c7ed696ac28197ff",
+   "bytes": 23312029
+  },
+  {
+   "file": "clips/v7__venice-kling-o3-pro.mp4",
+   "md5": "e2afec88c47740e49319a31a89b6d3f7",
+   "bytes": 29294796
+  },
+  {
+   "file": "clips/v7m__venice-kling-o3-pro.mp4",
+   "md5": "dbef7aaa61776e4e3c68ce0d97523682",
+   "bytes": 12913751
+  },
+  {
+   "file": "clips/v9__venice-kling-o3-pro.mp4",
+   "md5": "43be95db896b15a2779a5924edeefcac",
+   "bytes": 10364442
+  },
+  {
+   "file": "clips/vM1__venice-kling-o3-pro.mp4",
+   "md5": "ab22e9d6d443ab1acc8e9d76aa2cd85f",
+   "bytes": 12673083
+  },
+  {
+   "file": "clips/vM2__venice-kling-o3-pro.mp4",
+   "md5": "ee81b5148d13d87a26e1402e2d7de375",
+   "bytes": 15085607
+  },
+  {
+   "file": "clips/vM3__venice-kling-o3-pro.mp4",
+   "md5": "c1340711f5af8b9884cd01684aeccb66",
+   "bytes": 7293690
+  },
+  {
+   "file": "clips/vM4__venice-kling-o3-pro.mp4",
+   "md5": "aceb789fe1aacd4ed48de5c60b7ba2d2",
+   "bytes": 7194395
+  },
+  {
+   "file": "clips/vM5__venice-kling-o3-pro.mp4",
+   "md5": "86901dc60e82438cf170a6b760de7192",
+   "bytes": 8526950
+  },
+  {
+   "file": "stillclips/sm_k07b.mp4",
+   "md5": "54be186e75ee436c3ee84bf41731538d",
+   "bytes": 37680523
+  },
+  {
+   "file": "stillclips/sm_k11.mp4",
+   "md5": "9bcae75235a4bf3fe4388a95b1ce117c",
+   "bytes": 24522861
+  },
+  {
+   "file": "stillclips/sm_k14.mp4",
+   "md5": "f050357f99aba088aa40597f068a93c2",
+   "bytes": 39749521
+  },
+  {
+   "file": "stillclips/sm_k20.mp4",
+   "md5": "1404cbac5a776f19c5a726c7315d631c",
+   "bytes": 36981586
+  },
+  {
+   "file": "stillclips/sm_k22.mp4",
+   "md5": "ab531fce0d1c55f1336545344df84669",
+   "bytes": 37965804
+  },
+  {
+   "file": "stillclips/sm_k25m.mp4",
+   "md5": "cedb2895894406f9fb4ddfb3a08b791d",
+   "bytes": 44299500
+  },
+  {
+   "file": "stillclips/sm_k26.mp4",
+   "md5": "9ae93be9d4744c24bb778b901afe4edd",
+   "bytes": 25428016
+  },
+  {
+   "file": "stillclips/sm_k30.mp4",
+   "md5": "60df02758a4909b8562e55996a8a2380",
+   "bytes": 1310768
+  }
+ ],
+ "music": [
+  {
+   "file": "music/film9.mp3",
+   "md5": "f2ce453049ceb25388bf1f296eee80af",
+   "bytes": 7201063
+  },
+  {
+   "file": "music/film9_deephouse.mp3",
+   "md5": "e3801ecab1630274470a9cfe2a8f2d60",
+   "bytes": 7201063
+  }
+ ]
+}

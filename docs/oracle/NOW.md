@@ -492,17 +492,18 @@ git log keeps the record.
   M1_M2_30_31_10ab_impressionist. Venice ledger $32.15. **ALL 39 FRAMES APPROVED 8 Oct** → official files `img/M1..M5.jpg`,
   `k10a`, `k10b`, `k30`, `k31` (+ earlier); final 4:30 order in plan.json `final_frames_4m30`. Realism pass run on the 26 older
   frames (`<frame>_real.jpg`, $2.08, replaces nothing yet).
-  **8 Oct afternoon — text, realism QA, motion test.** ALL burned-in text: `docs/atuona/FILM9_ONSCREEN_TEXT_2026-10-08.md`
-  (65 lines: 46 her English verbatim, 2 with a marked cut, 17 OUR English of her LITPROM Russian shown beside it — need her OK;
-  6 stage directions removed; shot 19 code text checked against #064). 3 shots overloaded (25, 26, 28) → her call, recommendations
-  in the doc. Realism QA (`film9_text_and_realism_verdicts_2026-10-08.json`): keep original for 18 (k37_real ADDED A PERSON —
-  never use), k36 → use real, 7 for her eye: private sheet `Pictures/Atuona-film9-private/review_realism_8_2026-10-08.jpg`.
-  Motion directions for 38 shots: `docs/atuona/film9_motion_directions_2026-10-08.json` (275 s; one take each as planned =
-  $60.06 at Venice quotes Pro $0.77/5 s, 4K $2.31/5 s). **Motion test DONE ($3.85, plan entries v13/v30/vM3, clips
-  `~/atuona-film9/clips/v*__venice-kling-o3-*.mp4`, laptop copy in the private folder):** v13 4K good; **v30 FAILS — her lips
-  close to his jaw (no Kira/Ule kiss rule)** → re-take with her head locked; vM3 faces hold but the craquelure spreads (her call).
-  Venice balance **$60.35** (API). **Elena's move:** text corrections, 3 overload choices, 8 realism pairs, the test clips, and
-  4K-vs-Pro (all-Pro full run ≈ $44 leaves ~$16 for re-takes; as planned ≈ $56 leaves ~$4).
+  **8 Oct evening — COMPILE IN PROGRESS (Claude Code).** Elena: "move on with video compilation", "all the frames already
+  approved by me should stay", text = ONE sharp stanza per shot from her own poems, emotional fit, atmospheric English; music =
+  DEEP HOUSE underground (memory `feedback_atuona_film_style`). **Approved assets: memory `project_atuona_film9_approved_assets`
+  + md5 manifest `docs/atuona/FILM9_APPROVED_MANIFEST_2026-10-08.json`; 2nd copy verified on the laptop
+  (`Pictures/Atuona-film9-private/APPROVED_2026-10-08/`). Never overwrite an approved name.** Motion: 36 Kling O3 Pro clips
+  ($44.66, Venice left **$15.69**), QC `docs/atuona/film9_stanza_work/qc_first_pass.json` → choices `clip_choice.json` (PASS / TRIM
+  / REVIEW for her eye / REJECT → $0 still-motion from her approved frame: 7, 20, 22, 25, 26, 30, 34, + 35 base). Stanzas: 39
+  picked by 3 curators + editor, all 39 quotes code-verified against `content/poems.json` (32 poems, 17 RU / 22 EN,
+  `picks_verified.json`); RU translation workflow running. Compile = `scripts/atuona-film9.mjs` (1080p/24, `PREVIEW=1` fast cut),
+  voice `scripts/atuona-film9-vo.py` (Kira/marin), cut via `docs/atuona/film9_stanza_work/build_cut.py`. Music
+  `music/film9_deephouse.mp3` (ElevenLabs, measured 118 BPM). **Elena's move after the preview:** the REVIEW clips + stanzas.
+  The 8 Oct morning text doc (`FILM9_ONSCREEN_TEXT_2026-10-08.md`) is SUPERSEDED by the stanza approach.
   Oracle note: a 30 Sep aigo-promo bash wait loop (pid 840701, `pgrep` matches itself, never exits) is harmless — not ours, not killed.
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.

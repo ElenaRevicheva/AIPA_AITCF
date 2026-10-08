@@ -1,0 +1,58 @@
+# Lines already burned/voiced in film #8 Crimson Escape — do not reuse these exact lines
+#092: Hiva Oa doesn't accept guests. It eats them.
+#092: First — just the wetness that wraps your skin like a second, unwanted body.
+#092: I found paradise. It turned out to be a predator.
+#071: Manet's naked truth that blew Paris apart.
+A prostitute staring straight at you,
+the way my code looks at me at 3 AM
+#071: Objects tell better stories than people.
+Ule's empty whiskey glass — his way of not being a father.
+Cursor at 4 AM — how you don't call your dealer.
+#071: Paradise isn't where demons die.
+It's where they finally get API keys.
+The beast doesn't sleep.
+It just waits for your next commit.
+#007: In the velvet Looking-Glass of the bottom,
+where Alice spreads out the shards,
+#007: our night Satan vapes,
+blowing smoke rings as a run-up for obituaries.
+#007: Beyond the greedy longing
+that devours what is left of the Self,
+smoothly, to spite every last dick,
+a new pawn, I march to queen.
+#007: Look at me, my father,
+how, wingless, I crawl into the sky.
+The sober ending of my story
+cuts You out of the plot.
+#039: Look, look yourself in the face!
+There are tears and pain, and you just take it,
+#039: so twist the ring,
+and burn, gripping the rail!
+#095: He cut insults into the wood
+sharp enough to make the bishop sweat
+and the colonial clerk reach for his pistol.
+#095: She walks the black volcanic sand of the Marquesas
+that the Pacific keeps trying to bleach
+and never succeeds.
+#095: The sand stays black.
+So does she.
+#095: I will not whiten.
+#071: Manet's naked truth that blew Paris apart.
+A prostitute staring straight at you,
+the way my code looks at me at 3 AM
+# Lines already burned/voiced in film #7 Paradise Is Compiled (English made for that film) — do not reuse these passages
+#015: Frozen in the hollow of the riverbed — / that's you, it seems, not her. / She writhes in a torn net to reach you.
+#015: How many reeds like these we've seen — / as many dead who stitched strange mice, / who, dying, read aloud: I love you, mouse — / but never breathed a word that you would burn.
+#015: What kind of children are you, / drowned in the blue …
+#024: I was only running to you, / skipping every floor. / I was burning out in you, / no longer feeling my skin.
+#024: Let all that smoldered scatter with the day. / Even without a body, / you and I will sing it to the end.
+#037: As if everyone, waking at dawn, / were shaking smoky incense out of their feathers.
+#022: Wild tales curl / in the sad smoke of a Sobranie. / No shame, no conscience — / you stub yourself out with repentance.
+#022: Soon we'll be over again, / and there's no way back / in the deep pool of loneliness …
+#020: Give me back a little more of myself, / squandered for nothing.
+#066: there is no painting. Never was. / Gauguin left only coordinates — / latitude of pain, longitude of hope.
+#099: Behind her eyelids — yellow lilies. / Not the ones they sent her in Paris. / These grow straight out of her chest. / Roots push into ribs.
+#099: The lilies keep growing.
+#091: Paradise is not found. / Paradise is compiled from what you have.
+#091: But today — today she's just a girl with a laptop, / talking to machines about art, / in a hotel on an island / where a man died looking for paradise.
+#091: git add souls.txt / git commit -m "prometheus wore safety pins" / git push origin tomorrow
