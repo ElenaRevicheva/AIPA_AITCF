@@ -459,7 +459,12 @@ git log keeps the record.
   Seedream wins all 3 (cast held, realistic; 15 built a literal birdcage instead of its shadow); qwen missed the cast. Private
   sheet: laptop Pictures/Atuona-film9-private/shots_15_30_31_2026-10-07.jpg. **Elena's move:** approve/reject. Mila & Jean-Marc
   sequence (#082-#086, full texts `docs/atuona/POEMS_082-086_MILA_JEAN.txt`) designing in `wf_c17e329c-ec2`. Venice ledger ~$26.4.
-  **Open:** motion plan (4K hero + O3 Pro).
+  **8 Oct Mila/Jean "go" (all 5, as designed):** cast `img/mila.jpg` (Seedream) + `img/jean.jpg` (nano); M1-M5 on Seedream won
+  (qwen weaker: CGI glows, navy hair). Surreal fixes by nano edit: M1f = a bronze walking-figure sculpture stands beside Mila
+  (not the planned shadow), M5f = Mila semi-transparent like a ghost (not in the window). Picks: M1f (alt M1s), M2s, M3s
+  (craquelure works), M4s (ultramarine pigment works), M5f. Private sheet: Pictures/Atuona-film9-private/
+  mila_jean_sequence_2026-10-08.jpg. Venice ledger $28.11 (~$3.30 of her $77 spent). **Elena's move:** approve; and still
+  15/30/31 approval. **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
