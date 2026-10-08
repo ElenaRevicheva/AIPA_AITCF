@@ -49,6 +49,7 @@ const fit = `scale=${VW}:${VH}:force_original_aspect_ratio=increase,crop=${VW}:$
 const STANZA_SIZE = 33, STANZA_COLS = 92;
 function spread(text, maxCols = STANZA_COLS) {
   const verse = String(text).replace(/\r/g, '').split(/\n| \/ /).map(l => l.trim()).filter(Boolean);
+  if (verse.some(l => l.length > maxCols)) return balanced(verse.join(' '), maxCols);   // a prose sentence longer than a line
   const len = g => g.join(' ').length;
   const parts = (from, n) => n === 1 ? [[verse.slice(from)]]
     : Array.from({ length: verse.length - from - n + 1 }, (_, k) => from + k + 1)
@@ -57,7 +58,16 @@ function spread(text, maxCols = STANZA_COLS) {
     const fits = parts(0, n).filter(p => p.every(g => len(g) <= maxCols));
     if (fits.length) return fits.sort((a, b) => Math.max(...a.map(len)) - Math.max(...b.map(len)))[0].map(g => g.join(' ')).join('\n');
   }
-  return wrap(verse.join(' '), maxCols, 7);
+  return balanced(verse.join(' '), maxCols);
+}
+// the fewest screen lines of EVEN length: no orphan word ("years.") left alone on the last line
+function balanced(text, maxCols) {
+  const n = Math.ceil(text.length / maxCols);
+  for (let w = Math.ceil(text.length / n); w <= maxCols; w++) {
+    const out = wrap(text, w, 99).split('\n');
+    if (out.length <= n) return out.join('\n');
+  }
+  return wrap(text, maxCols, 7);
 }
 function textDraw(lines, clipDur, opaque) {
   const fo = (clipDur - 1.0).toFixed(2);
@@ -130,7 +140,8 @@ async function main() {
     let ss = it.ss || 0;
     const avail = endAt - ss - (it.composite_offset || 0) - 0.05;
     const d = Math.max(it.edit, need);
-    const src = Math.min(avail, d / (it.slow || 1));
+    // tail shots: the main clip runs at its own pace and leaves at least tail_min s (plus the 1 s dissolve) to the tail
+    const src = it.tail ? Math.min(avail, (d - (it.tail_min || 0) + 1.0) / (it.slow || 1)) : Math.min(avail, d / (it.slow || 1));
     if (it.end) ss = Math.max(0, endAt - (it.composite_offset || 0) - src - 0.05);
     plan.push({ it, vd, ss, src, d, factor: d / src });
   }
@@ -161,6 +172,15 @@ async function main() {
     if (it.composite_of) {   // 35: the same woman twice — the clip over its own mirror image, a few seconds later
       args.push('-ss', String(it.composite_offset), '-t', p.src.toFixed(3), '-i', clipPath(it));
       fc = `[0:v]${fit}[a];[1:v]${fit},hflip[b];[a][b]blend=all_mode=screen:all_opacity=${it.composite_opacity || 0.55},${slow},format=yuv420p${textDraw(txt, p.d)}[v]`;
+    } else if (it.tail) {    // 36: the clean part of the walk at its own pace, then a 1 s dissolve into the still-motion of the
+      // same approved frame for the rest of the stanza (QC cut the walk at 4 s; her #003 lines need ~12 s)
+      const mainOut = p.src * (it.slow || 1), XF = 1.0, tailOut = p.d - mainOut + XF;
+      const tss = it.tail_ss || 0, tailF = Math.max(1, tailOut / ((await vdur(path.join(CLIPS, it.tail))) - tss - 0.05));
+      args.push(...(tss ? ['-ss', tss.toFixed(2)] : []), '-i', path.join(CLIPS, it.tail));
+      const mi = f => !PREVIEW && f >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
+      fc = `[0:v]${fit},setpts=${(it.slow || 1).toFixed(4)}*(PTS-STARTPTS),${mi(it.slow || 1)},settb=AVTB[m];` +
+           `[1:v]${fit},setpts=${tailF.toFixed(4)}*(PTS-STARTPTS),${mi(tailF)},trim=duration=${tailOut.toFixed(3)},settb=AVTB[t];` +
+           `[m][t]xfade=transition=fade:duration=${XF}:offset=${(mainOut - XF).toFixed(3)},format=yuv420p${textDraw(txt, p.d)}[v]`;
     } else if (it.key) {     // 17: Gauguin's red dog keyed onto the beach, no shadow
       const k = it.key, kh = Math.round(VH * k.plate_h);
       args.push('-loop', '1', '-i', path.join(IMG, k.img));
@@ -169,7 +189,7 @@ async function main() {
     } else {
       fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow},format=yuv420p${textDraw(txt, p.d)}[v]`;
     }
-    const sIdx = it.composite_of ? 2 : it.key ? 2 : 1;
+    const sIdx = it.composite_of || it.key || it.tail ? 2 : 1;
     await execFileP('ffmpeg', [...args, ...silence, '-filter_complex', fc, '-map', '[v]', '-map', `${sIdx}:a`, '-t', p.d.toFixed(2), ...enc, out], { maxBuffer: 1 << 26, timeout: 3600000 });
     segOf[it.sid] = out;
     process.stderr.write(`seg ${i + 1}/${plan.length} ${it.sid} ${p.d.toFixed(2)}s from ${p.src.toFixed(2)}s${p.factor > 1.001 ? ` slow×${p.factor.toFixed(2)}${p.factor >= MI_FROM ? ' (interp)' : ''}` : ''}\n`);
@@ -191,12 +211,35 @@ async function main() {
   const durs = []; for (const c of seq) durs.push(await vdur(c.file));
   const joinD = seq.map((c, k) => k === 0 ? 0 : (c.glitch || seq[k - 1].glitch) ? GLITCH_XF : XFADE_D);
   const segStart = k => { let s = 0; for (let i = 0; i < k; i++) s += durs[i] - joinD[i + 1]; return Math.max(0, s); };
-  const inputs = seq.flatMap(c => ['-i', c.file]); let fc = ''; let vlab = '0:v', alab = '0:a', merged = durs[0];
-  for (let k = 1; k < seq.length; k++) { const D = joinD[k], ofs = Math.max(0, merged - D).toFixed(3); fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${D}:offset=${ofs}[vc${k}];[${alab}][${k}:a]acrossfade=d=${D}[ac${k}];`; vlab = `vc${k}`; alab = `ac${k}`; merged += durs[k] - D; }
+  // 8 Oct 2026: ONE ffmpeg decoding all ~45 full-HD inputs at once ran the 12 GB box out of memory and froze every bot on it
+  // for a long while. So the chain runs in batches of CHUNK segments (near-lossless intermediates), then the batches are
+  // dissolved together — never more than CHUNK decoders alive — and it refuses to start when the box is short of memory.
+  const CHUNK = 6;
+  const memAvailMB = () => Math.round(+(fs.readFileSync('/proc/meminfo', 'utf8').match(/MemAvailable:\s+(\d+)/) || [0, 0])[1] / 1024);
+  async function chain(files, ds, joins, out, last) {
+    if (memAvailMB() < 2500) throw new Error(`only ${memAvailMB()} MB free — not starting a dissolve chain (the bots share this box)`);
+    if (files.length === 1) { fs.copyFileSync(files[0], out); return ds[0]; }
+    const inputs = files.flatMap(f => ['-i', f]); let fc = '', vlab = '0:v', alab = '0:a', merged = ds[0];
+    for (let k = 1; k < files.length; k++) { const D = joins[k], ofs = Math.max(0, merged - D).toFixed(3); fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${D}:offset=${ofs}[vc${k}];[${alab}][${k}:a]acrossfade=d=${D}[ac${k}];`; vlab = `vc${k}`; alab = `ac${k}`; merged += ds[k] - D; }
+    const v = last ? ['-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M']
+                   : ['-preset', PREVIEW ? 'ultrafast' : 'veryfast', '-crf', PREVIEW ? '16' : '12'];
+    await execFileP('ffmpeg', ['-y', '-threads', '2', '-filter_threads', '1', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`,
+      '-c:v', 'libx264', ...v, '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', out], { maxBuffer: 1 << 27, timeout: 7200000 });
+    return merged;
+  }
   const body = path.join(W, 'body.mp4');
-  process.stderr.write(`dissolve chain: ${seq.length} segments, ${merged.toFixed(1)}s\n`);
-  await execFileP('ffmpeg', ['-y', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`,
-    '-c:v', 'libx264', '-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', body], { maxBuffer: 1 << 27, timeout: 7200000 });
+  const starts = []; for (let i = 0; i < seq.length; i += CHUNK) starts.push(i);
+  const chunkFiles = [];
+  for (const [g, s0] of starts.entries()) {
+    const ks = Array.from({ length: Math.min(CHUNK, seq.length - s0) }, (_, j) => s0 + j);
+    const f = path.join(W, `${PREVIEW ? 'pv_' : ''}chunk_${g}.mp4`);
+    await chain(ks.map(k => seq[k].file), ks.map(k => durs[k]), ks.map((k, j) => j === 0 ? 0 : joinD[k]), f, false);
+    chunkFiles.push(f);
+    process.stderr.write(`dissolve batch ${g + 1}/${starts.length}\n`);
+  }
+  const cds = []; for (const f of chunkFiles) cds.push(await vdur(f));
+  const merged = await chain(chunkFiles, cds, starts.map((s0, g) => g === 0 ? 0 : joinD[s0]), body, true);
+  process.stderr.write(`dissolve chain: ${seq.length} segments in ${starts.length} batches, ${merged.toFixed(1)}s\n`);
 
   // 4. mix: music ducked under the voice bus, loudness-normalized, limited
   const LEN = await dur(body);

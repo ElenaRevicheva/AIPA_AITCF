@@ -124,8 +124,13 @@
   "qc": "REJECT (Ule mouths words from 0.6 s) -> still-motion"
  },
  "24": {
-  "clip": "v24__venice-kling-o3-pro.mp4",
-  "qc": "REVIEW: Ule's look hardens into a glare"
+  "clip": "v24La__venice-kling-o3-pro.mp4",
+  "slow": 1.0,
+  "edit": 13.0,
+  "tail": "v24Lb__venice-kling-o3-pro.mp4",
+  "tail_ss": 7.0,
+  "tail_min": 3.0,
+  "qc": "Elena 8 Oct: Ule's tears turn into auction lots. v24La (face holds, tear -> gilt-framed painting, tear -> emerald drop) + 1 s dissolve into v24Lb's lots on black velvet under saleroom spotlights. v24 (look hardens) kept, unused."
  },
  "25": {
   "clip": "../stillclips/sm_k25m.mp4",
@@ -166,7 +171,8 @@
  "36": {
   "clip": "v36__venice-kling-o3-pro.mp4",
   "trim": 4.0,
-  "qc": "REJECT after 4 s (her lips part, smile) -> clean 0-4.0 s"
+  "tail": "../stillclips/sm_k36.mp4",
+  "qc": "REJECT after 4 s (lips part) -> clean 0-4.0 s walk at x1.2, then a 1 s dissolve into the still-motion of the same approved frame (critic fix)"
  },
  "35": {
   "clip": "../stillclips/sm_k36.mp4",

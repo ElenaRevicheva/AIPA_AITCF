@@ -1,0 +1,331 @@
+{
+ "final": [
+  {
+   "slot": "1b",
+   "en": "Hello, friend. If only I could touch you lightly, just barely, / but this warmth costs so dear, above any currency",
+   "words": 20,
+   "chosen": "A",
+   "image_map": [
+    "Здравствуй -> 'Hello'",
+    "друг -> 'friend' (kept as friend, never lover)",
+    "мне бы ... прикоснуться (the wish) -> 'If only I could touch'",
+    "к тебе -> 'you'",
+    "легонько -> 'lightly'",
+    "чуть-чуть -> 'just barely'",
+    "Но -> 'but'",
+    "так дорого стоит -> 'costs so dear'",
+    "это тепло -> 'this warmth'",
+    "выше всяких валют -> 'above any currency'"
+   ],
+   "added": [],
+   "why": "A and B are nearly identical. A wins on two small points: 'costs so dear' is the older, more poetic form and keeps 'dear' as both 'costly' and 'beloved', like her 'дорого'. A also leaves the end open instead of adding a full stop, because her sentence runs on in the poem. There is no comma before 'lightly', which matches her 'прикоснуться легонько'. 20 words, under the 30 maximum."
+  },
+  {
+   "slot": "2",
+   "en": "I wait for no kiss. My lips / will cover the ice on the glass with kisses.",
+   "words": 16,
+   "chosen": "A",
+   "image_map": [
+    "Поцелуя не жду -> 'I wait for no kiss' (her inverted order kept)",
+    "Губами (at the end of her line 1) -> 'My lips /' (also at the end of line 1)",
+    "Расцелую (future tense, kiss all over) -> 'will cover ... with kisses'",
+    "я -> carried by 'My'",
+    "лед -> 'ice' (not frost)",
+    "на стеклах -> 'on the glass'"
+   ],
+   "added": [],
+   "why": "A is tighter and has the better line break. 'My lips /' hangs at the end of the line the way her 'Губами' does, and the voice lands on it. B's 'With my lips ... in kisses' sounds less natural, and changing it to 'with kisses' would repeat 'with'. A keeps the echo between her Поцелуя and Расцелую as 'kiss' and 'kisses'. 'Glass' avoids 'panes', which a listener would hear as 'pains'. 16 words."
+  },
+  {
+   "slot": "5",
+   "en": "And for me — grace. Burning down. Burning down.",
+   "words": 8,
+   "chosen": "A",
+   "image_map": [
+    "А мне -> 'And for me' (her contrast with the leaves waltzing apart in the line before)",
+    "благодать -> 'grace' (keeps the sacred weight)",
+    "Догорать -> 'Burning down' (an ongoing process, burning to the end)",
+    "Догорать (repeated) -> 'Burning down' (repeated)"
+   ],
+   "added": [],
+   "why": "I checked the whole poem (094). It burns all the way through: 'в топку', 'раскаленную плазму', the house 'Вот он смотри, горит', 'Духом горит оболочка'. 'Burning down' continues that fire to its end and is literally what a candle or a house does when it 'догорает'. 'Burning out' brings in the modern office sense of burnout, a feeling that is not in her line. Her three short strikes are kept. 8 words, under the 13 maximum, which suits a 4-second shot."
+  },
+  {
+   "slot": "7",
+   "en": "In vain you shed your scales again / right where I, ever so quietly, take flight.",
+   "words": 15,
+   "chosen": "merged",
+   "image_map": [
+    "Зря -> 'In vain' (futility and reproach together)",
+    "ты -> 'you'",
+    "снова -> 'again'",
+    "сбросил -> 'shed' (past tense)",
+    "чешую -> 'your scales'",
+    "там, где -> 'right where' (an idiomatic way to point at the exact place)",
+    "я -> 'I'",
+    "тихонечко (tender diminutive) -> 'ever so quietly'",
+    "взлетаю -> 'take flight' (at the end of the line, as hers ends on взлетаю)"
+   ],
+   "added": [],
+   "why": "The first line is B's: 'In vain you shed your scales again'. It has four beats and an inner chime between 'vain' and 'again', so a stranger remembers it. A's 'for nothing' at the end of the line can also be heard as 'free of charge'. The second line is A's because it follows her word order and ends on the act of flying, as 'взлетаю' does. B moved 'ever so quietly' to the end and lost that. No wings are added. 15 words, exactly the target."
+  },
+  {
+   "slot": "11",
+   "en": "Come on, ease the straps down off your shoulders... / For God's sake, don't be cold-blooded, / killing me in bed!",
+   "words": 19,
+   "chosen": "A",
+   "image_map": [
+    "Ну же -> 'Come on'",
+    "приспусти (lower only partway) -> 'ease ... down'",
+    "бретели -> 'the straps'",
+    "с плеч -> 'off your shoulders'",
+    "her ellipsis -> '...' kept",
+    "Ради Бога -> 'For God's sake'",
+    "не будь хладнокровна (addressed to Longing, a woman) -> 'don't be cold-blooded' (no name or gender word added)",
+    "Убивая меня -> 'killing me' (kept as a bare participle, like hers)",
+    "в постели -> 'in bed'",
+    "her exclamation mark -> '!' kept"
+   ],
+   "added": [],
+   "why": "A keeps her bare participle 'Убивая' as 'killing me in bed!'. That is natural spoken English ('don't be cruel, leaving me like that'), and it lands on the third line as a separate blow, the way hers does. B's 'as you kill me' explains more and is slower. Three lines, her ellipsis and exclamation mark kept, the register raw but never explicit. 'Ease ... down' keeps the partial lowering of 'при-', which matches the shot, where the strap stops at the upper arm. 19 words, under the 30 maximum."
+  },
+  {
+   "slot": "M2",
+   "en": "The night foxes are crying. / I know their tears.",
+   "words": 9,
+   "chosen": "A",
+   "image_map": [
+    "Плачут -> 'are crying' (plain register, not the literary 'weep')",
+    "ночные лисицы -> 'The night foxes' (not 'vixens', which would add a sly-woman meaning)",
+    "Слезы их -> 'their tears'",
+    "мне знакомы -> 'I know' (familiarity kept as knowing, shorter than 'are familiar to me')"
+   ],
+   "added": [],
+   "why": "A and B are identical and both are right. It is two plain lines, like hers, and the second lands as recognition. It sits under target_words because her stanza is only two lines, and padding it would add content."
+  },
+  {
+   "slot": "13",
+   "en": "Think I'll pay the bastards a visit, / an uninvited guest.",
+   "words": 10,
+   "chosen": "B",
+   "image_map": [
+    "Навещу-ка -> 'Think I'll ... pay ... a visit' (the offhand '-ка' becomes 'Think I'll')",
+    "ублюдков -> 'the bastards' (raw kept raw)",
+    "Я -> 'I'll'",
+    "непрошеным гостем -> 'an uninvited guest' ('guest' kept: the poem is titled Guest)",
+    "her trailing comma -> full stop on screen (punctuation only, because the burned stanza ends here)"
+   ],
+   "added": [],
+   "why": "B is better because A's 'drop in' takes the verb from her NEXT line, 'Загляну на минутку', so it borrows an action this stanza does not have. 'Pay the bastards a visit' is the natural English for навестить. It has the swagger of the unhurried entrance, and it speaks well in a low voice. It is 10 words, inside max 13."
+  },
+  {
+   "slot": "14",
+   "en": "These meanings have grown together forever — erotica and assets. / Them — under fierce guard — they're safe and sound.",
+   "words": 17,
+   "chosen": "merged",
+   "image_map": [
+    "Эти смыслы -> 'These meanings'",
+    "навечно -> 'forever'",
+    "срослись -> 'have grown together' (the organic knitting image, like bone or bark; 'fused' would turn it into a welding or heat image)",
+    "эротика и активы -> 'erotica and assets' (cognate kept, set beside assets as two holdings)",
+    "Их -> 'Them' (her elliptical, verbless order is kept, with no 'keep' or 'put' added)",
+    "под лютый конвой -> 'under fierce guard' (конвой = a prisoner guard)",
+    "они целы и невредимы -> 'they're safe and sound' (the stock idiom answering her stock idiom, which keeps the irony)"
+   ],
+   "added": [],
+   "why": "Line 1 is from B: 'grown together' is truer to срослись than A's 'fused'. Line 2 merges the two: A's 'fierce' and B's 'guard'. 'Escort' is rejected because, next to 'erotica', English hears sex work, which is not in конвой. 'Savage' is rejected because on Gauguin's island it adds a colonial charge that лютый does not carry. Her dashes become em dashes. It is 17 words, inside max 30, and nothing is padded toward the target of 22."
+  },
+  {
+   "slot": "M4",
+   "en": "You never quite happened, baby... / Happen now, out of the trap.",
+   "words": 11,
+   "chosen": "B",
+   "image_map": [
+    "Ты -> 'You'",
+    "как-то -> 'quite' (the colloquial hedge 'kind of never' becomes the English hedge 'never quite')",
+    "детка -> 'baby'",
+    "не случалась... -> 'never ... happened...' (her ellipsis kept)",
+    "Случись -> 'Happen' (the happened / Happen echo of случалась / Случись kept)",
+    "теперь -> 'now'",
+    "из западни -> 'out of the trap' (her odd grammar kept, not smoothed into 'escape')"
+   ],
+   "added": [],
+   "why": "Both versions add nothing. B's 'never quite happened' is the English a stranger remembers: tender, intimate and rhythmic, and it matches the 05 Oct close reading. A's 'Somehow, baby,' is literal but sounds stiff at the start of the line. The word count is corrected to 11 (B reported 10), inside max 13."
+  },
+  {
+   "slot": "16b",
+   "en": "Repeating gulps of Kilian / from handfuls of Her hair, / I'll never become Her, darling.",
+   "words": 14,
+   "chosen": "A",
+   "image_map": [
+    "Повторяя -> 'Repeating' (literal, keeping the sense of imitation: copying Her does not make you Her)",
+    "глотки -> 'gulps' (a swallow of drink and a gulp of breath, which feeds her next line, 'On the Rocks')",
+    "Килиана -> 'of Kilian' (the brand as is)",
+    "Из пригоршней -> 'from handfuls'",
+    "Её волос -> 'of Her hair' (capital H kept)",
+    "Я -> 'I'll'",
+    "Ей -> 'Her' (capital kept)",
+    "миленький -> 'darling' (placed last, as the dismissive flick)",
+    "так и не стану -> 'never become'"
+   ],
+   "added": [],
+   "why": "A and B are identical and faithful line for line. B's grammar caveat is resolved: 'ей' is a standard instrumental form of 'она' (a variant of 'ею'), so 'Я Ей ... не стану' grammatically means 'I won't become Her', and 'I'll never become Her' is correct. Elena does not need to confirm it. It is 14 words, inside max 30."
+  },
+  {
+   "slot": "20b",
+   "en": "I won't find you: the canvas languishes beneath a drab mask...",
+   "words": 11,
+   "chosen": "A",
+   "image_map": [
+    "Я тебя не найду (I will not find you) -> 'I won't find you'",
+    "her colon -> kept after 'you'",
+    "страждет (suffers, aches with longing; high, archaic register) -> 'languishes'",
+    "холст (canvas) -> 'the canvas'",
+    "под (under) -> 'beneath'",
+    "невзрачною (drab, plain, unsightly) -> 'drab'",
+    "маской (mask) -> 'mask'",
+    "her ellipsis -> kept at the end"
+   ],
+   "added": [],
+   "why": "Both versions keep every image. A wins on voice: 'I won't' is spoken English, and 'languishes' carries both halves of 'страждет', the suffering and the longing, plus its old literary weight, where 'suffers' keeps only the pain. Kept as one line because she wrote it as one line. 11 words, max 13."
+  },
+  {
+   "slot": "21",
+   "en": "A gnawing in the belly. Not from hunger — from recognition.",
+   "words": 10,
+   "chosen": "A",
+   "image_map": [
+    "В животе (in the belly) -> 'in the belly'",
+    "засосало (impersonal sucking or hollow pang, with no subject) -> 'A gnawing', the English hunger-pang idiom, also without a subject",
+    "Не от голода (not from hunger) -> 'Not from hunger'",
+    "her dash -> kept",
+    "от узнавания (from recognition) -> 'from recognition'"
+   ],
+   "added": [],
+   "why": "The two translations have identical words. A keeps her single line, while B adds a line break she did not write. 'A gnawing' is how English names the hollow hunger pang, so her next sentence can deny the hunger and land on the film's key word, 'recognition'. 10 words, max 13."
+  },
+  {
+   "slot": "24",
+   "en": "\"I will never cry...\" / But a tear suddenly floors / the brake on the conversation — / a trickle of thawed ice.",
+   "words": 19,
+   "chosen": "B",
+   "image_map": [
+    "\"Не заплачу никогда...\" (the vow, in quotes, with ellipsis) -> '\"I will never cry...\"', not contracted, so it keeps its weight",
+    "Но (but) -> 'But'",
+    "слеза (a tear) -> 'a tear'",
+    "вдруг (suddenly) -> 'suddenly'",
+    "до упора (all the way, to the stop), at the end of her line 2 -> 'floors', at the end of English line 2",
+    "Жмет на тормоз (presses the brake) -> 'floors / the brake'",
+    "разговора (of the conversation) -> 'on the conversation', which echoes the English idiom 'put the brakes on'",
+    "Струйкой (as a trickle) -> 'a trickle'",
+    "стаявшего (thawed, melted) -> 'thawed'",
+    "льда (ice) -> 'ice'"
+   ],
+   "added": [],
+   "why": "A's 'slams' adds violence and noise. Her verb is 'жмет', which means presses, and the forbidden-to-add list rules that out. B's 'floors' is exactly 'до упора жмет' (pressed all the way down). It also sits at the end of line 2, where her 'до упора' sits, so it is line for line. 'The brake on the conversation' plays on a real English idiom. Rhyme dropped, every image kept. 19 words, target 20."
+  },
+  {
+   "slot": "27",
+   "en": "Not out of spite, not out of anything. / Just a certain precision — / like old sandpaper / that wore away my skin.",
+   "words": 20,
+   "chosen": "merged",
+   "image_map": [
+    "И ни со зла (and not out of malice or anger) -> 'Not out of spite', the native English idiom for 'со зла'",
+    "и никак (and not in any way: a shrug, no motive at all) -> 'not out of anything', which keeps her doubled 'ни... и' echo",
+    "Просто (just, simply) -> 'Just'",
+    "некая (a certain, some kind of) -> 'a certain'",
+    "точность (precision) -> 'precision'",
+    "her dash -> kept",
+    "Словно (like, as if) -> 'like'",
+    "старый наждак (old sandpaper) -> 'old sandpaper'",
+    "Мне (to me, my) -> 'my'",
+    "истерший кожу (that wore away the skin) -> 'that wore away my skin', ending on 'skin' as the strongest word"
+   ],
+   "added": [],
+   "why": "The merge takes B's doubled 'not out of... not out of' shape and A's sharper 'spite'. 'Out of spite' is the natural English for 'со зла', and 'malice' sounds legal. It also avoids film #7's 'not for anything', because in English that suggests 'not for anything in the world' and changes her shrug. The line ends on 'skin', as B's does, and neither version adds 'raw', so the scar stays healed. 20 words, target 22."
+  },
+  {
+   "slot": "30",
+   "en": "As if in the underworld, one password waits for us.",
+   "words": 10,
+   "chosen": "merged",
+   "image_map": [
+    "Будто бы (as if) -> 'As if'",
+    "в преисподней (in the nether world, hell) -> 'in the underworld', which keeps both hell and the film's underground",
+    "ждет (waits) -> 'waits'",
+    "нас (for us) -> 'for us'",
+    "один (one: a single password, and one shared by both) -> 'one', keeping both meanings",
+    "пароль (password) -> 'password'"
+   ],
+   "added": [],
+   "why": "This is B's wording. 'One password' keeps her ambiguity (a single password, and one the two of them share), which A's 'a single' narrows. B's line break is replaced with a comma, because she wrote one line. 'Waits for us' is the low, intimate ending for the voice. 10 words, target 11, max 13."
+  },
+  {
+   "slot": "36",
+   "en": "You'll ring yourself in as someone's husband. / I'll remain: nobody's wife, / Atuona, a hunchbacked old woman, / on the whole with God, and a little — with Satan.",
+   "words": 26,
+   "chosen": "merged",
+   "image_map": [
+    "Закольцуешься (to close yourself into a ring/loop; also the wedding ring) -> 'You'll ring yourself in' (enclosed, like 'fence yourself in', and the ring is in the word)",
+    "чьим-то мужем (instrumental: as someone's husband) -> 'as someone's husband'",
+    "Я останусь: (her colon kept) -> 'I'll remain:'",
+    "ничьей женой -> 'nobody's wife'",
+    "Атуоной (she remains as Atuona) -> 'Atuona,' (appositive)",
+    "горбатой старушкой -> 'a hunchbacked old woman'",
+    "В целом с Богом -> 'on the whole with God'",
+    "и чуть - с Сатаной (her dash kept as the pause before the grin) -> 'and a little — with Satan'"
+   ],
+   "added": [],
+   "why": "Merged. Line 1 is a new wording. A's 'ring yourself shut' made 'shut' do too much work, and B's 'ring yourself into someone's husband' sounds odd in English and reads the instrumental case as a change of form. 'Ring yourself in as someone's husband' holds both the wedding ring and the closed loop, sounds like English ('box/fence yourself in'), and fits the empty foam ring behind her. Line 2 takes B's 'I'll remain', which has the weight of a vow and keeps both senses of останусь (stay behind and remain as) for the low voice. Lines 3 and 4 come from A: plain 'old woman' (no 'crone', no added 'little'), and 'on the whole' keeps her deadpan 'в целом' better than 'mostly'. Her dash before 'with Satan' is kept. Every image is in place and nothing is added. 26 words against a max of 30; it runs over the 18-word target because the stanza falls apart if any line is cut."
+  },
+  {
+   "slot": "37",
+   "en": "Everything will end in loneliness. / Again. / And begin with it.",
+   "words": 10,
+   "chosen": "A",
+   "image_map": [
+    "Все закончится (future: everything will end) -> 'Everything will end'",
+    "одиночеством -> 'in loneliness'",
+    "Снова. (alone on its own line) -> 'Again.' (alone on its own line)",
+    "И с него же начнется (and with that very one it will begin) -> 'And begin with it.' ('it' can only mean loneliness, and the short, flat close carries 'же')"
+   ],
+   "added": [],
+   "why": "A is closer and stronger. It keeps her future tense, so the line reads as a prophecy, as it does in Russian. It keeps the three-line shape with 'Again.' standing alone. 'Everything' rather than 'It all' leaves loneliness as the only thing 'it' can mean. B's 'that's where it begins' turns her 'with it' into a place and moves into the present tense, which flattens the fate in the line. 'And begin with it.' is the line a stranger keeps: four flat words that close the loop back to the opening silence while the foam draws back off the black sand. 10 words against a max of 13."
+  }
+ ],
+ "critic": {
+  "verdict": "The film reads well as one arc. It moves from silence (1a) through drowning and rebirth, the market and the necklace, the hunt, the lie (22), the tears (24) and the name (30), and it closes on 'nobody's wife' and the loneliness loop (37). The echoes are deliberate and they land: frost-kiss (2) to thawed ice (24), salt (7m) to salt trails (25), the lie (22) to 'no longer possible to lie' (32), and the swallowed scream (1a) to her definition of silence (28). I checked all 17 Russian renderings line by line against her Russian. Every image and action of hers is there and none adds an image, name, colour or emotion. Every one of the 39 slots has a stanza. None goes over its listed max_words. The witness rule holds, and 31 and 34 state it outright. Five things are worth fixing, ranked below. Only the first is serious. Shot 36's 26-word stanza no longer fits its shot, because QC cut the usable clip to 4.0 s after the 30-word limit was set, so the title walk would play in very heavy slow motion. Shot 14 also gets about 2.3x slow motion, but that comes from its 10 s edit length, not its stanza, so it is not listed.",
+  "issues": [
+   {
+    "slot": "36",
+    "kind": "too-long",
+    "detail": "The 30-word limit for this slot was set before QC. QC then cut the walk to its clean 0-4.0 s ('REJECT after 4 s (her lips part, smile)'). scripts/atuona-film9.mjs sets the shot length to max(edit, 0.7 + voice + 1.9) and slows the clip to fill it. 26 words in 4 lines, read 'unhurried, almost a whisper', is about 11-13 s of voice. That makes the shot about 14-16 s (over the slot's 13 s max) built from 3.95 s of footage: roughly 3.5-4x interpolated slow motion on a walking woman, on the title shot. Every other walk or trimmed shot stays near 2x or less.",
+    "fix": "Preferred, so her title-poem stanza stays whole: change the picture, not the text. Play v36 0-4.0 s at its normal x1.2 slow, then dissolve into sm_k36.mp4, the still-motion from the same approved frame (already rendered, $0, face locked), for the rest of the voice. Alternative, only if the walk must carry the whole shot (her call, because it cuts inside her third line): 'You'll ring yourself in as someone's husband. / I'll remain: nobody's wife, / Atuona.' That is 12 words and keeps the ring that matches the foam, 'nobody's wife' and the title word, at about 2x."
+   },
+   {
+    "slot": "M5",
+    "kind": "flat",
+    "detail": "'Mila caught his gaze and smiled slightly' is narrative prose. It also describes something that is not in the frame: Mila sits alone on the window sill with a neutral face, looking back at Kira, and there is no man and no smile. Only the second half carries the shot's feeling, as she fades in and out of transparency.",
+    "fix": "Burn only her own continuous words: 'That smile people wear / when they've already decided on their own disappearance.' That is 12 words, verbatim from #085 apart from the capital T, and fits the 7.5 s edit easily."
+   },
+   {
+    "slot": "16b",
+    "kind": "rule",
+    "detail": "Ule is the man who closes the clasp here (scenario 16b: 'he fastens it again… his face lowered into her hair'; the 14 QC note names Ule). Kira's low voice calling him 'darling' over his hands on her wet bare back reads as lovers to an English viewer. 'миленький' from a woman is ironic and slightly patronising, not tender.",
+    "fix": "'Repeating gulps of Kilian / from handfuls of Her hair, / I'll never become Her, dear.' It is just as faithful to 'миленький', cooler and condescending, and keeps him a witness rather than a lover."
+   },
+   {
+    "slot": "10a",
+    "kind": "repetition",
+    "detail": "Shot 9 ('Morning in Atuona doesn't begin with light. / It begins with scent.') and shot 10a ('…Atuona morning, thick as honey. / The air tastes of frangipani…') come one after the other. Both name the Atuona morning and its scent, so it reads as the same caption twice before 10b says 'The light moves'. Separately, 10a's 23 words run its 6.25 s clean clip past the slot's 13 s max, at about 2.2x slow motion.",
+    "fix": "Burn 10a as lines 1 and 3 only: 'Sheets stuck to skin like a second dress. / The air tastes of frangipani and rust.' That is 15 words, all hers, still underground through 'rust', and the frame's honey light is then named by 10b."
+   },
+   {
+    "slot": "14",
+    "kind": "other",
+    "detail": "'Them — under fierce guard — they're safe and sound.' copies the Russian grammar. In her Russian, 'Их — под лютый конвой' reads naturally as an order ('take them under escort'). In English, a sentence opening on 'Them —' reads and sounds like a slip, both burned on screen and spoken.",
+    "fix": "'These meanings have grown together forever — erotica and assets. / Put them under fierce guard — they're safe and sound.' 17 words. 'Put' only spells out the order already implied by the Russian construction."
+   }
+  ]
+ }
+}

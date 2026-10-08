@@ -26,9 +26,11 @@ for sid in ORDER:
     else:
         c, md = CL[sid], MD[sid]
         it.update({'clip': c['clip'], 'edit': c.get('edit', md['edit_seconds']), 'slow': c.get('slow', md['slow_factor'])})
-        for k in ('ss', 'trim', 'end'):
+        for k in ('ss', 'trim', 'end', 'tail', 'tail_ss', 'tail_min'):
             if c.get(k):
                 it[k] = c[k]
+        if c.get('trim'):   # a trimmed clip: let the voice set the length instead of the old planned edit
+            it['edit'] = min(it['edit'], round(c['trim'] * it['slow'], 1))
     it['qc'] = c.get('qc', '')
     if sid == '5':
         it['reverse'] = True   # generated falling, played rising (scenario production note)
