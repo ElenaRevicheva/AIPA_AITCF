@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (film #9 session) | 09 Oct 13:00 | Oracle disk cleanup + prevention (Elena: "free maximum space without destroying live products; remove only garbage/duplicates; stop it coming back") | Oracle /tmp, ~/aigo-*, ~/atuona-film*, ~/backups, ~/.pm2/logs, /var/log, health_monitor.sh, check_oracle_health.sh, pm2-logrotate, espaluz-webhook (duplicate unit), logrotate.d, sysstat | d66b25a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
