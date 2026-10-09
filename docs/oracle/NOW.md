@@ -508,13 +508,16 @@ git log keeps the record.
   ✅ **8 Oct 20:46–21:41 UTC — Oracle frozen ~55 min by the film #9 preview build (Claude Code's fault) — RECOVERED.**
   One ffmpeg decoding ~45 full-HD inputs reached 9.2 GB RSS on the 12 GB box (no swap); the kernel OOM-killed it
   (`dmesg: Out of memory: Killed process (ffmpeg)`), no reboot (uptime 148 d). Verified 21:42: PM2 all online, EspaLuz ×3 +
-  VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. Doc drift: `openclaw-gateway.service` does not exist
-  (OpenClaw answers on :18789) — fix the RESILIENCE row. **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
+  VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. (OpenClaw is a systemd --user unit: `systemctl --user is-active openclaw-gateway`; also answers on :18789.) **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
   **8 Oct ~22:30 UTC — Elena watched the preview: "film is ugly. Music is ugly. Only few shots are more or less good."**
   Music + voice ON HOLD by her word. ALL film #9 material collected for her: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\`
-  (916 files, 4.8 GB, README + MD5SUMS; stanzas doc in 01_STANZAS). **Elena's move:** which shots are good. Nothing to build.
+  (README + MD5SUMS; stanzas doc in 01_STANZAS; generator/plan/ledger in 10_). **HANDOVER for any agent:**
+  `docs/atuona/FILM9_HANDOVER_2026-10-08.md` (= `00_HANDOVER_FOR_NEXT_AGENT.md` there). Oracle `~/atuona-film9/film9.mjs` is renamed
+  `…OLD-froze-oracle…DO-NOT-RUN`; compile only on the laptop. Oracle disk 98% (1.4 GB free after deleting OUR verified-copied
+  `work/`); other /tmp + ~/.cache candidates (~4.3 GB, not ours) await Elena's go — list in the handover §8.
+  **Elena's move:** which shots are good. Nothing to build.
   **8 Oct evening — COMPILE (superseded by the verdict above; kept for the record).** Elena: "move on with video compilation", "all the frames already
   approved by me should stay", text = ONE sharp stanza per shot from her own poems, emotional fit, atmospheric English; music =
   DEEP HOUSE underground (memory `feedback_atuona_film_style`). **Approved assets: memory `project_atuona_film9_approved_assets`

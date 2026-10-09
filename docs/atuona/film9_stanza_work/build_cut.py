@@ -2,7 +2,9 @@
   - stanzas_final.json : one stanza per slot (her English verbatim, or our atmospheric English of her Russian), source-checked
   - clip_choice.json   : which clip each slot uses (+ optional ss / src cap from QC)
   - film9_motion_directions_2026-10-08.json : edit seconds and slow factor per shot
-Approved frames only; nothing is deleted. Run locally, then scp cut.json to Oracle."""
+Approved frames only; nothing is deleted. Run from the repo root on the laptop; the laptop compile reads cut.json via FILM9_CUT
+(never compile on Oracle). The shot list is ORDER below; GLITCH_AFTER ties the 3 approved glitches to shots 7/11/14 and
+`cover` must be a kept shot."""
 import json, sys
 
 W = 'docs/atuona/film9_stanza_work'

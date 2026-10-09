@@ -1,0 +1,250 @@
+{
+ "fresh": {
+  "verdict": "The handover is a good overview, and it is enough to rebuild the same preview on the laptop and to find a frame on disk. It is not enough to do the other five tasks safely. Every laptop and repo path it names exists, and the Oracle paths check out (img 274 recursive, clips 48, stillclips 10, send_preview_tg.sh present). There are four places where following it as written goes wrong:\n(1) The re-take command overwrites the existing, md5-locked clip. Its model is elided, and its budget variables are undocumented cumulative caps.\n(2) The compile always mixes in the voice and music she has put on hold. It cannot build a cut without voice or text, and the shot list sits in an unmentioned array in build_cut.py that also drives the glitches and the cover shot.\n(3) There are three numbering systems, and \"frame 14\" is ambiguous between them.\n(4) Oracle's disk is 100% full (219 MB free), and Oracle's own film9.mjs is the pre-fix version that froze the server. Neither fact is in the handover.\nThe $0 still-motion option and the stanza-change path have no runnable recipe. The money figure cannot be refreshed from the document. The laptop copy of the handover does not exist yet, and the handover, cut.json and frames_map.txt are all untracked.",
+  "issues": [
+   {
+    "section": "§4.2 Motion / §5 Money (re-take one clip)",
+    "kind": "wrong",
+    "detail": "Running the documented re-take command `node gen.mjs video v<shot> venice` OVERWRITES the clip already in the cut and in the md5 manifest. gen.mjs writes to `clips/<shotId>__<tag>.mp4` with renameSync and has no exists-guard. So re-taking v15 destroys Oracle's only `v15__venice-kling-o3-pro.mp4`, which breaks rule 9 and the manifest's 47 locked clips.",
+    "evidence": "Oracle gen.mjs veniceVideo(): `const dest = path.join(BASE, 'clips', `${shotId}__${tag}.mp4`)` … `fs.renameSync(dest + '.part', dest)`. video() has no existsSync check. FILM9_APPROVED_MANIFEST lists 47 clips with md5s.",
+    "fix": "Add a 're-take recipe' block. (1) Back up plan.json: `cp plan.json plan.json.bak-pre-<shot>r2-<date>`. (2) Write a docs/atuona/film9_retake_<shot>_<date>.py that copies plan.shots['v15'] to a NEW key such as 'v15r2', with any motion-text change she approved. scp it and run it with python3. (3) Run gen.mjs on 'v15r2', which produces `clips/v15r2__venice-kling-o3-pro.mp4`. State plainly: never re-run gen.mjs video on an existing shot id."
+   },
+   {
+    "section": "§4.2 Motion (re-take command and budget env vars)",
+    "kind": "wrong",
+    "detail": "The command elides the model (`VENICE_VIDEO_MODEL=…`). Without that variable, gen.mjs falls back to wan-3-0-pro-image-to-video at a different price and writes `v<shot>__venice.mp4`. BUDGET_USD and VENICE_BUDGET_USD are CUMULATIVE ledger caps (total spent so far + this job), not per-run limits, and the document never says this. The real run used VENICE_BUDGET_USD=84.08, which would now refuse every call because Venice ledger spend is $85.83. With BUDGET_USD=110 and no Venice cap, the guard allows $13.91, more than the $12.61 in the wallet.",
+    "evidence": "gen.mjs line 250: `model = process.env.VENICE_VIDEO_MODEL || 'wan-3-0-pro-image-to-video'`. guard(): `if (s + usd > BUDGET)` with s = sum of all succeeded ledger rows. ~/atuona-film9/run_motion.sh: `export BUDGET_USD=110 VENICE_BUDGET_USD=84.08 …`. Ledger now: total 96.09, venice 85.83, replicate 10.27.",
+    "fix": "Write the exact command, with numbers and the meaning of each: `cd ~/atuona-film9 && nohup env VENICE_VIDEO_MODEL=kling-o3-pro-image-to-video VENICE_OMIT=aspect_ratio,resolution BUDGET_USD=<96.09 + approved $> VENICE_BUDGET_USD=<85.83 + approved $> node gen.mjs video v15r2 venice > logs_motion/v15r2.log 2>&1 &`. It polls for up to 20 minutes. Add: 'caps are cumulative: run `node gen.mjs ledger` first and add only the amount Elena approved'. Also name run_motion.sh and motion_run_ids.txt as the batch form."
+   },
+   {
+    "section": "§4.6 Compile / §7 Open decisions (tighter cut, voice and music on hold)",
+    "kind": "missing",
+    "detail": "The document says music and voice are on hold, but any rebuild following §4.6 puts BOTH back in. The compile has no switch to leave them out: it throws when a shot with a stanza has no vo/<sid>.mp3, it always mixes CUT.music, and a shot with its stanza removed gets the literal word 'undefined' burned on screen. So 'voice: none' or 'key stanzas only' ($7.3) cannot be built without a code change. The agent is not told this, and is not told what the next preview should contain by default.",
+    "evidence": "atuona-film9.mjs l.139-140: `if (noVo.length && !--stanza-preview) throw new Error('missing voice: …')`. l.177: `fs.writeFileSync(txt, spread(it.stanza))`, where spread(undefined) returns 'undefined'. l.39/262: MUSIC is always an input. build_cut.py hardcodes `'music': 'music/film9_deephouse.mp3'` and asserts every slot has a stanza.",
+    "fix": "Add to §0/§7: 'Until Elena decides, a rebuild still carries all 39 voice lines and the deep-house track she called ugly. Say so in the Telegram caption, or ask first. A cut with no voice, partial voice, no music or no text needs a small change to scripts/atuona-film9.mjs (e.g. FILM9_NO_VO=1 skips the voice check and the voice mix; FILM9_NO_MUSIC=1 uses anullsrc; text drawn only when it.stanza is set). That is a repo code change: Teach → Plan → Confirm with her.'"
+   },
+   {
+    "section": "§4.6 Compile (make a tighter cut from shots she names)",
+    "kind": "missing",
+    "detail": "The document never says where the shot list lives. It is the hardcoded ORDER array in build_cut.py. Several traps are also undocumented:\n- The 3 approved glitches are tied to shots 7, 11 and 14 (GLITCH_AFTER), so dropping one of those shots silently drops its glitch.\n- `cover: '1a'` makes the compile crash (`cover.it` of undefined) if 1a is cut.\n- The script uses relative paths, so it must run from the repo root.\n- It writes over cut.json, the untracked file the preview was built from.\n- Its date line '08.10.2026' is hardcoded.\n- `--reuse` reuses pv_seg_<sid>.mp4 by shot id only, so any shot whose clip, trim or stanza changed must be listed in `--reseg=`, or the old segment goes in silently.",
+    "evidence": "build_cut.py: `ORDER = ['1a','1b','1c','2',…]`, `GLITCH_AFTER = {'7': 'G7.jpg', '11': 'G8_clean.jpg', '14': 'G6s.jpg'}`, `'cover': '1a'`, `json.dump(cut, open(f'{W}/cut.json','w'…))`. atuona-film9.mjs l.176 reuse test is by `seg_${it.sid}` only. `git status`: `?? docs/atuona/film9_stanza_work/cut.json`. A dry run confirmed the current cut.json is exactly what build_cut.py produces.",
+    "fix": "Add a 'tighter cut' recipe:\n- cd to the repo root.\n- Copy build_cut.py to build_cut_tight.py, or add an ORDER/OUT env var. Set ORDER to her shots in film order, and write `cut_tight_<date>.json`.\n- Keep GLITCH_AFTER on surviving shots (or ask her where G6s/G7/G8 go), and set cover to a kept shot.\n- Pass `FILM9_CUT=…/cut_tight_<date>.json`.\n- Use `--reuse --reseg=<every changed sid>`.\n- Commit cut.json now as the record of the 8 Oct preview."
+   },
+   {
+    "section": "§0 / §3 (find any frame she mentions)",
+    "kind": "unclear",
+    "detail": "Three numbering systems collide, and the document names none of the mappings:\n- Position in frames_in_film_order (01–39, no card): '14' = shot 13 = img/k13.\n- Section number in FILM9_STANZAS.md (1–40, card 1c is #3): '14' = shot M2.\n- Shot id (1a…37, M1…M5): shot 14 is position 15.\nOn top of that:\n- '7m' vs '7' is never explained.\n- Image names differ from shot ids (16b = k16m, 25 = k25m, 35 = k36).\n- If she says 'the shot at 2:10', the time-to-shot map is render_local/work/timeline.json, which the document never mentions.\n- frames_map.txt, the position→image map, is untracked.",
+    "evidence": "frames_map.txt: `14_13 k13`, `15_14 k14`, `20_16b k16m`, `37_35 k36`, `06_7m k07m`, `07_7 k07b`. The FILM9_STANZAS md has 40 sections starting '## 1. Shot 1a', '## 2. Shot 1b', with section 3 = card 1c. render_local/work/timeline.json has 39 rows {shot, clip, poem, start, dur}.",
+    "fix": "Embed one 39-row table in the handover: position NN | shot id | official image (img/kNN.jpg plus its same_bytes_as alias) | clip used | poem # | start time in the 5:24 preview (from timeline.json). Add the rule: 'when Elena gives a bare number, it is the NN prefix in 02_APPROVED/frames_in_film_order. If in doubt, ask her and send that thumbnail back.' Commit frames_map.txt."
+   },
+   {
+    "section": "§8 Incidents / §3 Oracle table",
+    "kind": "missing",
+    "detail": "Oracle's ~/atuona-film9/film9.mjs is the OLD compile: no batched dissolve chain, no memory guard. It is the exact build that froze the server. Stale instructions also point at Oracle:\n- The repo script's own header says 'Run on Oracle: cd /home/ubuntu/atuona-film9 && node film9.mjs'.\n- build_cut.py's docstring says 'scp cut.json to Oracle'.\n- The vo script header says it runs on Oracle.\n- The compile's DONE line says 'then: node film9.mjs --publish'. --publish targets the PUBLIC gallery path /home/ubuntu/cto-aipa/data/atuona/films/out.",
+    "evidence": "md5: Oracle film9.mjs d6a4e3cd… vs repo scripts/atuona-film9.mjs 926f4374…. `grep -c CHUNK film9.mjs` on Oracle = 0. Repo atuona-film9.mjs lines 9-12 and 25 (OUTDIR), line 273 (DONE message).",
+    "fix": "Add to §8: 'Oracle ~/atuona-film9/film9.mjs and vo9.py are STALE pre-freeze copies: never run them. Ignore the Run-on-Oracle comments inside the scripts and the --publish hint in the DONE line. Publishing needs her explicit go, and on the laptop it would fail anyway.' Optionally, with her OK, rename Oracle's copy to film9.mjs.DO-NOT-RUN-pre-1008."
+   },
+   {
+    "section": "§0 READ FIRST (Oracle state)",
+    "kind": "missing",
+    "detail": "Oracle's root disk is 100% full with 219 MB free. Delivering to her phone needs a ~44 MB scp to Oracle, re-takes write 10–20 MB clips there, and still-motion writes there too. A full disk takes down the same bots §8 is protecting. The handover does not mention it; only NOW.md does.",
+    "evidence": "`df -h /` on Oracle: `/dev/sda1 45G 44G 219M 100%`. NOW.md PART 2: '🚨 DISK 100% FULL (120 MB free) … Nothing deleted, waiting for Elena's go'. ~/atuona-film9/work is 1.1 GB, and a 44 MB ATUONA_film9_preview_phone.mp4 is already in ~/atuona-film9.",
+    "fix": "Add an §0 bullet: 'Oracle disk is full (8 Oct: 219 MB free). Before any scp or gen.mjs run, check `df -h /` and stop if free space is under 3× the file. Remove only files you uploaded this session. Freeing ~/atuona-film9/work (1.1 GB from the failed Oracle attempt) needs Elena's go.'"
+   },
+   {
+    "section": "§4.2 Motion (still-motion $0 fallback) / §7.1",
+    "kind": "missing",
+    "detail": "Still-motion is offered as the $0 alternative, but there is no command for it. In fact:\n- It runs on Oracle as `~/atuona-film7/venv/bin/python still_motion.py render sm/specs/<name>.json`, via run_sm.sh with nice -n 12 and -P 2.\n- The depth model is ~/atuona-film7/models/depth_anything_v2_small.onnx.\n- Oracle's system python3 has no cv2, and the laptop has cv2 but no onnxruntime.\n- Depth maps (sm/depth/*.png) and specs exist only on Oracle.\n- Specs hardcode base_dir ~/atuona-film9 and out `stillclips/sm_<name>.mp4`, so re-rendering overwrites the clip in the cut.\n- It is a video render on Oracle, which conflicts with the 'NEVER render video on Oracle' rule.",
+    "evidence": "run_sm.sh: `ls sm/specs/*.json | xargs -P 2 … ~/atuona-film7/venv/bin/python still_motion.py render {}`. film9_still_motion_fallbacks_2026-10-08.py: `'base_dir': os.path.expanduser('~/atuona-film9') … 'out': f'stillclips/sm_{name}.mp4'`. Oracle `python3 -c 'import cv2'` gives ModuleNotFoundError. Laptop: `import onnxruntime` gives ModuleNotFoundError, while cv2 5.0.0 is present.",
+    "fix": "Add a still-motion recipe and decide where it runs. Laptop option: scp the depth PNG and spec, set base_dir to the laptop APPROVED folder and out to a NEW name (sm_<name>_v2.mp4), then `python scripts/atuona-still-motion.py render <spec>`. Oracle option: only with her OK, one at a time, under nice, after a memory and disk check, using the film7 venv path above. Note that new frames need a depth map, which needs onnxruntime and the model."
+   },
+   {
+    "section": "§4.3 Stanzas (change a stanza)",
+    "kind": "missing",
+    "detail": "The change path is not described. The text flows picks.json → verify_picks.py → translation → stanzas_final.json → build_cut.py → cut.json, and verify_picks.py only checks picks.json, not stanzas_final.json. The voice script skips any shot whose vo/<sid>.mp3 already exists, so the old voice would read the old text over the new stanza. The burned-in segment is reused unless that sid is in --reseg. The readable FILM9_STANZAS .md/.html exists only in the laptop folder, with no generator, so it goes stale.",
+    "evidence": "verify_picks.py: `picks = json.load(open(f'{W}/picks.json'))`. atuona-film9-vo.py: `if not (os.path.exists(out) and os.path.getsize(out) > 2000):` (skip). `git grep FILM9_STANZAS_2026-10-08` hits only the handover; the file sits in D:\\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\\01_STANZAS\\.",
+    "fix": "Add a stanza-change recipe:\n- Edit slot <sid> in picks.json and stanzas_final.json (back them up first). English = her text verbatim from poems_github_2026-10-08.json. Russian = atmospheric English that keeps every image and adds nothing.\n- Run `python docs/atuona/film9_stanza_work/verify_picks.py` from the repo root.\n- Rebuild cut.json.\n- If voice is used, move render_local/vo/<sid>.mp3 into vo/_replaced/ before re-voicing (paid, needs her go).\n- Rebuild with `--reuse --reseg=<sid>`.\n- Update the stanza .md/.html by hand, or commit them to the repo so a generator can follow."
+   },
+   {
+    "section": "§4.4 Voice (laptop run command)",
+    "kind": "wrong",
+    "detail": "In the voice command, FILM9_VO is given as `<dir>`, but the compile reads the voice from WORK/vo. It must be render_local/vo, or the compile reports 'missing voice'. The command also leaves out the static-ffmpeg PATH: the script calls ffprobe after each PAID TTS call, so it crashes after the first purchase. It never says the call costs money and needs her go.",
+    "evidence": "atuona-film9.mjs: `VODIR = WORK + '/vo'`. atuona-film9-vo.py calls `subprocess.run(['ffprobe', …])` after curl. `which ffprobe` on the laptop finds nothing; ffprobe.exe exists only in the static_ffmpeg win32 folder.",
+    "fix": "Replace with: `cd D:/aideazz/ai-cofounders/cto-aipa && PATH=\"$FB:$PATH\" FILM9_ENV=D:/aideazz/VibeJobHunterAIPA_AIMCF/.env FILM9_CUT=<cut file> FILM9_VO=C:/Users/kirav/Pictures/Atuona-film9-private/render_local/vo python scripts/atuona-film9-vo.py`. Add: 'OpenAI spend, only with Elena's explicit go; existing mp3s are skipped, so move a changed shot's mp3 to vo/_replaced/ first.'"
+   },
+   {
+    "section": "§4.6 Deliver to her phone",
+    "kind": "unclear",
+    "detail": "The encode step gives only partial flags: no input, codec, output name, or bitrate rule for other lengths. The scp destination and working directory are not given. The file name collides with the 44 MB phone file already sitting in ~/atuona-film9. The Telegram token and chat id exist only in Oracle's .env (not the laptop's), so Oracle is the only send route, which interacts with the full disk.",
+    "evidence": "The laptop's cto-aipa .env has no TELEGRAM_BOT_TOKEN, CONCIERGE_TG_CHAT or VENICE_API_KEY lines. send_preview_tg.sh reads /home/ubuntu/cto-aipa/.env and posts `video=@\"$1\"` relative to its cwd. No phone-encode command is logged in render_local/*.log.",
+    "fix": "Give the full commands:\n1. `\"$FB/ffmpeg.exe\" -y -i $R/work/preview.mp4 -vf scale=1280:720 -c:v libx264 -preset veryfast -b:v 1000k -maxrate 1400k -bufsize 2800k -c:a aac -b:a 96k -movflags +faststart $R/work/ATUONA_film9_<label>_<date>_phone.mp4`\n2. For runs longer than about 5:30: video kbps ≈ 48×8192/seconds − 96. Telegram's hard limit is 50 MB.\n3. `df -h /` on Oracle.\n4. `scp <file> oracle-cto-aipa:~/atuona-film9/`\n5. `ssh oracle-cto-aipa 'cd ~/atuona-film9 && ./send_preview_tg.sh <file> \"<caption>\"'`; expect 'ok'.\n6. Remove the uploaded copy afterwards (you created it this session)."
+   },
+   {
+    "section": "§0 / §5 Money (how much money is left)",
+    "kind": "unclear",
+    "detail": "The $12.61 is labelled 'API balance, ~23:00 UTC', but the document never says how it was read. It equals the $15.69 noted after the full run minus v24La + v24Lb ($3.08), so it looks computed. NOW.md says the Venice balance is 'not readable with our key'. The Replicate line ('small (~$10.27 spent of her prepaid)') gives spend, not what is left. '6 bake-off videos' were 3 billed + 3 failed. OpenAI is 'pennies' with no figure.",
+    "evidence": "Ledger: last Venice spend 2026-10-08T20:42Z (v24Lb $1.54; v24La $1.54); venice total 85.83. NOW.md l.451: 'Venice wallet balance is not readable with our key (needs admin key)'. NOW.md l.523: 'Venice left $15.69'. Ledger replicate videos: 3 succeeded, 3 failed.",
+    "fix": "Rewrite as: 'Venice: ledger spend $85.83 (last call 20:42 UTC 8 Oct); remaining ≈ $12.61 = last read $15.69 − $3.08 since. To refresh: `ssh oracle-cto-aipa \"cd ~/atuona-film9 && node gen.mjs ledger | tail -1\"`. [State the exact balance-read call if one exists; otherwise only Elena can see venice.ai/settings/api.] Replicate: $10.27 spent on film #9; remaining unknown, only Elena can read replicate.com/account/billing. OpenAI: not tracked in the ledger.'"
+   },
+   {
+    "section": "Header (copies) / NOW.md",
+    "kind": "stale",
+    "detail": "The header says copies exist at D:\\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\\00_HANDOVER_FOR_NEXT_AGENT.md and on repo main. The laptop copy does not exist, the repo file is untracked, and NOW.md has no pointer to it. Per CLAUDE.md rule 7 and the 'NOW.md lives on main' rule, a Cursor or new Claude session will not find it. cut.json and frames_map.txt, which the recipes depend on, are also untracked.",
+    "evidence": "`ls D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08/00_HANDOVER_FOR_NEXT_AGENT.md`: No such file. `git status`: `?? docs/atuona/FILM9_HANDOVER_2026-10-08.md`, `?? docs/atuona/film9_stanza_work/cut.json`, `?? docs/atuona/film9_stanza_work/frames_map.txt`. `grep HANDOVER_2026-10-08 docs/oracle/NOW.md`: no match.",
+    "fix": "Commit the handover, cut.json and frames_map.txt by name to main and push. Add a one-line NOW.md pointer ('film #9: read docs/atuona/FILM9_HANDOVER_2026-10-08.md first'). Copy the file into the laptop folder, and say which copy is canonical (the repo) so the two do not drift."
+   },
+   {
+    "section": "§4.2 / §3 (getting a re-take into the laptop build)",
+    "kind": "missing",
+    "detail": "The laptop build reads clips from FILM9_BASE = APPROVED_2026-10-08/clips. Nothing says that a new Oracle clip must be copied there and verified, that clip_choice.json slot <sid> must be pointed at it, or that the all-material folder and its MD5SUMS should get the new file. The laptop APPROVED/clips also holds only 41 of the 48 clips (the s13* bake-offs are missing), while the document says 'all clips'.",
+    "evidence": "atuona-film9.mjs: `CLIPS = BASE + '/clips'`, throws 'missing clips'. build_cut.py takes the clip from clip_choice.json. Laptop APPROVED/clips holds 41 files; Oracle clips holds 48.",
+    "fix": "Add the steps: `scp oracle-cto-aipa:~/atuona-film9/clips/<new>.mp4 C:/Users/kirav/Pictures/Atuona-film9-private/APPROVED_2026-10-08/clips/`, compare md5sum on both ends, add the file to 04_ALL_VIDEO_CLIPS and append it to MD5SUMS.txt, set clip_choice.json[<sid>].clip (plus trim/end after QC at full resolution), rebuild cut, then `--reuse --reseg=<sid>`. Correct 'all clips' to '41 film clips (s13 bake-offs only on Oracle and in 04_ALL)'."
+   },
+   {
+    "section": "§4.1 Frames (canonical order; new frame engine)",
+    "kind": "wrong",
+    "detail": "§4.1 says the 39 frames 'in 4:30 order' are in plan.json → final_frames_4m30. That list has k07b before k07m and calls both shot '7', and calls k20/k20b both '20'. The real cut order (build_cut.py ORDER, the frames_in_film_order folder) puts 7m before 7 and has 20b as its own shot. Separately, when the document's engine standard is followed for a new frame: gen.mjs uses flux-2-max-edit, not seedream-v5-pro-edit, whenever refs are given without an explicit vmodel.",
+    "evidence": "plan.json final_frames_4m30.order: `{shot:'7',frame:'k07b'},{shot:'7',frame:'k07m'}…{shot:'20',frame:'k20'},{shot:'20',frame:'k20b'}`. build_cut ORDER: '6','7m','7','9'…'20','20b'. gen.mjs l.192: `modelId = spec.vmodel || (refs.length ? 'flux-2-max-edit' : 'seedream-v5-pro')`.",
+    "fix": "State that the canonical order is build_cut.py ORDER, the same as 02_APPROVED/frames_in_film_order; final_frames_4m30 is the approval list, not the sequence. For new frames, add: 'set plan.images[<new id>].vmodel = \"seedream-v5-pro-edit\", engine \"venice\", refs [cast], under a NEW id; back up plan.json first.'"
+   },
+   {
+    "section": "§4.6 Laptop run (practicalities)",
+    "kind": "missing",
+    "detail": "Several facts needed for a clean run are not written down:\n- The command must be run in Git Bash from the repo root, because `node scripts/atuona-film9.mjs` is a relative path.\n- A PREVIEW build takes at least 5 minutes (cards at 16:28, preview at 16:33 local), longer than the Bash tool's 2-minute default, so it must run in the background. The 1080p master with minterpolate takes much longer.\n- Each run overwrites work/preview.mp4 and the work files in place. The watched preview survives only as the copy in 05_FILM_PREVIEW.",
+    "evidence": "render_local/work mtimes: card_intro.mp4 16:28, preview.mp4 16:33. preview_build3.log ends 'DONE …preview.mp4 (420.6MB, 323.7s, 39 shots, 39 voice lines)'. atuona-film9.mjs: `final = path.join(W, PREVIEW ? 'preview.mp4' : 'final.mp4')`.",
+    "fix": "Prefix the block with `cd /d/aideazz/ai-cofounders/cto-aipa`. Add 'run in background; tail render_local/preview_build*.log', and 'for a new cut, use a new FILM9_WORK (e.g. render_local_tight_<date>, with the fonts copied) or copy preview.mp4 aside first'."
+   },
+   {
+    "section": "§3 Oracle header / §6 Workflows",
+    "kind": "unclear",
+    "detail": "Two smaller problems. The document writes the Oracle IP (`ubuntu@170.9.242.90`) into a file headed for the PUBLIC AIPA_AITCF repo, against CLAUDE.md §3 (no hostnames or IPs on public pages); the alias is enough. §6's advice to resume a failed run with `resumeFromRunId` (finished agents replay from cache) applies only inside the Claude Code session that ran the workflow. A new or Cursor session cannot resume those runs, and only translate_workflow.js is saved in the repo.",
+    "evidence": "`gh repo view` reports AIPA_AITCF as PUBLIC. Handover line 70. Only docs/atuona/film9_stanza_work/translate_workflow.js exists among the 5 workflows listed.",
+    "fix": "Use 'ssh alias oracle-cto-aipa' only. In §6, say that the run ids are a record only and that a new session must re-run from the saved script. Save the curation and QC workflow scripts to docs/atuona/film9_stanza_work/ if they are to be reused."
+   }
+  ]
+ },
+ "facts": {
+  "verdict": "Mostly accurate. These claims match their sources:\n- the ALL-material folder (916 files, 4.8 GB, the folder counts, README and MD5SUMS);\n- the Oracle folder counts (274 images, 48 clips, 10 still-motion clips, 2 music files);\n- the ledger totals (Venice $85.82, Replicate $10.27, the 36-clip run at $44.66 with 0 failures, the per-model prices);\n- the stanza facts (39/39 verified, 32 poems, 17 RU / 22 EN, the card 1c line from #053);\n- every constant and flag in the compile script, the cut.json special shots, the frame aliases, the glitch inserts, the workflow IDs and the memory files;\n- the OOM kill itself (ffmpeg, 9.2 GB anon-RSS, no swap, uptime 148 d), and all five health ports plus all five systemd services checking out.\n\nSeveral points still need fixing before a blind agent can safely continue:\n- **Oracle's own `film9.mjs` is the old one-pass build that froze the server**, and the repo script's header still says \"Run on Oracle\". The handover does not warn about either.\n- **Oracle's disk is 100% full.**\n- **`openclaw-gateway.service` does exist** (as a `--user` unit).\n- **The md5 manifest is stale:** 2 still-motion md5s are wrong and the 4 clips added after it are missing.\n- **The budget caps are cumulative totals, not per-run amounts.**\n- **`gen.mjs`, the current `plan.json` and the ledger exist only on Oracle.**\n- **The claimed handover copies and `cut.json` are not on `main` or on D: yet.**\n- **The compile cannot run with \"no voice\"** without a code change.\n- **The freeze lasted about 46 minutes, not 55.**",
+  "issues": [
+   {
+    "section": "§0 / §3 Oracle table / §8 — compile on Oracle",
+    "kind": "missing",
+    "detail": "Oracle's ~/atuona-film9/film9.mjs (20:48 UTC) is the OLD one-pass compile that froze the server. It has no CHUNK batching, no free-memory check and no FILM9_BASE. On top of that, the repo script's own header (scripts/atuona-film9.mjs lines 9-12) still says 'Run on Oracle: cd /home/ubuntu/atuona-film9 && node film9.mjs', and BASE defaults to /home/ubuntu/atuona-film9. Nothing in the handover tells the next agent that running this file on Oracle repeats the 8 Oct freeze.",
+    "evidence": "ssh: `grep -c CHUNK ~/atuona-film9/film9.mjs` = 0; md5 d6a4e3cd… on Oracle vs fe16c430… for the LF-normalised repo file. The batching was added in commit 3217b76, after the freeze.",
+    "fix": "Add to §0 and §8: \"Oracle's ~/atuona-film9/film9.mjs is the OLD unbatched compile that froze the box. Never run it. The header of scripts/atuona-film9.mjs still says 'Run on Oracle'; ignore that. Build only on the laptop with FILM9_BASE/FILM9_WORK set.\" Also list film9.mjs in the §3 Oracle table with that warning."
+   },
+   {
+    "section": "§0 / §4.6 Deliver / §4.1-4.2 gen.mjs runs",
+    "kind": "missing",
+    "detail": "Oracle's root disk is 100% full. NOW.md says to run `df -h /` before any render or deploy. gen.mjs writes into img/, clips/ and raw/, and §4.6 sends a 44 MB preview to Oracle by scp. A full disk makes those writes fail silently. The handover never mentions this.",
+    "evidence": "ssh `df -h /` at 9 Oct 00:05 UTC: `/dev/sda1 45G 44G 219M 100% /`. NOW.md §HANDOFF 8 Oct: 'DISK 100% FULL … Next agent: check df -h / before any render or deploy … Nothing deleted, waiting for Elena's go.' ~/atuona-film9 itself is 3.0 GB.",
+    "fix": "Add to §0: \"Oracle / is 100% full (219 MB free, 9 Oct 00:05 UTC). Run `df -h /` before any gen.mjs call or scp. Delete nothing there without Elena's go (see NOW.md 8 Oct handoff).\""
+   },
+   {
+    "section": "§8 Incidents — openclaw-gateway",
+    "kind": "wrong",
+    "detail": "The handover says 'The RESILIENCE doc's openclaw-gateway.service does not exist — OpenClaw answers on :18789'. That is false. The unit exists as a systemd --user unit and is active. The RESILIENCE doc already says so (lines 870 and 1104, 'verified 7 Oct 2026'). NOW.md line 512 repeats the same wrong claim.",
+    "evidence": "ssh `systemctl --user is-active openclaw-gateway` → active; `systemctl --user list-units` → 'openclaw-gateway.service loaded active running OpenClaw Gateway (job shortlist bot)'.",
+    "fix": "Replace with: \"(OpenClaw is a systemd --user unit: check `systemctl --user is-active openclaw-gateway`. It also answers on :18789.)\" Fix the same line in NOW.md."
+   },
+   {
+    "section": "§2 rule 9 / §4.1 — approved md5 manifest",
+    "kind": "stale",
+    "detail": "The manifest is described as the md5 guard for approved files, and memory says 'a changed md5 on an approved name = it was overwritten'. But the manifest was written at 20:35 UTC, while still-motion renders were still finishing. Two of its md5s therefore never matched the finished files, so a check would raise a false 'overwritten' alarm. It also lacks 4 files the cut uses: v24La and v24Lb (rendered 20:41-20:42), sm_k34 and sm_k36 (20:38-20:39).",
+    "evidence": "Re-hashing all 95 manifest entries on Oracle (read-only): mismatches = [stillclips/sm_k26.mp4, stillclips/sm_k30.mp4]. The files' mtimes are 20:35 and 20:37; the manifest's mtime is 20:35. The laptop copy's tmp/new_md5.txt has the current md5 for sm_k26 (400a2d14…). The manifest's clips list has 47 entries, with no v24La/v24Lb/sm_k34/sm_k36.",
+    "fix": "Add: \"The manifest md5s for sm_k26 and sm_k30 were captured mid-render and do not match the files. That is not an overwrite. The manifest also omits v24La, v24Lb, sm_k34 and sm_k36, which the cut uses. With Elena's OK, re-run film9_approved_manifest.py to refresh it; until then treat those 4 + 2 as unguarded.\""
+   },
+   {
+    "section": "§3 gen.mjs / §4.2 run command — budget caps",
+    "kind": "unclear",
+    "detail": "'Always pass BUDGET_USD=<cap>' reads like a per-run amount. In gen.mjs the guard compares the CUMULATIVE ledger spend: BUDGET_USD covers all wallets (now $96.09) and VENICE_BUDGET_USD covers Venice only (now $85.82). Without the env var, BUDGET_USD defaults to 30, so every call is refused. The §4.2 example 'BUDGET_USD=110' with no VENICE_BUDGET_USD would allow about $13.91 more, which is above the $12.61 actually left on Venice.",
+    "evidence": "gen.mjs line 24: `BUDGET = Number(process.env.BUDGET_USD || 30)`; guard(): `if (spent() + usd > BUDGET) … Refused` and `spentIn(wallet) + usd > VENICE_BUDGET_USD`. run_motion.sh used `BUDGET_USD=110 VENICE_BUDGET_USD=84.08`.",
+    "fix": "Replace with: \"The caps are cumulative ledger totals, not per-run amounts. To allow at most $X more on Venice: VENICE_BUDGET_USD=<85.82+X> BUDGET_USD=<96.09+X> (check `node gen.mjs ledger` first). Without the env vars the default cap of 30 refuses everything.\""
+   },
+   {
+    "section": "§3 Where everything is — single copies",
+    "kind": "missing",
+    "detail": "Three things exist only on Oracle: the generator gen.mjs, the current plan.json (every prompt: 187 images, 43 shots) and ledger.jsonl. None of them is in the repo or in D:\\ATUONA_FILM9_ALL_MATERIAL_2026-10-08. The laptop APPROVED_2026-10-08/plan.json is an older copy (41 shots, without v24La/v24Lb). The repo has only film #8's scripts/atuona-film8-gen.mjs. The handover is meant for 'if something happens', so it should say that losing Oracle loses the generator, the prompts and the spend record.",
+    "evidence": "`git ls-files | grep gen.mjs` → only scripts/atuona-film8-gen.mjs and aigo-promo-gen.mjs. `find D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08 -name plan.json -o -name ledger.jsonl -o -name 'gen*.mjs'` → nothing. The laptop plan.json has 41 shots; Oracle's has 43.",
+    "fix": "Add to §3: \"gen.mjs, the current plan.json and ledger.jsonl exist ONLY on Oracle ~/atuona-film9. The laptop APPROVED_2026-10-08/plan.json is older (no v24La/v24Lb). Copying these text files off Oracle is light, but ask Elena first.\""
+   },
+   {
+    "section": "Header (copies) / §3 Repo",
+    "kind": "wrong",
+    "detail": "The header claims copies at D:\\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\\00_HANDOVER_FOR_NEXT_AGENT.md and in the repo on main. Neither exists yet: the D: file is missing and the repo file is untracked. §3 also lists cut.json as part of the repo on main, but docs/atuona/film9_stanza_work/cut.json and frames_map.txt are untracked. A Cursor or cloud agent reading main will find neither the handover nor the cut.",
+    "evidence": "`ls D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08` shows no 00_HANDOVER file. `git status --short`: '?? docs/atuona/FILM9_HANDOVER_2026-10-08.md', '?? docs/atuona/film9_stanza_work/cut.json', '?? …/frames_map.txt'. The repo cut.json is identical to Oracle's ~/atuona-film9/cut.json.",
+    "fix": "Before relying on the header: commit FILM9_HANDOVER_2026-10-08.md and cut.json as named files (never `git add -A`; leave the untracked docs/atuona/_bakeoff_sheet.jpg out), push to main, add a NOW.md pointer, and copy the file to D:. Otherwise change the text to 'cut.json: laptop working tree + Oracle only'. Note: MD5SUMS.txt (915 lines) will not list the added file."
+   },
+   {
+    "section": "§4.4 Voice / §4.6 Compile / §7 decision 3",
+    "kind": "missing",
+    "detail": "Three practical gaps around voice:\n(a) The compile refuses to build if any shot with a stanza lacks vo/<sid>.mp3 ('missing voice: … (run vo9.py)'), so 'voice: key stanzas only / none' cannot be built without a code or cut change.\n(b) The VO script skips any existing mp3 over 2000 bytes, so a changed stanza keeps its old voice unless a new FILM9_VO folder is used.\n(c) The laptop VO command lacks the static-ffmpeg PATH, and the script calls ffprobe, which is not on the laptop's PATH.",
+    "evidence": "scripts/atuona-film9.mjs line 140: `if (noVo.length && !process.argv.includes('--stanza-preview')) throw new Error('missing voice: …')`. atuona-film9-vo.py: `if not (os.path.exists(out) and os.path.getsize(out) > 2000)` and `subprocess.run(['ffprobe', …])`. On the laptop, `which ffprobe` → not found.",
+    "fix": "Add to §4.4: \"Run with PATH=\\\"$FB:$PATH\\\" (the script calls ffprobe). It skips any mp3 already in FILM9_VO, so use a fresh FILM9_VO folder after a stanza changes; never delete the old take.\" Add to §4.6 / §7.3: \"The compile requires a voice file for every stanza shot (line 140). 'Fewer or no voices' needs a small code change to allow a missing vo, after Elena's go.\""
+   },
+   {
+    "section": "§4.2 Motion — still-motion fallback",
+    "kind": "missing",
+    "detail": "§4.2 and §7.1 offer 'still-motion at $0' as the re-take path but do not say where it runs. All 10 sm_*.mp4 clips were rendered ON ORACLE via ~/atuona-film9/run_sm.sh, and the fallbacks script's docstring says 'Run on Oracle ~/atuona-film9'. That conflicts with the handover's own rule 'NEVER render video on Oracle'.",
+    "evidence": "Oracle run_sm.sh: `ls sm/specs/*.json | xargs -P 2 … nice -n 12 ~/atuona-film7/venv/bin/python still_motion.py render {}`. docs/atuona/film9_still_motion_fallbacks_2026-10-08.py docstring: 'Run on Oracle ~/atuona-film9'. still_motion.py on Oracle has the same md5 as scripts/atuona-still-motion.py.",
+    "fix": "Add: \"The 8 Oct still-motion clips were rendered on Oracle (run_sm.sh, film #7's venv with the Depth Anything V2 ONNX model). Under the no-render rule, new still-motion goes on the laptop. Its venv/model there has not been checked, so set that up first, or get Elena's explicit go.\""
+   },
+   {
+    "section": "§8 Incidents — freeze window",
+    "kind": "wrong",
+    "detail": "'8 Oct 20:46–21:41 UTC: Oracle frozen ~55 min' is wrong. The box was logging normally until 20:54, so the freeze ran from about 20:55 to 21:41 UTC, roughly 46 minutes. NOW.md disagrees with itself here (line 136 says '~21:00', line 508 says '20:46–21:41'), and the memory file says ~55 min.",
+    "evidence": "journalctl per-minute counts: 50–105 lines every minute from 20:40 to 20:54, then near-silence until a burst at 21:40–21:41. body.mp4 was last written at 20:54:57. Kernel at 21:40:58: 'Out of memory: Killed process 3693830 (ffmpeg) … anon-rss:9239028kB'.",
+    "fix": "\"8 Oct ~20:55–21:41 UTC: Oracle frozen ~46 min (the build started ~20:48; journald goes silent after 20:54; the kernel OOM-killed ffmpeg at 21:40:58, anon-RSS 9.2 GB)\". Align NOW.md and memory feedback_no_heavy_renders_on_oracle."
+   },
+   {
+    "section": "§0 'her next move' / §3 frames_final / §4.1 '39 approved frames'",
+    "kind": "unclear",
+    "detail": "The laptop's 39 files are not the manifest's 39:\n- 02_APPROVED/frames_in_film_order and frames_final contain 37_35.jpg, a byte-copy of k36, and leave out k17b.\n- The manifest and final_frames_4m30 count k17b (the 17-key plate) among the 39 and have no frame for 35.\n- The NN prefix is the position (01–39), not the shot number: 28_24.jpg is shot 24.\nIf Elena says 'shot 24 is good', the reader must know which numbering she used.",
+    "evidence": "md5sum: 37_35.jpg = 38_36.jpg = 981b4361… (= k36 in the manifest). 02_APPROVED has 47 files = 39 + 4 cast + 3 glitch + manifest, and k17b is not among them. The manifest frames include 'img/k17b.jpg role shot 17-key'.",
+    "fix": "Add: \"frames_in_film_order/ (and frames_final/) holds 39 files named <position>_<shot>.jpg. 37_35.jpg is a copy of k36 (35 = double exposure of 36), and the red-dog plate k17b is not in it (it is in APPROVED_2026-10-08/img/). When Elena names a number, confirm whether she means the position or the shot.\""
+   },
+   {
+    "section": "§1 What the film is — poem sources",
+    "kind": "wrong",
+    "detail": "'ATUONA vault #047–#099, English' is not quite right. Three ATUONA poems are Russian: #059, #093 and #094. All three are in this cut: M2 = #059, 21 = #093, and 5 and 14 = #094. Rule 7 ('ATUONA English verbatim; Russian → atmospheric English') would mislead an agent into treating them as verbatim English.",
+    "evidence": "poems_github_2026-10-08.json: ATUONA ids ≥047 → 50 en + 3 ru ['059','093','094']. cut.json items M2/21/5/14 have lang 'ru'.",
+    "fix": "\"ATUONA vault #047–#099 (English, except #059, #093, #094, which are Russian); LITPROM #001–#046 (Russian)\"."
+   },
+   {
+    "section": "§0 / §5 Money",
+    "kind": "wrong",
+    "detail": "Four precision fixes:\n- The Venice balance of $12.61 was read on 9 Oct at 00:03 UTC (19:03 Panama), not '8 Oct ~23:00 UTC'.\n- 'video 48 clips' counts calls: 45 delivered, and 3 Venice calls on 7 Oct failed at $0.\n- Replicate's '6 bake-off videos' are 6 calls, of which 3 delivered (Kling v3, Hailuo, Luma); Sora 2 Pro, Veo 3.1 and Wan 2.7 failed at $0.\n- The Replicate balance that is left was never measured; 'small' is a guess.",
+    "evidence": "Session transcript tool result, 2026-10-09T00:03:11Z: 'venice balance 12.612929 … (venice, video): 48, (replicate, video): 6'. Ledger: venice video 48 calls / 45 succeeded; replicate s13 wan1080/sora/veo31 status failed, usd 0.",
+    "fix": "\"Venice $12.61 left (read 9 Oct 00:03 UTC). Venice $85.82 = 250 image calls + 48 video calls (45 clips delivered). Replicate $10.27 = 4 images, 3 delivered bake-off videos (3 more refused at $0), 2 music tracks; the remaining Replicate balance has not been measured.\""
+   },
+   {
+    "section": "§4.2 REVIEW clips",
+    "kind": "wrong",
+    "detail": "The list does not match clip_choice.json. '24-old' is not a REVIEW clip: v24 is 'kept, unused'. v30 IS marked REVIEW (her eyes close at his jaw), but the cut uses still-motion for 30 instead. The M2 and M4 notes are also missing.",
+    "evidence": "clip_choice.json REVIEW entries: 1b, 2, 6, M1, M2, M3, M4, 15, 30. Shot 24's note: 'v24 (look hardens) kept, unused'.",
+    "fix": "\"REVIEW: 1b (breath vapour), 2 (frontal reflection), 6 (face under water after 9 s, cut at 9 s), M1 (smirk → grin), M2 (Kira's face a little narrower; Jean-Marc looks at Mila's wrist), M3 (cracks spread), M4 (his fist lines up over her hand), 15 (Ule's mouth moves), and v30 (eyes close at his jaw; the cut uses still-motion). The old v24 is kept, unused.\""
+   },
+   {
+    "section": "§4.1 Realism pass",
+    "kind": "unclear",
+    "detail": "'Realism pass was run on 26 older frames; only 15, 22, 24 were approved' implies 15, 22 and 24 were among the 26. They were not. Three frames (k15s_real, k22_real, k24_real) were done first and approved; the later 26-frame pass ($2.08) produced nothing approved. That makes 29 _real images in total.",
+    "evidence": "Ledger: 29 unique *_real image ids succeeded. film9_realism_all_2026-10-08.py FRAMES has 26 entries, none of them 15, 22 or 24. NOW.md: 'Realism pass run on the 26 older frames ($2.08)'.",
+    "fix": "\"Realism pass: first on 15, 22 and 24 (approved; now img/k15, k22, k24), then on the other 26 frames ($2.08): none approved (k37_real added a person).\""
+   },
+   {
+    "section": "§1 Characters",
+    "kind": "missing",
+    "detail": "Two character details are missing or conflicting:\n- Ule's gender is never stated, and 'her witness, never her lover' reads ambiguously. Ule is a man (light ash-blond hair, pale blue eyes, about 47).\n- Kira is given 'black curly hair', but the film frames use kira_hair_v3: 'true black … wavy, not curly (#086)'. Only the cast portrait kira.jpg has curls. A re-take prompt that says 'curly' would drift from the approved frames.",
+    "evidence": "plan.json characters.ule: 'the man from the reference image (ule) … light ash-blond hair … about 47'. plan.json kira_hair_v3: 'true black … wavy, not curly'. Scenario v3: 'Ule — … Norwegian … At 47 he was'.",
+    "fix": "\"Ule (img/ule.jpg = 'Ule #2'): a man, Norwegian, about 47, light ash-blond, pale blue eyes; Kira's witness, never her lover.\" and \"Kira: true black, long, wavy (not curly) hair in the film frames (kira_hair_v3).\""
+   },
+   {
+    "section": "§0 'Nothing was deleted anywhere' / §4.2 4K",
+    "kind": "wrong",
+    "detail": "Two small wording fixes:\n- Six empty folders left by the copy were removed from the ALL-material folder (the previous message to Elena says so), so 'nothing was deleted anywhere' is not literally true.\n- §4.2 calls the 4K engine 'only for the shot-13 test', but that 4K take (v13__venice-kling-o3-4k.mp4) is the clip the cut uses for shot 13.",
+    "evidence": "cut.json sid 13: clip 'v13__venice-kling-o3-4k.mp4', trim 3.5. Previous assistant message: 'six empty leftover folders from the copy … removed them'.",
+    "fix": "\"No file was deleted (6 empty folders left by the copy were removed)\" and \"kling-o3-4k ($2.31 / 5 s) only for shot 13; that 4K take is the one in the cut\"."
+   }
+  ]
+ }
+}

@@ -6,10 +6,14 @@
 //   - each clip is trimmed to its planned edit length (motion directions), slowed by its factor, and stretched further only if
 //     the voice needs it; `reverse` (shot 5: the leaf rises), `composite_of` (35: a double exposure of 36), `key` (17: the red
 //     dog keyed onto the beach), `card` (1c: a text card).
-// Run on Oracle:  cd /home/ubuntu/atuona-film9 && node film9.mjs              (writes work/final.mp4 — NOT published)
-//                 node film9.mjs --reuse [--reseg=7,17]                       (re-cut only those shots)
-//                 node film9.mjs --stanza-preview                             (every stanza over its shot, as PNGs)
-//                 node film9.mjs --publish                                    (copies the verified final into films/out)
+// ⛔ RUN ON THE LAPTOP, NEVER ON ORACLE (8 Oct 2026: a one-pass build there froze the server and every bot ~50 min).
+// Laptop, from the repo root, with FILM9_BASE / FILM9_WORK / FILM9_CUT / FILM9_FONT / FILM9_MONO set and static-ffmpeg on
+// PATH — full command in docs/atuona/FILM9_HANDOVER_2026-10-08.md §4.6:
+//                 node scripts/atuona-film9.mjs                    (master: writes WORK/work/final.mp4 — NOT published)
+//                 PREVIEW=1 node scripts/atuona-film9.mjs          (fast cut, no motion interpolation: WORK/work/preview.mp4)
+//                 ... --reuse [--reseg=7,17]                       (re-cut only those shots; list EVERY changed shot)
+//                 ... --stanza-preview                             (every stanza over its shot, as PNGs)
+//                 ... --publish                                    (copies final into the PUBLIC gallery — only with Elena's go)
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
