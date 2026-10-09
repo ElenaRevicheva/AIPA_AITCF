@@ -523,6 +523,11 @@ git log keeps the record.
   VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. (OpenClaw is a systemd --user unit: `systemctl --user is-active openclaw-gateway`; also answers on :18789.) **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
+  🔎 **9 Oct — DISK FORENSICS DONE (read-only): `docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md`.** Why the 28 Sep cleanup did
+  not hold: it fixed the incident (logs), not the class — 13.8 GB of film/promo work (30 Sep–8 Oct) landed where no tool looks;
+  pm2-logrotate COMPRESSION broken since day one (0/107 .gz, pmx Autocast vs parseBool); the only disk alarm
+  (`health_monitor.sh`) writes to a file nobody reads; health check restarted a duplicate `espaluz-webhook` 29,637×. Fix list
+  A–I awaits Elena's go. **Disk 98%, 1.4 GB free — `df -h /` before any write.**
   **8 Oct ~22:30 UTC — Elena watched the preview: "film is ugly. Music is ugly. Only few shots are more or less good."**
   Music + voice ON HOLD by her word. ALL film #9 material collected for her: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\`
   (README + MD5SUMS; stanzas doc in 01_STANZAS; generator/plan/ledger in 10_). **HANDOVER for any agent:**

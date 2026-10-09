@@ -1,0 +1,475 @@
+{
+ "report": {
+  "tooling": [
+   {
+    "item": "28 Sep manual cleanup: compressed the 4 DragonTrade Bybit/Binance PM2 logs (5.5 GB to 260 MB), archived and then emptied dragontrade-main-out.log (3.0 GB to 52 MB), cleared the npm and pip caches",
+    "when_who": "28 Sep 2026, Claude Code session; commit c952a81 (95% to 72%), followed by 58b90ec (to 69%). Both are authored under Elena's git name.",
+    "status": "PARTLY",
+    "evidence": "Freed about 11.8 GB and all 5 .gz archives (314 MB) are still intact. It was a one-off done by hand: no script was committed, so nothing repeats it. ~/.cache/pip has already grown back 245 MB of the 359 MB it cleared. It did not touch the film folders (7.6 GB, deferred to a 'per-film check'), /tmp or /var/log."
+   },
+   {
+    "item": "pm2-logrotate 3.0.0: rotation (max_size 50M, retain 10, daily 00:00 UTC)",
+    "when_who": "28 Sep 2026, same Claude session, 58b90ec",
+    "status": "WORKS",
+    "evidence": "Live: the module has been online since 2026-09-28 15:37. Its own log shows files created and deleted at 2026-10-09 00:00. ~/.pm2/logs is 713 MB and stays bounded by retain=10."
+   },
+   {
+    "item": "pm2-logrotate compress=true",
+    "when_who": "28 Sep 2026, 58b90ec",
+    "status": "BROKEN",
+    "evidence": "Re-checked today on Oracle: gz=0, log=107. Not one rotated file has ever been compressed. In the installed app.js, lines 38-49 read 'const parseBool = (str...) => { if (str === 'true') return true; ...' and 'var COMPRESSION = parseBool(conf.compress, false)'. PM2's config loader passes the boolean true rather than the string 'true', so the check fails and compression falls back to off. The 28 Sep note 'VERIFY tomorrow: rotated *__*.log.gz files exist' would have caught this on 29 Sep."
+   },
+   {
+    "item": "pm2-logrotate coverage of PM2's own daemon log and of logs from removed apps",
+    "when_who": "Side effect of the 28 Sep install (58b90ec)",
+    "status": "PARTLY",
+    "evidence": "When it was installed, it renamed the 842 MB pm2.log (Jan-Sep) to ~/.pm2/pm2__2026-09-28_15-38-05.log, 882,455,872 bytes, uncompressed (re-checked today). The new pm2.log is 52 KB, so it will never reach 50M and the retain limit never applies to it: nothing will ever clean that file. 15 logs from apps no longer in PM2 (331 MB) are also outside its scope."
+   },
+   {
+    "item": "journald size cap: /etc/systemd/journald.conf.d/99-aideazz-size.conf SystemMaxUse=1G",
+    "when_who": "28 Sep 2026, 58b90ec",
+    "status": "WORKS",
+    "evidence": "Live: the journal uses 1015.5M, right at the cap. The setting held through the journald restart on 2 Oct 15:40."
+   },
+   {
+    "item": "VJH httpx logger raised to WARNING (stopped the bot token being written to the journal ~8,640 times a day)",
+    "when_who": "28 Sep 2026, VibeJobHunterAIPA_AIMCF commit b38836e",
+    "status": "WORKS",
+    "evidence": "Checked today: zero 'api.telegram.org/bot' lines in the vibejobhunter journal over the last 24 hours."
+   },
+   {
+    "item": "'VERIFY tomorrow' follow-up check that rotation produced .gz files",
+    "when_who": "Written 28 Sep 2026 in 58b90ec (NOW.md ~line 1129)",
+    "status": "NEVER EXISTED",
+    "evidence": "No later commit, NOW.md entry or memory note records that it was run. It was buried around line 1,120 of a 3,137-line NOW.md. Meanwhile the memory index line reads 'pm2-logrotate + journal 1G cap live', which looks like the problem is solved."
+   },
+   {
+    "item": "The rotation and cap settings stored as code in git (so they can be re-applied and compared with the live box)",
+    "when_who": "Never done",
+    "status": "NEVER EXISTED",
+    "evidence": "No repo contains a logrotate, SystemMaxUse or pm2-logrotate config. The only trace is prose in docs/oracle/NOW.md:1125-1126 and the memory file reference_oracle_disk_housekeeping.md."
+   },
+   {
+    "item": "Disk alarm: health_monitor.sh (warns above 80%)",
+    "when_who": "19 Mar 2026 (repo docs/oracle/health_monitor.sh, a855b32); runs from Oracle's crontab",
+    "status": "BROKEN",
+    "evidence": "It measures correctly but tells nobody. Verified today: crontab line 4 is '*/5 * * * * /home/ubuntu/health_monitor.sh', and its latest line is '2026-10-09 10:15:01 | WARNING: High disk usage: 98%'. It writes only to ~/health.log: no Telegram, and nobody reads that file. 500 of the 1000 lines are warnings. 'tail -1000' keeps only about 42 hours, so it erases its own history. Correction to the history report: it IS scheduled."
+   },
+   {
+    "item": "A disk check in check_oracle_health.sh or in the NOW.md §4 start-of-session checklist",
+    "when_who": "Never done; 'check df -h /' was first written on 8 Oct (10e7f8d), after the disk was already full",
+    "status": "NEVER EXISTED",
+    "evidence": "scripts/oracle-resilience/check_oracle_health.sh only checks that processes are alive and never runs df. The NOW.md §4 checklist (lines 63-77) has no disk item."
+   },
+   {
+    "item": "Disk guard in the film and promo pipelines, and removal of their intermediate files",
+    "when_who": "8 Oct 2026, guard added to scripts/atuona-film9.mjs (3217b76)",
+    "status": "NEVER EXISTED",
+    "evidence": "The 'refuses under 2.5 GB free' guard reads MemAvailable from /proc/meminfo, so it checks RAM, not disk. No film or promo script (atuona-film9.mjs, aigo-promo-gen.mjs, atuona-film8-gen.mjs, *cut*.py) checks free disk or removes its own work files. FILM_COMPILATION_GUIDE.md ends at 'scp final to Desktop' and has no step for clearing the working folder."
+   },
+   {
+    "item": "'Per-film published+backed-up check' before any film folder may be cleaned",
+    "when_who": "Rule written 28 Sep 2026 in memory reference_oracle_disk_housekeeping.md",
+    "status": "NEVER EXISTED",
+    "evidence": "The rule correctly blocks deletion, but the check itself was never carried out and never turned into a tool. The 7.6 GB flagged on 28 Sep is untouched. The first concrete list Elena could say yes or no to came only on 8-9 Oct (docs/atuona/FILM9_HANDOVER_2026-10-08.md:264-266)."
+   },
+   {
+    "item": "Crash-loop brake in the resilience.conf drop-ins (StartLimitIntervalSec=300, StartLimitBurst=10)",
+    "when_who": "Feb 2026, scripts/oracle-resilience/deploy_on_server.sh",
+    "status": "BROKEN",
+    "evidence": "The key sits in the [Service] section, and systemd logs \"Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring\". The effective interval is 10s, so the brake can never trip. As a result the old espaluz-webhook.service has failed with 'Address already in use' about every 10 s since 2026-06-28 11:32, because the live espaluz-payments-webhook already holds port 5000. Our own health check has restarted it 29,634 times."
+   },
+   {
+    "item": "Rotation for the app logs in /var/log (oracle-health.log, espaluz-webhook.log, espaluz-familybot.log, joblist-pipeline.log, oci-keepalive.log)",
+    "when_who": "Never done",
+    "status": "NEVER EXISTED",
+    "evidence": "Nothing in /etc/logrotate.d matches these files. Sizes: espaluz-webhook 278 MiB, oracle-health 203 MiB (209.5 MB of it written before 26 May, during the old dragontrade restart loop), espaluz-familybot 138 MiB. About 0.62 GB in total."
+   },
+   {
+    "item": "Repo copy of check_oracle_health.sh vs the live copy",
+    "when_who": "Live copy patched by hand on Oracle on 25 May 2026; repo copy last changed 2993bba (28 Mar)",
+    "status": "PARTLY",
+    "evidence": "The live copy is fixed (jq check, bybit/binance removed). The repo copies (scripts/oracle-resilience/check_oracle_health.sh:49-54, deploy_on_server.sh:45-50) still have the broken 'grep status: online' loop. That loop restarted dragontrade every 5 minutes and wrote the 209 MB in oracle-health.log. Redeploying from the repo would bring it back."
+   },
+   {
+    "item": "Ubuntu's built-in /tmp cleaner (deletes /tmp files untouched for 30 days)",
+    "when_who": "Ships with Ubuntu, not ours",
+    "status": "WORKS",
+    "evidence": "It ran successfully at 03:19 today. But /tmp sits on the root disk, and the 30-day window let 4.0 GB of film and test scratch pile up (2.9 GB of it since 28 Sep)."
+   }
+  ],
+  "causes": [
+   {
+    "cause": "Promo-film working folders (~/aigo-promo, aigo-med, aigo-villa, aigo-reloc, aigo-ig, aigo-art), all created after the 28 Sep cleanup. Nothing ever clears them, and no tool looks at them.",
+    "gb": 7.2,
+    "evidence": "Live: folders created 30 Sep-4 Oct: aigo-promo 3233 MB (25,153 files), aigo-med 2105, aigo-villa 1040, aigo-reloc 838, aigo-ig 145. No promo script removes its intermediate files or checks free disk."
+   },
+   {
+    "cause": "Space that was already full before 28 Sep and never freed, because the rules require a per-film check that nobody carried out. Older film folders: atuona-film7/8 3.0 GB and aideazz-api-film* 2.6 GB. Plus the 842 MB PM2 daemon log that the 28 Sep install itself left behind. Had the 7.6 GB flagged on 28 Sep been checked and freed, the disk would have peaked at about 86% instead of 100%.",
+    "gb": 6.4,
+    "evidence": "Live: atuona-film7 1526 MB, atuona-film8 1499 MB, aideazz-api-film* ~2.6 GB (11-13 Sep), ~/.pm2/pm2__2026-09-28_15-38-05.log 882,455,872 bytes. 58b90ec: 'Film working folders (~7.6 GB) still need a per-film check'. 10e7f8d: 'Nothing deleted, waiting for Elena's go'."
+   },
+   {
+    "cause": "Film #9 working folder ~/atuona-film9 (created 6 Oct), with no step that clears it.",
+    "gb": 2.9,
+    "evidence": "1.83 GB is still there now, plus the 1.1 GB work/ folder the 9 Oct session deleted after copying it. Folder created 2026-10-06 16:23."
+   },
+   {
+    "cause": "Scratch files in /tmp left by other sessions. /tmp is on the same 45 GB disk, and the built-in cleaner waits 30 days before deleting.",
+    "gb": 2.9,
+    "evidence": "Live: find /tmp -newermt '2026-09-28 15:45' = 2,885 MB. vjh-test-20261006 1246 MB (6 Oct), demucs_* music separations about 1.19 GB (2-3 Oct), espaluz_video_*.mp4 170 MB. Not new but still there: atuona-hd 604 MB (25 Sep), qrvenv 237 MB."
+   },
+   {
+    "cause": "VibeJobHunter's own folder grew. It writes a new DEBUG-level log file every day and never deletes old ones. It runs under systemd, so pm2-logrotate does not reach it.",
+    "gb": 0.47,
+    "evidence": "Live: +473 MB under ~/VibeJobHunter* since 28 Sep. Verified today: ~/VibeJobHunterAIPA_AIMCF/logs = 290M, 100 'vibejobhunter_*' files. src/utils/logger.py:48-51 uses a plain FileHandler at DEBUG level."
+   },
+   {
+    "cause": "Rotated PM2 logs are kept uncompressed because the compress setting does nothing. The count is limited by retain, but each file stays full-size.",
+    "gb": 0.4,
+    "evidence": "+396 MB new in ~/.pm2 since 28 Sep. 0 of 107 rotated files are .gz. dragontrade-main-out alone keeps 10 uncompressed files = 336 MB. Until its 8 Oct restart it was writing about 77 MB/day of 'Health check recorded'."
+   },
+   {
+    "cause": "New images published under /var/www/influencer-images",
+    "gb": 0.38,
+    "evidence": "Live: youtube 232 MB (3 Oct) and ig-aigo 144 MB (4 Oct). The folder is now 1166 MB."
+   },
+   {
+    "cause": "Download caches grew back after the one-off 28 Sep clean",
+    "gb": 0.34,
+    "evidence": "Live: ~/.cache +342 MB since 28 Sep. pip 245 MB, after 359 MB was cleared on 28 Sep. huggingface +80 MB."
+   },
+   {
+    "cause": "Logs in /var/log with no rotation, plus the espaluz-webhook crash loop. Noisy, but they barely contributed to this refill.",
+    "gb": 0.03,
+    "evidence": "Since 28 Sep: espaluz-webhook.log +27 MB (about 2.3 MB/day of 'Address already in use') and oracle-health.log +0.3 MB. Their 0.62 GB standing total is old: 209.5 of the 212.9 MB in oracle-health.log predates 26 May."
+   },
+   {
+    "cause": "No alert ever reached Elena: the only disk alarm writes to a file nobody reads, and no session checked df between 28 Sep and 8 Oct. This freed or used no space itself, but it is why nobody acted in time.",
+    "gb": 0,
+    "evidence": "~/health.log has 500 'WARNING: High disk usage' lines. 95% at 2026-10-07 16:00, 100% at 2026-10-08 21:00, found only during the 8 Oct RAM freeze. NOW.md §4 has no df step. The memory line 'pm2-logrotate + journal 1G cap live' read as if the problem were solved."
+   }
+  ],
+  "fixes": [
+   {
+    "fix": "Make the existing disk alarm reach Elena. health_monitor.sh already checks the disk every 5 minutes; add one Telegram message through the existing alert bot when usage crosses 85%, 90% and 95% (once per crossing, not every 5 minutes), and add 'df -h /' to the NOW.md §4 start-of-session check (and to the .cursor mirror).",
+    "gb": 0,
+    "risk": "Low. Changes only our own cron script, by adding a message on the way out. Nothing is deleted or restarted.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Fix pm2-logrotate so compression actually happens: either a one-line parseBool patch so it also accepts the boolean true, or pin to 2.7.0, which reads the setting with JSON.parse. Then gzip the 107 rotated files and the orphaned 842 MB PM2 daemon log, using the 28 Sep method (verify byte counts, then remove the original). Verify the next morning that *.gz files appear.",
+    "gb": 1.3,
+    "risk": "Low. Restarts only the pm2-logrotate module; no product. The patch would be lost if the module is reinstalled, so record it in git. All the files are logs; nothing is thrown away, only compressed.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Do the per-film check that was never done: for each folder (aigo-promo/med/villa/reloc/ig, atuona-film7, atuona-film8, aideazz-api-film*, the rest of atuona-film9), list whether the final film is published and whether the laptop copy matches by md5. Elena ticks which folders can go. Film #9's approved assets are excluded.",
+    "gb": 12.8,
+    "risk": "HIGH if done carelessly: this is the kind of folder whose loss on 1 Jul destroyed the finding-paradise original. Delete only folders whose copies were verified by md5, never film #9's approved assets, and only folder by folder with Elena's go. These are other sessions' files.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Clear the /tmp scratch: vjh-test-20261006 (1.25 GB), demucs_* stems (1.19 GB), atuona-hd (0.6 GB, which memory puts on the per-film-check list), qrvenv (0.24 GB). Also run pip's own purge command on ~/.cache/pip (0.25 GB), as was done on 28 Sep.",
+    "gb": 3.5,
+    "risk": "Low to medium, and none of it is ours. First confirm nothing runs from vjh-test (no pm2, systemd or cron path points there) and that no promo song still needs re-mixing from its demucs stems.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Add a close-out step to the existing film and promo machinery (FILM_COMPILATION_GUIDE.md plus atuona-film9.mjs and aigo-promo-gen.mjs): next to the existing RAM guard, also refuse to render below about 5 GB of free disk; write demucs and other scratch inside the film's own folder instead of /tmp; and once the final mp4 is md5-verified on the laptop, remove that film's work/ files, the same way the 9 Oct session did.",
+    "gb": 0,
+    "risk": "Low for the guard. The automatic removal encodes deletion, so Elena should approve the exact rule (only after an md5-verified copy; never approved assets). This prevents about 10 GB of work files piling up for every few films.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Stop the espaluz-webhook crash loop: disable the old duplicate espaluz-webhook.service (the live espaluz-payments-webhook keeps port 5000 and PayPal), remove its line from the live check_oracle_health.sh so the health check stops restarting it every 5 minutes, then compress its 278 MB log.",
+    "gb": 0.25,
+    "risk": "Low to medium. Touches the EspaLuz payments area, which is not ours. First confirm the PayPal webhook is served by the payments unit (pid 1031872 on :5000). The 16 Jul audit already judged the disable safe. Also stops about 2.3 MB/day of log and about half of the systemd lines in syslog.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Add one logrotate rule (the built-in logrotate already runs nightly) covering /var/log/oracle-health.log, espaluz-webhook.log, espaluz-familybot.log, joblist-pipeline.log and oci-keepalive.log: size 20M, rotate 4, compress, copytruncate.",
+    "gb": 0.5,
+    "risk": "Low. copytruncate leaves the writing programs alone, and old content is compressed, not lost. The EspaLuz logs are not ours.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Stop VJH's daily DEBUG logs from growing without limit (290 MB, 100 files) inside VJH's own logger: either a TimedRotatingFileHandler that keeps 30 files, or compress files older than 14 days. First check whether the self-learning loop reads these files.",
+    "gb": 0.25,
+    "risk": "Medium. VJH is a live product, and its logs may hold evidence its learning depends on. Compressing instead of deleting avoids losing anything.",
+    "needs_elena_go": true
+   },
+   {
+    "fix": "Repo only: commit the live pm2-logrotate settings, the journald drop-in and the new logrotate rule as one re-apply script in scripts/oracle-resilience/. Sync the repo check_oracle_health.sh with the 25 May live fix, so a redeploy cannot bring back the dragontrade restart loop. Move StartLimitIntervalSec/StartLimitBurst to [Unit] in the resilience.conf template; applying that live later is a separate decision.",
+    "gb": 0,
+    "risk": "None on Oracle; it changes only git. Applying the [Unit] fix to live services would change how bots behave when they crash, so that step needs Elena's go separately.",
+    "needs_elena_go": false
+   },
+   {
+    "fix": "Docs and memory only: change the memory line 'pm2-logrotate + journal 1G cap live' to say what it does NOT cover (films, /tmp, /var/log app logs, compression broken), record the overdue VERIFY result (0 .gz files), and move the open disk items to the top part of NOW.md.",
+    "gb": 0,
+    "risk": "None. Text only, so the next agent does not read the problem as solved.",
+    "needs_elena_go": false
+   }
+  ],
+  "plain_answer": "Only one real disk cleanup was ever set up. On 28 Sep a Claude session cleaned the server by hand (95% down to 69%) and installed two guards: nightly PM2 log rotation and a 1 GB cap on the system journal. It also stopped VibeJob writing its bot token to the logs thousands of times a day. I checked them on the server today. The journal cap works, the token spam is gone and rotation runs every night. But the 'compress' setting has silently never worked (0 of 107 old files are zipped), and the install left behind an 842 MB old PM2 log that nothing will ever clean up. Those guards are not why the disk filled. They only cover two kinds of log, and in the next ten days about 14 GB of film and promo work landed where no tool looks: 7.2 GB of promo-film folders, about 2.9 GB for film #9, and 2.9 GB of scratch in /tmp (a 1.3 GB VibeJob test copy and 1.2 GB of music separations). No film or promo script checks free disk or removes its own working files; the 8 Oct guard checks RAM, not disk. The disk alarm did exist: a script checks the disk every 5 minutes and wrote 'WARNING: High disk usage' hundreds of times, but only into a file on the server that nobody reads, so you were never told. The rules that stop agents deleting other sessions' files did their job, but the 'check each film folder' step they wait on was never done. Had the 7.6 GB flagged on 28 Sep been checked and cleared, the disk would have peaked around 86% instead of 100%. The fixes I propose for your go mostly repair what already exists: a Telegram message when the disk crosses 85%, working compression, a 'close out the film' step once the final film is safely on your laptop, and a list of folders for you to approve one by one (up to about 15 GB). In interview words: this was an 'alarm with no listener' combined with 'fixing the incident instead of the class' — we capped what filled the disk last time, not the kind of growth that came next."
+ },
+ "hist": {
+  "findings": [
+   {
+    "topic": "28 Sep one-off cleanup (what was actually done)",
+    "claim": "One manual session (Claude Code, 28 Sep) took the disk from 95% to 72%. It compressed 4 old DragonTrade Bybit/Binance PM2 logs (5.5 GB down to 260 MB) and archived the live dragontrade-main-out.log (3.0 GB down to 52 MB), then emptied that file in place. It also cleared the npm caches (ubuntu 355 MB, root 1.7 GB) and the pip cache (359 MB). COVERS: logs and download caches present that day. DOES NOT COVER: film folders (about 7.6 GB, flagged for a per-film check), /tmp, backups, /var/log/oracle-health.log, the journal at that step. This was a cleanup run by hand, not a tool. No script was committed.",
+    "evidence": "git show c952a81 (2026-09-28 10:33) docs/oracle/NOW.md: 'Oracle disk 95% -> 72% (13 GB free)... Logs COMPRESSED, not deleted... OPEN (needs Elena's go): no log rotation exists... Film working folders ~7.6 GB need a per-film check'; earlier warnings 07ddd06 (22 Sep, 'Oracle disk is 91% full (4.1 GB free)') and e543d8f (28 Sep 08:04, '95% full (2.3 GB free)')",
+    "gb": 10.7
+   },
+   {
+    "topic": "28 Sep prevention: pm2-logrotate + journald cap + VJH httpx",
+    "claim": "The only standing tooling ever put in place. (1) pm2-logrotate 3.0.0: max_size 50M, retain 10, compress, daily 00:00 UTC. (2) Journal capped through /etc/systemd/journald.conf.d/99-aideazz-size.conf SystemMaxUse=1G, which brought it from 2.1 GB to 1010 MB. (3) VJH b38836e raised the httpx logger to WARNING, which stopped the bot token being written to the journal about 8,640 times a day. Result: 69%, 14 GB free. COVERS ONLY: ~/.pm2/logs/* of PM2 apps and the systemd journal. DOES NOT COVER: /tmp, the film/promo working folders (~/atuona-film*, ~/aigo-*), demucs stems, test copies, ~/.cache, backups, cron-written logs (/var/log/oracle-health.log, oci-keepalive.log), or files apps write themselves (VJH daily logs, espaluz-webhook.log, ~/logs/*). The commit title 'disk growth stopped' overclaims: it stopped growth in two log channels only.",
+    "evidence": "git show 58b90ec (2026-09-28 10:46) NOW.md now lines 1124-1130; VibeJobHunterAIPA_AIMCF b38836e src/main.py: logging.getLogger(\"httpx\").setLevel(logging.WARNING); memory reference_oracle_disk_housekeeping.md:11",
+    "gb": 1.1
+   },
+   {
+    "topic": "The rotation/cap config exists only on Oracle, not in git",
+    "claim": "Neither the pm2-logrotate settings nor the journald drop-in were committed as a file or script in any repo. They exist only as prose in NOW.md and in memory. So nothing can re-apply them after a rebuild, nothing can be diffed against the live box, and nothing shows whether they are still active.",
+    "evidence": "grep -rIn 'logrotate|SystemMaxUse|journald.conf|RotatingFileHandler' across cto-aipa scripts/docs/src, EspaLuz*, VJH, dragontrade-agent, whitespace -> only hits are docs/oracle/NOW.md:1125-1126 (prose); git log --all -G'(logrotate|journald|SystemMaxUse|df -h|du -sh|ENOSPC|No space left)' since 2026-07-01 -> only c952a81, 58b90ec, 10e7f8d, 1a287b0 (all NOW/docs text)"
+   },
+   {
+    "topic": "'VERIFY tomorrow' was never verified",
+    "claim": "The 28 Sep session wrote 'VERIFY tomorrow: rotated *__*.log.gz files exist in ~/.pm2/logs after 00:00 UTC'. No later commit, NOW entry or memory records that check. Whether pm2-logrotate ever rotated anything is unproven in history (~/.pm2/logs was 807 MB on 8 Oct, which is consistent with it working, but nobody confirmed it).",
+    "evidence": "58b90ec NOW.md:1129-1130 '**VERIFY tomorrow:** rotated `*__*.log.gz` files exist'; git log --all --since=2026-09-28 -G'rotated|__.*\\.log\\.gz|pm2 conf|logrotate' -> only 58b90ec and c952a81 (plus unrelated 0adbefe, c187ae7)"
+   },
+   {
+    "topic": "No disk monitoring or alerting exists anywhere",
+    "claim": "Nothing watches free disk space and nothing alerts Elena. check_oracle_health.sh (cron every 5 min) checks only whether processes are alive: it curls ports and runs systemctl is-active/pm2 describe, and never runs df. docs/oracle/health_monitor.sh does compute DISK% and writes 'WARNING' above 80%, but only to its own /home/ubuntu/health.log, with no Telegram. It was last touched 19 Mar and nothing in the repo shows it was ever put in cron. No src/ or scripts/ code checks free disk space. The NOW.md §4 start-of-session check has no df -h item. 'Check df -h / before any render or deploy' was only added to a HANDOFF line on 8 Oct, after the disk was already full.",
+    "evidence": "scripts/oracle-resilience/check_oracle_health.sh:1-80 (no df); docs/oracle/health_monitor.sh:4,12,22-25 (LOG_FILE=/home/ubuntu/health.log, alert only echo >> file), git log -- docs/oracle/health_monitor.sh -> only a855b32 2026-03-19; grep statfs/df/disk-alert in src scripts -> none; docs/oracle/NOW.md:63-77 (§4 checklist, no disk item); NOW.md:140 (10e7f8d) 'Next agent: check df -h /'"
+   },
+   {
+    "topic": "What actually refilled the disk 28 Sep -> 8 Oct",
+    "claim": "About 14 GB was consumed in 10 days. Nearly all of it was working data from pipelines that started AFTER the 28 Sep fix, and that fix never covered them: four AI Growth Operator promo-film folders, demucs music stems in /tmp, the film #9 working tree, and a 1.3 GB VJH test copy in /tmp. No disk reading was recorded anywhere between 28 Sep and 8 Oct. The disk hit 100% (120-219 MB free) on the same day as the RAM/OOM freeze.",
+    "evidence": "First-mention commits: aigo-promo 960f61e (30 Sep), aigo-villa e0bb909 (1 Oct), aigo-reloc 3c427ba (2 Oct), aigo-med 81d1e26 (3 Oct), demucs 2115ed6 (30 Sep), atuona-film9 01fd828 (6 Oct), vjh-test first named in 10e7f8d; 10e7f8d NOW.md:137 'Disk / 44G/45G. Biggest: /tmp 4.0G (vjh-test-20261006 1.3G, demucs_* ~1.1G, atuona-hd 604M), ~/aigo-* promo dirs ~7.3G, film7/8/9 ~5G, ~/.pm2/logs 807M, /var/log 1.9G'",
+    "gb": 14
+   },
+   {
+    "topic": "Film/promo pipelines have no working-folder lifecycle",
+    "claim": "No film or promo script checks free disk space or removes its own intermediates. The film guide has no 'after publish, prune work/' step; its only rule is 'scp the final mp4 to Elena's Desktop'. Each promo film gets its own Oracle folder with its own generator copy and ledger, so every new film adds a full working tree that stays forever. The 8 Oct guard in atuona-film9.mjs ('refuses under 2.5 GB free') checks MEMORY (MemAvailable in /proc/meminfo), not disk.",
+    "evidence": "grep statfs|df|disk|rmSync|unlink|cleanup in scripts/atuona-film9.mjs, aigo-promo-gen.mjs, atuona-film8-gen.mjs, *cut*.py, *-assets.py -> only aigo-promo-gen.mjs:214 (unlink of a .part file on failure); docs/atuona/FILM_COMPILATION_GUIDE.md:325,350 (own folder per film), :446 (scp final to Desktop); git show 3217b76 scripts/atuona-film9.mjs: memAvailMB() reads /proc/meminfo, 'if (memAvailMB() < 2500) throw'"
+   },
+   {
+    "topic": "Rules that block cleanup, and why the blocked items piled up",
+    "claim": "Three standing rules correctly stop any agent deleting what it did not create: the never-wipe iron rule (after the 1 Jul data/ wipe), 'film folders only after a per-film published+backed-up check', and 'never touch film #9 approved assets'. Every session that saw the space obeyed them and deferred to Elena: 22 Sep, 28 Sep, 8 Oct and 9 Oct. But the 'per-film check' was never carried out and never turned into a tool. Elena got no concrete list of what could be deleted until 8-9 Oct. So 'waiting for her go' became a permanent state while new folders kept arriving.",
+    "evidence": "memory feedback_never_wipe_anything.md (iron rule, July 2); .claude/SKILL.md:495-505 'NEVER WIPE ANYTHING'; memory reference_oracle_disk_housekeeping.md:13 'Film folders ... only after a per-film published+backed-up check'; memory project_atuona_film9_approved_assets.md; deferrals: 07ddd06 NOW.md:976-977 'atuona-film7/work/ holds three rollback cuts; clear them only with her go-ahead', 58b90ec 'Film working folders (~7.6 GB) still need a per-film check', 10e7f8d NOW.md:138 'Nothing deleted, waiting for Elena's go', docs/atuona/FILM9_HANDOVER_2026-10-08.md:264-266 (~4.3 GB list)",
+    "gb": 7.6
+   },
+   {
+    "topic": "/var/log/oracle-health.log is unbounded",
+    "claim": "The health check redirects all its output, for its whole run, into /var/log/oracle-health.log. That output is a header, a footer, every 'restarting...' line and the full output of every pm2/systemctl restart, written every 5 minutes (288 times a day) since Feb 2026. No logrotate rule for this file exists in any repo, and pm2-logrotate and the journald cap do not touch it. Measured at 212 MB on 8 Oct. A likely cause of the bulk (my inference, not checked on Oracle): pm2 restart prints a whole process table, and before the 25 May fix the script restarted 4 dragontrade apps every 5 minutes.",
+    "evidence": "scripts/oracle-resilience/check_oracle_health.sh:7-8 'LOG=/var/log/oracle-health.log / exec >> \"$LOG\" 2>&1', :10 and :80 (header/footer every run); deploy_on_server.sh:94-95,101 (log created, cron */5); NOW.md:139 (10e7f8d) '/var/log/oracle-health.log (212 MB)'",
+    "gb": 0.21
+   },
+   {
+    "topic": "espaluz-webhook crash-loop known since 16 Jul, never disabled",
+    "claim": "The old espaluz-webhook.service runs the same paypal_webhook_server.py on :5000 that espaluz-payments-webhook already owns, so it crash-loops. The 16 Jul audit counted 154,000+ restarts and called 'systemctl disable' safe 'in a future pass, not urgent'. On 29 Sep it was 'seen, not touched'. It was never disabled. Two tools of ours keep it alive: the resilience drop-in gives it Restart=always, and the health check sees it inactive and runs 'sudo systemctl restart espaluz-webhook' every 5 minutes. That feeds both the 5-minute 'espaluz-webhook not active, restarting...' line and a 290 MB espaluz-webhook.log. The old unit file is in no repo, so where that log lives is not documented.",
+    "evidence": "docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md:731 (2f4115c, 2026-07-16) '154,000+ restarts ... safe to systemctl disable in a future pass, not urgent'; memory project_fleet_hubspot_audit_july16.md:24; NOW.md:869 (04b7824, 29 Sep) 'Seen, not touched: espaluz-webhook.service (old PayPal unit) is in activating auto-restart'; check_oracle_health.sh:73-78; deploy_on_server.sh:115-122 (drop-in Restart=always for espaluz-webhook); EspaLuzFamilybot/deploy/espaluz-payments-webhook.service:26 (same script); NOW.md:139 'espaluz-webhook.log 290 MB'",
+    "gb": 0.29
+   },
+   {
+    "topic": "Health-check script: repo copy has drifted from the live copy",
+    "claim": "On 25 May the live /home/ubuntu/check_oracle_health.sh was patched directly on Oracle. It now uses a jq check, and dragontrade-bybit/-binance were removed from the loop. The repo copies were never updated: they still contain the broken grep 'status: online' loop over 4 apps, a grep that never matches. Anyone redeploying from the repo (deploy_on_server.sh / deploy_from_windows.ps1) would bring back a restart every 5 minutes of all dragontrade apps, and with it the noise in the log that is never rotated.",
+    "evidence": "docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md:2140-2170 ('Patched live (live state on Oracle VM)' ... jq; bybit/binance removed); scripts/oracle-resilience/check_oracle_health.sh:49-54 and deploy_on_server.sh:45-50 still 'for app in dragontrade-main dragontrade-dashboard dragontrade-bybit dragontrade-binance ... grep -q \"status: online\"'; repo script last changed 2993bba (2026-03-28)"
+   },
+   {
+    "topic": "VJH daily file logs are never pruned",
+    "claim": "VJH writes a new log file every day, at DEBUG level, through a plain logging.FileHandler, and never deletes old ones. NOW.md counts 99 such files. VJH runs under systemd, not PM2, so pm2-logrotate does not apply, and the journald cap does not cover files. Their total size is not recorded anywhere in history.",
+    "evidence": "VibeJobHunterAIPA_AIMCF/src/utils/logger.py:48-51 'log_file = log_dir / f\"vibejobhunter_{datetime.now().strftime('%Y%m%d')}.log\" ... logging.FileHandler(log_file) ... setLevel(logging.DEBUG)'; cto-aipa docs/oracle/NOW.md:218 '~9 months of VJH logs (99 file logs + the journal since 18 Sep)'"
+   },
+   {
+    "topic": "Other unrotated writers outside PM2/journald",
+    "claim": "Minor but also unbounded. oci_keepalive.sh appends one line every 4 hours to /var/log/oci-keepalive.log. The service-payments deploy script's fallback starts the webhook with nohup, appending to ~/logs/espaluz-payments-webhook.log. Neither file is rotated by anything we installed.",
+    "evidence": "scripts/oracle-resilience/oci_keepalive.sh:7,15; scripts/oracle-deploy-service-payments.sh:62-63 'nohup python3 paypal_webhook_server.py >> /home/ubuntu/logs/espaluz-payments-webhook.log' (69bdafd, 2026-07-04)"
+   },
+   {
+    "topic": "8-9 Oct state and what is still waiting for Elena",
+    "claim": "On 8 Oct the disk was at 100% (120 MB free), on the same day the film #9 ffmpeg run froze the box through RAM/OOM. That freeze was a memory incident, not a disk one. On 9 Oct a session deleted only its own ~/atuona-film9/work (1.1 GB, verified copied to the laptop first), leaving 98% used, 1.4 GB free. About 4.3 GB of other sessions' data is listed but untouched pending Elena's go: /tmp/vjh-test-20261006 1.3 GB, /tmp/demucs_* about 1.1 GB, /tmp/atuona-hd 604 MB, ~/.cache 1.0 GB, /tmp/qrvenv 237 MB.",
+    "evidence": "10e7f8d NOW.md:133-140; 1a287b0 NOW.md:530-531 'Oracle disk 98% (1.4 GB free after deleting OUR verified-copied work/); other /tmp + ~/.cache candidates (~4.3 GB, not ours) await Elena's go'; docs/atuona/FILM9_HANDOVER_2026-10-08.md:264-266",
+    "gb": 4.3
+   },
+   {
+    "topic": "NOW.md bloat buried the open items",
+    "claim": "NOW.md is 3,137 lines long, against its own rule of one screen per part. The 28 Sep follow-ups ('VERIFY tomorrow' and 'Film working folders ~7.6 GB still need a per-film check') sit around line 1113-1130, far below where any agent reads. Meanwhile the memory index line says 'pm2-logrotate + journal 1G cap live', which reads as solved. So later sessions had no reason to run df.",
+    "evidence": "grep -c . docs/oracle/NOW.md -> 3137; NOW.md §8 (line ~120) 'Keep it to one screen per part'; NOW.md:1113-1130; MEMORY.md:75 'Oracle disk: 28 Sep 2026 95%→69%; pm2-logrotate + journal 1G cap live.'"
+   },
+   {
+    "topic": "Sibling repos",
+    "claim": "Only one sibling-repo commit in the last 3 months touches disk or log volume: VJH b38836e (httpx to WARNING, journal noise). VJH 84a2ff0 'daily clean-up' sweeps closed HubSpot job deals and does nothing to disk. The EspaLuz* 'untrack ...' commits of 6-8 Sep (for example EspaLuzWhatsApp fe3beb1, the 180 MB session store) are git rm --cached hygiene: the files stay on disk and no space is freed. dragontrade-agent, whitespace and EspaLuz_Influencer have no disk or log-rotation changes.",
+    "evidence": "git -C <repo> log --all --since=2026-07-01 -i -E --grep='disk|logrotate|journal|cleanup|tmp|rotate|purge|cache|logging|httpx|RotatingFileHandler' for VibeJobHunterAIPA_AIMCF, EspaLuzFamilybot, EspaLuzWhatsApp, EspaLuz_Influencer, dragontrade-agent, whitespace; VJH 84a2ff0 message 'daily clean-up of closed postings'; NOW.md:3417 'never delete from disk (git rm --cached + .gitignore only)'"
+   }
+  ],
+  "summary": "Only one piece of disk tooling was ever encoded. On 28 Sep a Claude session ran a manual cleanup (c952a81), then installed two guards (58b90ec): pm2-logrotate (50M, retain 10, compress, daily) and a 1 GB journald cap (/etc/systemd/journald.conf.d/99-aideazz-size.conf), plus VJH b38836e (httpx to WARNING). The cleanup compressed logs and cleared npm/pip caches, taking the disk from 95% to 69% (about 11.8 GB freed).\n\nIt did not work for four reasons.\n\n1. **It fixed that day's cause, not the one that came next.** On 28 Sep the disk was full of PM2 logs and journal. The guards cover only ~/.pm2/logs and the systemd journal. From 30 Sep to 8 Oct about 14 GB was filled by things the guards never covered:\n   - four new promo-film folders (~/aigo-promo, -villa, -reloc, -med, about 7.3 GB);\n   - demucs stems and a 1.3 GB VJH test copy in /tmp (4.0 GB);\n   - the film #7/8/9 working folders (about 5 GB).\n\n   No film or promo script checks free disk or removes its own intermediates. The 8 Oct '2.5 GB free' guard checks RAM, not disk.\n\n2. **Nothing watches the disk.** check_oracle_health.sh only checks that processes are alive. health_monitor.sh writes disk warnings to its own file, and nothing shows it was ever scheduled. No code alerts on free space. The NOW.md start-of-session check has no df step. No disk reading was recorded between 28 Sep and 8 Oct, so 100% was only discovered during the RAM freeze.\n\n3. **Unrotated logs and a known crash-loop.** /var/log/oracle-health.log (212 MB) is written by our own health script every 5 minutes and nothing rotates it. espaluz-webhook.service has crash-looped since at least 16 Jul (154,000+ restarts) because espaluz-payments-webhook already holds port 5000. 'Disable it' was noted as safe but never done (16 Jul, 29 Sep). Our health script and our Restart=always drop-in restart it every 5 minutes, which feeds the 290 MB espaluz-webhook.log. VJH also writes a new DEBUG log file every day (99 files) that nothing prunes.\n\n4. **The fix was never confirmed or kept as code.** The pm2-logrotate and journald settings exist only on Oracle and as prose in NOW.md, in no repo. The 'VERIFY tomorrow' check that rotated files appeared was never recorded. That item was buried around line 1,120 of a 3,137-line NOW.md, and the memory line 'pm2-logrotate + journal 1G cap live' made the problem look solved.\n\nThe never-wipe and per-film-check rules worked as intended: every session (22 Sep, 28 Sep, 8 Oct, 9 Oct) found the space and deferred to Elena. But the per-film check was never actually done, and no one brought her a concrete delete list until 8-9 Oct, so 'waiting for her go' became permanent while new folders kept arriving.\n\nThere is also drift: the repo copy of the health script still has the broken pre-25-May dragontrade loop that was patched only on the live box. Redeploying from the repo would bring back a restart every 5 minutes and more log noise.\n\nCurrent state (9 Oct): 98% used, 1.4 GB free. About 4.3 GB of candidates are listed in docs/atuona/FILM9_HANDOVER_2026-10-08.md:264-266, waiting for Elena's go. I changed nothing anywhere: everything above comes from git history, memory and the repo, and I did not touch Oracle.\n\nKey files: D:/aideazz/ai-cofounders/cto-aipa/docs/oracle/NOW.md, D:/aideazz/ai-cofounders/cto-aipa/scripts/oracle-resilience/check_oracle_health.sh, D:/aideazz/ai-cofounders/cto-aipa/scripts/oracle-resilience/deploy_on_server.sh, D:/aideazz/ai-cofounders/cto-aipa/docs/oracle/health_monitor.sh, D:/aideazz/ai-cofounders/cto-aipa/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md, C:/Users/kirav/.claude/projects/D--aideazz-ai-cofounders-cto-aipa/memory/reference_oracle_disk_housekeeping.md, D:/aideazz/VibeJobHunterAIPA_AIMCF/src/utils/logger.py."
+ },
+ "live": {
+  "summary": "I checked Oracle's live state read-only on 9 Oct 2026, 10:09–10:20 UTC. Nothing was deleted, truncated, restarted or edited. Side effect: running `cat` on the 8 /tmp/espaluz_video_*.mp4 files (170 MB) to measure them refreshed their access time, so the 30-day /tmp cleaner will now remove them about 8 Nov instead of about 27–30 Oct.\n\nDisk now: 45G total, 43G used, 1.4G free (98%). Uptime 149 days (booted 13 May). No swap.\n\nVERDICT: two of the three 28 Sep fixes held. The journal cap works (1015.5M, at or under 1G). pm2-logrotate does rotate daily and does enforce retain=10. The disk did not refill from logs. It refilled from about 13.5 GB of new film/promo working files, which no cleanup tool covers:\n- ~/aigo-promo, aigo-med, aigo-villa, aigo-reloc, aigo-ig, aigo-art: about 7.2 GB, all created 30 Sep–4 Oct.\n- ~/atuona-film9: 1.83 GB, created 6 Oct.\n- /tmp: demucs music separations 1.16 GB, and a VibeJob test copy (vjh-test-20261006) of 1.22 GB.\n- /var/www/influencer-images: +0.37 GB on 3–4 Oct.\n\nNobody was warned, because the only disk alert is health_monitor.sh. It writes 'WARNING: High disk usage' to ~/health.log, a file nobody reads; all 500 warning lines in its 1000-line window fired with no Telegram alert. The disk hit 100% on 8 Oct around 21:00 UTC.\n\nThe 28 Sep tooling also has four defects of its own:\n1. pm2-logrotate's compress=true has silently never worked. pm2-logrotate 3.0.0's parseBool only accepts the string 'true', and pmx's Autocast turns that string into the boolean true first, so compression falls back to off. Result: 0 of 107 rotated files are gzipped. The 28 Sep NOW.md said 'VERIFY tomorrow: rotated *__*.log.gz files exist', and that check was never done.\n2. When the module started, it moved the 842 MB pm2 daemon log to ~/.pm2/pm2__2026-09-28_15-38-05.log, uncompressed. That file will never be cleaned up: pm2.log only rotates at 50 MB and it is now 52 KB, so the 10-file retain limit is never reached.\n3. The npm/pip cache clean was one-off, and ~/.cache/pip has already grown back 244.5 MB.\n4. The 28 Sep work never looked at /var/log. Its app logs have no logrotate rule: espaluz-webhook.log 278 MB, oracle-health.log 203 MB, espaluz-familybot.log 138 MB, joblist-pipeline.log 2.5 MB.\n\nThe repeating 'espaluz-webhook not active, restarting' line is a separate problem, a stale duplicate service. espaluz-payments-webhook.service was written at 2026-06-28 11:32. Its process (pid 1031872, started 1 Oct) runs the same paypal_webhook_server.py on port 5000. The old espaluz-webhook.service was never disabled, so it has been failing with 'Address already in use' every ~10.25 s since 2026-06-28 11:32:56 (NRestarts=4352). The 5-minute health check restarts it again each time (29,634 times so far). That is about 245 MB of espaluz-webhook.log, ~2.3 MB/day, plus about half of all syslog systemd lines.\n\nThe resilience.conf drop-ins were meant to stop restart loops like this, but they put StartLimitIntervalSec in the [Service] section. Systemd logs 'Unknown key name StartLimitIntervalSec in section Service, ignoring', so the limit is the default 10s and can never trip.\n\noracle-health.log is big, but not because of this loop. 209.5 MB of its 212.9 MB was written before 26 May (pm2 status tables dumped during the old dragontrade restart loop), and it has grown only 312 KB since 28 Sep.\n\nSpace Elena could approve freeing (not touched): pm2 daemon log 842 MB; /tmp vjh-test 1.25 GB; /tmp demucs 1.19 GB; espaluz-webhook.log crash output about 245 MB; old logs of apps no longer in pm2, 331 MB (this includes the Bybit/Binance .gz, 273 MB, which memory says to keep).",
+  "findings": [
+   {
+    "topic": "disk now",
+    "claim": "Root disk 98% full: 1.4G free of 45G; uptime 149 days (boot 2026-05-13 02:53), no swap, inodes 12%",
+    "evidence": "ssh oracle-cto-aipa 'df -h /' -> '/dev/sda1 45G 43G 1.4G 98% /'; uptime -> 'up 149 days, 7:15'; uptime -s -> 2026-05-13 02:53:27; swapon --show empty",
+    "gb": 1.4
+   },
+   {
+    "topic": "28 Sep baseline",
+    "claim": "28 Sep session left the disk at 69% / 14 GB free and wrote 'VERIFY tomorrow: rotated *__*.log.gz files exist in ~/.pm2/logs after 00:00 UTC'",
+    "evidence": "git show 58b90ec -- docs/oracle/NOW.md: '28 Sep 15:45 UTC — Oracle disk 95% → 69% (14 GB free)' ... '**VERIFY tomorrow:** rotated `*__*.log.gz` files exist'",
+    "gb": 14
+   },
+   {
+    "topic": "pm2-logrotate: module state",
+    "claim": "pm2-logrotate 3.0.0 is online since 2026-09-28 15:37:05 with max_size 50M, retain 10, compress true, rotateInterval '0 0 * * *', workerInterval 60; it rotates daily and deletes beyond retain (its own log shows creates + deletes at 2026-10-09 00:00)",
+    "evidence": "pm2 jlist -> 'pm2-logrotate online 1790609825072' (= 2026-09-28_15:37:05); pm2 conf pm2-logrotate; tail ~/.pm2/logs/pm2-logrotate-out.log -> '\"dragontrade-main-out__2026-10-03_17-01-27.log\" has been deleted', '...cto-aipa-out-9__2026-10-09_00-00-00.log\" has been created'; pm2-logrotate-error.log 0 bytes"
+   },
+   {
+    "topic": "pm2-logrotate: compress silently broken",
+    "claim": "compress=true does nothing: 0 of 107 rotated files since 28 Sep are gzipped. Root cause: pmx Autocast turns the config string 'true' into the boolean true, and pm2-logrotate's parseBool only accepts the string 'true', otherwise returning default false",
+    "evidence": "find ~/.pm2/logs -name '*__2026-*.gz' | wc -l -> 0; -name '*__2026-*.log' -> 107. app.js:49 'var COMPRESSION = parseBool(conf.compress, false)'; parseBool: \"if (str === 'true') return true; if (str === 'false') return false; return defaultVal;\"; pmx/lib/configuration.js:97 'var casted_conf = Autocast(JSON.parse(process.env[conf.module_name]))'; pmx/lib/utils/autocast.js common_strings {'true': true}; /proc/<pid 234579>/environ shows compress \"true\""
+   },
+   {
+    "topic": "pm2 daemon log orphaned uncompressed",
+    "claim": "Right after install, pm2-logrotate moved the 842 MB pm2 daemon log (2026-01-07 to 2026-09-28) to an uncompressed file that will never be cleaned up. pm2.log only rotates by size (force=false), and at 52 KB it will not reach 50M, so the 10-file retain limit is never hit",
+    "evidence": "ls -la ~/.pm2 -> '882455872 2026-09-28_15:38 pm2__2026-09-28_15-38-05.log'; du -> '842M pm2__2026-09-28_15-38-05.log'; app.js scheduler: \"proceed_file(PM2_ROOT_PATH + '/pm2.log', false)\" (cron forces only proceed_app(app, true)); ~/.pm2/pm2.log 51960 bytes",
+    "gb": 0.84
+   },
+   {
+    "topic": "pm2 log totals",
+    "claim": "~/.pm2 = 1.6G, ~/.pm2/logs = 713M. dragontrade-main-out holds 10 rotated files = 336 MB uncompressed. It wrote about 77 MB/day ('Health check recorded' spam, 4955 of the last 5000 lines) until its restart on 2026-10-08 00:58, and about 4.4 MB/day since",
+    "evidence": "du -sh ~/.pm2 ~/.pm2/logs -> 1.6G / 713M; per-app sum 'dragontrade-main-out files=10 bytes=336361804'; ls -laS: dragontrade-main-out__2026-10-04_16-41-27.log 52573889 and __2026-10-05_00-00-00.log 22782505 (pattern 50M + ~25M per day), __2026-10-09_00-00-00.log 4400989; pm_uptime 1791421107338 = 2026-10-08_00:58:27; uniq -c on tail -n 5000 -> '4955 ... Health check recorded'",
+    "gb": 0.71
+   },
+   {
+    "topic": "orphan pm2 logs",
+    "claim": "15 log files from apps no longer in pm2 total 331 MB. pm2-logrotate only handles live apps, so retain never touches them. This includes the 28 Sep session's own Bybit/Binance gz archives, which memory says to keep",
+    "evidence": "loop over ~/.pm2/logs excluding pm2 jlist out/err paths and *__2026-* -> orphan_total_bytes=331471447 orphan_count=15; e.g. dragontrade-bybit-error.log.gz 148013415 (2026-05-25), dragontrade-binance-out.log.gz 48423580, cto-aipa-error-7.log 1066245 (2026-04-13)",
+    "gb": 0.33
+   },
+   {
+    "topic": "28 Sep gz archives",
+    "claim": "All 5 .gz archives from 28 Sep are still present, about 314 MB total",
+    "evidence": "ls -la ~/.pm2/logs/*.gz -> dragontrade-binance-error.log.gz 28441971, dragontrade-binance-out.log.gz 48423580, dragontrade-bybit-error.log.gz 148013415, dragontrade-bybit-out.log.gz 48460125, dragontrade-main-out.2026-01-16_to_2026-09-28.log.gz 55163746",
+    "gb": 0.31
+   },
+   {
+    "topic": "journald cap",
+    "claim": "Journal cap works: the drop-in sets SystemMaxUse=1G and usage is at the cap. journald was last restarted 2026-10-02 15:40 and kept the setting",
+    "evidence": "journalctl --disk-usage -> 'Archived and active journals take up 1015.5M'; cat /etc/systemd/journald.conf.d/99-aideazz-size.conf -> '[Journal] SystemMaxUse=1G' (root, 2026-09-28_15:42); du /var/log/journal -> 1016M; systemctl status systemd-journald -> 'active (running) since Fri 2026-10-02 15:40:40 UTC'",
+    "gb": 1
+   },
+   {
+    "topic": "/var/log without rotation",
+    "claim": "/var/log is 1.9G. These app logs have no logrotate rule at all: espaluz-webhook.log 278 MB, oracle-health.log 203 MB, espaluz-familybot.log 138 MB, joblist-pipeline.log 2.5 MB, oci-keepalive.log 52 KB. The 28 Sep work never covered /var/log",
+    "evidence": "sudo du -sh /var/log -> 1.9G; ls -la /var/log/*.log -> 291286007 espaluz-webhook.log (root), 212857894 oracle-health.log, 145003624 espaluz-familybot.log, 2601094 joblist-pipeline.log, 52762 oci-keepalive.log; grep -l -E 'oracle-health|espaluz|oci-keepalive|familybot' /etc/logrotate.d/* /etc/logrotate.conf -> no match; /etc/logrotate.d lists only alternatives apport apt bootlog btmp certbot cloud-init dpkg fail2ban nginx postgresql-common rsyslog ubuntu-pro-client unattended-upgrades wtmp",
+    "gb": 0.62
+   },
+   {
+    "topic": "espaluz-webhook stale duplicate unit",
+    "claim": "The old espaluz-webhook.service has been crash-looping since the minute espaluz-payments-webhook.service was installed (2026-06-28 11:32). Both run the same paypal_webhook_server.py on port 5000; the payments unit holds the port and the old unit fails with 'Address already in use' every ~10.25 s",
+    "evidence": "ls -la /etc/systemd/system/espaluz-payments-webhook.service -> 2026-06-28_11:32; first 'Address already in use' in /var/log/espaluz-webhook.log preceded by '2026-06-28 11:32:56,781 - INFO - Starting PayPal Webhook Server on port 5000...'; ss -ltnp -> '0.0.0.0:5000 users:((\"python\",pid=1031872' = espaluz-payments-webhook MainPID=1031872 (started Thu Oct 1 06:58:40); systemctl status espaluz-webhook -> 'activating (auto-restart) (Result: exit-code)', NRestarts=4352, Restart=always, RestartSec=10"
+   },
+   {
+    "topic": "why 'restarting' repeats every 5 min",
+    "claim": "check_oracle_health.sh (cron */5) checks 'systemctl is-active espaluz-webhook'. The unit is nearly always in 'activating (auto-restart)', so the check logs the line and restarts it every run: 29,634 times since 2026-06-28 11:35",
+    "evidence": "crontab -l -> '*/5 * * * * /home/ubuntu/check_oracle_health.sh'; script: 'if ! systemctl is-active --quiet espaluz-webhook ... echo \"espaluz-webhook not active, restarting...\"; sudo systemctl restart espaluz-webhook'; grep -c 'espaluz-webhook not active' /var/log/oracle-health.log -> 29634; first occurrence after '=== 2026-06-28T11:35:01+00:00 ==='"
+   },
+   {
+    "topic": "crash-loop brake never armed",
+    "claim": "All 6 resilience.conf drop-ins (Feb 2026) put StartLimitIntervalSec in [Service], which systemd ignores. Effective StartLimitInterval is 10s, so a burst of 10 can never be reached with RestartSec=10, and the loop never stops",
+    "evidence": "cat /etc/systemd/system/espaluz-webhook.service.d/resilience.conf -> '[Service] Restart=always RestartSec=10 StartLimitIntervalSec=300 StartLimitBurst=10'; systemctl show espaluz-webhook -> StartLimitIntervalUSec=10s StartLimitBurst=10; journalctl -> \"/etc/systemd/system/espaluz-whatsapp.service.d/resilience.conf:4: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.\" (same for vibejobhunter, vibejobhunter-web)"
+   },
+   {
+    "topic": "espaluz-webhook.log growth",
+    "claim": "About 245 MB of the 278 MB espaluz-webhook.log is crash-loop output since 28 Jun, about 2.3 MB/day, and +27 MB since 28 Sep. The same loop is about half of all syslog systemd lines and produced 14,899 journal mentions today by about 10:15",
+    "evidence": "grep -b offsets: crash start 34414426, 2026-09-28 262849274, 2026-10-08 287808759, 2026-10-09 290225955, size 291288030; tail -n 20000 /var/log/syslog systemd[1] lines -> 2416 'espaluz-webhook.service: Main process exited, code=exited, status=1/FA' + 2416 'Started espaluz-webhook...' + 2335 'Scheduled restart job'; journalctl --since '2026-10-09 00:00' | grep -c espaluz-webhook -> 14899",
+    "gb": 0.24
+   },
+   {
+    "topic": "oracle-health.log is legacy, not current growth",
+    "claim": "209.5 MB of the 212.9 MB oracle-health.log was written before 26 May (pm2 restart tables from the old dragontrade restart loop). It has grown only 312 KB since 28 Sep; each run now writes about 100 bytes",
+    "evidence": "grep -b -m1 '^=== <date>T' offsets: 2026-05-26 209518346, 2026-06-28 210022176, 2026-09-28 212545585, size 212857894; grep -c '│' -> 457018 table lines; script comment 'May 25 2026 FIX ... every dragontrade-* app to be wrongly restarted every 5 min for weeks'",
+    "gb": 0.2
+   },
+   {
+    "topic": "espaluz-familybot.log",
+    "claim": "138 MB, no rotation rule, written via systemd append. It has no timestamps, so growth since 28 Sep cannot be dated; its tail is repeating 'Webhook killer check cycle #22841' noise",
+    "evidence": "grep familybot.log /etc/systemd/system/espaluz-familybot.service -> 'StandardOutput=append:/var/log/espaluz-familybot.log'; size 145004173; grep -b '2026-09-28' -> no match; tail -> '🛡️ Webhook killer check cycle #22841 ... Webhook is already deleted'",
+    "gb": 0.14
+   },
+   {
+    "topic": "syslog/kern.log",
+    "claim": "syslog is covered by rsyslog logrotate (weekly, rotate 4, compress): syslog 83 MB + syslog.1 75 MB, kern.log 42 MB + 20 MB. Bounded, but inflated by the webhook crash loop",
+    "evidence": "cat /etc/logrotate.d/rsyslog -> '/var/log/syslog ... rotate 4 weekly ... compress delaycompress'; find /var/log -size +5M -> 83.4M syslog, 75.4M syslog.1, 41.6M kern.log, 19.9M kern.log.1; logrotate.timer last ran 'Fri 2026-10-09 00:00:01 UTC'",
+    "gb": 0.22
+   },
+   {
+    "topic": "/tmp policy",
+    "claim": "/tmp is on the root disk (not tmpfs). systemd-tmpfiles-clean runs daily and deletes /tmp entries untouched for 30 days. It works (last run 03:19 today, success), but it lets up to 30 days of film scratch build up: /tmp is 4.0G now, all of it owned by ubuntu",
+    "evidence": "grep /usr/lib/tmpfiles.d/tmp.conf -> 'D /tmp 1777 root root 30d'; findmnt /tmp -> no separate mount; systemctl show systemd-tmpfiles-clean.service -> Result=success ExecMainExitTimestamp=Fri 2026-10-09 03:19:12; sudo du -xsh /tmp -> 4.0G",
+    "gb": 4
+   },
+   {
+    "topic": "/tmp contents",
+    "claim": "The big /tmp items are all ubuntu-owned scratch from other sessions: vjh-test-20261006 1246 MB (6 Oct), atuona-hd 604 MB (25 Sep), demucs_med2 481 + demucs_med 292 + demucs_reloc 240 + demucs_mus 73 + demucs_reloc_v1 56 + demucs_reloc4 45 MB (2–3 Oct), qrvenv 237 MB (13 Sep), 8 espaluz_video_*.mp4 = 170 MB (27 and 30 Sep). New since 28 Sep: 2,885 MB",
+    "evidence": "sudo du -xs --block-size=1M /tmp/* sorted with stat %U/%y; find /tmp -newermt '2026-09-28 15:45' -printf %s summed -> tmp_new_MB=2885; espaluz videos: 8 files, 169747869 bytes",
+    "gb": 2.9
+   },
+   {
+    "topic": "growth since 28 Sep: home",
+    "claim": "Files modified after 2026-09-28 15:45 under /home/ubuntu total 10,660 MB, almost all film/promo working folders: aigo-promo 3166 MB (25,153 files), aigo-med 2103, atuona-film9 1871 (left after the 1.1 GB deletion), aigo-villa 1039, aigo-reloc 837, VibeJobHunter 473, .pm2 396, .cache 342, aigo-ig 144, cto-aipa 144",
+    "evidence": "nice -n 15 ionice -c3 find /home/ubuntu -xdev -type f -newermt '2026-09-28 15:45' -printf '%s %P\\n' | awk sum per top dir; total home_new_MB=10660",
+    "gb": 10.7
+   },
+   {
+    "topic": "film folder creation dates",
+    "claim": "All aigo-* folders were created after the 28 Sep cleanup, 30 Sep–4 Oct, about 7.2 GB together; atuona-film9 created 6 Oct (1.83 GB). Older film folders, not cleaned since: atuona-film7 1.49 GB, atuona-film8 1.46 GB, aideazz-api-film* about 2.6 GB (11–13 Sep)",
+    "evidence": "stat -c %w + du -sm: aigo-promo 3233 MB born 2026-09-30 13:17; aigo-villa 1040 born 2026-10-01 16:05; aigo-reloc 838 born 2026-10-02 10:35; aigo-med 2105 born 2026-10-03 17:01; aigo-ig 145 born 2026-10-04 12:41; aigo-art 5 born 2026-10-01; atuona-film9 1874 born 2026-10-06 16:23; atuona-film7 1526 born 2026-09-21; atuona-film8 1499 born 2026-09-22; aideazz-api-film 691, -v14 509, -v15 654, -v17 95, -v18 298, -v19 425",
+    "gb": 9.2
+   },
+   {
+    "topic": "/var growth",
+    "claim": "/var/www/influencer-images grew 375 MB on 3–4 Oct (youtube 232 MB on 3 Oct, ig-aigo 144 MB on 4 Oct). The folder is now 1166 MB, of which youtube is 996 MB",
+    "evidence": "sudo find /var/www/influencer-images -newermt '2026-09-28 15:45' -> 231.6 MB youtube 2026-10-03, 143.6 MB ig-aigo 2026-10-04, 1.0 MB youtube 2026-10-05; sudo du -sm -> 1166 total, youtube 996",
+    "gb": 0.38
+   },
+   {
+    "topic": "cache regrowth",
+    "claim": "The 28 Sep npm/pip cache clear was one-off and the caches are growing back: ~/.cache/pip is 255 MB, 244.5 MB of it since 28 Sep (28 Sep had cleared 359 MB). huggingface +80 MB, ~/.npm 104 MB (+46 MB). ~/.cache total 1011 MB (ms-playwright 613 MB, deliberately kept)",
+    "evidence": "du -sm ~/.cache/* -> 613 ms-playwright, 255 pip, 81 huggingface, 64 n8n; find ~/.cache -newermt '2026-09-28 15:45' -> 244.5 MB pip, 80.2 MB huggingface, 17.4 MB n8n; git show c952a81: 'pip 359 MB' cleared",
+    "gb": 0.26
+   },
+   {
+    "topic": "~/backups",
+    "claim": "~/backups is 1.34 GB with nothing new and large since 28 Sep. Biggest: EspaLuzWhatsApp.pre-llm-chain tgz 538 MB (16 Aug), EspaLuzFamilybot pre-convo-chain 158 MB, crimson-escape-v1-1632.mp4 117 MB (22 Sep), 28 Sep journal export 40 MB",
+    "evidence": "du -sm ~/backups -> 1338; ls -la ~/backups sorted: 538143035 EspaLuzWhatsApp.pre-llm-chain.20260816-1828.tgz, 157943344 EspaLuzFamilybot.pre-convo-chain-20260817-0025.tgz, 116677610 crimson-escape-v1-1632.mp4, 40119189 journal-2026-08-10_to_2026-09-28.log.gz; find ~/backups -newermt 28 Sep -> 2.7 MB",
+    "gb": 1.34
+   },
+   {
+    "topic": "disk alerting",
+    "claim": "The only disk monitor is health_monitor.sh (cron */5). It writes 'WARNING: High disk usage' (threshold 80%) to ~/health.log only: no Telegram, nobody reads it, and it keeps only the last 1000 lines (about 3.5 days). Every run in that window warned (500 warnings). Disk went from 95% at 2026-10-07 16:35 to 100% at 2026-10-08 21:00, then 98% after the 1.1 GB deletion. No other script checks df",
+    "evidence": "cat ~/health_monitor.sh -> 'if [ $DISK_PERCENT -gt 80 ]; then echo ... WARNING: High disk usage ... >> $LOG_FILE' and 'tail -1000 $LOG_FILE'; grep -c 'WARNING: High disk' ~/health.log -> 500 of 1000 lines; transitions: '2026-10-07 16:00 DISK: 95%', '2026-10-08 20:00 98%', '2026-10-08 21:00 100%', '2026-10-09 00:00 98%'; grep for df/DISK in ~/*.sh ~/bin/* ~/cto-aipa/scripts -> only health_monitor.sh; root crontab: 'no crontab for root'; /etc/cron.d has only certbot, e2scrub_all, sysstat"
+   },
+   {
+    "topic": "no cleanup cron exists",
+    "claim": "No scheduled job deletes or rotates anything on Oracle besides pm2-logrotate, the stock logrotate/rsyslog rules, journald's cap and the stock 30-day /tmp cleaner. Nothing covers film/promo working folders, /tmp scratch under 30 days, ~/.cache, or /var/log app logs",
+    "evidence": "crontab -l (34 entries, none cleanup/disk except health_monitor.sh); sudo -n crontab -l -u root -> 'no crontab for root'; /etc/cron.d: certbot, e2scrub_all, sysstat"
+   },
+   {
+    "topic": "accounting 28 Sep -> 9 Oct",
+    "claim": "Free space went from 14 GB (28 Sep) to 219 MB (8–9 Oct). New files since 28 Sep: home 10.66 GB (11.8 GB before 1.1 GB of film9 was deleted), /tmp 2.89 GB, /var/www 0.38 GB, about 15 GB written in total, minus what rotation and retain removed. Log growth was small by comparison (espaluz-webhook +27 MB, oracle-health +0.3 MB, journal flat at its cap, pm2 bounded by retain)",
+    "evidence": "home_new_MB=10660, tmp_new_MB=2885, influencer-images new 376 MB; git show 58b90ec '(14 GB free)'; df now 1.4G avail",
+    "gb": 13.9
+   },
+   {
+    "topic": "side effect of this read-only audit",
+    "claim": "Running 'cat espaluz_video_*.mp4 | wc -c' read 8 /tmp video files (170 MB) and refreshed their access time. The 30-day tmpfiles clean will now remove them about 8 Nov instead of about 27–30 Oct. No other state was changed",
+    "evidence": "command: ssh oracle-cto-aipa 'cd /tmp; ... $(cat espaluz_video_*.mp4 | wc -c)' -> 169747869 bytes; tmp.conf 'D /tmp 1777 root root 30d'",
+    "gb": 0.17
+   }
+  ]
+ }
+}
