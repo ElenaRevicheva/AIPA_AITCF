@@ -1,5 +1,52 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 Disk: why the 28 Sep fix did not hold, the 9 Oct cleanup (98% → 47%), and prevention that reaches a human (8–9 October 2026)
+
+**What happened.** 28 Sep: a Claude session took the disk 95% → 69% by hand and installed `pm2-logrotate` + a 1 GB journald
+cap. By 8 Oct the disk was **100%** again and, on the same evening, a film #9 preview build (one ffmpeg dissolving ~45 full-HD
+inputs, 9.2 GB RSS, no swap) froze the whole box ~50 min until the kernel OOM-killed ffmpeg (no reboot; every bot down meanwhile).
+Forensics (two read-only rounds, 12 agents, claims adversarially verified): `docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md`.
+
+**Why the 28 Sep fix did not hold — the named failure modes:**
+- **Fixing the incident, not the class.** It capped the two kinds of log that filled the disk last time; the next ~13.8 GB came
+  from a NEW activity (film/promo production, 30 Sep – 8 Oct: `~/aigo-*` 7.2 GB, film #9 2.9 GB, /tmp stems/tests 2.8 GB) that no
+  tool covered and no script cleaned.
+- **Alarm with no listener.** `~/health_monitor.sh` (cron */5, since March) logged "WARNING: High disk usage" ~500 times — into
+  `~/health.log`, which nobody reads.
+- **Silent failure.** pm2-logrotate COMPRESSION never worked: module 3.0.0 `parseBool` accepts only the string 'true', but its
+  own pmx Autocast hands it the boolean → 0 of 107 rotated logs gzipped; the install left an 842 MB daemon log uncompressed.
+- **Unverified fix.** The note "VERIFY tomorrow: rotated *.log.gz exist" was never acted on.
+- Plus: the health check had restarted the dead duplicate `espaluz-webhook.service` **29,637 times** since 28 Jun (same
+  `paypal_webhook_server.py` as `espaluz-payments-webhook`, which owns :5000), writing ~280 MB of "Address already in use".
+
+**9 Oct cleanup (Elena: "free up maximum space possible but without destroying live products; remove only the garbage or
+duplicated stuff"):** read-only liveness map (40 live paths) + classifiers + skeptics (8 vetoes honoured) → garbage 9.4 GB
+removed; logs compressed byte-verified (842 MB → 39 MB; health log 212 → 4.8 MB); 12 GB of film/promo working folders + old
+backups **archived to the laptop `D:\ORACLE_ARCHIVE_2026-10-09\`** (md5 file by file, 4,787 files, 0 mismatches, README) then
+removed; two week-old self-matching `while pgrep` wait-loops ended. **Result 98% → 47% (24 GB free); all bots verified after
+every step.** Kept on purpose: `~/atuona-film7/venv` + `models` (film #9 still-motion), `_session-backups/wwebjs_auth.20260906`,
+`backups/espaluz-pre-persistence-*` + `atlas-assets-IRREPLACEABLE`, the paused DragonTrade Bybit/Binance logs, VJH data.
+
+**Prevention now in place (re-runnable: `scripts/oracle-resilience/disk-prevention-apply.sh`):**
+| Piece | What it does | Proof |
+|---|---|---|
+| `~/health_monitor.sh` (repo `docs/oracle/health_monitor.sh`) | Telegram to Elena when the disk crosses 85/90/95 % up, 12 h reminder at 95 %+, "back below 80 %" — delivery checked (`"ok":true`), state `~/.disk_alert_level` | "DISK ALERT DELIVERED" 98 % (13:03) and "back to 73 %" (13:55) on 9 Oct |
+| `~/check_oracle_health.sh` (repo `scripts/oracle-resilience/check_oracle_health.sh` = the live copy) | watches `espaluz-payments-webhook` (the real :5000 unit) instead of the dead duplicate; the repo copy no longer carries the May dragontrade restart loop | payments :5000 = 200 after |
+| `espaluz-webhook.service` | **disabled** (duplicate, could never bind :5000) | `is-enabled` = disabled |
+| pm2-logrotate | `parseBool` patched to accept boolean true (re-run the apply script after any `pm2 install pm2-logrotate`) | first rotation verify: see NOW.md |
+| `/etc/logrotate.d/aideazz-app-logs` | health/familybot/joblist/keepalive logs + `~/logs/*.log`, `su root syslog` for /var/log (as ubuntu = "Permission denied") | forced rotation 9 Oct OK |
+| journald | `SystemMaxUse=1G` (28 Sep, re-asserted) | 1015 MB |
+| sysstat | `-S XDISK` → `sar -F` keeps disk history | from 9 Oct |
+| `~/atuona-film9/gen.mjs` | refuses paid calls under 3 GB free (disk guard next to the money guard) | 9 Oct |
+| **Rule** | **No video renders on Oracle** — film builds run on the laptop (`scripts/atuona-film9.mjs` with `FILM9_*` env; dissolves in batches of 6 + free-memory check) | memory `feedback_no_heavy_renders_on_oracle` |
+
+**Cleanup tools (use these, never ad-hoc rm):** `scripts/oracle-resilience/safe-remove.sh <list> [--apply]` (dry run by default;
+refuses protected paths, anything outside home//tmp//var/cache/apt, and anything a running process holds; logs `~/safe-remove.log`),
+`archive-to-laptop.sh` (copy + md5 both ends; prints VERIFIED only on a full match), `compress-verified.sh` (gzip, original
+removed only if the .gz unpacks to the same bytes). Lists and logs: `docs/oracle/disk-cleanup-2026-10-09/`.
+**Still open:** VJH data growth (`autonomous_data/ats_cache` 698 MB never pruned, checkpoint DB +3 MB/day) — a VJH design
+decision; resizing the boot volume (VM.Standard.E5.Flex, cost unverified). **Before any write to Oracle: `df -h /`.**
+
 ## 🟢 4everland pin + the sitemap's second writer (August 21-22 2026)
 
 The 21 August daily post published to Dev.to, announced itself on Telegram, and its
@@ -728,7 +775,7 @@ Elena asked to confirm every agent actually surfaces its outcomes to HubSpot (cl
 - **HIRING-OPENCLAW, CLIENT-CMO, CLIENT-PLACES** — still genuinely not wired (no code path exists yet), as previously documented.
 - **ESPALUZ — was 100% dark, now FIXED:** `_push_espaluz_to_crm()` / `_push_espaluz_tg_to_crm()` (in EspaLuzWhatsApp/EspaLuzFamilybot) both had `if not secret: return` with **`OUTREACH_SECRET` never set in either bot's `.env`** — silent no-op, no log line, ever. Confirmed via Postgres: **28 real WhatsApp trial users** (real phone numbers, multiple countries, back to 2025-07) had never once reached HubSpot. Fixed: added `OUTREACH_SECRET` + `CTO_AIPA_WEBHOOK_URL` to both `.env` files, restarted both services (forward-going trials verified live via direct API test), then ran a one-off backfill (`EspaLuzWhatsApp/scripts/backfill_espaluz_hubspot.py`) — all 28 now live in HubSpot as `[ESPALUZ] WA {phone} — trial` deals.
 - **EspaLuz_Influencer daily CRM signal — separate bug, also FIXED:** `_CRM_HUB_URL` was hardcoded to `127.0.0.1:8080` (VJH's web port) instead of cto-aipa's `:3000` — every daily content-post signal 404'd for at least 14 straight days (log-confirmed: `CRM signal sent ... Status: 404` nightly). One-line fix, `EspaLuz_Influencer` commit `c488625`, deployed + restarted.
-- **Noted, not fixed (low priority):** `espaluz-webhook.service` (`paypal_webhook_server.py`, port 5000) is crash-looping — **154,000+ restarts** — almost certainly because `espaluz-payments-webhook.service` already owns port 5000 and is the live one (`active running`). Looks like dead/superseded legacy service; safe to `systemctl disable` in a future pass, not urgent since the real payment receiver is healthy.
+- **Noted, not fixed (low priority):** `espaluz-webhook.service` (`paypal_webhook_server.py`, port 5000) is crash-looping — **154,000+ restarts** — almost certainly because `espaluz-payments-webhook.service` already owns port 5000 and is the live one (`active running`). Looks like dead/superseded legacy service; safe to `systemctl disable` in a future pass, not urgent since the real payment receiver is healthy. **→ Disabled 9 Oct 2026** (29,637 health-check restarts since 28 Jun); the health check now watches `espaluz-payments-webhook` — see the Disk section at the top.
 
 ## ✅ VJH `detected_responses` — FIXED July 16 2026 (was: real replies detected, surfaced to NOBODY)
 
@@ -1182,6 +1229,7 @@ RestartSec=10
 StartLimitIntervalSec=300
 StartLimitBurst=10
 # No MemoryMax needed (12 GB RAM). No WatchdogSec unless app supports it.
+# 8 Oct 2026: 12 GB is NOT enough for a video render next to the bots — no ffmpeg/film builds on this box (see Disk section).
 ```
 
 Then:
@@ -1207,6 +1255,12 @@ sudo systemctl restart espaluz-whatsapp
 Single script that checks every product and restarts only the unhealthy ones. Run from cron every 5 minutes.
 
 **Path on server:** `/home/ubuntu/check_oracle_health.sh`
+
+> **9 Oct 2026 — the CURRENT script is `scripts/oracle-resilience/check_oracle_health.sh` (repo copy = the live copy).** The
+> example below is the original Feb design and is out of date: the live script uses `pm2 jlist` + jq for dragontrade (the old
+> `grep "status: online"` restarted it every 5 min for weeks, fixed by hand 25 May) and watches `espaluz-payments-webhook`
+> instead of the disabled duplicate `espaluz-webhook`. Deploy the repo copy (`disk-prevention-apply.sh` installs it), not this
+> example. Its log `/var/log/oracle-health.log` is now rotated (`/etc/logrotate.d/aideazz-app-logs`).
 
 ```bash
 #!/bin/bash
