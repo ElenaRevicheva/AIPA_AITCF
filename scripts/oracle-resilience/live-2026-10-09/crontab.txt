@@ -1,0 +1,29 @@
+# job-list-filter priority export
+# oracle-resilience
+*/5 * * * * /home/ubuntu/check_oracle_health.sh
+*/5 * * * * /home/ubuntu/health_monitor.sh
+0 */4 * * * /home/ubuntu/oci_keepalive.sh
+0 */6 * * * cd /home/ubuntu/job-list-filter && ./run_shortlist.sh >> /var/log/joblist-pipeline.log 2>&1
+0 14 * * 1 bash /home/ubuntu/whitespace/scripts/atlas-capture-cron.sh # Atlas WEEKLY capture Mon 9AM Panama (cheap-mode 2026-07-19)
+15 6 * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/sync-atlas-ga4.mjs >> /home/ubuntu/logs/atlas-ga4-sync.log 2>&1
+17 * * * * cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && venv/bin/python scripts/judge_feedback_sync.py >> autonomous_data/judge_feedback_sync.log 2>&1
+*/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh
+15 15 * * 1 cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/atlas-campaign-alert.cjs >> /home/ubuntu/logs/atlas-campaign-alert.log 2>&1 # Atlas service-window outbound alert (after weekly capture)
+30 15 * * 1 cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/hs-outcomes-to-atlas.cjs >> /home/ubuntu/logs/atlas-outcomes.log 2>&1 # Atlas outcomes feedback (after alert)
+17 * * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/resend-reconcile.cjs >> /home/ubuntu/logs/resend-reconcile.log 2>&1
+0 16 * * 1 cd /home/ubuntu/cto-aipa && LEAD_MAX_NEW=8 /usr/bin/node scripts/atlas-lead-machine.cjs >> /home/ubuntu/logs/atlas-lead-machine.log 2>&1 # Atlas lead machine — new qualified leads Mon 11AM Panama (after outcomes)
+0 9 21 * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/hunter-owner-sweep.cjs --apply >> /home/ubuntu/logs/hunter-sweep.log 2>&1 # Hunter owner sweep, day after monthly free-tier reset (Aug 20 cycle)
+0 13 * * 1 /home/ubuntu/run-citation-probe.sh >> /home/ubuntu/logs/citation-probe.log 2>&1 # AI citation probe — Mondays 13:00 UTC (moved off GitHub Actions 2026-08-17)
+45 12 * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/concierge-selftest.cjs >> /home/ubuntu/logs/concierge-selftest.log 2>&1 # Daily lead-pipeline drill 07:45 Panama — silent on PASS, Telegram alert on FAIL
+30 21 * * * cd /home/ubuntu/cto-aipa && AIDEAZZ_REPO_PATH=/home/ubuntu/aideazz /usr/bin/node scripts/wiki-ship.cjs >> /home/ubuntu/logs/wiki-ship.log 2>&1 # AI Ops Wiki -> blog + Dev.to, daily 16:30 Panama (after the 14:30 daily post)
+0 12 * * * cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && python3 scripts/followup_radar.py --notify --hubspot >> /home/ubuntu/logs/followup-radar.log 2>&1 # Follow-up radar - whose turn is it, daily 07:00 Panama
+0 11 * * 2 /home/ubuntu/VibeJobHunterAIPA_AIMCF/scripts/job-board-watch.sh >> /home/ubuntu/logs/job-board-watch.log 2>&1 # Re-qualify wired job boards, Tue 06:00 Panama — silent on PASS, Telegram on degradation
+47 * * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/sort-cita-lists.cjs >> /home/ubuntu/logs/cita-sort.log 2>&1 # Kira Cita columns back in date order (00:30 Panama)
+0 9 * * * /home/ubuntu/bin/github-token-watch.sh # GitHub token expiry watch (alerts <=14 days or dead)
+15 13 * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/apply-queue.cjs --out /home/ubuntu/apply-queue.html --telegram >> /home/ubuntu/logs/apply-queue.log 2>&1 # Apply queue -> Telegram, daily 08:15 Panama (15 min after the sprint briefing)
+*/10 * * * * cd /home/ubuntu/cto-aipa && /usr/bin/flock -n /tmp/apply-kit.lock sh -c "/usr/bin/node scripts/hs-fill-apply-kit.cjs --apply >> /home/ubuntu/logs/apply-kit.log 2>&1; /usr/bin/node scripts/hs-attach-cv.cjs >> /home/ubuntu/logs/attach-cv.log 2>&1" # Apply kit every 10 min (was 2h; 1 Oct: a new deal sat 1h+ with letter only). flock = no overlapping runs
+45 13 * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/hs-audit-apply-kit.cjs --telegram >> /home/ubuntu/logs/apply-kit-audit.log 2>&1 # Read-back audit, Telegram alert on any gap, 08:45 Panama
+*/10 * * * * cd /home/ubuntu/cto-aipa && /usr/bin/python3 scripts/reply-radar.py --apply --since-days 3 >> /home/ubuntu/logs/reply-radar.log 2>&1 # Reply radar: any person on any deal replies -> email + note (+ stage for open non-HIRING deals)
+55 12 * * * cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && venv/bin/python scripts/sweep_i_act_today.py --apply --dead-only >> /home/ubuntu/logs/sweep-i-act-today.log 2>&1 # Daily 07:55 Panama: CLOSED postings out of I Act TODAY (labelled AUTO-SWEEP, never learned from), 20 min before the apply queue
+*/30 * * * * cd /home/ubuntu/cto-aipa && /usr/bin/node scripts/hs-deal-prep.cjs --digest --out=/home/ubuntu/.openclaw/workspace/deals/TOOLS.md >> /home/ubuntu/logs/deal-digest.log 2>&1 # OpenClaw mock interview: live job deals sheet, injected by bootstrap-extra-files (7 Oct 2026)
+*/10 * * * * /usr/bin/python3 /home/ubuntu/.openclaw/workspace/skills/interview-spar/references/build-cards.py >> /home/ubuntu/logs/interview-cards.log 2>&1 # OpenClaw mock-interview cards rebuilt from real sessions (7 Oct 2026)

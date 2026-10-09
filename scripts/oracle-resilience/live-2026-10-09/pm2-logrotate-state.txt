@@ -1,0 +1,28 @@
+{
+    "pm2-logrotate": {
+        "max_size": "50M",
+        "retain": "10",
+        "compress": "true",
+        "dateFormat": "YYYY-MM-DD_HH-mm-ss",
+        "workerInterval": "60",
+        "rotateInterval": "0 0 * * *",
+        "rotateModule": true
+    },
+    "module-db-v2": {
+        "pm2-logrotate": {}
+    }
+}  PM2_ROOT_PATH = path.resolve(process.env.HOMEDRIVE, process.env.HOME || process.env.HOMEPATH, '.pm2');
+
+const parseBool = (str, defaultVal = false) => {
+  if (str === 'true') return true;
+  if (str === 'false') return false;
+  return defaultVal;
+};
+
+var WORKER_INTERVAL = isNaN(parseInt(conf.workerInterval)) ? 30 * 1000 : 
+                            parseInt(conf.workerInterval) * 1000; // default: 30 secs
+var SIZE_LIMIT = get_limit_size(); // default : 10MB
+var ROTATE_CRON = conf.rotateInterval || "0 0 * * *"; // default : every day at midnight
+var RETAIN = isNaN(parseInt(conf.retain)) ? undefined : parseInt(conf.retain); // All
+var COMPRESSION = parseBool(conf.compress, false); // Do not compress by default
+var DATE_FORMAT = conf.dateFormat || 'YYYY-MM-DD_HH-mm-ss';

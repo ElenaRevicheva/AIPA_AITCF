@@ -1,6 +1,5 @@
 #!/bin/bash
-# Oracle — health check ALL AI agents, restart only the unhealthy ones. Deploy: /home/ubuntu/check_oracle_health.sh · cron */5.
-# 9 Oct 2026: this repo copy = the LIVE copy (the old repo copy still had the May dragontrade restart loop) + the payments fix.
+# Oracle 170.9.242.90 — health check ALL 8 AI agents.
 LOG=/var/log/oracle-health.log
 exec >> "$LOG" 2>&1
 
@@ -60,14 +59,12 @@ if systemctl list-unit-files vibejobhunter.service 2>/dev/null | grep -q "vibejo
   fi
 fi
 
-# EspaLuz payments webhook (PayPal + PagueloFacil, Flask :5000) — espaluz-payments-webhook.
-# 9 Oct 2026: this block used to restart the OLD duplicate espaluz-webhook.service. It runs the same paypal_webhook_server.py,
-# could never bind :5000 (held by espaluz-payments-webhook since 28 Jun 2026) and was restarted here 29,637 times, writing
-# ~280 MB of "Address already in use" (docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md). The duplicate is disabled; this now
-# watches the unit that actually serves payments.
-if ! systemctl is-active --quiet espaluz-payments-webhook 2>/dev/null; then
-  echo "EspaLuz payments webhook not active, restarting..."
-  sudo systemctl restart espaluz-payments-webhook
+# espaluz-webhook (EspaLuz stack)
+if systemctl list-unit-files espaluz-webhook.service 2>/dev/null | grep -q "espaluz-webhook.service"; then
+  if ! systemctl is-active --quiet espaluz-webhook 2>/dev/null; then
+    echo "espaluz-webhook not active, restarting..."
+    sudo systemctl restart espaluz-webhook
+  fi
 fi
 
 echo "Health check done."

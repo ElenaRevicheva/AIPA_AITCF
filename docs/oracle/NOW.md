@@ -524,6 +524,12 @@ git log keeps the record.
   VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. (OpenClaw is a systemd --user unit: `systemctl --user is-active openclaw-gateway`; also answers on :18789.) **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
+  🛡️ **9 Oct 13:03 UTC — DISK PREVENTION DEPLOYED (Elena: "stop it to come back"), re-runnable:**
+  `scripts/oracle-resilience/disk-prevention-apply.sh` (staged on Oracle in `~/disk-prevention-2026-10-09/`, backups `*.bak-2026-10-09`).
+  ✅ disk alarm → Telegram at 85/90/95 % (fired: "DISK ALERT DELIVERED" in ~/health.log, state `~/.disk_alert_level`) · ✅ health check
+  watches `espaluz-payments-webhook` (:5000, 200); the duplicate `espaluz-webhook` is disabled · ✅ pm2-logrotate parseBool patched
+  (compression) · ✅ `/etc/logrotate.d/aideazz-app-logs` · ✅ sysstat `-S XDISK`. All bots verified after.
+  **VERIFY after 00:00 UTC 10 Oct (any agent):** `ls ~/.pm2/logs | grep -c "__2026-10-10.*log.gz"` > 0 and the app logs have `.1.gz`.
   🔎 **9 Oct — DISK FORENSICS DONE (read-only): `docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md`.** Why the 28 Sep cleanup did
   not hold: it fixed the incident (logs), not the class — 13.8 GB of film/promo work (30 Sep–8 Oct) landed where no tool looks;
   pm2-logrotate COMPRESSION broken since day one (0/107 .gz, pmx Autocast vs parseBool); the only disk alarm
