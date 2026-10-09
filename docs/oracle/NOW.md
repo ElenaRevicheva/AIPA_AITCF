@@ -523,6 +523,7 @@ git log keeps the record.
   VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. (OpenClaw is a systemd --user unit: `systemctl --user is-active openclaw-gateway`; also answers on :18789.) **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
+  🔄 **9 Oct ~16:00 UTC — FLEET SYNC AUDIT (read-only, 4 agents): running code = GitHub everywhere; laptop = GitHub.** cto-aipa: all 94 Oracle dist/*.js = the build of main, all 15 cron scripts = main. Fixed: film #9 generator now in git (`scripts/atuona-film9-gen.mjs`, disk guard also in `aigo-promo-gen.mjs`), installer refuses a stale REPO, 2 live Oracle-only scripts committed, resilience doc paths/rows, laptop `.git/info/exclude` hides `.env.*` + PII scratch. **Needs Elena (security):** dragontrade + espaluz Postgres passwords are in PUBLIC git history and :5432 may be internet-reachable — rotate + restrict (Teach→Plan→Confirm). Record: `docs/oracle/fleet_sync_audit_2026-10-09.json`.
   ✅ **9 Oct 14:08 UTC — ORACLE DISK 98% → 47% (24 GB free), nothing live touched, all bots verified.** Garbage 9.4 GB removed;
   logs compressed (byte-verified); 12 GB of film/promo working folders + old backups ARCHIVED to the laptop
   `D:\ORACLE_ARCHIVE_2026-10-09\` (md5-verified file by file, README) then removed. Tools: `scripts/oracle-resilience/{safe-remove,
@@ -1570,7 +1571,7 @@ Organization / Person, Elena as founder); on `/aifilmstudio/` a CollectionPage +
 **VideoObjects** and a `<noscript>` film list. Then meta descriptions trimmed to ~135 chars and one
 clear H1 per page (film page had none; the homepage's second H1 was inside a hidden modal — both
 keep their inline styles, nothing renders differently). Commits `1991d914`, `e8eaa69a`.
-Home **93/A+**, film studio **89/A**. Backup: `D:ideazz\_backupstuona-geo-20260919\`.
+Home **93/A+**, film studio **89/A**. Backup: `D:\aideazz\_backups\atuona-geo-20260919\`.
 **Left for Elena (visible design):** question-shaped headings + a short FAQ and more body copy on
 `/aifilmstudio/` would close the last checks (schema-answer, question-headings, content-depth).
 **Also:** the poetry vault holds **99** poems — her CVs say 98.
@@ -2615,7 +2616,7 @@ reply asks what makes a listing match faster. A live listing with no buyer motio
 >    because she called the stop.
 >
 > **RISK / TRAPS**
-> · **`D:ideazztuona` now exists** — the resilience doc said no local checkout did.
+> · **`D:\aideazz\atuona` now exists** — the resilience doc said no local checkout did.
 >   It is unshallowed, `main` tracks `origin/main`. Update the doc or the next agent
 >   clones a second copy.
 > · **index.html is GENERATED between markers** (`VAULT:TREE`, `DNA`, `TYPE`,

@@ -1,0 +1,407 @@
+[
+ {
+  "product": "cto-aipa (CTO AIPA + Atuona) — laptop D:/aideazz/ai-cofounders/cto-aipa · GitHub ElenaRevicheva/AIPA_AITCF main · Oracle ~/cto-aipa (PM2 cto-aipa + crons)",
+  "local_vs_github": "IN SYNC. I re-fetched at the end of the audit: laptop HEAD = origin/main = 1788c4d, 0 ahead and 0 behind. The audit started at d6dd6bf. While it ran, another agent pushed 1788c4d, which changes only docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md, and the NOW.md session board has no claims. There are 214 commits on origin/main since 2026-10-02.\n\nsrc/ files changed this week (13): atuona-creative-ai, atuona-fact-engine, board-briefing, brightdata-enrich, concierge, cto-aipa, database, hubspot-client, lead-triage, outreach, resend-webhook, telegram-bot, trello-voice. All 13 are clean against main on the laptop.\n\nThe laptop dist/ IS a build of current main:\n- All 94 dist/*.js were written by one tsc run on 2026-10-08 between 16:17:37 and 16:17:41 (-05:00).\n- No src/*.ts is newer than dist (find -newer returned nothing).\n- The last src commit, 879cbb6, was committed at 18:26, but the source edits in it are dated 15:59 and 16:16, before the build.\n- One orphan: dist/hashnode-daily.js has no matching src file. It is identical on Oracle and harmless.\n\nscripts/ files changed this week (41): aigo-frame-sheet12.sh, aigo-gate-sheet.py, aigo-ig-calendar.py, aigo-ig-images.py, aigo-ig-reel-overlays.py, aigo-ig-reels.sh, aigo-promo-find-private.py, aigo-promo-gen.mjs, aigo-promo-rec-audit.mjs, apim-vo-fix.py, atlas-lead-machine.cjs, atuona-film9-vo.py, atuona-film9.mjs, concierge-selftest.cjs, hs-deal-prep.cjs, make-6263197-lane-audit.cjs, med-{assets,cut,safe-screens,srt,thumbnail,vo}.py, med-rec-audit.mjs, oracle-resilience/{archive-to-laptop,check_oracle_health,compress-verified,disk-prevention-apply,safe-remove}.sh, oracle-resilience/logrotate-aideazz-app-logs.conf, oracle-resilience/live-2026-10-09/{check_oracle_health.sh,crontab.txt,github-token-watch.sh,health_monitor.sh,pm2-logrotate-state.txt}, reloc-{assets,cut,safe-screens,srt,thumbnail}.py, stage-manual-prospect.cjs, wa-link-lib.cjs.\n\nLaptop working tree: 4 modified files (old scratch and build artifacts, see drift) and 159 untracked entries. The only local commit not on any remote is bc66403 on branch claude/romantic-bohr-6baf5a, from May. Its subject is identical to 2379b46, which is already on main.",
+  "oracle_vs_github": "RUNNING CODE IN SYNC; THE CHECKOUT LAGS ON PURPOSE.\n\nCompiled code: all 94 dist/*.js on Oracle match the laptop build of main by md5 after CRLF→LF, with 0 differences. The 13 files built from this week's src changes:\n- atuona-creative-ai 929297e2, atuona-fact-engine b899ad93, board-briefing f88a82e5\n- brightdata-enrich 2c8c49b2, concierge a0f05859, cto-aipa 05981677\n- database 6d6cc43d, hubspot-client ebb13b98, lead-triage c1287ba2\n- outreach f6f5163c, resend-webhook ddd39a54, telegram-bot 164f1c79, trello-voice f8ad6b4c\n\nPM2: cto-aipa is online, runs /home/ubuntu/cto-aipa/dist/cto-aipa.js, and has 0 unstable restarts. It was restarted at 2026-10-08 23:27:05 UTC, after the newest dist files (hubspot-client.js 23:27:01, lead-triage.js 23:27:02), so 879cbb6 is live.\n\nCron: all 15 scripts in ~/cto-aipa/scripts that the crontab calls match origin/main by md5: sync-atlas-ga4, atlas-campaign-alert, hs-outcomes-to-atlas, resend-reconcile, atlas-lead-machine, hunter-owner-sweep, concierge-selftest, wiki-ship, sort-cita-lists, apply-queue, hs-fill-apply-kit, hs-attach-cv, hs-audit-apply-kit, reply-radar.py, hs-deal-prep.\n\nThis week's 41 scripts:\n- 27 are identical to main.\n- 2 differ, and neither is what actually runs: aigo-promo-gen.mjs and oracle-resilience/check_oracle_health.sh (see drift).\n- 12 are missing from ~/cto-aipa/scripts by design. The film #9 compile and voice-over scripts run on the laptop only since the 8 Oct out-of-memory freeze. The oracle-resilience tools are staged in ~/disk-prevention-2026-10-09/ and installed at their live paths, and those live copies match main: ~/check_oracle_health.sh = 83c5b93f, ~/health_monitor.sh = main docs/oracle/health_monitor.sh b9e23005, /etc/logrotate.d/aideazz-app-logs = d7541f0c, and crontab -l = live-2026-10-09/crontab.txt (1a134a67). The live-2026-10-09/* files are snapshots of the replaced scripts; they match ~/*.bak-2026-10-09 (60756d2d, 8dd90eb7).\n\nCheckout: HEAD is 5325e2c, which is not on GitHub. It carries 3 automatic Atlas-lead commits on top of 40b1c22 (7 Sep) and is 689 behind its last-fetched origin/main. It has 19 tracked modified files, 129 untracked, 3 stashes and the branches atlas-stranded-20260907 and atlas-stranded-20261005. rebase.autostash and pull.rebase are unset, and no rebase is in progress.\n\nHand patches: ~/cto-aipa holds no hand-patched code (no untracked or modified code file that is missing from main). The one hand patch is outside the checkout: ~/atuona-film9/gen.mjs.",
+  "drift": [
+   {
+    "what": "The film generator's newest version is not in git. ~/atuona-film9/gen.mjs on Oracle was edited today at 14:08 UTC and is a hand-made fork of scripts/aigo-promo-gen.mjs. It contains work that is not on GitHub: a disk guard that refuses paid calls when less than 3 GB is free (added 9 Oct after the disk filled), a wan1080 engine, a seedream-v5-pro-edit price, and the VENICE_VIDEO_MODEL / VENICE_VIDEO_RES / VENICE_OMIT settings. Main's copy (9c8a09a) has none of these. Oracle's ~/cto-aipa/scripts/aigo-promo-gen.mjs is even older: it is the 3 Oct version (ffc15ac) with no Venice engine at all.",
+    "evidence": "md5 after CRLF→LF: Oracle ~/atuona-film9/gen.mjs = 56ac4d80, main = 65d1d637, Oracle ~/cto-aipa/scripts/aigo-promo-gen.mjs = cdbc952c (exactly the ffc15ac version). The fork and main differ by 28 lines: the fork changes BASE to /home/ubuntu/atuona-film9 and adds the items above; main has one extra comment. The only other copy is on the laptop, D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08/10_GENERATOR_PLAN_LEDGER/gen.mjs, same md5 56ac4d80. ~/atuona-film9 is not a git repo.",
+    "safe_fix": "The Oracle fork wins: it is newer and is a superset of main. Merge, do not overwrite. Add the four additions to scripts/aigo-promo-gen.mjs on main, keeping main's BASE '/home/ubuntu/aigo-promo' and its comment (BASE is the only intended difference per film folder). Commit that one file. Then, with Elena's go, back up ~/cto-aipa/scripts/aigo-promo-gen.mjs and scp the new version there; this needs no PM2 restart because it is a command-line tool. Never copy main's current version over ~/atuona-film9/gen.mjs: that would delete the disk guard.",
+    "risk": "The next film folder will be cloned from the canonical file, which has no disk guard. A paid render could then fill the bots' disk again, as it did on 8 Oct when the disk reached 100%. The fork is also a single point of failure: one Oracle file plus one laptop copy."
+   },
+   {
+    "what": "Re-running the disk-prevention installer as its own usage line says would silently undo today's prevention. scripts/oracle-resilience/disk-prevention-apply.sh defaults to REPO=/home/ubuntu/cto-aipa and says 'run from ~/cto-aipa'. That checkout still holds the OLD files the installer copies into place: docs/oracle/health_monitor.sh from 4 Apr (no Telegram disk alarm) and scripts/oracle-resilience/check_oracle_health.sh from 14 Sep. The live files themselves are correct today.",
+    "evidence": "In ~/cto-aipa: docs/oracle/health_monitor.sh md5 60756d2d (the version that was replaced) and scripts/oracle-resilience/check_oracle_health.sh 42a8ad74. Main has b9e23005 and 83c5b93f. The installer is not in ~/cto-aipa/scripts at all. The staged copy ~/disk-prevention-2026-10-09/scripts/oracle-resilience/disk-prevention-apply.sh line 15 reads REPO=${REPO:-/home/ubuntu/cto-aipa}. Its install lines are `install -m 755 \"$REPO/docs/oracle/health_monitor.sh\" /home/ubuntu/health_monitor.sh` and the same for check_oracle_health.sh.",
+    "safe_fix": "Until fixed, always run it as `REPO=/home/ubuntu/disk-prevention-2026-10-09 bash ...`. Lasting fix, with Elena's go:\n1. On main, change the usage line and the default REPO to ~/disk-prevention-2026-10-09, or make the installer refuse when $REPO/docs/oracle/health_monitor.sh is not the new version.\n2. Optionally, back up the old files and scp main's docs/oracle/health_monitor.sh plus scripts/oracle-resilience/{check_oracle_health.sh,disk-prevention-apply.sh,logrotate-aideazz-app-logs.conf,safe-remove.sh,compress-verified.sh} into ~/cto-aipa. Nothing runs these from that path, so no restart is needed.\nDo not touch the live ~/check_oracle_health.sh or ~/health_monitor.sh: they are already correct.",
+    "risk": "The disk alarm would lose its Telegram alert and the health check would stop watching the payments webhook, with no error. This is the same silent-failure pattern that let the disk go from 69% to 100%."
+   },
+   {
+    "what": "A file containing live credentials is untracked and NOT ignored on the laptop, in a PUBLIC repo: .env.bak-pre-concierge-20261006 (6 Oct). .gitignore line 6 ignores only the exact name `.env`.",
+    "evidence": "A credential-pattern scan of all 173 untracked text files flagged only this file. It contains a HubSpot private-app token pattern, a Google API key pattern, and KEY/TOKEN/SECRET= lines (values not printed). `git status` lists it as `??`, so it is not ignored.",
+    "safe_fix": "Do not commit it. Add `.env.*` and `!.env.example` to .git/info/exclude; that file is local only, needs no commit and changes nothing public. Or add the same to .gitignore in a named-file commit. Move the file to D:/aideazz/_private-backups/. Never use `git add -A` or `git add .` here, which is already a CLAUDE.md rule.",
+    "risk": "One broad `git add` would publish working HubSpot and Google keys to a public GitHub repo."
+   },
+   {
+    "what": "Oracle's checkout holds 3 automatic Atlas-lead commits that are not on GitHub, and its dirty working tree is what blocks a pull. The commits are 21782df, 90d402a and 5325e2c, on branches atlas-stranded-20260907 and atlas-stranded-20261005. Together they carry about 125 prospect draft files plus docs/selling/outreach-registry.json, which contain prospect emails and phone numbers. 21782df also swept in 96 files, including src/ and 9 scripts that exist only on the cursor/atlas-classify-failed-1e36 and cursor/intelliops-addendum-ded9 branches.",
+    "evidence": "rev-list HEAD...origin/main = 3 / 689; merge-base 40b1c22. git status -uno shows 19 modified files. rebase.autostash is unset. NOW.md (6 Oct entry) explains that the Monday 12 Oct 16:00 UTC lead-machine run will commit locally, its `pull --rebase` will refuse because of the dirty tree, and the push will be rejected. The 9 Oracle-only tracked scripts (atlas-patches/*, hs-post-deal-note.cjs, hs-prove-note-stamps.cjs, oracle-lead-machine-{diagnose,run}.sh, oracle-resilience/{atlas-post-pull-dist.sh,lib/lf-normalize.py,push-atlas-patch.sh,sync-atlas-encoding.sh}) all exist on those GitHub branches, and no cron calls them. The ford-realty draft files on Oracle are kept off the public repo on purpose (commit 69d3da3).",
+    "safe_fix": "Do nothing now. Do not clean, commit, stash or pull the Oracle tree, and do not set rebase.autostash. The dirty tree is the guard that stops the robot deploying 689 commits and pushing prospect PII to a public repo. Elena keeps the repo public until about 20 Nov. After it goes private, push the stranded branches, then move publishing to the GitHub API, as planned in NOW.md.",
+    "risk": "If someone 'tidies' the Oracle tree, the Monday cron would pull all of main into the live checkout and push prospect PII to the public repo."
+   },
+   {
+    "what": "Oracle's src/ is stale, while its dist/ is correct. Of this week's 13 src/*.ts files, 11 differ from main on Oracle and atuona-fact-engine.ts is missing; only resend-webhook.ts matches.",
+    "evidence": "md5 comparison of origin/main src/*.ts against ~/cto-aipa/src/*.ts. The Oracle src files are dated as far back as 8 May, while dist was redeployed between 4 and 8 Oct. package.json has \"build\": \"tsc\".",
+    "safe_fix": "Keep the existing rule: build on the laptop and scp dist/ only. Never run `npm run build` or tsc on Oracle. No change is needed now.",
+    "risk": "A build on Oracle would compile the stale sources over the correct dist/. After the next restart the bot would silently lose a week of fixes, including concierge, lead-triage and hubspot-client."
+   },
+   {
+    "what": "Oracle's scripts/test-job-tailor.cjs is one version behind main.",
+    "evidence": "Oracle c17bb3db = ec7fddd (28 Sep); main 3b2e70fa = 3a36bb8 (29 Sep). It is untracked on Oracle and no cron calls it.",
+    "safe_fix": "Copy main's version over by scp in the next deploy that already has Elena's go. Main wins because it is newer. Low priority.",
+    "risk": "Low: a test could falsely pass or fail against the deployed tailor."
+   },
+   {
+    "what": "The 4 modified files in the laptop working tree are old scratch and build artifacts, not work from this week. All 4 have the same timestamp, 2 Oct 06:04:40, 5 s after commit 056c88b, so they were carried across a stash/pop. The 4 files:\n1. dist-lambda/sprint/lambda-pkg/handler.js: a regenerated esbuild bundle of the Sprinter Lambda.\n2. docs/selling/_evaluate_send_report.json: August HubSpot dry-run output.\n3. docs/selling/_install-wa-fu-notes.json: August (11 Aug) HubSpot script output.\n4. .claude/launch.json: local preview server configs.",
+    "evidence": "handler.js is 1.31 MB (26.5k lines, against 88.7k tracked). It matches neither the tracked May version nor the deployed 18 Sep zip (md5 36398bb6 vs 9e2fe1a6), and src/sprint-briefing has not changed since b8b12d2 (18 Sep). No secret patterns were found in it. _evaluate_send_report.json holds 12 prospect emails, 12 phones and 12 deal ids. _install-wa-fu-notes.json holds 1 deal id and a company name. launch.json adds atuona-dist-preview on port 4175 and atuona-lan-preview bound to 0.0.0.0:4176, with no secrets.\n\nThe current public HEAD of _evaluate_send_report.json ALREADY exposes 35 prospect emails and 118 HubSpot deal ids.",
+    "safe_fix": "Do not commit the handler.js bundle or the two JSON files. Leave them in place: discarding them uses `checkout --` on files this session did not write, which is Elena's call. launch.json can be committed or left alone. Rebuild handler.js from src only if the Lambda is redeployed. The existing public exposure is Elena's decision (the repo goes private around 20 Nov; deleting the file from HEAD does not remove it from history).",
+    "risk": "Committing them would add more prospect PII to a public repo and ship a Lambda bundle nobody can trace to a source."
+   },
+   {
+    "what": "Real work that exists only as untracked files on the laptop. CLAUDE.md rule 7 says a work product belongs in a committed file.",
+    "evidence": "- scripts/update-sprinter-token.py (584 B, no secrets). NOW.md:1595 and RESILIENCE.md:1061,1593 name it as THE token-rotation procedure.\n- docs/ELENA_REVICHEVA_RESUME_2026.md. The committed scripts/lib/comet-prompt.cjs says 'every line copied from' it. It contains her own email, the same exposure as the tracked ELENA_REVICHEVA_RESUME_2026-08.md.\n- docs/applications/2026-08-30_rwazi_ai_engineer_gtm_APPLICATION.md, docs/interview/MICRO1_AI_WORKFLOW_SPECIALIST_PREP.md, docs/selling/AI_GROWTH_OPERATOR_MONEY_BLUEPRINT.md, docs/selling/linkedin_comment_behram_ai_native_builder.md, docs/applications/2026-09-15_toptal_intro_video_teleprompter.html plus scripts/build-toptal-teleprompter.py. No credential patterns found.\n- docs/selling/video/deliverables/*.mp4: 7 final promo films, 215 MB.\n- scripts/atuona-{compile-build,compile-vo,film-final,montage,oneoff-build,oneoff-ocr}.mjs, atuona-restanza.py and atuona-sharp-stanzas.py (June): the old film pipeline, superseded by the committed atuona-film7/8/9.mjs.\n- manukora-sop-brief/: a DIVERGENT copy of the separate repo D:/aideazz/manukora-sop-brief (31 differences, including HANDOFF_PUBLISH.md, which the canonical repo lacks). Mock data only.\n- AIPA_AITCF-pr/: a full second clone of AIPA_AITCF nested inside this repo (139 MB, HEAD 9213236, already on main, clean), plus 1 February stash on readme-cto-review-screenshot.",
+    "safe_fix": "With Elena's go, commit by name: scripts/update-sprinter-token.py first (no PII, and the docs depend on it), then the application, interview and blueprint docs after checking them for third-party names. Committing the resume is her call. Keep the mp4 files out of git: they are large binaries and already on YouTube. Merge manukora-sop-brief/ into D:/aideazz/manukora-sop-brief rather than overwriting either copy, and never commit it here. Leave AIPA_AITCF-pr/ alone, or remove it only after exporting its stash and getting Elena's go (no-duplicate-folders rule); add it to .git/info/exclude so `git add` cannot embed it.",
+    "risk": "Documented procedures and the source file behind comet-prompt.cjs exist only on one laptop. One broad git add would embed a whole second repo."
+   },
+   {
+    "what": "Untracked scratch that contains PII or sensitive images and must never be committed to the public repo.",
+    "evidence": "Counts below are of third-party emails, phones and HubSpot deal ids.\n- docs/selling/_*.json (16 files; e.g. _audit-three-stream-outreach.json: 150 emails, 133 phones).\n- scripts/_*.cjs (about 60 one-off scripts, several with hardcoded prospect emails or phones).\n- Root _manual_deals_jul18.json (53 emails, 59 phones, 60 deal ids), _panama_good.md, _reaudit_5.json.\n- backups/registry-merge-20260808/oracle_reg.json (134 emails, 129 phones, 286 deal ids).\n- .claude/settings.local.json.bak-2026-08-30-1441 (3 emails, 7 phones inside allowed commands).\n- scripts/hs-refresh-manual-emails.cjs (3 prospect emails).\n- scripts/oracle-*.sh (15 files, Aug 23): contain the Oracle IP, which tracked sibling scripts already expose.\n- _f/ (39 jpg) and _q/ (54 jpg): film #9 keyframes, including the character reference faces kira.jpg and ule.jpg; docs/atuona/_bakeoff_sheet.jpg (404358 bytes, the same size as Oracle's bakeoff_sheet.jpg). Film #9 has a planned 'hot shots' sequence. I did not open these images.\n- docs/selling/gbp-photos/: Elena's own portraits for her Google Business Profile.\nThe canonical film #9 material is on Oracle in ~/atuona-film9/ and on the laptop in D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08.",
+    "safe_fix": "Do not commit and do not delete; the never-wipe rule applies. Add local-only patterns to .git/info/exclude: `_f/`, `_q/`, `/_*`, `scripts/_*`, `docs/selling/_*`, `docs/atuona/_*.jpg`, `docs/selling/gbp-photos/`, `docs/selling/video/deliverables/`, `backups/`, `AIPA_AITCF-pr/`, `manukora-sop-brief/`, `*.bak-*`. This makes an accidental `git add` harmless and changes nothing public.",
+    "risk": "Prospect emails, phones and HubSpot ids, and possibly sensual character images, could be published on the public repo that employers are reading."
+   }
+  ],
+  "in_sync": false
+ },
+ {
+  "product": "VibeJobHunterAIPA_AIMCF (VJH + CMO) - PUBLIC repo",
+  "local_vs_github": "In sync. Laptop D:/aideazz/VibeJobHunterAIPA_AIMCF main fbff8da = origin/main fbff8da (0 ahead / 0 behind after git fetch). No stash. The local branch claude/gracious-einstein has 0 commits that are not on origin/main. Untracked files are scratch only, no work: .coverage and coverage.xml (test output); autonomous_data/{judge_decisions,judge_feedback,learned_rules,screenshot_reasons}.json (stale 27 Sep snapshots; Oracle's copies are newer, rewritten 9 Oct 14:17 UTC); yc_oss_ats_cache.json (30 Jul); src/autonomous/job_monitor.py.bak-20260829-preANB. Three commits this week: cd1d1c6 (5 Oct, ats_scraper: a16z consumer-AI boards), 83d8d04 (6 Oct, Professional Outlook roles + Puente, 16 files), fbff8da (7 Oct, response_detector: boardy.ai added to the sender blocklist).",
+  "oracle_vs_github": "In sync, and Oracle runs all three commits. ~/VibeJobHunterAIPA_AIMCF HEAD fbff8da = origin. The reflog shows `pull --ff-only` at 2026-10-07 21:14:43 UTC. 0 tracked dirty files. systemd vibejobhunter (python -m src.main autonomous) ExecMainStartTimestamp is 2026-10-07 21:14:43 UTC, the same second as the pull, NRestarts=0. Proof of output: today's journal is all [RUN 20261007-211444]. It contains '[ASHBY][lovable] Found 81 jobs', '[gamma] 22' and '[genspark] 8' (from cd1d1c6) and 'Puente (LATAM): 53 jobs' (from 83d8d04). PM2 serpapi-jobs (VJH code: src/search/serpapi_jobs_ingest.py) started 2026-10-06 18:19:42 UTC, 9 s after the 83d8d04 pull. That follows the documented restart-both rule; fbff8da does not touch it. vibejobhunter-web (web_server.py) started 2026-10-01 06:58:40 UTC, before all three commits (see drift). 40 untracked files on Oracle: runtime/learning state, sweep_undo files, many .bak copies, 5 .env.bak files, and 2 old stashes (Apr 10 and Jun 10 2026). Those stashes predate later commits.",
+  "drift": [
+   {
+    "what": "vibejobhunter-web is still running code it loaded on 1 Oct, older than cd1d1c6, 83d8d04 and fbff8da",
+    "evidence": "ExecMainStartTimestamp is Thu 2026-10-01 06:58:40 UTC. Its own log today still says '[RUN 20261001-065849][ATS][ERRORS] count=0' then 'ATS_RUNNER [ATS][DONE] jobs_found=2109'. src/job_engine/ats_runner.py only logs that count; the scraper writes a debug jobs_<RUN_ID>.json cache. The comment in web_server.py says it only reads the dashboard; the real pipeline is vibejobhunter, which was restarted.",
+    "risk": "Low. Nothing that produces output depends on it. It is wasted hourly scraper calls using the old board list.",
+    "safe_fix": "No action needed. It picks up the new code at its next restart. If Elena wants it aligned: `sudo systemctl restart vibejobhunter-web` only (not vibejobhunter), then `curl :8080/health`. Under the contract this needs her confirm."
+   },
+   {
+    "what": "Credential backups sit untracked and NOT gitignored in a PUBLIC repo checkout on Oracle",
+    "evidence": "Five files: .env.bak-bd-20260806-194157, .env.bak-pre-gemini-xai-20260816-1343, .env.bak-pre-gmail-20260824-105356, .env.bak-pre-groqmodel-20260816-1539, .env.bak.1779135246. `git check-ignore` gives 'NOT IGNORED'. The learning-state JSONs are not ignored either.",
+    "risk": "Any `git add -A` or `git add .` on Oracle would publish API keys to a public GitHub repo.",
+    "safe_fix": "Never commit on Oracle. A safe hardening is a laptop commit adding `.env.bak*` and `*.bak*` to .gitignore, pushed and pulled normally. Do not delete the backups without Elena's go."
+   },
+   {
+    "what": "Laptop autonomous_data learning-state JSONs are stale copies",
+    "evidence": "md5 differs on all 5 files. Laptop judge_decisions.json is 201,032 bytes, 27 Sep; Oracle's is 234,643 bytes, 9 Oct 14:17. The cron `17 * * * * judge_feedback_sync.py` keeps Oracle current.",
+    "risk": "Someone copies the laptop files to Oracle and rolls back two weeks of judge learning.",
+    "safe_fix": "Oracle wins: it is the live, hourly-synced source. Never copy laptop to Oracle. Leave the laptop copies untracked or refresh them from Oracle when needed."
+   },
+   {
+    "what": "The fleet table in ORACLE_ALL_PRODUCTS_RESILIENCE.md (7 Oct) says VJH is 'in sync 83d8d04'",
+    "evidence": "Oracle and GitHub are now at fbff8da (pulled 7 Oct 21:14 UTC).",
+    "safe_fix": "Doc-only: change the row to fbff8da on the next NOW.md/doc commit."
+   },
+   {
+    "what": "Not a sync drift, flagged because 83d8d04 is new: the Puente source is half-failing",
+    "evidence": "Journal 9 Oct: 'Puente (LATAM): 53 jobs  ❌ 1/1 role pages failed (HTTP 404 ...__next_error__...)'",
+    "risk": "Role-page detail for Puente jobs is lost every run.",
+    "safe_fix": "Investigate separately in VJH. No sync action."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "dragontrade-agent (Algom Alpha) - PUBLIC repo",
+  "local_vs_github": "In sync. Laptop main 0e6849d = origin/main 0e6849d (0/0). No stash. One commit this week: 0e6849d (7 Oct 19:54 -0500), 'alerts: read ALERT_COOLDOWN_H when an alert fires, not at import'. Untracked: 8 Jan-2026 Oracle-migration scripts (add-oracle-signature.sh, export-db.cjs/.js, fix-sequence.sh, import-to-oracle.cjs, oracle-import.js, oracle-pg-external.sh, oracle-setup.sh). None of them was ever committed. They are CREDENTIALS, not work (see drift).",
+  "oracle_vs_github": "The checkout lags by design, but the running code equals GitHub. ~/dragontrade-agent HEAD is 17558e2 (16 Aug): 4 behind origin 0e6849d, 0 ahead. The only tracked dirty file is alerts.mjs, md5 41fbc396fb2a8dd73261f5434b4f5ca3. That is byte-identical to the 0e6849d blob, so it was a named-file deploy. File mtime is 2026-10-08 00:58:27.117 UTC. PM2 dragontrade-main pm_uptime is 1791421107338 ms, 221 ms after the file was written: it runs 0e6849d. Proof of output: data/alert-state.json has x-credits lastAlertAt 2026-10-07T17:21:12Z, lastSeenAt 2026-10-09T14:55:56Z, count 1777. That is 46 h of X-credit errors with no repeat Telegram alert; the old 12 h default would have fired about 3 times. The next alert is due on or after 14 Oct 17:21 UTC, which matches NOW.md. The other 3 missing commits (1fd623b, 38d3a5c, 4e99aca, 5-6 Sep) touch only .gitignore, two migration docs, test-oracle-db.cjs and the deletion of cmo-aipa-integration.patch. None is a runtime file. dragontrade-dashboard (16 Aug), algom-stream (16 Aug) and algom-poll (28 Jul) do not import alerts.mjs. Only index.js, engagement-bot.js and x-tech-updater.js do, all inside dragontrade-main. Oracle untracked: .env.bak-pre-alerts-20260816-1749 and .env.bak-pre-chain-20260816-1703 (credentials), data/, engagement_state.json, stream_state.json (runtime), test-tweet.js and aideazz-content-generator.js.bak-modelfix-20260616 (scratch).",
+  "drift": [
+   {
+    "what": "SECURITY: the live dragontrade Postgres password is in public git history and on the laptop, and Postgres is reachable from the internet",
+    "evidence": "The DB password hardcoded in the untracked laptop scripts oracle-setup.sh and oracle-import.js matches 1 line in Oracle's ~/dragontrade-agent/.env (checked with grep -c -F; the value was never printed). The same literal was committed in test-oracle-db.cjs at 68788c2 (17 Jan) and is still in PUBLIC origin/main history and in origin/backup/oracle-state-2026-02-16 and origin/backup/pre-posting-fixes-2026-02-17. 1fd623b removed it from HEAD only. On Oracle, `ss -ltn` shows Postgres listening on 0.0.0.0:5432 and [::]:5432. A TCP connect to the Oracle host on 5432 from the laptop succeeds. The OCI ingress source CIDR and pg_hba were not read (pg_hba needs sudo, which was not used). oracle-pg-external.sh appended a 0.0.0.0/0 scram line for this user. oracle-pg-external.sh and import-to-oracle.cjs also hold the Oracle public IP. export-db.cjs/.js hold a Railway connection string with a password; Railway was decommissioned per 38d3a5c, so that one is probably dead.",
+    "risk": "Anyone who reads the public repo history can try that password against an internet-reachable Postgres. If pg_hba and OCI allow it, the trading/stream DB is open.",
+    "safe_fix": "Do NOT commit any of the 8 laptop scripts. Hide them locally with .git/info/exclude (no commit) or move them out of the repo into a private backup folder, with Elena's go. Then, under Teach > Plan > Confirm and with Elena's go: (1) check the OCI security-list rule for 5432 and narrow it, or close it if nothing outside needs the DB; (2) rotate the dragontrade DB user's password (ALTER USER), update ~/dragontrade-agent/.env, and `pm2 restart dragontrade-main dragontrade-dashboard algom-stream algom-poll --update-env`; (3) verify from the logs that each app reconnects. Rewriting public history is not the fix; rotation is."
+   },
+   {
+    "what": "The Oracle checkout HEAD lags 4 commits, with 0e6849d's alerts.mjs deployed as a file",
+    "evidence": "HEAD 17558e2; `git diff origin/main` shows only .gitignore, 2 docs, alerts.mjs (now equal), cmo-aipa-integration.patch, test-oracle-db.cjs",
+    "risk": "None to runtime. Note that Oracle's tracked test-oracle-db.cjs still contains the DB password from the item above (Oracle-local, not public).",
+    "safe_fix": "Leave it. Running code = GitHub. Never `git pull` dragontrade on Oracle (doc rule). Update the 7 Oct fleet-table row from '3 behind' to '4 behind; alerts.mjs = 0e6849d deployed by file, dragontrade-main restarted 00:58:27 UTC 8 Oct'."
+   },
+   {
+    "what": "Credential backups on Oracle are untracked and not ignored (public repo)",
+    "evidence": ".env.bak-pre-alerts-20260816-1749, .env.bak-pre-chain-20260816-1703",
+    "safe_fix": "Never commit on Oracle. Do not delete without Elena's go."
+   },
+   {
+    "what": "Not a sync issue: the X API credits are exhausted, so Algom Alpha's X posting is failing",
+    "evidence": "alert-state.json x-credits count 1777, still seen 9 Oct 14:55 UTC. NOW.md already records 'credits really $0'.",
+    "safe_fix": "Known; Elena's billing decision. No code action."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "EspaLuzWhatsApp - PRIVATE repo, paying users",
+  "local_vs_github": "In sync. Laptop main 5fb6b7e = origin/main (0/0). No commits this week. No stash. One untracked file: deploy.zip (172 MB, 1 Feb 2026, 567 entries). It contains .wwebjs_auth/session/ (a WhatsApp Web login session, which is credential-equivalent) and whatsapp_users.json (customer PII). Not work. Not gitignored.",
+  "oracle_vs_github": "Intentional lag. ~/EspaLuzWhatsApp HEAD 24e5c15 (16 Aug), 11 behind origin 5fb6b7e, 0 ahead, matching the 7 Oct table. CODE dirty files: espaluz_bridge.py md5 3d7d3ddc85c72b8d49ae7c1b19751cfe = exactly the 9029b1f blob, so the 4 Sep voice fixes 677d322/77576d1/9029b1f were deployed by file. espaluz_neural_tts.py md5 47618288bdb6c895d658dcc4cb512afd = origin/main. scripts/backfill_espaluz_hubspot.py is deleted from disk but still exists in HEAD and origin. The index holds staged deletions from 6 Sep (git rm --cached) of family_memory_data/{conversation_history,family_relationships,learning_progress,user_profiles}.json, subscribers.json and subscription_info_shown.json; all are still present on disk. These are runtime state, as expected. espaluz-whatsapp (venv python espaluz_bridge.py) started 2026-10-01 06:58:40 UTC, NRestarts=0, after the 4 Sep files, so it runs the 9029b1f bridge. Not running: the PII-hygiene refactors in e7ce522 and 61ae629 (subscriber/admin ids read from env) plus changes to espaluz_enhancements, paypal_auto_detection, user_trial_system, wiring_emitter, family_memory_system, and fbc5f38 (emergency switchboards as digit groups). Untracked on Oracle: .env.bak-pre-chain-20260816-1928 (credentials), check_subscribers.py and whatsapp_mode_state.py (Jan/Feb scratch; nothing imports them), 9 espaluz_bridge/user_analytics/whatsapp_convo_mode .bak or rollback copies, whatsapp_analytics.csv (likely PII), 5 neural_tts_*.mp3, and 5 stashes from Feb to Jun 2026 that predate later commits. whatsapp_users.json, user_trials.json and user_migration.json are still TRACKED at Oracle's HEAD and hold subscriber PII; origin untracked them.",
+  "drift": [
+   {
+    "what": "11-commit intentional lag; the PII-refactor code is not running on Oracle",
+    "evidence": "HEAD..origin/main = 5fb6b7e, 69dd45a, fbc5f38, 61ae629, fe3beb1, c1ee640, e7ce522, 0257bd0, 9029b1f, 77576d1, 677d322. The last three are already live via file deploy.",
+    "risk": "A blind `git pull` would delete the untracked-in-commit runtime files (subscribers, trials, 180 MB session store). The new code also needs env vars that Oracle's .env may not have.",
+    "safe_fix": "Leave it. GitHub is canonical for code; Oracle wins for runtime state. If the new code is wanted, use the June 30 pattern: back up, add the env vars the new code reads, `git checkout origin/main -- <named code files>`, restart, verify from the logs, restore the runtime JSON. Never pull."
+   },
+   {
+    "what": "Staged deletions sit in Oracle's index since 6 Sep",
+    "evidence": "`git diff --cached --name-status` lists 6 D entries; all 6 files are present on disk. .git/index mtime is 2026-09-06 10:48.",
+    "risk": "Harmless to the bot. A stray `git commit` on Oracle would record them.",
+    "safe_fix": "Leave it. Never commit on Oracle."
+   },
+   {
+    "what": "scripts/backfill_espaluz_hubspot.py is missing from Oracle's disk",
+    "evidence": "`git status` shows ' D'. The file is in HEAD and origin/main. The resilience doc still says it 'differs on Oracle'.",
+    "risk": "None. It is a one-off script and nothing schedules it.",
+    "safe_fix": "Leave it. Restore with `git checkout HEAD -- scripts/backfill_espaluz_hubspot.py` only if someone needs to run it. Correct the doc line."
+   },
+   {
+    "what": "Laptop deploy.zip holds a WhatsApp login session and the user list",
+    "evidence": "`unzip -l`: .wwebjs_auth/session/Default/..., whatsapp_users.json. Not ignored.",
+    "risk": "Committing it would leak a live session and customer data. The repo is private, but it is licensed and bundled.",
+    "safe_fix": "Never commit. With Elena's go, move it out of the repo into a private backup, or add it to .git/info/exclude."
+   },
+   {
+    "what": "SECURITY (shared with Familybot): the espaluz Postgres password in Familybot's public history is live in this bot's .env",
+    "evidence": "The credential removed from Familybot HEAD in 8ef5695 (Postgres user espaluz, 12-char password) matches 2 lines in ~/EspaLuzWhatsApp/.env. Postgres listens on 0.0.0.0:5432 and is reachable from the laptop.",
+    "safe_fix": "Covered by the Familybot rotation item below. Rotate once and update both .env files."
+   }
+  ],
+  "in_sync": false
+ },
+ {
+  "product": "EspaLuzFamilybot (Telegram + PagueloFacil/PayPal webhook) - PUBLIC repo, paying users",
+  "local_vs_github": "In sync. Laptop main c9bb721 = origin/main (0/0). No commits this week. No stash. Untracked: docs/PANAMA_PILOT_OPPORTUNITIES.md (36 KB). It was untracked on purpose in 35f7e81 ('a research doc out of HEAD') and has 14 email lines and 3 phone lines, so do not commit it to this public repo. deploy/parse_webhook_journal.py: a one-off diagnostic with a hardcoded 28 Jun timestamp, scratch. subscribers.json: Jan 2026 customer records, untracked on purpose by df94cad. No uncommitted work.",
+  "oracle_vs_github": "Intentional lag, plus one Oracle-only money hook. ~/EspaLuzFamilybot HEAD 58cdb4b (16 Aug), 7 behind origin c9bb721, 0 ahead. CODE dirty files: (1) main.py is a CRLF-only difference. With CR stripped its md5 8b9f56cf4e044e02885ec1f6bc6270c2 = HEAD = origin, and `git diff --ignore-cr-at-eol` is empty, so it is not real drift. (2) paypal_webhook_server.py has +10 lines: the AIDEAZZ_SVC_HOOK_START/END block that imports aideazz_service_payments.intercept_service_webhook. This is the AIdeazz service-payment router (SVC:* PagueloFacil). It is not in Familybot git. cto-aipa's scripts/oracle-deploy-service-payments.sh injects it, and the text is identical to lines 24-33 of that script. The untracked aideazz_service_payments.py (5,376 b, 2026-09-29 17:42 UTC) md5 6e0263804e8de01df26cf20b1428ebce = cto-aipa HEAD deploy/espaluz-familybot/aideazz_service_payments.py (commit 30c6221), so it is backed by git in cto-aipa. espaluz-payments-webhook and espaluz-familybot both started 2026-10-01 06:58:40 UTC (NRestarts=0), after the module was deployed, so the current hook and module are live. Runtime JSON dirty, as expected: espaluz_analytics.json, telegram_trials.json, user_onboarding.json, user_sessions.json, user_trials.json. 51 staged deletions in the index from 6 Sep (backup_before_postgres/*, data_backup/*, subscribers.json, telegram_subscribers.json, telegram_phone_email_mapping.json, discovered_*.json, fix_sub.py, restore_sub.py); all 51 are still on disk. Untracked on Oracle: 4 .env.bak files (credentials); grant_manual_pf_payment.py (29 Jun one-off with PII-shaped lines; the parameterised version is in git under deploy/); main.py, espaluz_* and paguelofacil .bak/.rollback/.corrupt copies; convo_3177.mp3/.ogg (probably a customer voice note); 2 stashes from Jan 2026.",
+  "drift": [
+   {
+    "what": "TRAP: the Oracle-only SVC hook in paypal_webhook_server.py is erased by the documented code-only deploy pattern",
+    "evidence": "`git diff` shows +10 lines (AIDEAZZ_SVC_HOOK). Neither HEAD nor origin/main has them. The resilience doc's own pattern for EspaLuz is `git checkout origin/main -- <code-files>`. Re-running scripts/oracle-deploy-service-payments.sh as written also runs `git pull --ff-only origin main` in ~/cto-aipa (forbidden: that checkout lags on purpose), then `npm run build` and `pm2 restart cto-aipa`.",
+    "risk": "A routine Familybot code deploy would silently stop matching AIdeazz service payments (the $100 Diagnostic path) to their orders. Payments would fall through to EspaLuz processing, the same silent failure that d516f99 fixed.",
+    "safe_fix": "Oracle wins: keep the hook exactly as it is (live money path, module md5-verified against cto-aipa 30c6221). After any future Familybot deploy, `grep -c AIDEAZZ_SVC_HOOK_START ~/EspaLuzFamilybot/paypal_webhook_server.py` must return 1. To re-apply, run ONLY the python patch block (script lines 17-42), then `sudo systemctl restart espaluz-payments-webhook` and check the log. Never run the whole script. Doc fix (cto-aipa, laptop commit): replace the stale section 'Oracle-only code with NO git backup' (it says 4,065 b, Jul 4, not in git) with: module canonical in cto-aipa deploy/espaluz-familybot (30c6221, md5 above); hook text in scripts/oracle-deploy-service-payments.sh; re-apply per the above. Optional follow-up with Elena's go: split the script so the hook step never pulls or restarts cto-aipa."
+   },
+   {
+    "what": "SECURITY: a live espaluz DB password is in PUBLIC git history, and Postgres is reachable from the internet",
+    "evidence": "8ef5695 removed three Postgres credentials from HEAD only. The 12-char password for user espaluz matches 2 lines in ~/EspaLuzFamilybot/.env and 2 lines in ~/EspaLuzWhatsApp/.env (checked with grep -c -F; the value was never printed). The other two removed credentials (espaluz 19-char, espaluz_app) are not in the Familybot .env. Postgres listens on 0.0.0.0:5432 and [::]:5432, and a TCP connect from the laptop succeeds. pg_hba and the OCI ingress CIDR were not read.",
+    "risk": "The DB holds paying-subscriber and payment records. A public password plus a reachable port is a breach risk if pg_hba allows the espaluz user remotely.",
+    "safe_fix": "With Elena's go (Teach > Plan > Confirm, paying users, off-peak, one service at a time): check the OCI 5432 ingress and pg_hba and restrict them to localhost if nothing external needs them. Rotate the espaluz DB user password, update both bots' .env, restart espaluz-familybot, espaluz-payments-webhook and espaluz-whatsapp one at a time, and verify from the journals that each reconnects and a test command answers. Rotation is the fix; history rewriting is not needed."
+   },
+   {
+    "what": "7-commit intentional lag (DataVendor PII cleanup)",
+    "evidence": "HEAD..origin/main = c9bb721, 53a7e48, c257b45, 35f7e81, 4843bec, df94cad, 8ef5695. Code-side changes include espaluz_enhancements, espaluz_memory, espaluz_rag, espaluz_database, espaluz_paguelofacil and wiring_emitter.",
+    "risk": "A pull would delete the 51 runtime and backup files that origin untracks, including subscribers.json, and would wipe the SVC hook.",
+    "safe_fix": "Leave it. Never pull. If the code is wanted: June 30 pattern, with the SVC-hook re-check above as an extra step."
+   },
+   {
+    "what": "main.py on Oracle has CRLF line endings, which shows as a 5,903-line diff",
+    "evidence": "With CR stripped, md5 equals HEAD and origin (8b9f56cf...). `file` reports CRLF.",
+    "risk": "None at runtime. It does confuse audits.",
+    "safe_fix": "Leave it. Treat it as in sync. If it is ever redeployed by file, normalise to LF."
+   },
+   {
+    "what": "Laptop PANAMA_PILOT_OPPORTUNITIES.md is a selling asset that has been untracked",
+    "evidence": "Removed from HEAD in 35f7e81. It is still in the public history (957d804, 4fb48c3).",
+    "safe_fix": "Keep it untracked in this public repo. If Elena wants it versioned, put it in a private repo with her go; do not re-add it here."
+   }
+  ],
+  "in_sync": false
+ },
+ {
+  "product": "EspaLuz_Influencer - PUBLIC repo",
+  "local_vs_github": "In sync. Laptop main 62f4c82 = origin/main (0/0). No commits this week. Untracked: content_memory.json (1,500 b, 16 Apr): a stale runtime copy, not work. One stash (stash@{0}, 24 Jun 07:02, base d0bc4cd) has no tracked changes against its base. It is an empty artifact left by the d0bc4cd -> d165085 amend; no work in it.",
+  "oracle_vs_github": "In sync. ~/EspaLuz_Influencer HEAD 62f4c82 = origin. The reflog shows the 15 Sep commits were made on Oracle and pushed. 0 tracked dirty files. espaluz-influencer (venv python -u main.py) started 2026-10-01 06:58:40 UTC (NRestarts=0), after the 15 Sep commit, so it runs origin. Untracked: content_memory.json (156,635 b, live, written 2026-10-08 23:00) and main.py.bak-pre-make-image-fix. No stash.",
+  "drift": [
+   {
+    "what": "content_memory.json is not gitignored on either side",
+    "evidence": "`git check-ignore` gives 'content_memory not ignored'. Oracle's copy is 156 KB and live; the laptop's is 1.5 KB from April.",
+    "risk": "`git add -A` would put runtime memory into a public repo, and a laptop copy pushed back would erase Oracle's.",
+    "safe_fix": "Oracle wins (live). Never commit it and never copy laptop to Oracle. Optional hardening: a laptop commit adding content_memory.json to .gitignore."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "whitespace (Atlas Shifted / WHITESPACE; repo ElenaRevicheva/atlas-shifted, PUBLIC; laptop D:/aideazz/whitespace, Oracle ~/whitespace, PM2 whitespace:8095)",
+  "local_vs_github": "IN SYNC. Laptop main = 7842c75 = GitHub main (checked with git ls-remote, no fetch). This week's only commit is 7842c75 (7 Oct): atlas-capture-cron.sh pushes via the credential store and scrubs advertiser contacts before the snapshot. The 11 'modified' files are NOT work. They are phantom dirty flags: for every one, the raw working-tree blob hash equals HEAD (e.g. contest-verify.sh 02f2940d on disk, in the index and in HEAD), there are 0 CR bytes on disk and in HEAD, and `git diff` is empty. Cause: the index caches the old CRLF checkout size (contest-verify.sh: index 2198 bytes vs 2153 on disk; 2153 + 45 CRs = 2198). Git treats a size mismatch as modified without reading the content. All 11 share mtime 2026-08-23 11:32:55, the same mass rewrite seen in AILA. There are 3 untracked files: scripts/e2e-audit.mjs (real work, a 187-line E2E audit of Atlas + WHITESPACE), scripts/oracle-deploy-ui-fix.sh (one-off), scripts/update-luma-key.py (one-off). None were ever committed on any branch. There is also 1 laptop stash, 'honest-status-banner (deferred)' (20 Jul, 40 lines), which HEAD supersedes through src/pipeline-status.ts stale_reason and the 'Radar paused' banner in public/atlas.html. The laptop dist/ is a stale Aug 17 build; it is gitignored and never deployed, so it is harmless.",
+  "oracle_vs_github": "IN SYNC for code. Oracle HEAD = 7842c75 = GitHub main, 0 ahead, no tracked changes. All 11 scripts the laptop flags, plus atlas-capture-cron.sh, have IDENTICAL md5 on Oracle (e.g. contest-verify.sh 0ef9148e, wire-telegram-env.sh 35f35f21), so Oracle already runs exactly this content. e2e-audit.mjs is also on Oracle, untracked, md5 2b270817, identical, dated 28 Jun. oracle-deploy-ui-fix.sh and update-luma-key.py are NOT on Oracle. Running build: dist/ (30 files, 14 Sep 14:24) carries the 14 Sep fixes ab84566/8c2a9f3, which were committed on Oracle by 'AIdeazz Oracle Deploy'. dist/llm.js contains gemini-embedding-001. The PM2 process, however, started 17 Aug 10:27 UTC (uptime 53D), before that rebuild. server.js imports llm.js, so the server holds the pre-14-Sep llm.js in memory. That has no functional effect: the 14 Sep change touches only embeddings, which no server-path module calls. The weekly cron runs capture/classify/brief/concept as fresh node processes, and the 5 Oct run proves the new code produced output: 'ATLAS CONCEPT DONE' for all 7 verticals, then '[main c6d6d34] snapshot 2026-10-05 … backup pushed'. Oracle also has untracked items: 7 .env.bak* files, scripts/e2e-feature-cycle.sh.bak (identical to the tracked file), and 3 old June stashes (26–27 Jun: package-lock, deploy-oracle.sh, atlas.html).",
+  "drift": [
+   {
+    "what": "CREDENTIALS: Oracle ~/whitespace has 7 untracked .env backups (.env.bak-bd-20260806-193741, .env.bak-bd-reapply-20260806-194043, .env.bak-pre-chain-20260817-1023, .env.bak-pre-groqmodel-20260816-1539, .env.bak.1784485259, .env.bak.1784587265, .env.bak.1784593593), 25–29 KEY= lines each. .gitignore covers only `.env` and `.env.local`, so these are NOT ignored, and the repo is PUBLIC. They and .env itself are mode 664, readable by any user on the box.",
+    "evidence": "`git status` on Oracle lists them as `??`; `git check-ignore -v` matches only `.env`; `gh api repos/ElenaRevicheva/atlas-shifted` reports private=false; `stat` gives 664 for ~/whitespace/.env",
+    "risk": "A single `git add -A` / `git add .` on Oracle, the way 'AIdeazz Oracle Deploy' committed there on 14 Sep, publishes every API key to a public repo.",
+    "safe_fix": "Never commit them. Zero-risk local guard first: append `.env.bak*` and `.env.*` to Oracle ~/whitespace/.git/info/exclude, then `chmod 600 ~/whitespace/.env ~/whitespace/.env.bak*`. Durable fix: on the laptop, add `.env.*` + `.env.bak*` + `!.env.example` to .gitignore (.env.example is tracked, so it must stay un-ignored), commit that one named file and push; Oracle picks it up on its next ff-only pull. Do not delete the backups without Elena's go (never-wipe rule); if she agrees, move them to a 700 folder outside the repo."
+   },
+   {
+    "what": "PII / doc error: atlas-captures (the data-backup repo pushed by the weekly cron) is PUBLIC, but ORACLE_ALL_PRODUCTS_RESILIENCE.md calls it 'private'. HEAD is clean. Pre-scrub history still contains third-party advertiser contacts.",
+    "evidence": "`gh api repos/ElenaRevicheva/atlas-captures` reports private=false. HEAD captures.jsonl has 0 emails and 35 [contact-redacted] markers. Commit 326c5c1 (31 Aug, before the 6 Sep scrub) holds 2 unique emails and 1 international phone number; the history has 44 commits back to 25 Jun.",
+    "risk": "Contact details of real third parties in a public repo the cron comment says is 'offered under licence'. They came from the advertisers' own public ads, so the severity is low, but it contradicts the stated privacy and the DataVendor PII gate.",
+    "safe_fix": "Make atlas-captures private in the GitHub settings: nondestructive and matches what the doc already claims. Do NOT rewrite history or force-push, which the protocol forbids; a history purge needs Elena's explicit go and a backup clone first. Correct the doc line either way."
+   },
+   {
+    "what": "Real work never committed: scripts/e2e-audit.mjs (187-line E2E audit), untracked and identical on laptop and Oracle since 28 Jun.",
+    "evidence": "md5 2b2708171d293f2378d6d0c9c3cfcaa4 on both sides; `git log --all -- scripts/e2e-audit.mjs` is empty. A secret scan found no keys; it holds only the public webhook URL and the localhost default.",
+    "risk": "Exists only as loose copies; lost if either box is cleaned.",
+    "safe_fix": "Commit it from the laptop as a named file (`git add scripts/e2e-audit.mjs`) and push. Before Oracle's next ff-only pull, move Oracle's identical untracked copy aside (e.g. to ~/whitespace-untracked-bak/); otherwise git may refuse the merge with 'untracked working tree file would be overwritten'. Leave oracle-deploy-ui-fix.sh (a one-off whose `git pull` is superseded by deploy-oracle.sh) and update-luma-key.py (passes the API key on argv, so it lands in shell history) uncommitted as scratch."
+   },
+   {
+    "what": "Phantom 'modified' on 11 laptop scripts: stale index stat cache, no content change.",
+    "evidence": "Raw working-tree hash = index = HEAD for all 11; `git diff` is empty; `git ls-files --debug` caches size 2198 vs 2153 on disk (contest-verify.sh).",
+    "risk": "Misleads the next agent into thinking unsaved work exists, or into a blind `git checkout --`.",
+    "safe_fix": "`git add -- <the 11 named scripts>` on the laptop. Content is identical, so it stages nothing and only refreshes the cached size; the status then reads clean. `git update-index --refresh` will NOT clear it: git skips the content check when the cached size differs. No commit needed."
+   },
+   {
+    "what": "The running whitespace server process (started 17 Aug) predates the 14 Sep dist rebuild.",
+    "evidence": "`ps lstart` = Mon Aug 17 10:27:06; all 30 dist/*.js have mtime 2026-09-14 14:24; server.ts imports breakerState from ./llm.js",
+    "risk": "Low. The 14 Sep diff touches only embeddings (geminiEmbedBatch/openaiEmbedBatch); no server-path module (server/agent/angles/intelligence/radar-board/tracking/performance-hub) calls them. Still a 'file on disk ≠ running process' gap.",
+    "safe_fix": "Do not restart for this alone. On the next planned whitespace deploy, `pm2 restart whitespace --update-env` (claim the NOW.md row and check uptime first) and grep dist/llm.js for gemini-embedding-001 to prove it."
+   },
+   {
+    "what": "7 Oct cron change (credential-store push + contact scrub committed) not yet proven in a real run.",
+    "evidence": "The last capture.log run is 2026-10-05T14:16:30Z, which pushed with the old cron. The next scheduled run is `0 14 * * 1`, i.e. Mon 12 Oct 14:00 UTC.",
+    "risk": "If credential.helper=store is missing for that clone, the push fails and the backup silently stops.",
+    "safe_fix": "After 14:20 UTC on 12 Oct, grep ~/whitespace/data/capture.log for '[main …] snapshot 2026-10-12' and 'backup pushed'. Nothing to change before then."
+   },
+   {
+    "what": "Leftover stashes: 1 on the laptop (superseded honest-status-banner, 20 Jul) and 3 on Oracle (26–27 Jun pre-SSH-pull deploy stashes).",
+    "evidence": "`git stash list` on both sides; only 11/34 of the laptop stash's added lines are in HEAD, but its purpose ships via pipeline-status.ts stale_reason.",
+    "risk": "None to runtime; clutter only.",
+    "safe_fix": "Leave as is (never-wipe). Drop only with Elena's go."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "aideazz (aideazz.xyz; repo ElenaRevicheva/aideazz, PUBLIC; laptop D:/aideazz/aideazz; Oracle ~/aideazz = wiki-ship push clone; GitHub main deploys to 4everland)",
+  "local_vs_github": "IN SYNC. Laptop main = 20d2271 = GitHub main (ls-remote). There are 19 commits this week (2–9 Oct): daily 'ai-ops-wiki: refresh journal + AEO surfaces' from Oracle, daily 'chore(blog-static): regenerate …' blog pages, bd37e79 (api page footer YouTube link, 2 Oct), df6336c (wiki chapter 'I Act TODAY', 6 Oct) and 20d2271 (wiki chapter last-modified-is-not-last-activity, 9 Oct, `blog: no`, closing `---` present). Untracked items are scratch only: .claude/launch.json (no secrets) and backups/LabApi.tsx.pre-redesign-20260902-1605 (no keys). Neither should be committed to this public repo. Deploy proof: 4everland deployment for 20d2271 has state success at 2026-10-09T10:11:06Z. aideazz.xyz/ai-ops-wiki.html returns 200 and contains 'last-modified-is-not-last-activity' 19 times.",
+  "oracle_vs_github": "CLEAN, 2 COMMITS BEHIND BY DESIGN. Oracle ~/aideazz is on branch main at 273a03d, which is an ancestor of GitHub 20d2271. It has 0 commits ahead of origin/main, nothing dirty or untracked and no stashes. It lacks eea509c (blog-static regen, 8 Oct 23:27) and 20d2271 (laptop wiki chapter, 9 Oct). 273a03d is exactly what the last wiki-ship run pushed (rotated log: '✓ pushed 273a03d — 4everland will rebuild', 8 Oct). wiki-ship.cjs is identical on laptop and Oracle (md5 b005f769…) and starts every run with `git fetch` + `git merge --ff-only origin/main`. Tonight's cron (`30 21 * * *` UTC) will therefore bring the clone onto 20d2271 before it writes anything. The only extra ref is the local branch wiki-ship-stuck-20260919 (2d2bf01, the 19 Sep recovery backup).",
+  "drift": [
+   {
+    "what": "Oracle ~/aideazz is 2 commits behind origin/main (eea509c, 20d2271).",
+    "evidence": "Oracle HEAD 273a03d vs GitHub main 20d2271; `git merge-base --is-ancestor 273a03d 20d2271` succeeds; `rev-list origin/main..HEAD` = 0; working tree clean",
+    "risk": "None. It is a strict ancestor and clean, so the ff-only merge cannot conflict.",
+    "safe_fix": "No action. Do NOT pull by hand: wiki-ship's own fetch + ff-only at 21:30 UTC catches it up. To prove it, after 21:35 UTC tonight check that the new wiki-ship.log contains '✓ site repo on origin/main (20d2271)' or a later commit."
+   }
+  ],
+  "in_sync": false
+ },
+ {
+  "product": "atuona (atuona.xyz; repo ElenaRevicheva/atuona, PUBLIC; laptop D:/aideazz/atuona; GitHub main deploys to 4everland; no Oracle checkout by design)",
+  "local_vs_github": "IN SYNC. Laptop main = 1bff859 = GitHub main (ls-remote). The working tree is clean: 0 modified, 0 untracked, no stash. No commits this week; the last was 1bff859 (25 Sep, film sheets). The 4everland deployment for 1bff859 was created 2026-09-25 and atuona.xyz returns 200. The live llms.txt lists 'eight finished short films', matching memory.",
+  "oracle_vs_github": "N/A by design. There is no atuona git checkout on Oracle. ~/atuona-film7 and ~/atuona-film9 are film working dirs without .git. The Atuona agent runs inside cto-aipa. Film #9 is in production and private (docs/atuona/FILM9_HANDOVER_2026-10-08.md: 'Never publish … without her explicit go'), so the site correctly still shows 8 films and needs no update.",
+  "drift": [
+   {
+    "what": "Doc-only: the canonical-map rows for atuona in ORACLE_ALL_PRODUCTS_RESILIENCE.md print the path as `D:ideazztuona`. The backslashes in D:\\aideazz\\atuona were eaten as escape sequences.",
+    "evidence": "Repo-map row and the 'atuona.xyz site' row of the quick-lookup table both read `D:ideazztuona`",
+    "risk": "The next agent cannot find the clone from the map and may create a duplicate.",
+    "safe_fix": "Correct both rows to `D:\\aideazz\\atuona` in cto-aipa docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md (docs-only commit to main, named file)."
+   },
+   {
+    "what": "Not a defect, for the record: the live film #7 title 'Could not generate content.' is intentional.",
+    "evidence": "docs/atuona/FILM7_PARADISE_IS_COMPILED.md:8: 'Title (Elena, 22.09.2026): #099's own title … chosen'; NOW.md marks poem #099 KEPT ON PURPOSE.",
+    "risk": "An agent 'fixing' it would overwrite Elena's artistic choice.",
+    "safe_fix": "Leave as is."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "AILA (repo ElenaRevicheva/AILA, PRIVATE; laptop D:/aideazz/AILA on branch docs; paused, not deployed)",
+  "local_vs_github": "IN SYNC on the working branch. Laptop docs = 6653971 = GitHub docs (ls-remote); no commits this week (last 6653971, 5 Sep). The 1 'modified' file, docs/architecture/AILA_BLUEPRINT.md, is a PHANTOM like whitespace's. The raw working-tree hash equals the index and HEAD (f9965576b4), there are 0 CR bytes on disk and in HEAD, and `git diff` shows no content change, only the 'LF will be replaced by CRLF' warning. The index caches 38672 bytes against 38117 on disk = HEAD size, and the mtime is the same 2026-08-23 11:32:55 mass rewrite. Commit a5fd738 (25 May) warned about a 'pre-existing change' to this file. Every copy on the laptop (AILA/, _license-bundle-2026-09-05/AILA/, _license-history/AILA/) has the same LF content md5 (072c0cf5…) as HEAD, so no differing version survives anywhere to recover; it was most likely the same line-ending phantom. The local `main` branch (not checked out) is 36 behind origin/main aa477b1. That is a stale ref, not lost work: 0 ahead.",
+  "oracle_vs_github": "N/A, correct per the canonical map. No AILA/aela/aila directory exists on Oracle ('Do not recreate a clone on Oracle').",
+  "drift": [
+   {
+    "what": "Phantom 'modified' on docs/architecture/AILA_BLUEPRINT.md from a stale index size cache.",
+    "evidence": "hash-object --no-filters = HEAD blob f9965576b4; index size 38672 vs disk 38117",
+    "risk": "Invites someone to commit or 'restore' a file that has no changes.",
+    "safe_fix": "`git add -- docs/architecture/AILA_BLUEPRINT.md` in D:/aideazz/AILA. It stages nothing (identical content) and clears the flag; no commit needed."
+   },
+   {
+    "what": "Local branch `main` is 36 commits behind origin/main.",
+    "evidence": "`git rev-list --left-right --count main...origin/main` = 0 36",
+    "risk": "None; the branch is not checked out and has 0 local-only commits.",
+    "safe_fix": "Optional: `git fetch origin main:main` (fast-forward only; refuses if it would lose anything). Otherwise leave it."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "#7 OpenClaw Vibejob Shortlist: the YC shortlist pipeline (Oracle ~/job-list-filter, cron 0 */6 run_shortlist.sh). GitHub ElenaRevicheva/openclaw-vibejob-shortlist (PUBLIC)",
+  "local_vs_github": "D:/aideazz/openclaw-vibejob-shortlist does NOT exist at all, with or without .git. The real laptop clone is D:/aideazz/ai-cofounders/job-list-filter (origin = openclaw-vibejob-shortlist.git). After git fetch: docs = origin/docs 39692d8 (checked out), main = origin/main 5045cbd (23 Mar), backup-feb20-before-priority-sync = origin b7bc560. Working tree is clean. The only extra files are gitignored runtime data from Feb (companies.csv, filtered_jobs.csv, paste_here.txt, result.txt, yc_ai_assistant_companies.json). This week: 7 commits, all dated 7 Oct, all on docs and all pushed. Nothing new on main. Caveat: the docs branch holds no code; code lives only on main.",
+  "oracle_vs_github": "~/openclaw-vibejob-shortlist never existed (ls: No such file), which confirms the 7 Oct doc correction. ~/job-list-filter has no .git; it is a flat copy. Every code file matches an origin/main blob once CRLF is normalised to LF: filter_jobs.py 0dfab321, shareable_output.py 278fd747, yc_ai_assistant_ingest.py 9e612e73, requirements.txt a8a5981f, elena_profile.txt 54f97000, RUN_FILTER.bat, run_shortlist.bat and .gitattributes. run_shortlist.sh c73dfa84 matches byte-for-byte. The pipeline produced output today: yc_ai_assistant_meta.json says fetched_at 2026-10-09 12:00:02 UTC, and priority_companies_for_vibejob.json was written at 12:00. /var/log/joblist-pipeline.log is 0 bytes because it was rotated at 13:55 today; the 12:00 run is in .log.1.gz (23 KB). That is not a failure. The only differences are leftover docs from the old pre-split layout: README.md 60cb2250 vs main 744e2429, the root *.md guides, and openclaw-skill/job-shortlist/SKILL.md, which is an old historic blob (89fc4f6e). That SKILL.md is not the live skill; the live one is ~/.openclaw/workspace/skills/job-shortlist/SKILL.md, which matches GitHub.",
+  "drift": [
+   {
+    "what": "Old doc copies inside Oracle ~/job-list-filter (README.md, root HOW_TO_USE_BOT/OPENCLAW_*/PROFILE/START_HERE/YC_PIPELINE md, openclaw-skill/job-shortlist/SKILL.md) differ from GitHub",
+    "evidence": "README.md normalises to 60cb2250, main has 744e2429. openclaw-skill/job-shortlist/SKILL.md normalises to 89fc4f6e, which exists only in old history; docs/openclaw/SKILL.md is a9b4a8e4. All of these files are dated 15 Feb 2026.",
+    "risk": "An agent could edit the dead SKILL.md copy and believe it changed the bot. No runtime impact: run_shortlist.sh does not read them.",
+    "safe_fix": "GitHub wins, because nothing on Oracle is newer than 15 Feb. Leave the files in place (never-wipe rule). Optionally add one line to docs/openclaw/ORACLE_LIVE_SETUP.md on the docs branch saying ~/job-list-filter/openclaw-skill/ is dead and the live skill is ~/.openclaw/workspace/skills/job-shortlist/SKILL.md."
+   },
+   {
+    "what": "Oracle code copies use CRLF line endings (Windows scp); the GitHub blobs are LF",
+    "evidence": "CR counts: filter_jobs.py 183, shareable_output.py 81. The hashes match only after tr -d '\\r'. run_shortlist.sh is already LF.",
+    "risk": "None today: python ignores CR and the cron ran at 12:00. A future .sh copied with CRLF would fail with 'bash\\r', the failure commit b7bc560 already fixed once.",
+    "safe_fix": "No action. On the next deploy, copy from the LF checkout of main (the .gitattributes there enforces LF for *.sh)."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "#7 OpenClaw gateway + ~/.openclaw/workspace (interview-spar mock-interview coach, built 7 Oct). systemd --user openclaw-gateway",
+  "local_vs_github": "The workspace is tracked on the openclaw-vibejob-shortlist docs branch under docs/openclaw/: workspace/AGENTS.md, HELP.md and IDENTITY.md; interview-spar/SKILL.md and references (build-cards.py, sources.sh, outlook.txt); SKILL.md (job-shortlist); ORACLE_LIVE_SETUP.md. Laptop docs = origin/docs 39692d8, clean. The unit file copy is cto-aipa scripts/openclaw-gateway.service (laptop HEAD 1788c4d = origin/main). The deal-digest feeder scripts/hs-deal-prep.cjs is 7a798f5a on the laptop and on origin/main. A public-repo scan of the docs-branch files found no secrets or IPs. The only email is the business address aipa@aideazz.xyz; the 'phone' hits in AGENTS.md are timestamps.",
+  "oracle_vs_github": "~/.openclaw/workspace is NOT in any git repo: no .git there or in ~/.openclaw. Every file that git tracks still matches the docs branch byte-for-byte: AGENTS.md 00285a25, HELP.md a7563e20, IDENTITY.md 09122e5c, interview-spar/SKILL.md 61307fd8, build-cards.py 45ddbc66, sources.sh d6dc599e. outlook.txt (91b2a5d1) and skills/job-shortlist/SKILL.md (a9b4a8e4) match after CRLF normalisation. ~/.config/systemd/user/openclaw-gateway.service matches scripts/openclaw-gateway.service after normalisation (9d6be0c5…); the Oracle copy has CRLF on all 16 lines but loads fine. The gateway has been active since 2026-10-07 21:05:18 UTC with NRestarts=0, running openclaw@2026.2.14 as documented. Oracle hs-deal-prep.cjs is 7a798f5a, the same as origin/main. The digest cron is writing '51 live job deals … (8142 chars)' and the cards cron '1 answers across 1 role(s)'. Not in git: USER.md and RESUME_CONTEXT.md (personal, excluded on purpose per ORACLE_LIVE_SETUP.md); SOUL.md, HEARTBEAT.md and TOOLS.md (stock OpenClaw templates from Feb, not work); AGENTS.md.bak (Feb); generated cards/, deals/ and interview-cards/; ~/.openclaw/openclaw.json plus .bak..bak.3; .env; credentials/telegram-allowFrom.json and telegram-pairing.json; memory/main.sqlite; cron/jobs.json. A backup exists at ~/_session-backups/openclaw-spar-20261007.",
+  "drift": [
+   {
+    "what": "~/.openclaw/openclaw.json (the 5-provider model chain, the bootstrap-extra-files hook paths, Telegram customCommands, edge TTS settings) exists only on Oracle and in Oracle-side backups",
+    "evidence": "Top-level keys: meta, agents, tools, messages, commands, hooks, channels, gateway, plugins. 2 token/key-style fields. Not in any repo; ORACLE_LIVE_SETUP.md describes it in prose only.",
+    "risk": "It contains CREDENTIALS (the gateway token and probably the Telegram bot token), so it must never be committed. Its non-secret structure has no off-box copy: if the VM is lost, the config has to be rebuilt by hand from the prose doc.",
+    "safe_fix": "Oracle wins because it is the only copy. Leave it untouched. With Elena's go only: produce a REDACTED template (every token/key/secret value replaced by a placeholder, grep-verified to have zero long tokens) at docs/openclaw/openclaw.template.json on the docs branch. The repo is PUBLIC, so verify the redaction before pushing. Never copy the real file, the .bak files, .env or credentials/."
+   },
+   {
+    "what": "Personal and generated files on Oracle that must stay out of git (PII flag)",
+    "evidence": "deals/TOOLS.md is a HubSpot digest of 51 live job deals, rewritten every 30 min. RESUME_CONTEXT.md has a contact-like line. USER.md, interview-cards/ and cards/ hold her own answers. credentials/telegram-allowFrom.json holds her Telegram id. memory/main.sqlite holds session memory.",
+    "risk": "Copying workspace/ wholesale into the PUBLIC openclaw-vibejob-shortlist repo would leak CRM data and personal information.",
+    "safe_fix": "Never 'git add' workspace/ as a folder. Keep committing only the named instruction files listed in ORACLE_LIVE_SETUP.md. If USER.md and RESUME_CONTEXT.md need an off-box copy, put them in the private aideazz-private-docs repo, never the public one."
+   },
+   {
+    "what": "CRLF line endings in the live unit file and in outlook.txt / job-shortlist SKILL.md on Oracle",
+    "evidence": "16 CR in openclaw-gateway.service. The hashes match only after tr -d '\\r'.",
+    "risk": "Cosmetic today: systemd loads the unit and the gateway is active.",
+    "safe_fix": "No action. Do not restart or rewrite the unit just for this."
+   }
+  ],
+  "in_sync": true
+ },
+ {
+  "product": "Oracle home + ~/bin cron and helper scripts (no product repo; copies live in cto-aipa = GitHub AIPA_AITCF, PUBLIC until ~20 Nov)",
+  "local_vs_github": "After git fetch, cto-aipa laptop HEAD 1788c4d = origin/main, and every repo copy below is tracked and clean. The live crontab is byte-identical to scripts/oracle-resilience/live-2026-10-09/crontab.txt (empty diff). This week's commits touching these scripts: d770163 and d6dd6bf (9 Oct, disk prevention and cleanup). Laptop-only untracked work: 14 one-off scripts/oracle-*.sh diagnostics dated 23 Aug (atlas-diagnose, deploy-lead-loop, hubspot-test, perf-smoke, verify-all, …). They contain Oracle IP addresses (1–4 each) and, in 2 files, an email address. They are scratch, not cron'd, and must NEVER be committed to the public repo.",
+  "oracle_vs_github": "CRON'D, in sync. ~/check_oracle_health.sh 83c5b93f = scripts/oracle-resilience/check_oracle_health.sh (deployed 9 Oct 13:03). ~/health_monitor.sh b9e23005 = docs/oracle/health_monitor.sh (9 Oct 13:03). ~/bin/github-token-watch.sh a382f7a3 = scripts/github-token-watch.sh. ~/bin/hs-watch-manual-emails.sh 3b0b7965 has no standalone repo file, but it is byte-identical to the heredoc in scripts/oracle-install-hs-email-watcher.sh, so it can be rebuilt; its .cjs (81c623bd) = origin/main. ~/job-list-filter/run_shortlist.sh and the OpenClaw build-cards.py and hs-deal-prep.cjs are covered under #7 and match. CRON'D, drifted: ~/oci_keepalive.sh ed4548f3 vs repo 2b1900f0, comment lines only. CRON'D with NO repo copy anywhere (all branches of git history plus a laptop find): ~/run-citation-probe.sh 7bfe3b94; its .cjs (4c12d0ef) = origin/main. HELPERS, in sync: bin/github-token-set.sh f719b1b8, set-ghtoken-stdin.sh c3763f23, set-deepseek-stdin.sh f8f04b88, set-opspw-stdin.sh 4d937dac, set-pplx-stdin.sh 7a86d2e6, set-venice-stdin.sh 622a0d0c, oracle-deploy-go-wa.sh 94a04b7e, oracle-fix-git-https-auth.sh 03667ecc (deprecated), oracle-setup-github-ssh-fleet.sh fc0e4ed1, openclaw-oracle-install.sh 68f5d917. Several of those only match after CRLF normalisation of the laptop working copy. HELPERS, drifted: add_joblist_cron.sh has an extra 'set -e' plus a blank line on Oracle. HELPERS with NO repo copy: set-gmail-stdin.sh (spawned by the live bot, src/telegram-bot.ts:1165, the /gmailpw command), set-reddit-stdin.sh (spawned by src/telegram-bot.ts:1718), set-gmail.sh (interactive variant), fragments_recut.sh (one-off Atuona film 7/8 rebuild), scripts-github-token-watch.sh (7 Sep draft, superseded by ~/bin/github-token-watch.sh, not cron'd).",
+  "drift": [
+   {
+    "what": "~/run-citation-probe.sh (weekly cron, Mon 13:00 UTC) has no copy in any repo",
+    "evidence": "md5 7bfe3b947842bc3fd4a934aa540cd399. git log --all --name-only in cto-aipa finds no such file, and a laptop find under D:/aideazz finds nothing. ORACLE_ALL_PRODUCTS_RESILIENCE.md:2886 only names it. The Oct 5 run is logged in citation-probe.log.1.gz.",
+    "risk": "It is a 13-line wrapper that sources /home/ubuntu/cto-aipa/.env by path. It contains no secrets, so it is safe to commit. If the VM is rebuilt the weekly probe silently stops, because the cron line points at a file nobody can recreate.",
+    "safe_fix": "Oracle wins (it is the only copy). Copy it byte-for-byte to the laptop as scripts/oracle-resilience/run-citation-probe.sh, check md5 = 7bfe3b94, then commit on main with a named-file add. No change on Oracle."
+   },
+   {
+    "what": "set-gmail-stdin.sh and set-reddit-stdin.sh are LIVE machinery (the cto-aipa Telegram bot spawns them) with no repo copy; set-gmail.sh is the interactive sibling",
+    "evidence": "src/telegram-bot.ts:1165 spawn('/home/ubuntu/set-gmail-stdin.sh'). src/telegram-bot.ts:1718 spawn('/home/ubuntu/set-reddit-stdin.sh'). The other set-*-stdin.sh siblings are already in scripts/, and their comments cite set-gmail-stdin.sh as the contract they copy. md5 5057e7e9 / 1fd01386 / 51d3e7ad.",
+    "risk": "PII: set-gmail.sh and set-gmail-stdin.sh hard-code Elena's personal Gmail address, and AIPA_AITCF is PUBLIC until ~20 Nov. set-reddit-stdin.sh holds no values (they arrive on stdin). Without a repo copy, a rebuilt VM breaks /gmailpw and the Reddit credential command.",
+    "safe_fix": "Oracle wins. set-reddit-stdin.sh: copy byte-for-byte into scripts/ and commit (no secrets). set-gmail*.sh: either hold them in the private aideazz-private-docs repo until AIPA_AITCF goes private, or commit a version that reads the address from an env var and record in the commit that it intentionally differs from the live md5. Never commit the hard-coded address to the public repo. No change on Oracle."
+   },
+   {
+    "what": "~/oci_keepalive.sh differs from scripts/oracle-resilience/oci_keepalive.sh in comment lines only",
+    "evidence": "Oracle md5 ed4548f3, repo 2b1900f0 (LF). The diff shows only the header comment block and 3 '# N product' comment lines; the curl commands are identical.",
+    "risk": "None functionally. It shows up as noise in md5 sync checks.",
+    "safe_fix": "No action needed. Neither side carries newer logic. If the md5 noise matters, scp the repo copy at the next planned deploy (it only adds comments). Do not make a special trip to touch the production cron for this."
+   },
+   {
+    "what": "~/add_joblist_cron.sh has 'set -e' and the repo copy does not",
+    "evidence": "Normalised diff: Oracle has '+set -e' at line 4 and an extra trailing blank line. Repo scripts/add_joblist_cron.sh is 745286a7 (LF); Oracle is 29c5522b.",
+    "risk": "Low: it is a one-time installer from Feb, not cron'd.",
+    "safe_fix": "Oracle carries the stricter version, so Oracle wins. Optionally copy it into the repo. Not urgent."
+   },
+   {
+    "what": "Scratch scripts on Oracle with no repo copy: ~/scripts-github-token-watch.sh and ~/fragments_recut.sh",
+    "evidence": "scripts-github-token-watch.sh (5f89c9af, 7 Sep 18:11) is an earlier draft: it lacks the delivery-verification and exit-3 logic of the live ~/bin/github-token-watch.sh (a382f7a3, 18:16), and the crontab calls the bin one. fragments_recut.sh is a 3-line rebuild of Atuona films 7 and 8 from 22 Sep, not cron'd.",
+    "risk": "The superseded token-watch sitting next to the live one could be edited or run by mistake. Its single long string is the 'github-authentication-token-expiration' header name, not a secret.",
+    "safe_fix": "Not work, so do not commit either one. Leave both in place (never-wipe rule). Remove only with Elena's explicit go after a backup."
+   }
+  ],
+  "in_sync": false
+ }
+]

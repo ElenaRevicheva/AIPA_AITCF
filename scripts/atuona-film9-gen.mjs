@@ -17,7 +17,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 const run = promisify(execFile);
 
-const BASE = '/home/ubuntu/aigo-promo';
+const BASE = '/home/ubuntu/atuona-film9';
 const PLAN = JSON.parse(fs.readFileSync(path.join(BASE, 'plan.json'), 'utf8'));
 const LEDGER = path.join(BASE, 'ledger.jsonl');
 const UPLOADS = path.join(BASE, 'uploads.json');
@@ -49,6 +49,11 @@ const ENGINES = {
       duration: o.duration, resolution: '720p',
       // Wan rewrites the prompt by default; on s08 that rewrite kept adding cuts to Kira's face -> plan `expand: false`
       enable_prompt_expansion: o.expand !== false }),
+  },
+  wan1080: {  // film #9 (6 Oct): same Wan 2.7 i2v at 1080p, $0.15/s (Replicate pricing read 5 Oct)
+    model: 'wan-video/wan-2.7-i2v', perSec: () => 0.15,
+    input: o => ({ prompt: o.prompt, negative_prompt: o.negative, first_frame: o.start, ...(o.end ? { last_frame: o.end } : {}),
+      duration: o.duration, resolution: '1080p', enable_prompt_expansion: o.expand !== false }),
   },
   happyhorse: {
     model: 'alibaba/happyhorse-1.0', perSec: () => 0.14,
@@ -114,11 +119,10 @@ const spent = () => ledger().filter(e => e.status === 'succeeded').reduce((s, e)
 const walletOf = e => (e.engine === 'venice' || String(e.engine || '').startsWith('venice')) ? 'venice' : 'replicate';
 const spentIn = w => ledger().filter(e => e.status === 'succeeded' && walletOf(e) === w).reduce((s, e) => s + e.usd, 0);
 function guard(usd, what, wallet = 'replicate') {
-  // 9 Oct 2026: DISK guard next to the money guard — Oracle is the bots' box; at 100% they fail to save data
-  // (docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md). Every paid call downloads into this folder. Film/promo folders
-  // are copies of this file, so the guard is inherited (film #9's ~/atuona-film9/gen.mjs = scripts/atuona-film9-gen.mjs).
+  // 9 Oct 2026: a DISK guard next to the money guard - Oracle is the bots' box; at 100% they fail to save data
+  // (docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md). Every paid call downloads into img/ clips/ raw/ here.
   const st = fs.statfsSync('/'), freeGB = st.bavail * st.bsize / 1e9;
-  if (freeGB < 3) throw new Error(`DISK: only ${freeGB.toFixed(1)} GB free (< 3 GB) - ${what} refused. Free space first.`);
+  if (freeGB < 3) throw new Error(`DISK: only ${freeGB.toFixed(1)} GB free on Oracle (< 3 GB) - ${what} refused. Free space first.`);
   const s = spent();
   if (s + usd > BUDGET) throw new Error(`BUDGET: ${what} would cost ~$${usd.toFixed(2)}; spent $${s.toFixed(2)} of $${BUDGET}. Refused.`);
   const cap = Number(process.env[wallet === 'venice' ? 'VENICE_BUDGET_USD' : 'REPLICATE_BUDGET_USD'] || Infinity), w = spentIn(wallet);
@@ -182,6 +186,7 @@ const VENICE_IMAGE = {
   'nano-banana-pro-edit': () => 0.23, 'flux-3-image-edit': () => 0.145,   // 2K, Venice /models 6 Oct 2026
   'grok-imagine-quality-edit': n => 0.09 + 0.012 * n,
   'qwen-edit-uncensored': () => 0.04,
+  'seedream-v5-pro-edit': () => 0.08,   // Venice /models 7 Oct 2026: $0.06 inpaint, rounded up
   'firered-image-edit': () => 0.05,
   'seedream-v5-pro': () => 0.11, 'qwen-image-3-pro': () => 0.09, 'flux-2-max': () => 0.09, 'nano-banana-pro': () => 0.23,
 };
@@ -231,7 +236,7 @@ async function image(id) {
   guard(price, `image ${id} on ${engineId}`);
   const refs = [];
   for (const r of spec.refs || []) refs.push(await resolveImg(r));
-  const prompt = [spec.prompt, spec.look === undefined ? PLAN.look : spec.look].filter(Boolean).join('\n\n');   // same spec.look rule as veniceImage
+  const prompt = [spec.prompt, spec.look === undefined ? PLAN.look : spec.look].filter(Boolean).join('\n\n');
   const p = await predict(model, eng.input(prompt, spec.aspect || '16:9', refs), `img_${id}`);
   const e = { kind: 'image', id, engine: engineId, model, status: p.status, usd: p.status === 'succeeded' ? price : 0, error: p.error || null, prediction: p.id };
   record(e);
@@ -246,9 +251,10 @@ async function image(id) {
 async function veniceVideo(shotId, shot, o) {
   const key = (fs.readFileSync('/home/ubuntu/cto-aipa/.env', 'utf8').match(/^VENICE_API_KEY=(.*)$/m) || [])[1]?.replace(/["\s]/g, '');
   if (!key) throw new Error('VENICE_API_KEY missing');
-  const base = 'https://api.venice.ai/api/v1', model = 'wan-3-0-pro-image-to-video';
+  const base = 'https://api.venice.ai/api/v1', model = process.env.VENICE_VIDEO_MODEL || 'wan-3-0-pro-image-to-video';
+  const tag = process.env.VENICE_VIDEO_MODEL ? 'venice-' + model.replace(/-image-to-video.*/, '') : 'venice';  // 6 Oct: model chosen per run
   const post = (p, body) => {   // execFile cannot pipe stdin -> the body goes through a file, like predict() does
-    const f = path.join(BASE, 'raw', `${shotId}__venice${p.replace(/\//g, '_')}.request.json`);
+    const f = path.join(BASE, 'raw', `${shotId}__${tag}${p.replace(/\//g, '_')}.request.json`);
     fs.writeFileSync(f, JSON.stringify(body));
     return run('curl', ['-s', '-m', '180', '-X', 'POST', '-H', `Authorization: Bearer ${key}`, '-H', 'Content-Type: application/json',
       '--data-binary', `@${f}`, `${base}${p}`], { maxBuffer: 1 << 28 });
@@ -256,7 +262,8 @@ async function veniceVideo(shotId, shot, o) {
   const src = shot.start_by_engine?.venice ?? shot.start;
   const body = { model, prompt: o.prompt, negative_prompt: o.negative,
     image_url: `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${src}.jpg`)).toString('base64')}`,
-    duration: `${o.duration}s`, resolution: '1080p', aspect_ratio: '16:9' };
+    duration: `${o.duration}s`, resolution: process.env.VENICE_VIDEO_RES || '1080p', aspect_ratio: '16:9' };
+  for (const k of (process.env.VENICE_OMIT || '').split(',').filter(Boolean)) delete body[k];  // some models refuse aspect_ratio/resolution
   const q = await post('/video/quote', body);
   const usd = Number((q.stdout.match(/"quote"\s*:\s*([\d.]+)/) || [])[1]);
   if (!Number.isFinite(usd)) throw new Error('Venice gave no quote: ' + q.stdout.slice(0, 200));
@@ -264,9 +271,9 @@ async function veniceVideo(shotId, shot, o) {
   const qr = await post('/video/queue', body);
   const qid = (qr.stdout.match(/"queue_id"\s*:\s*"([^"]+)"/) || [])[1];
   if (!qid) { record({ kind: 'video', id: shotId, engine: 'venice', model, status: 'failed', usd: 0, error: qr.stdout.slice(0, 200) });
-    console.log(`FAIL ${shotId}__venice: ${qr.stdout.slice(0, 200)}`); process.exitCode = 2; return; }
+    console.log(`FAIL ${shotId}__${tag}: ${qr.stdout.slice(0, 200)}`); process.exitCode = 2; return; }
   process.stderr.write(`  ${shotId}__venice: ${model} queue ${qid} (quoted $${usd})\n`);
-  const dest = path.join(BASE, 'clips', `${shotId}__venice.mp4`), t0 = Date.now();
+  const dest = path.join(BASE, 'clips', `${shotId}__${tag}.mp4`), t0 = Date.now();
   while (Date.now() - t0 < 20 * 60 * 1000) {
     await new Promise(r => setTimeout(r, 10000));
     const { stdout } = await run('curl', ['-s', '-m', '180', '-X', 'POST', '-H', `Authorization: Bearer ${key}`, '-H', 'Content-Type: application/json',
@@ -275,7 +282,7 @@ async function veniceVideo(shotId, shot, o) {
   }
   const ok = fs.existsSync(dest);
   record({ kind: 'video', id: shotId, engine: 'venice', model, seconds: o.duration, status: ok ? 'succeeded' : 'failed', usd: ok ? usd : 0, error: ok ? null : 'timeout', prediction: qid });
-  console.log(ok ? `OK ${shotId}__venice -> ${dest} (~$${usd.toFixed(2)}; spent $${spent().toFixed(2)} of $${BUDGET})` : `FAIL ${shotId}__venice: no video in 20 min`);
+  console.log(ok ? `OK ${shotId}__${tag} -> ${dest} (~$${usd.toFixed(2)}; spent $${spent().toFixed(2)} of $${BUDGET})` : `FAIL ${shotId}__${tag}: no video in 20 min`);
 }
 
 async function video(shotId, engineOverride) {
