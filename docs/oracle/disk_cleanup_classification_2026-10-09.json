@@ -1,0 +1,1924 @@
+{
+ "live": {
+  "live_paths": [
+   {
+    "path": "/home/ubuntu/cto-aipa (dist/, node_modules/, .env, docs/, scripts/, atuona-state.json, serpapi_prospects_seen.json)",
+    "used_by": "PM2 cto-aipa (pid 3720247, script dist/cto-aipa.js, cwd ~/cto-aipa); nginx /cto/ and /queue/ to :3000; 17 cron lines `cd /home/ubuntu/cto-aipa && node scripts/...`",
+    "how": "runs the code; reads .env and docs/oracle/NOW.md plus docs/selling/* (registry, drafts, attachments); writes atuona-state.json",
+    "evidence": "pm2 jlist: cwd=/home/ubuntu/cto-aipa, script=dist/cto-aipa.js. atuona-state.json mtime 2026-10-09 13:02. dist greps: process.cwd(),'docs','oracle','NOW.md' and 'serpapi_prospects_seen.json'. crontab -l lists sync-atlas-ga4, resend-reconcile, atlas-*, hunter-owner-sweep, concierge-selftest, wiki-ship, sort-cita-lists, apply-queue, hs-fill-apply-kit, hs-attach-cv, hs-audit-apply-kit, reply-radar.py and hs-deal-prep."
+   },
+   {
+    "path": "/home/ubuntu/cto-aipa/wallet + /opt/oracle/instantclient_23_4 (/opt/instantclient_23_4 symlink)",
+    "used_by": "PM2 cto-aipa (Oracle DB client) and cron sync-atlas-ga4.mjs",
+    "how": "read; the client libraries are memory-mapped",
+    "evidence": "pm2 env TNS_ADMIN=/home/ubuntu/cto-aipa/wallet, ORACLE_HOME=/opt/oracle/instantclient_23_4. lsof -p 3720247 shows mem /opt/oracle/instantclient_23_4/libclntsh.so.23.1. sync-atlas-ga4.mjs references /home/ubuntu/cto-aipa/wallet. The wallet.backup-20250414, wallet.backup-20260414-1916 and wallet.bak.dec2025 copies are not referenced."
+   },
+   {
+    "path": "/home/ubuntu/cto-aipa/data/ (611 MB: blog-posts-cache.json, blog-es-cache/, concierge/, chat-concierge-state.json, reply-radar-state.json, resend-ledger.json, make-can-draft.json, alert-cooldowns.json, stale-repos-announced.json ...)",
+    "used_by": "PM2 cto-aipa and the cron scripts resend-reconcile and reply-radar",
+    "how": "reads and writes state and caches",
+    "evidence": "dist greps: path.join(process.cwd(),'data',...) for blog-posts-cache.json, concierge, make-can-draft.json, alert-cooldowns.json, stale-repos-announced.json and data/blog-es-cache. Today's mtimes: chat-concierge-state.json 13:00, reply-radar-state.json 13:00, make-can-draft.json 12:57, concierge/ 12:45. resend-reconcile.cjs uses 'data/resend-ledger.json'."
+   },
+   {
+    "path": "/home/ubuntu/cto-aipa/data/atuona/films/out/ (383 MB, 8 mp4)",
+    "used_by": "PUBLIC: https://webhook.aideazz.xyz/cto/films, /cto/films/<name> and /cto/films.json, served by cto-aipa. atuona.xyz/aifilmstudio pages and atuona public/llms.txt hardcode all 8 file names",
+    "how": "served over HTTP with Range support; /film build writes new films here",
+    "evidence": "dist/cto-aipa.js:927 app.get('/films/:name') resolves to filmsOutDir() = (HASHNODE_TOPIC_STATE_DIR unset, so) cwd/data/atuona/films/out. lsof -p 3720247 has fds 27r/28r open on recovered-2026-07-04T11-04-13.mp4 and Atuona.xyz__Paradise.js-2026-05-20T12-00-22.mp4. D:/aideazz/atuona/public/aifilmstudio/index.html and llms.txt list crimson-escape, could-not-generate-content, recovered, reprint, the-secret-exhibition, stanzas, between-compile-and-run and Paradise.js. Size twins that are not themselves served: ~/atuona-film8/work/final.mp4 (= crimson-escape), ~/atuona-film7/work/final_published_moments.mp4 (= could-not-generate-content), ~/atuona-backups-2026-07-03/the-secret-exhibition...mp4. Sizes only; md5 was not run."
+   },
+   {
+    "path": "/home/ubuntu/cto-aipa/data/atuona/films/shots/ (189 MB) + films/music/ (31 MB) + films/work/ (5 MB)",
+    "used_by": "PUBLIC: /cto/films/shots/:name, served by cto-aipa. The Atuona bot writes shots/ (persistShot) and pins shot URLs on atuona pages. /film build reads music/ and uses work/ as scratch",
+    "how": "write, read and serve",
+    "evidence": "dist/cto-aipa.js:888 app.get('/films/shots/:name') resolves to shotsDir(). dist/atuona-creative-ai.js:9602 persistShot(pageId, videoUrl). grep atuona-state.json finds 11 live shot URLs: 019/055/085/099-still(-v).jpg, venice-023-1791368533891.mp4, venice-048-1790118491254.mp4 and venice-085-1791413571247.mp4. Newest shot is 085.mp4 from 7 Oct 22:52."
+   },
+   {
+    "path": "/home/ubuntu/whitespace (dist/server.js, public/, data/: radar.sqlite, concepts.json, brief.json, intelligence.json, outcomes.json, assets/)",
+    "used_by": "PM2 whitespace (pid 1072138, :8095); nginx /whitespace/; cron atlas-capture-cron.sh (Mon 14:00 UTC); cron atlas-lead-machine.cjs reads data/concepts.json",
+    "how": "serves public/ and data/assets via express.static; reads and writes data/",
+    "evidence": "dist/server.js:113 express.static(PUBLIC_DIR); :115 '/assets' to data/assets; :138 data/radar.sqlite. The crontab runs `bash /home/ubuntu/whitespace/scripts/atlas-capture-cron.sh`, which does cd $WS/data. atlas-lead-machine.cjs references /home/ubuntu/whitespace/data/concepts.json. Referenced at webhook.aideazz.xyz/whitespace/atlas.html (27 repo refs)."
+   },
+   {
+    "path": "/home/ubuntu/dragontrade-agent (index.js, dashboard-server.js, algom-*.js, stream_state.json, engagement_state.json, .env; also the paused Bybit/Binance bot code)",
+    "used_by": "PM2 dragontrade-main (3404834), dragontrade-dashboard (868384, :3001), algom-stream (875211), algom-poll (3343160)",
+    "how": "runs; writes state JSON",
+    "evidence": "pm2 jlist cwd=/home/ubuntu/dragontrade-agent for all 4 processes. stream_state.json and engagement_state.json mtime 2026-10-09 12:40. Memory reference_oracle_disk_housekeeping: the paused Bybit/Binance bots are NEVER cleaned (their code is here; the gz logs sit in ~/.pm2/logs)."
+   },
+   {
+    "path": "/usr/lib/node_modules/n8n (/usr/bin/n8n) + /home/ubuntu/.n8n (database.sqlite + -wal/-shm) + /tmp/n8nDataTableUploads (empty) + /tmp/node-compile-cache (33 MB, can be regenerated)",
+    "used_by": "PM2 n8n (pid 4139760, 127.0.0.1:5678); nginx /crm/ (editor) and /crm/webhook/* (public webhooks, e.g. Resend/HubSpot); /crm/webhook/ops feeds the /ops dashboard",
+    "how": "database open read-write; served through the proxy",
+    "evidence": "lsof -p 4139760: 22ur/23u /home/ubuntu/.n8n/database.sqlite(-wal). nginx webhook site: location /crm/ proxy_pass 127.0.0.1:5678 and location = /crm/webhook/ops. Correction to round 2, which said 'No nginx site points at n8n': nginx does proxy /crm/ to it. No workflow in the n8n DB references a local file path (grep -a found no /home, /tmp or /var/www strings)."
+   },
+   {
+    "path": "/home/ubuntu/VibeJobHunterAIPA_AIMCF (venv/, src/, .env, google_analytics_credentials.json, vibejobhunter.db, autonomous_data/ [vjh_checkpoint.db 442 MB, ats_cache 698 MB, seen_jobs.json, judge_decisions.json, judge_feedback_sync.log], logs/vibejobhunter_YYYYMMDD.log)",
+    "used_by": "systemd vibejobhunter (pid 3353377) and vibejobhunter-web (1031933, :8080); PM2 serpapi-jobs (2944099); crons judge_feedback_sync.py (:17 hourly), followup_radar.py, job-board-watch.sh, sweep_i_act_today.py; cto-aipa dist reads autonomous_data/judge_feedback.json",
+    "how": "reads and writes the DBs, caches and daily logs",
+    "evidence": "lsof: pids 2944099 and 3353377 hold vibejobhunter.db open (13u/17u) and write logs/vibejobhunter_20261006.log and _20261007.log; 1031933 writes _20261001.log. src/langgraph_pipeline/runner.py:83 CHECKPOINT_DB_PATH='autonomous_data/vjh_checkpoint.db'. telegram_bot_enhanced.py:1487 and ats_scraper.py:514 read autonomous_data/ats_cache. Only the open daily logs are written. The other ~97 files in logs/ (290 MB total) have no reader in src or scripts."
+   },
+   {
+    "path": "/home/ubuntu/.cache/ms-playwright (613 MB) + ~/.npm/_npx (37 MB) + ~/.cache/n8n (64 MB)",
+    "used_by": "VJH src/autonomous/ats_submitter.py (Playwright browsers); npx tooling; n8n",
+    "how": "read at runtime",
+    "evidence": "grep finds ms-playwright/chromium usage in VibeJobHunterAIPA_AIMCF/src/autonomous/ats_submitter.py. ls ~/.cache/ms-playwright shows chromium-1200, chromium_headless_shell-1200 and ffmpeg-1011. Standing rule (memory reference_oracle_disk_housekeeping): NEVER clean."
+   },
+   {
+    "path": "/home/ubuntu/aw-portal (.venv, app.py, static/, data/portal.db, data/reports/<id>/{sacs,tcc}.pdf)",
+    "used_by": "systemd aw-portal (pid 3811716, uvicorn 127.0.0.1:8090); nginx /aw-portal/",
+    "how": "serves static/ and the report PDFs; DB read-write",
+    "evidence": "unit WorkingDirectory=/home/ubuntu/aw-portal, Environment AW_PORTAL_DB_PATH=/home/ubuntu/aw-portal/data/portal.db. app.py:17 StaticFiles(ROOT/'static'). app.py:155/163 FileResponse(ROOT/'data'/'reports'/id/'sacs.pdf'|'tcc.pdf')."
+   },
+   {
+    "path": "/home/ubuntu/EspaLuzFamilybot (venv/, main.py, paypal_webhook_server.py, json_store_guard.py, .env, subscribers/telegram_subscribers/user_*.json, paguelofacil_payments.json)",
+    "used_by": "systemd espaluz-familybot (1031870); espaluz-payments-webhook (1031872, :5000 = nginx '/' catch-all); espaluz-json-guard.timer (every 15 min, snapshots to Postgres); EspaLuzWhatsApp via its .env; the duplicate espaluz-webhook.service also points here (crash-loop)",
+    "how": "runs; reads and writes the JSON stores",
+    "evidence": "systemctl cat: WorkingDirectory=/home/ubuntu/EspaLuzFamilybot for all 4 units; EnvironmentFile=-/home/ubuntu/EspaLuzFamilybot/.env. EspaLuzWhatsApp/.env: ESPALUZ_FAMILYBOT_PATH=/home/ubuntu/EspaLuzFamilybot, PAGUELOFACIL_PAYMENTS_FILE=/home/ubuntu/EspaLuzFamilybot/paguelofacil_payments.json. ss: 0.0.0.0:5000 held by python pid=1031872. json-guard last ran 12:58:47 today."
+   },
+   {
+    "path": "/home/ubuntu/EspaLuzWhatsApp (venv/, espaluz_bridge.py, .env, google_credentials.json)",
+    "used_by": "systemd espaluz-whatsapp (1031879, :8081); nginx /espaluz/",
+    "how": "runs",
+    "evidence": "unit WorkingDirectory=/home/ubuntu/EspaLuzWhatsApp, EnvironmentFile=/home/ubuntu/EspaLuzWhatsApp/.env, GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/EspaLuzWhatsApp/google_credentials.json, PORT=8081. nginx: location /espaluz/ proxy_pass 127.0.0.1:8081."
+   },
+   {
+    "path": "/tmp/media/",
+    "used_by": "PUBLIC: https://webhook.aideazz.xyz/espaluz/media/<file>, fetched by Twilio (WhatsApp MediaUrl); written and served by espaluz-whatsapp",
+    "how": "write, then serve; files are transient",
+    "evidence": "espaluz_bridge.py:1112 and :4360 os.makedirs('/tmp/media'); :4363 hosted_path=f'/tmp/media/{filename}'; :4381 media_url=f'https://{PUBLIC_DOMAIN or webhook.aideazz.xyz/espaluz}/media/{filename}'; :4460 @app.route('/media/<filename>') does send_file. It currently holds 6 .ogg files (16 MB) from 27 and 30 Sep. Each file only needs to exist until Twilio fetches it; the directory itself is live."
+   },
+   {
+    "path": "/tmp/espaluz_video_*.mp4, /tmp/video_<uid>.mp4, /tmp/voice_*.mp3/.ogg, /tmp/tts_*.mp3, /tmp/conversation_*, /tmp/video_script_audio.mp3",
+    "used_by": "espaluz-whatsapp (core_logic.py, espaluz_bridge.py)",
+    "how": "scratch writes per message, then copied into /tmp/media",
+    "evidence": "espaluz_bridge.py:3708/3947 video_path=f'/tmp/espaluz_video_{int(time.time())}.mp4'; core_logic.py:56/89. The current 8 files (about 170 MB, dated 27 and 30 Sep) have new timestamped names on every run, and no code re-reads an old one. The live writer is the pattern, not those old files."
+   },
+   {
+    "path": "/tmp/espaluz-geo_api_rotation.json",
+    "used_by": "systemd espaluz-influencer (EspaLuz_Influencer/geo_api_promo.py), the GEO image rotation for Buffer Instagram/LinkedIn posts",
+    "how": "read and write state (current index 28)",
+    "evidence": "geo_api_promo.py:48 _MEMORY=Path(os.environ.get('GEO_API_MEMORY','/tmp/espaluz-geo_api_rotation.json')); GEO_API_MEMORY is not set. File mtime 2026-10-08 23:00, content {\"geo_api_image_rotation_index\": 28}. NOW.md 15 Sep: 'GEO counter lives in /tmp ... a VM reboot does [reset it]'. Deleting it restarts the rotation at 0. KEEP."
+   },
+   {
+    "path": "/home/ubuntu/EspaLuz_Influencer (venv/, main.py, geo_api_promo.py, cto_milestone_module.py, content_memory.json, .env)",
+    "used_by": "systemd espaluz-influencer (pid 1031871)",
+    "how": "runs; writes content_memory.json",
+    "evidence": "unit WorkingDirectory=/home/ubuntu/EspaLuz_Influencer; content_memory.json mtime 2026-10-08 23:00."
+   },
+   {
+    "path": "/var/www/influencer-images/{image1-5.jpg, espaluz_qr_4x5.jpg, sprinter.jpg, marketing_engine_*.png, marketing_engine_images/me_01..32.jpg, geo-api/*.jpg (6)}",
+    "used_by": "PUBLIC: webhook.aideazz.xyz/influencer-images/... EspaLuz_Influencer main.py and cto_milestone_module.py put these URLs in the payloads of Make scenario 3044021 and Buffer (Instagram and LinkedIn)",
+    "how": "served by nginx alias /var/www/influencer-images/",
+    "evidence": "nginx: location /influencer-images/ alias /var/www/influencer-images/. EspaLuz_Influencer/main.py:176-229 hardcodes each URL; cto_milestone_module.py has influencer-images/sprinter.jpg. NOW.md 15 Sep: GEO pool = 6 GEO images x10, then me_01..me_32. Originals in ~/backups/influencer-images-20260914/ are the rollback copy (34 files)."
+   },
+   {
+    "path": "/var/www/influencer-images/cmo/ (19 images)",
+    "used_by": "systemd vibejobhunter (src/notifications/linkedin_cmo_v4.py), LinkedIn CMO posts sent through the Make hook",
+    "how": "served",
+    "evidence": "linkedin_cmo_v4.py:1065 github_base='https://webhook.aideazz.xyz/influencer-images/cmo'."
+   },
+   {
+    "path": "/var/www/influencer-images/youtube/aigo-film-1-yacht.mp4, -2-api.mp4, -3-villa.mp4, -4-relocation.mp4, -5-medtour.mp4",
+    "used_by": "Make scenario 6263197 'Daily YouTube Upload', daily 09:15 Panama (14:15 UTC); filmIndex = day-of-year % 5; one http:ActionGetFile route per film",
+    "how": "fetched by Make over HTTPS (served by nginx; the youtube/ location sets no-store)",
+    "evidence": "docs/oracle/MAKE_API_PROMO_SCENARIO.md (3 Oct, and the 5 Oct medtour fix). Blueprint docs/selling/video/make/6263197_daily_youtube_upload_5FILMS_FIXED_2026-10-05.json references all 5 URLs. md5 today: 89e91e42, 28d5b971, 7253d8df, 5ab513a8, 3d1849e4f70c45ccd5ad2c55a8497d6d, matching the published masters in the doc table."
+   },
+   {
+    "path": "/var/www/influencer-images/youtube/thumbs/aigo-thumb-{yacht,api,villa,relocation,medtour}-en.jpg",
+    "used_by": "Make scenario 6518503 'AIGO YouTube to thumbnails', daily 09:45 Panama (youtube:setVideoThumbnail)",
+    "how": "fetched by Make",
+    "evidence": "Blueprint docs/selling/video/make/6518503_aigo_youtube_thumbnails_2026-10-05.json lines 50/60 hold the 5 thumb URLs. MAKE_API_PROMO_SCENARIO.md 5 Oct records the verified run (3 ops, 220,990 B)."
+   },
+   {
+    "path": "/var/www/influencer-images/ig-aigo/posts/<YYYY-MM-DD>.json + ig-aigo/reel_{yacht,villa,reloc,medtour,api}_v1.mp4",
+    "used_by": "Make scenario 6505010 'AIGO Films to Instagram Reels', daily 12:00 Panama; GETs posts/<Panama date>.json and POSTs it to Buffer, and Buffer/Instagram then fetches the reel_*.mp4 named inside",
+    "how": "fetched by Make and Buffer",
+    "evidence": "AIGO_INSTAGRAM_REELS.md plus blueprint 6505010_..._REDACTED.json:28. Each post file names its reel URL: 10-06 villa, 10-08 reloc, 10-10 medtour, 10-12 api (still upcoming on 10 and 12 Oct); 10-04.json.posted = yacht. Without a new calendar, nothing reads these after 12 Oct."
+   },
+   {
+    "path": "/var/www/influencer-images/youtube/watch.html, watch-v14.html, watch-v15.html + can-ai-find-and-cite-you-v13, v14, v15, v16, v18, v19 .mp4 + v19-poster.jpg + api-cta-qr.png",
+    "used_by": "PUBLIC watch pages. The on-demand Make hook (hook.us2 ...n78wclxk...) uses v19.mp4 and v19-poster.jpg. NOW.md gave Elena the v13 URL; v16/v18 are kept as the watch.html rollback",
+    "how": "served",
+    "evidence": "grep of the watch pages: watch.html references v15, v16, v18, v19, v19-poster and api-cta-qr.png; watch-v14 references v13 and v14; watch-v15 references v13, v14 and v15. MAKE_API_PROMO_SCENARIO.md:162/165 (v19 and its poster). NOW.md:1750-1952."
+   },
+   {
+    "path": "/var/www/ops/ (React build) + /etc/nginx/.htpasswd-ops",
+    "used_by": "PUBLIC (basic auth): webhook.aideazz.xyz/ops/, Elena's CRM ops dashboard (data from /crm/webhook/ops in n8n)",
+    "how": "served",
+    "evidence": "nginx: location /ops/ alias /var/www/ops/ with auth_basic_user_file /etc/nginx/.htpasswd-ops."
+   },
+   {
+    "path": "/var/www/aideazz-docs/ (nine-systems.html, nine-systems-040ebc....html, 2 intelliops PDFs)",
+    "used_by": "PUBLIC: webhook.aideazz.xyz/doc/ (noindex); /doc/nine-systems is linked 17 times in the repo",
+    "how": "served",
+    "evidence": "nginx: location /doc/ alias /var/www/aideazz-docs/, plus a 301 from the hashed name to /doc/nine-systems."
+   },
+   {
+    "path": "/etc/nginx/sites-available/webhook (enabled) + /etc/letsencrypt/live/webhook.aideazz.xyz + /var/www/html (default site)",
+    "used_by": "nginx (master + workers 1031912/1031913, :80/:443)",
+    "how": "read config and serve",
+    "evidence": "sites-enabled/webhook symlink, ssl_certificate /etc/letsencrypt/live/webhook.aideazz.xyz/fullchain.pem. The 13 webhook.bak.* files in sites-available are not included by nginx.conf (only sites-enabled/*)."
+   },
+   {
+    "path": "/home/ubuntu/.openclaw (openclaw.json, .env, agents/, telegram/, memory/, workspace/ incl. workspace/deals/TOOLS.md and workspace/skills/interview-spar/references/build-cards.py) + /usr/lib/node_modules/openclaw + /tmp/openclaw/ (daily logs) + /tmp/openclaw-1001/gateway.*.lock",
+    "used_by": "systemd --user openclaw-gateway (pids 3350337/3350345, 127.0.0.1:18789); cron hs-deal-prep.cjs every 30 min writes workspace/deals/TOOLS.md; cron build-cards.py every 10 min",
+    "how": "runs; reads and writes",
+    "evidence": "systemctl --user show: ExecStart=/usr/bin/env openclaw gateway --port 18789, EnvironmentFile=/home/ubuntu/.openclaw/.env, WorkingDirectory=/home/ubuntu. lsof 3350345: 21w /tmp/openclaw-1001/gateway.fce66949.lock. /tmp/openclaw/openclaw-2026-10-07.log (1.97 MB, written 8 Oct 21:40)."
+   },
+   {
+    "path": "/home/ubuntu/.pm2 (dump.pm2, module_conf.json, logs/, modules/pm2-logrotate, pm2.log, pub/rpc.sock)",
+    "used_by": "PM2 God daemon (3342857, since 28 Jul) and pm2-logrotate (234579)",
+    "how": "writes the logs; rotation rewrites logs/",
+    "evidence": "pm2 jlist out/err paths are all ~/.pm2/logs/*. dump.pm2 lists the same 8 apps. module_conf.json pm2-logrotate {max_size 50M, retain 10, compress 'true'}, touched 13:03 today. Note: pm2-ubuntu.service has been 'failed (Result: protocol)' since 28 Jul. ~/.pm2/pm2__2026-09-28_15-38-05.log (842 MB) and the Bybit/Binance *.gz are not written by anything (keep the gz per the standing rule)."
+   },
+   {
+    "path": "/var/lib/postgresql/16/main (106 MB)",
+    "used_by": "postgresql@16-main (3818261, :5432): EspaLuz bots, json-guard snapshots, DATABASE_URL in several .env files",
+    "how": "DB read-write",
+    "evidence": "ps: postgres -D /var/lib/postgresql/16/main; espaluz-json-guard.service is described as 'append-only snapshots of bot state into Postgres'."
+   },
+   {
+    "path": "/var/log/espaluz-familybot.log, /var/log/espaluz-webhook.log, /var/log/oracle-health.log, /var/log/oci-keepalive.log, /var/log/joblist-pipeline.log (+ syslog, kern.log, auth.log, nginx/, journal/ 1 GB cap, sysstat/)",
+    "used_by": "espaluz-familybot (StandardOutput=append); duplicate espaluz-webhook.service (crash-loop); cron check_oracle_health.sh; cron oci_keepalive.sh; cron run_shortlist.sh; system daemons",
+    "how": "appended",
+    "evidence": "lsof 1031870: 1w/2w /var/log/espaluz-familybot.log. Sizes and mtimes today: familybot 145 MB 13:11, espaluz-webhook 291.6 MB 13:03, oracle-health 212.9 MB 13:10, joblist 2.6 MB 12:00, oci-keepalive 52 KB 12:00. None of these app logs has a logrotate rule (round 1)."
+   },
+   {
+    "path": "/home/ubuntu/check_oracle_health.sh, /home/ubuntu/health_monitor.sh (+ ~/health.log, ~/.disk_alert_level), /home/ubuntu/oci_keepalive.sh, /home/ubuntu/run-citation-probe.sh, /home/ubuntu/bin/hs-watch-manual-emails.sh, /home/ubuntu/bin/github-token-watch.sh (reads ~/.git-credentials, cto-aipa/.env)",
+    "used_by": "ubuntu crontab (*/5, */5, 0 */4, Mon 13:00, */10, daily 09:00)",
+    "how": "executed; writes logs and state",
+    "evidence": "crontab -l. check_oracle_health.sh and health_monitor.sh were rewritten at 13:03 UTC today by another session (health_monitor now sends Telegram alerts and stores ~/.disk_alert_level; .bak-2026-10-09 copies sit beside them; staging folder ~/disk-prevention-2026-10-09/)."
+   },
+   {
+    "path": "/home/ubuntu/logs/ (≈6 MB of cron output logs)",
+    "used_by": "every cron line that ends `>> /home/ubuntu/logs/<name>.log`; cto-aipa dist reads /home/ubuntu/logs/followup-radar.log",
+    "how": "appended by cron",
+    "evidence": "crontab -l; dist/telegram-bot.js:8151 '/home/ubuntu/logs/followup-radar.log'. apply-kit.log and attach-cv.log written at 13:00 today."
+   },
+   {
+    "path": "/home/ubuntu/aideazz (git clone of the aideazz.xyz site)",
+    "used_by": "cron wiki-ship.cjs, daily 21:30 UTC (AIDEAZZ_REPO_PATH=/home/ubuntu/aideazz)",
+    "how": "read, write and git push",
+    "evidence": "crontab: `cd /home/ubuntu/cto-aipa && AIDEAZZ_REPO_PATH=/home/ubuntu/aideazz node scripts/wiki-ship.cjs`; wiki-ship.cjs references /home/ubuntu/aideazz."
+   },
+   {
+    "path": "/home/ubuntu/cv-build-deps/node_modules + /home/ubuntu/cv-build-fonts",
+    "used_by": "cron hs-fill-apply-kit.cjs, every 10 min (builds the CV PDFs attached to HubSpot deals)",
+    "how": "read",
+    "evidence": "hs-fill-apply-kit.cjs:72-73 CV_NODE_PATH=path.join(os.homedir(),'cv-build-deps','node_modules'), CV_FONTS=path.join(os.homedir(),'cv-build-fonts')."
+   },
+   {
+    "path": "/home/ubuntu/apply-queue.html, ~/.apply-queue-seen.json, ~/.apply-queue-research.json (paid Perplexity cache), /tmp/apply-kit.lock",
+    "used_by": "cron apply-queue.cjs (daily 13:15 UTC, --out /home/ubuntu/apply-queue.html); scripts/lib/company-research.cjs; flock in the */10 apply-kit cron",
+    "how": "write and read; lock file",
+    "evidence": "apply-queue.cjs:204 SEEN_FILE=path.join(os.homedir(),'.apply-queue-seen.json'); grep finds 'apply-queue-research' only in scripts/lib/company-research.cjs (its comment: 'CACHED by company, a company researched once is never paid for twice'). crontab: /usr/bin/flock -n /tmp/apply-kit.lock. Rebuilding the research cache would cost money; KEEP."
+   },
+   {
+    "path": "/home/ubuntu/job-list-filter (run_shortlist.sh, ~1 MB)",
+    "used_by": "cron, every 6 h",
+    "how": "executed",
+    "evidence": "crontab: `cd /home/ubuntu/job-list-filter && ./run_shortlist.sh >> /var/log/joblist-pipeline.log`."
+   },
+   {
+    "path": "/home/ubuntu/set-{gmail,pplx,deepseek,ghtoken,opspw,reddit,venice}-stdin.sh",
+    "used_by": "cto-aipa Telegram bot secret-setting commands (spawned)",
+    "how": "executed on demand",
+    "evidence": "dist/telegram-bot.js:1011/1080/1140/1228/1308/1524 spawn('/home/ubuntu/set-*-stdin.sh')."
+   },
+   {
+    "path": "/home/ubuntu/atuona-film9/{img/, clips/, stillclips/, music/, plan.json, APPROVED_MANIFEST_2026-10-0[89].json, film9_approved_manifest.py}",
+    "used_by": "Not served or scheduled. PROTECTED by Elena's rule: Copy 1 of the 39 approved film #9 frames and 51 clips (Copy 2 is on the laptop; all material is on D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08)",
+    "how": "none at runtime; reference assets",
+    "evidence": "Memory project_atuona_film9_approved_assets. du: clips 660 MB, raw 502 MB, stillclips 368 MB, img 264 MB, music 14 MB. No process cwd, cron, unit, nginx or symlink references it. Never remove the approved assets."
+   },
+   {
+    "path": "/tmp/systemd-private-* (logind, resolved, timesyncd, unified-monitoring-agent, ModemManager, polkit), /tmp/snap-private-tmp, /tmp/unified-monitoring-agent, /opt/unified-monitoring-agent",
+    "used_by": "running system services (PrivateTmp) and the OCI monitoring agent",
+    "how": "private tmp of live daemons",
+    "evidence": "Directory names match services listed as running by systemctl list-units --state=running; unified-monitoring-agent.service is running."
+   },
+   {
+    "path": "/home/ubuntu/.cursor-server, /home/ubuntu/.claude, /home/ubuntu/.local (Claude CLI), /home/ubuntu/.ssh, /home/ubuntu/.secrets, /home/ubuntu/.git-credentials",
+    "used_by": "remote-dev and agent tooling (Cursor/Claude over SSH); github-token-watch reads .git-credentials",
+    "how": "tooling, not products",
+    "evidence": "github-token-watch.sh references ~/.git-credentials; .git-credentials mtime 8 Oct 21:41."
+   }
+  ],
+  "notes": "STRICTLY READ-ONLY. I made no change on Oracle or the laptop: no delete, move, edit, restart, kill or message. Side effects: reading content (md5sum of 20 served and working mp4s, grep of the post JSONs and watch pages, cat of /tmp/espaluz-geo_api_rotation.json) may have refreshed atime under relatime. The only /tmp file whose content I read is that 41-byte state file, which its bot rewrites daily anyway.\n\nCONCURRENT WORK ON THE BOX: another session is applying disk-prevention fixes right now. At 13:03 UTC today ~/check_oracle_health.sh and ~/health_monitor.sh were rewritten (.bak-2026-10-09 copies beside them), ~/disk-prevention-2026-10-09/ was created (holding logrotate-aideazz-app-logs.conf and disk-prevention-apply.sh), and ~/.pm2/module_conf.json was touched. Coordinate through NOW.md before anyone deletes anything.\n\nNOT LIVE — evidence that nothing live reads, writes or serves these:\n1. ~/aigo-promo, aigo-med, aigo-villa, aigo-reloc, aigo-ig, aigo-art (≈7.2 GB). No PM2, systemd, cron, nginx, symlink or hardlink reference (find -links +1 in /var/www and the films dir found none). Only manual production scripts in ~/cto-aipa/scripts (*-cut.py, *-vo.py, aigo-ig-*.py/sh, aigo-promo-gen.mjs) name them. Every served deliverable is a separate copy in /var/www, and md5 proves it a byte-identical twin: aigo-promo/cut5/AIGO_FINAL = yacht 89e91e42; apim/cut1/AIGO_API_FINAL = api 28d5b971; aigo-villa/cut1/VILLA_FINAL = villa 7253d8df; aigo-reloc/cut1/RELOC_FINAL_v2 = relocation 5ab513a8; aigo-med/cut1/MEDTOUR_FINAL_v3 = medtour 3d1849e4; aigo-ig/reel_*_v1.mp4 = /var/www/.../ig-aigo/reel_*_v1.mp4 (all 5). /tmp/thumbs_en/*_EN.jpg are size-equal to the served thumbs.\n2. ~/aideazz-api-film, -v14, -v15, -v17, -v18, -v19 (≈2.6 GB), plus /tmp/api-film-out*, /tmp/youtube-api-audit-film*, /tmp/api-film-v1x-music. Unreferenced; their out/*.mp4 are size-equal to files in /var/www/influencer-images/youtube.\n3. ~/atuona-film3/4/5/7/8, atuona-compile/montage/oneoff/blindtest, atuona-backups-2026-07-03, trailer-sample, outlook-art, /tmp/atuona-hd. Unreferenced. Film7/film8 finals and the-secret-exhibition are size-equal to the served out/ films; several film3/4/7 clips are size-equal to shots/*.mp4 (md5 not run on these). Per memory, each film folder still needs the per-film published-and-backed-up check before cleaning.\n4. /tmp scratch: vjh-test-20261006 (1.25 GB; no process cwd, open fd or cron in it), demucs_med/med2/mus/reloc/reloc4/reloc_v1 (≈1.19 GB), qrvenv (237 MB), verify-*/verify5_*/reloc_verify*, YACHT_ and API_FINAL_1080p_phone.mp4, 3 Oct .org.chromium.* dirs (no chromium running), tmux-1001 (no tmux running), psrc/ and triage_ro_1008*.cjs (8 Oct session scratch). The lsof sweep over all processes shows only two open files under /tmp: /tmp/_chattest.log and /tmp/openclaw-1001/gateway.*.lock.\n5. Old EspaLuz backups in ~: EspaLuzWhatsApp_backup_jan23_prefix (685 MB) and EspaLuzWhatsApp_ORACLE_BACKUP_20260131_185049.tgz (435 MB). No service, cron or code reference. Some session ran git fetch inside jan23_prefix on 7 Oct 12:01 (.git/FETCH_HEAD), so treat it as another session's file until that is cleared.\n6. ~/backups (1.3 GB) and ~/_session-backups (60 MB): rollback copies only. NOW.md cites ~/backups/influencer-images-20260914 and ~/cto-aipa/backups/make as rollback sources; keep them.\n\nSERVED BUT UNREFERENCED (still public URLs, so classify with care): in /var/www/influencer-images/youtube, about 25 mp4s (≈0.64 GB) have no reference in any repo, Make blueprint, doc or watch page. They are the 13 timestamped can-ai-find-and-cite-you-2026-09-11T*.mp4 (all but two size-equal to v2–v11), v2–v12, can-ai-find-and-cite-you.mp4 (size = v13) and -20260911.mp4 (size = v2). Referenced, and therefore live: v13–v16, v18, v19, v19-poster, watch*.html and api-cta-qr.png. Old social posts may still link the others; I found no evidence of that either way.\n\nORPHAN PROCESSES (garbage, but killing them is a state change and needs Elena's go):\n- pid 3155170 `pm2 logs cto-aipa --raw --lines 0`, running since 27 Jul, streams a duplicate copy of cto-aipa's log into /tmp/_chattest.log (9.56 MB, still growing).\n- Seven stuck watcher loops: 150058 and 144335 (_sendfu.js, since 31 Jul), 559145 (gen5.mjs, since 3 Jul, tails ~/atuona-film4), 1113457 and 1114990 (dragontrade heartbeat, since 15 May), 840701 (cwd ~/aigo-promo, since 30 Sep) and 1525404 (cwd ~/aigo-reloc, since 2 Oct). Each loops `while pgrep -f \"<pattern>\"; do sleep N` and never exits: the target job is gone, and pgrep matches the pattern inside the loop's own bash -c command line. That pattern is called a self-matching pgrep. They hold cwd in the aigo folders but neither read nor write them.\n\nOTHER FINDINGS:\n- pm2-ubuntu.service has been 'failed (Result: protocol)' since 28 Jul. The running PM2 daemon was started by hand, so restoring the PM2 apps automatically after a reboot is unproven.\n- espaluz-webhook.service (enabled) is still a duplicate that crash-loops on :5000 and appends to /var/log/espaluz-webhook.log (291.6 MB).\n- ~/.config/pulse/...-runtime is a dangling symlink to the missing /tmp/pulse-PKdhtXMmr18n.\n- No symlink anywhere in ~, /var/www, /etc, /opt or /usr/local points into ~/aigo-*, ~/atuona-* or film folders. The /tmp-pointing ones I found are that dangling pulse link and the /opt/instantclient_23_4 link (into /opt/oracle).\n- No Make scenario or repo doc fetches anything from ~/aigo-*, ~/atuona-film*, /tmp or /cto/films/shots by a hardcoded URL; the Atuona shots are referenced from atuona-state.json.\n- n8n holds no local file paths.\n- No laptop scheduled task pulls from Oracle (schtasks); GitHub Actions only deploy into /home/ubuntu/cto-aipa.\n\nSizes of live dirs (du -sm): VibeJobHunter 2163 MB (autonomous_data 1240, venv 560, logs 290), .pm2 1590, cto-aipa 1288 (data 611, .git 492), /var/www/influencer-images 1166 (youtube 993), EspaLuzWhatsApp 808, ms-playwright 613, dragontrade-agent 547, EspaLuzFamilybot 392.\n\nReference for the earlier rounds: D:/aideazz/ai-cofounders/cto-aipa/docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md."
+ },
+ "classified": [
+  {
+   "group": "tmp",
+   "items": [
+    {
+     "path": "/tmp/vjh-test-20261006",
+     "mb": 1246,
+     "verdict": "GARBAGE",
+     "what": "A test copy of VibeJobHunter. Code is from 5 Oct 16:01, the data snapshot from 6 Oct 18:15: src/, evals/, .env, autonomous_data/ including vjh_checkpoint.db at 430 MB, ats_cache at 691 MB and a 110 MB checkpoint .bak. It is not a git repo, and its last log line is a test run at 6 Oct 18:16.",
+     "why": "Nothing points at it. These all came back empty: cwd of every /proc entry, open fds of every process (sudo, all pids), ps args, the ubuntu and root crontabs, /etc/cron* and /var/spool/cron, the systemd system and --user unit dirs, pm2 jlist and dump.pm2, nginx, symlinks under ~ /var/www /etc /opt /usr/local, and the .env of cto-aipa, VJH, openclaw, EspaLuz and whitespace. A grep of cto-aipa scripts/ and dist/, VJH src/ and scripts/, ~/bin, ~/*.sh and the openclaw workspace also found nothing. It is a copy: 148 of its 151 code files are byte-identical to the live ~/VibeJobHunterAIPA_AIMCF. In the other 3 the live file is the newer one: response_detector.py live 7 Oct 21:14; evals/test_llm_judge.py and test_outreach_company_intel.py live 6 Oct 18:19, after this copy. .env is cmp-identical to the live one, so this folder is also a stray copy of production secrets. vjh_checkpoint.db.bak-1782215456 (110 MB) is cmp-identical to the live .bak. So are seen_jobs .bak files, judge_decisions.pre-sweep, outreach_log.jsonl and manual_outreach_queue.json. ats_cache: 259 of 260 files identical to live. vjh_checkpoint.db is a 6 Oct snapshot that the live DB (442 MB, 9 Oct) has moved past. CONTEXT FOR ALL /tmp ITEMS: /usr/lib/tmpfiles.d/tmp.conf has 'D /tmp 1777 root root 30d', and systemd-tmpfiles-clean.timer runs daily at 03:19 UTC, so /tmp files untouched for 30 days get removed automatically. SIDE EFFECTS OF THIS AUDIT (no writes, deletes or restarts on Oracle): my reads moved the access time (atime) on files I cmp'd or md5'd. Those are the vjh-test compared files, api-film-out*, api-film-v14/v15-music, all youtube-api-audit-film* files, the reloc mp3s, the two phone mp4s, and the run/demucs logs. The 30-day clock for those files now restarts at 9 Oct. On the laptop I created and then deleted two of my own scratch hash lists in Git Bash /tmp."
+    },
+    {
+     "path": "/tmp/atuona-hd",
+     "mb": 604,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "1920x1080 upscales (lanczos + unsharp, x264 crf16, preset slow) of film #8 crimson-escape-2026-09-22T16-32-00-HD1080.mp4 (340 MB) and film #7 could-not-generate-content-2026-09-22T10-50-15-HD1080.mp4 (292 MB). Also run.sh and run.log. Made 25 Sep.",
+     "why": "Nothing live uses it: no process, cron, unit, nginx rule or script references it. They appear to be the HD copies for the Niio open call, which needs HD/4K (commit c19f4c2, 24 Sep; [ATUONA-ART] Niio deal in NOW.md). They are not on the laptop. I searched D:/aideazz, D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08, Desktop, Pictures, Downloads, Videos, D:/Downloads, D:/Videos, D:/Telegram Desktop and D:/CapCut Drafts by name and by exact byte size. Only stills of these films exist, in D:/aideazz/_caches/atuona-stills. The 720p originals they were made from stay live in ~/cto-aipa/data/atuona/films/out, and run.sh can rebuild the upscales (CPU-heavy on 2 CPUs). Memory reference_oracle_disk_housekeeping requires a per-film published-and-backed-up check before cleaning this folder. Films #7/#8 are published, but no copy of them exists on the laptop. URGENT: atime, mtime and ctime are all 25 Sep 13:34/13:48. The 30-day /tmp cleaner will delete both files in the first run after 25 Oct 13:48, i.e. 26 Oct 03:19 UTC, unless they are copied to the laptop first."
+    },
+    {
+     "path": "/tmp/demucs_med2",
+     "mb": 481,
+     "verdict": "GARBAGE",
+     "what": "htdemucs vocals and no_vocals.wav stems for 8 stock tracks (331music, in-case, delosound, luz_paris wild-party, rediskasound, riyhsal kuta-beach, senhoromar, thesilentthunder), plus logs. 3 Oct 21:03.",
+     "why": "A vocal screen of the medtour promo music, which ~/aigo-med/music/_vocalcheck.py describes as 'demucs htdemucs vocals stem vs mix'. All 8 source mp3s exist at ~/aigo-med/music/<same name>.mp3, and ~/aigo-promo/venv-demucs/bin/demucs exists, so each stem can be rebuilt in about 4 min per track. No script in ~/aigo-* or ~/cto-aipa/scripts references /tmp/demucs, htdemucs or no_vocals paths. No process, cron or unit uses it. The finished film MEDTOUR_FINAL_v3 is published and served, md5-identical to aigo-medtour.mp4 in /var/www (liveness map). These are intermediates of a finished film."
+    },
+    {
+     "path": "/tmp/demucs_med",
+     "mb": 292,
+     "verdict": "GARBAGE",
+     "what": "htdemucs stems for 5 tracks (alex_makemusic velvet-frequencies, deltax gold, sosimpleaudio thousand-miles, viktoryuriev playa-estepona, yurasoop afro-house), plus gold-413847.log. 3 Oct 19:44.",
+     "why": "The same medtour vocal screen. All 5 source mp3s exist in ~/aigo-med/music, and the demucs venv is in ~/aigo-promo/venv-demucs. Nothing references the stems: no script, process, cron or unit. The finished medtour film is published, and the served copy is md5-verified in /var/www/influencer-images/youtube."
+    },
+    {
+     "path": "/tmp/demucs_reloc",
+     "mb": 240,
+     "verdict": "GARBAGE",
+     "what": "htdemucs stems for rooted, scovinie_578418 and soundeden-my-love-343626. 2 Oct 15:33.",
+     "why": "A vocal screen of the relocation promo music. Sources are ~/aigo-reloc/music/djoldcatz-rooted-spirit-460492.mp3, scoviniebeatz-mwanditaya-ine-578418.mp3 and soundeden-my-love-343626.mp3. Two copies in /tmp were md5-checked against those masters: f76023a0 and 71d732bc. The stems can be rebuilt with ~/aigo-promo/venv-demucs. No script, process, cron or unit references them. RELOC_FINAL_v2 is published, and its served copy is md5-verified (liveness map)."
+    },
+    {
+     "path": "/tmp/demucs_mus",
+     "mb": 73,
+     "verdict": "GARBAGE",
+     "what": "htdemucs stems of mus1 and mus2. 3 Oct 22:26.",
+     "why": "Sources are ~/aigo-med/music_own/mus1.mp3 and ~/aigo-med/music/mus2.mp3, and the stems can be rebuilt with venv-demucs. Not referenced by any script, process, cron or unit. These are intermediates of the finished, published medtour film."
+    },
+    {
+     "path": "/tmp/demucs_reloc_v1",
+     "mb": 56,
+     "verdict": "GARBAGE",
+     "what": "htdemucs stems of 53462119-blue-horizon-494393. 2 Oct 15:34.",
+     "why": "The source is ~/aigo-reloc/music/53462119-blue-horizon-494393.mp3, and the copy in /tmp/v1_bluehorizon is md5 11c91b68, identical. The stems can be rebuilt and are not referenced anywhere. The relocation film is published."
+    },
+    {
+     "path": "/tmp/demucs_reloc4",
+     "mb": 45,
+     "verdict": "GARBAGE",
+     "what": "htdemucs stems of alexrockbeat-deep-house-586577. 2 Oct 15:33.",
+     "why": "The source is ~/aigo-reloc/music/alexrockbeat-deep-house-586577.mp3, md5 0ccbab95, the same as the copy in /tmp/reloc_verify4. The stems can be rebuilt and nothing references them. The relocation film is published."
+    },
+    {
+     "path": "/tmp/qrvenv",
+     "mb": 237,
+     "verdict": "GARBAGE",
+     "what": "A Python 3.12 venv (opencv-python-headless 5.0.0.93 + numpy 2.5.3), created 13 Sep 19:10 by 'python3 -m venv /tmp/qrvenv'.",
+     "why": "No process runs its python. No crontab, systemd unit, .env or script on Oracle references 'qrvenv'. The only mentions in the repo are the disk-forensics and FILM9 handover notes. It can be rebuilt with pip install. The interpreter binary's atime is still 13 Sep, so the 30-day cleaner will start removing its files around 13 Oct."
+    },
+    {
+     "path": "/tmp/api-film-out",
+     "mb": 54,
+     "verdict": "DUPLICATE",
+     "what": "Staging output of the /api promo v12 (11 Sep): can-ai-find-and-cite-you.mp4 and -v12.mp4, endcard, poster, QR and watch.html.",
+     "why": "Both mp4s have md5 ef6ba3401d43123d41e8f05efd7e7107, the same as the served /var/www/influencer-images/youtube/can-ai-find-and-cite-you-v12.mp4. api-cta-endcard.png, can-ai-find-and-cite-you-poster.jpg and api-cta-qr.png are cmp-identical to /var/www/influencer-images/youtube/. Only watch.html (1.7 KB) differs: it is the older v12 watch page, which the live watch.html has replaced. No process, cron, unit, nginx rule or script references it.",
+     "copy_at": "/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v12.mp4 (+ endcard/poster/qr beside it)"
+    },
+    {
+     "path": "/tmp/api-film-out-v14",
+     "mb": 27,
+     "verdict": "DUPLICATE",
+     "what": "Staging output of /api promo v14 (12 Sep): v14 mp4, poster, QR and watch-v14.html.",
+     "why": "The mp4 has md5 5e2adba4bd859829474e02f25f3bc2fc, the same as the served /var/www/influencer-images/youtube/can-ai-find-and-cite-you-v14.mp4. A same-size copy is also in ~/aideazz-api-film-v14/out/. Poster, QR and watch-v14.html are cmp-identical to the served files. Nothing references it.",
+     "copy_at": "/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v14.mp4 (+ v14-poster.jpg, watch-v14.html)"
+    },
+    {
+     "path": "/tmp/api-film-out-v15",
+     "mb": 20,
+     "verdict": "DUPLICATE",
+     "what": "Staging output of /api promo v15 (12 Sep): v15 mp4, poster, QR and watch-v15.html.",
+     "why": "The mp4 has md5 a4f76a753d2b1d2eb2c2d245a5e60a59, the same as the served /var/www/influencer-images/youtube/can-ai-find-and-cite-you-v15.mp4. Same-size copies are also in ~/aideazz-api-film-v15/out/. Poster, QR and watch-v15.html are cmp-identical. Nothing references it.",
+     "copy_at": "/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v15.mp4 (+ v15-poster.jpg, watch-v15.html)"
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film",
+     "mb": 10,
+     "verdict": "DUPLICATE",
+     "what": "The /api film asset kit (11 Sep): ui/*.png, fruit/*.jpg, loom/walkthrough.mp4, thumbnail and compile scripts.",
+     "why": "All 26 files are cmp-identical to the same relative paths under ~/aideazz-api-film/. Its scripts are also blobs in git, on branch origin/cursor/youtube-api-v15-0841 under scripts/youtube-api-audit-film/. Nothing references it.",
+     "copy_at": "/home/ubuntu/aideazz-api-film/ (same relative paths) + git branch origin/cursor/youtube-api-v15-0841"
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v14",
+     "mb": 8,
+     "verdict": "GARBAGE",
+     "what": "The v14 kit (12 Sep): UI shots, GEO fruit images, v14 fruit stills, compile-v14 and related scripts.",
+     "why": "22 files are cmp-identical to ~/aideazz-api-film-v14/. All 9 of its scripts and HTML files exist as git blobs on origin/cursor/youtube-api-v15-0841 (git hash-object checked). The only files with no other copy are 5 v14 fruit stills plus one .flux.json, about 1.3 MB. They are intermediate renders of the v14 cut, which is published and md5-identical in /var/www. Commit 4dbfd3d calls the v14 look 'rejected'. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v15 (everything except the 3 scripts below)",
+     "mb": 8,
+     "verdict": "GARBAGE",
+     "what": "The v15 kit (12–13 Sep): UI shots, GEO fruit, 10 v15 whole/cut fruit stills, __pycache__, and scripts already in git.",
+     "why": "22 files are cmp-identical to ~/aideazz-api-film-v15/. 12 scripts are git blobs on origin/cursor/youtube-api-v15-0841. The 10 v15 fruit stills (about 1.7 MB) are intermediates of the published v15 film (md5 a4f76a75, served), and the .pyc can be rebuilt. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v15/{compile-v15.mjs, hero-clip-v15.mjs, fetch-pixabay-music.py}",
+     "mb": 0.06,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "The last edits of the v15 film scripts: compile-v15.mjs (42,495 B, 13 Sep 10:53), hero-clip-v15.mjs (5,586 B, 13 Sep 00:56) and fetch-pixabay-music.py (14,227 B, 13 Sep 11:01).",
+     "why": "Their git hash-object blobs are not in the laptop repo on any branch. Their md5s (33f88104, f093b57f, 3d383bf0) differ from every other copy on Oracle: ~/backups/api-film-kit-20260912 holds the 12 Sep versions, and ~/aideazz-api-film/kit holds an older fetch-pixabay-music.py. They are probably the v15-to-v16 music and ducker work; v16 is the watch.html rollback. Small, but the only copy. Copy them to the laptop or a repo branch before the folder goes."
+    },
+    {
+     "path": "/tmp/api-film-v14-music",
+     "mb": 6,
+     "verdict": "DUPLICATE",
+     "what": "v14-under-the-mango-sky-pixabay.mp3 plus SELECTED.credit and SELECTED.path (12 Sep).",
+     "why": "The mp3 has md5 5494b79378594823d12de0f9551f90b1, the same as ~/aideazz-api-film-v14/music/v14-under-the-mango-sky-pixabay.mp3. Nothing references it. Note: if ~/aideazz-api-film-v14 is later archived, this copy goes with it.",
+     "copy_at": "/home/ubuntu/aideazz-api-film-v14/music/v14-under-the-mango-sky-pixabay.mp3"
+    },
+    {
+     "path": "/tmp/api-film-v15-music",
+     "mb": 6,
+     "verdict": "DUPLICATE",
+     "what": "v15-tropical-tropical-house-pixabay.mp3 plus SELECTED.credit and SELECTED.path (12 Sep).",
+     "why": "The mp3 has md5 b919f106a2fc727e3b45cd2f2c7c1da1, the same as ~/aideazz-api-film-v15/music/v15-tropical-tropical-house-pixabay.mp3. Nothing references it.",
+     "copy_at": "/home/ubuntu/aideazz-api-film-v15/music/v15-tropical-tropical-house-pixabay.mp3"
+    },
+    {
+     "path": "/tmp/node-compile-cache",
+     "mb": 33,
+     "verdict": "LIVE_KEEP",
+     "what": "The Node v22.22.0 V8 compile cache. The ubuntu subdir (30 MB, 4,182 of its 5,257 files) was rewritten 7 Oct. A root-owned subdir v22.22.0-x64-9de703df-0 (3 MB) dates from 28 Sep.",
+     "why": "The ubuntu cache was written at the openclaw-gateway restart: pids 3350337/3350345 started 7 Oct 21:05:18, and the files are dated 7 Oct. The liveness map counts it with n8n and openclaw. It is a self-managing cache: deleting it only makes the next Node start recompile, and it regrows. The root subdir (3 MB, from a root-run Node on 28 Sep) is stale but under the 5 MB threshold."
+    },
+    {
+     "path": "/tmp/jiti",
+     "mb": 10,
+     "verdict": "LIVE_KEEP",
+     "what": "The jiti TypeScript-to-CJS transpile cache: 431 .cjs files (core-skills, dist-terminal and similar), written 2 Oct 15:42.",
+     "why": "openclaw ships jiti (/usr/lib/node_modules/openclaw/node_modules has jiti). All 431 files have atime 7 Oct, which means the live openclaw-gateway read them when it started at 7 Oct 21:05. If deleted it rebuilds itself, so freeing 10 MB gains little."
+    },
+    {
+     "path": "/tmp/media (directory itself)",
+     "mb": 0,
+     "verdict": "LIVE_KEEP",
+     "what": "The public media directory of espaluz-whatsapp, served at webhook.aideazz.xyz/espaluz/media/<file> for Twilio WhatsApp MediaUrl.",
+     "why": "espaluz_bridge.py:1112 and :4360 call os.makedirs('/tmp/media'). :4363 sets hosted_path, :4460 is the @app.route('/media/<filename>') send_file. Liveness map. Do not remove the directory."
+    },
+    {
+     "path": "/tmp/media/* (8 audio_*.ogg + 8 video_*_compressed.mp4 from 27 and 30 Sep)",
+     "mb": 16,
+     "verdict": "GARBAGE",
+     "what": "Copies of EspaLuz WhatsApp replies that have already been sent: the opus voice replies and the compressed lesson videos for 27 Sep and 30 Sep users.",
+     "why": "send_whatsapp_media() copies the file here and immediately POSTs the MediaUrl to Twilio, which fetches it at send time (espaluz_bridge.py:4360-4410). Nothing re-reads a file once it has been sent, and no fd is open on them (the lsof sweep shows only _chattest.log and the openclaw lock in /tmp). They are user content, so removing them is also privacy hygiene. The 30-day cleaner would remove them around 27–30 Oct anyway. Keep the directory."
+    },
+    {
+     "path": "/tmp/espaluz_video_*.mp4 (8 files: 1790515858, 1790516059, 1790516072, 1790516179, 1790789945, 1790795365, 1790795368, 1790795390)",
+     "mb": 162,
+     "verdict": "GARBAGE",
+     "what": "Raw, uncompressed EspaLuz lesson videos, about 21 MB each, 169,747,869 B in total, from 27 and 30 Sep.",
+     "why": "These are written per message at espaluz_bridge.py:3708/3947 (video_path=f'/tmp/espaluz_video_{int(time.time())}.mp4'). send_whatsapp_media compresses each one and copies the result to /tmp/media: all 8 matching video_*_espaluz_video_<ts>_compressed.mp4 files are there. It then deletes only the compressed temp file, never the raw video_path. That is a leak, and these are its leftovers. No code re-reads an old name, and no fd is open on them. They are user content. Because the round-1 audit cat'ed them on 9 Oct, the 30-day cleaner now waits until about 8 Nov. More will pile up until the code deletes video_path after sending."
+    },
+    {
+     "path": "/tmp/verify5_soundeden",
+     "mb": 22,
+     "verdict": "GARBAGE",
+     "what": "2 Oct 15:35–15:56 vocal-check scratch for soundeden-my-love: mp3 clips, demucs.log, bass.txt, and Gemini listening scripts (gem_*.py, f0_5.py).",
+     "why": "One-off checking for the finished relocation promo. The source track is ~/aigo-reloc/music/soundeden-my-love-343626.mp3. None of the 25 scripts across the verify folders is in git, but they are throwaway listening checks. No process, cron, unit or script references the folder."
+    },
+    {
+     "path": "/tmp/qr",
+     "mb": 19,
+     "verdict": "GARBAGE",
+     "what": "11 full-frame PNG grabs (f_9 to f_103.png), 3 Oct 21:22.",
+     "why": "Frame grabs for checking a promo cut (paired with qrvenv's opencv). Nothing else is in the folder, and nothing references it. They can be re-extracted from the published, md5-verified films in /var/www."
+    },
+    {
+     "path": "/tmp/v1_bluehorizon",
+     "mb": 16,
+     "verdict": "GARBAGE",
+     "what": "Listening test of the blue-horizon track (2 Oct): the source mp3, chunks _c*/_r*/_x*/_voxboost.mp3, and listen.py, chunks.py, chopcheck.py, recheck.py.",
+     "why": "53462119-blue-horizon-494393.mp3 has md5 11c91b68b7940831b7736d341991203a, the same as ~/aigo-reloc/music/53462119-blue-horizon-494393.mp3. Everything else is derived chunks plus throwaway scripts that are not in git. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/reloc_verify3",
+     "mb": 15,
+     "verdict": "GARBAGE",
+     "what": "Vocal-check scratch for scovinie (2 Oct): scovinie_578418.mp3, clip_*/mix_*/vstem_*.mp3, demucs.log, gem*.out and energy.py.",
+     "why": "scovinie_578418.mp3 has md5 71d732bc1f0fa799b4ba1461eda1fc7f, the same as ~/aigo-reloc/music/scoviniebeatz-mwanditaya-ine-578418.mp3. The rest is derived clips and throwaway scripts. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/rf",
+     "mb": 12,
+     "verdict": "GARBAGE",
+     "what": "10 frame-grab PNGs (r_16.0 to r_117.0), 1 Oct 14:18.",
+     "why": "Frame grabs for checking a cut. No scripts and no references. They can be re-extracted from the published films."
+    },
+    {
+     "path": "/tmp/reloc_verify2",
+     "mb": 11,
+     "verdict": "GARBAGE",
+     "what": "Vocal-check scratch for rooted (2 Oct): rooted.mp3, chunk_*.mp3, bands.py, energy.py/.sh, gem*.py, full.txt, g31b.json and g37.json.",
+     "why": "rooted.mp3 has md5 f76023a087b2ab36628c48c303907d6d, the same as ~/aigo-reloc/music/djoldcatz-rooted-spirit-460492.mp3. The rest is derived chunks and throwaway scripts. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/chk",
+     "mb": 8,
+     "verdict": "GARBAGE",
+     "what": "Frame grabs from 3 Oct 20:05 (au_*.jpg, cg_*.jpg, t1_*.png).",
+     "why": "Frame-check scratch for a promo cut. No scripts and no references. They can be re-extracted from the published films."
+    },
+    {
+     "path": "/tmp/reloc_verify4",
+     "mb": 6,
+     "verdict": "GARBAGE",
+     "what": "Vocal-check scratch for alexrockbeat (2 Oct): the source mp3, vstem_40_75.mp3, vstem_95_132.mp3, demucs.log and gemini_*.py.",
+     "why": "alexrockbeat-deep-house-586577.mp3 has md5 0ccbab9599dc552e4e3d5e5f8778c4bc, the same as ~/aigo-reloc/music/alexrockbeat-deep-house-586577.mp3. The rest is derived excerpts and throwaway scripts. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/API_FINAL_1080p_phone.mp4",
+     "mb": 25.2,
+     "verdict": "DUPLICATE",
+     "what": "The phone-sized 1080p export of the AIGO API promo, 1 Oct 17:04.",
+     "why": "md5 3e1c14908dd7a39f8c9571c453a09b8b, the same as the laptop file D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/API_FINAL_1080p_phone.mp4 (that file is untracked in git but present on D:). Nothing on Oracle references it.",
+     "copy_at": "D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/API_FINAL_1080p_phone.mp4"
+    },
+    {
+     "path": "/tmp/YACHT_FINAL_1080p_phone.mp4",
+     "mb": 23.6,
+     "verdict": "DUPLICATE",
+     "what": "The phone-sized 1080p export of the AIGO yacht promo, 1 Oct 17:02.",
+     "why": "md5 d4328c4dddc44c565327a2331bce5eca, the same as the laptop file D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/YACHT_FINAL_1080p_phone.mp4. Nothing on Oracle references it.",
+     "copy_at": "D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/YACHT_FINAL_1080p_phone.mp4"
+    },
+    {
+     "path": "/tmp/_chattest.log",
+     "mb": 9.1,
+     "verdict": "COMPRESS",
+     "what": "Raw stdout and stderr of cto-aipa, streamed by an orphaned debug tap: pid 3155170, 'node /usr/bin/pm2 logs cto-aipa --raw --lines 0', running since 27 Jul 15:59, ppid 1. Its fd 1 points to /tmp/_chattest.log, which is still growing (mtime 9 Oct 13:27).",
+     "why": "No product reads it. The last 10 days duplicate ~/.pm2/logs/cto-aipa-{out,error}-9__*.log. But pm2-logrotate keeps only 10 files, and the oldest rotated cto-aipa log is from 30 Sep. So the 27 Jul–29 Sep part survives only in this file. Deleting it frees nothing while pid 3155170 holds it open (the inode stays allocated and keeps being written). Killing that pid is a state change that needs Elena's go. After that, gzip it (text log, should shrink to roughly 1 MB; not measured) and keep it on the laptop."
+    }
+   ],
+   "challenges": [
+    {
+     "path": "/tmp/vjh-test-20261006",
+     "keep": false,
+     "evidence": "Nothing is using it. My own /proc sweep (sudo) found no process with its working directory there and no memory map into it. The only open files anywhere in /tmp are /tmp/_chattest.log (pid 3155170) and the openclaw gateway lock. The only grep hits under ~ are NOW.md disk notes, and the NOW.md session board has no claim on it. I listed every file and checked whether it exists in live ~/VibeJobHunterAIPA_AIMCF: only 2 evals/__pycache__ .pyc files are missing from live. Everything in applications/ (643 = 643), submissions/, profiles/ and cache/ also exists in live. The one data difference: live judge_decisions.json has 569 deals and the snapshot has 590. All 31 missing entries are own-address echo deals (18 'Aideazz', 11 'Boardy', 2 calendar-subject/blank), all stage contractsent with an empty 'why'. They were swept on purpose on 8-9 Oct, and live keeps an undo file (autonomous_data/sweep_undo_20261008_own_address_echo.json). None of them is one of Elena's decisions. The snapshot's vibejobhunter.db and vjh_checkpoint.db are older than live (live 688 KB and 442 MB, modified 9 Oct). The .env is a stray copy of production secrets, so removing it is a gain. AUDIT SIDE EFFECT: I accidentally wrote a 214 KB scratch list to /dev/shm/.skeptic_t on Oracle (RAM tmpfs). I removed it within a minute and confirmed it is gone. I wrote nothing else."
+    },
+    {
+     "path": "/tmp/atuona-hd",
+     "keep": true,
+     "evidence": "These are the ONLY copies of the HD1080 upscales of film #7 (292,060,395 B) and film #8 (340,448,434 B). I searched D:/ and C:/Users/kirav to depth 6 for *HD1080*, crimson-escape* and could-not-generate*. I found only stills and the 720p originals (85,040,060 and 105,318,076 B in OneDrive Desktop) — no file of 250 MB or more. They exist for a pending deal: NOW.md (origin/main) line 415, '5 Oct — Niio answered the ATUONA Open Call questions · Elena's move: submit', and Niio requires HD/4K (≥1920x1080, commit c19f4c2). Standing rule: never wipe without a verified copy. The memory housekeeping rule also requires a per-film published-and-backed-up check, and these fail the backed-up half. Copy them to the laptop and md5-verify BEFORE 26 Oct 03:19 UTC: atime and mtime are still 25 Sep 13:34 and 13:48, so the 30-day tmpfiles cleaner will delete them then. Fallback if lost: run.sh (ffmpeg lanczos + unsharp, crf16, preset slow) can redo the upscale on the laptop from the identical-size 720p originals there. Do not re-render on Oracle — heavy renders are laptop-only after the 8 Oct OOM freeze."
+    },
+    {
+     "path": "/tmp/demucs_med2",
+     "keep": false,
+     "evidence": "All 8 sources still exist in ~/aigo-med/music (331music-luxury-lounge, 47643651-in-case, delosound, luz_paris-wild-party, rediskasound, riyhsal-kuta-beach, senhoromar, thesilentthunder). The screen's verdicts are kept in ~/aigo-med/music/_vocalcheck.jsonl, and _vocalcheck.py/_ts.py are there too. No cut script names a stem: grep of ~/aigo-*, cto-aipa/scripts and atuona-film9 for no_vocals, htdemucs and /tmp/demucs found only comments and the vocal-check scripts. The medtour music-mix takes a plain mp3, and the final music is mus1/mus2.mp3 (2,592,436 B) in ~/aigo-med. ~/aigo-promo/venv-demucs/bin/demucs exists for a rebuild; the model weights download on demand. No open fd, map, cwd, cron, unit or nginx rule touches it."
+    },
+    {
+     "path": "/tmp/demucs_med",
+     "keep": false,
+     "evidence": "Its htdemucs/ holds exactly the 5 tracks named. All 5 sources are in ~/aigo-med/music (alex_makemusic-velvet, deltax-music-gold, sosimpleaudio-thousand-miles, viktoryuriev-playa-estepona, yurasoop-afro-house). Same screening-only role as demucs_med2: no script reads a stem, and the verdicts are in _vocalcheck.jsonl. The medtour film is published (Make 6263197, verified in NOW.md 5-6 Oct). The demucs venv exists."
+    },
+    {
+     "path": "/tmp/demucs_reloc",
+     "keep": false,
+     "evidence": "Its htdemucs/ holds rooted, scovinie_578418 and soundeden-my-love-343626. The masters are in ~/aigo-reloc/music (djoldcatz-rooted-spirit-460492, scoviniebeatz-mwanditaya-ine-578418, soundeden-my-love-343626). The relocation music decision is written down in the repo: docs/selling/video/2026-10-02_RELOCATION_FILM_PLAN.md picks alexrockbeat 'Deep House', so these were rejected candidates. No script or process references the stems."
+    },
+    {
+     "path": "/tmp/demucs_mus",
+     "keep": false,
+     "evidence": "Its htdemucs/ holds mus1 and mus2. Both sources exist: ~/aigo-med/music_own/mus1.mp3 and ~/aigo-med/music/mus1.mp3 + mus2.mp3 (2,592,436 B each). The stems date from 22:26, after the mp3s were made, so this was a vocal check of the chosen bed and not its source. The final MEDTOUR_FINAL_v3 (22:53) is mixed from an mp3 via music-mix.py. Nothing references the stems."
+    },
+    {
+     "path": "/tmp/demucs_reloc_v1",
+     "keep": false,
+     "evidence": "Its htdemucs/ holds only 53462119-blue-horizon-494393. The master is in ~/aigo-reloc/music. Blue-horizon was the rejected 'A' cut (RELOC_A_bluehorizon.mp4); the published relocation film uses alexrockbeat. Nothing references the stems."
+    },
+    {
+     "path": "/tmp/demucs_reloc4",
+     "keep": false,
+     "evidence": "Its htdemucs/ holds only alexrockbeat-deep-house-586577. The master, ~/aigo-reloc/music/alexrockbeat-deep-house-586577.mp3, is the published relocation music, so the master must stay wherever ~/aigo-reloc ends up. These stems are only a vocal check of it and can be rebuilt. Nothing references them."
+    },
+    {
+     "path": "/tmp/qrvenv",
+     "keep": false,
+     "evidence": "No process maps or runs it: my /proc/*/maps grep found nothing, and there is no cwd or fd in it. No crontab (ubuntu or root), /etc/cron*, systemd, nginx, ~/.bashrc, ~/.profile, script or doc in ~ references 'qrvenv'. In the laptop repo it appears only in the disk notes (FILM9 handover §8, the forensics docs). FILM_COMPILATION_GUIDE §15/37/58 does call for decoding the QR with OpenCV, but names no venv path. It is a plain venv (bin/python3 links to /usr/bin/python3) holding opencv-python-headless + numpy, which pip install rebuilds. Note: pyvenv.cfg atime is now 9 Oct 13:20 (another session read it), so the old 13 Oct auto-clean estimate no longer applies."
+    },
+    {
+     "path": "/tmp/api-film-out",
+     "keep": false,
+     "evidence": "I cmp'd every file against /var/www/influencer-images/youtube: can-ai-find-and-cite-you-v12.mp4 and can-ai-find-and-cite-you.mp4 (both 27,657,563 B) match the served -v12.mp4. api-cta-endcard.png, api-cta-qr.png and the poster match too. Only watch.html (1,700 B, the old v12 page) has no twin, and the live watch.html replaced it. No route, script or cron references this folder. CAVEAT: served v12 sits in the 'served but unreferenced' group (v2-v12). If anyone later prunes /var/www v12, this /tmp copy would have been the last one, so prune both together or keep one."
+    },
+    {
+     "path": "/tmp/api-film-out-v14",
+     "keep": false,
+     "evidence": "cmp shows SAME for can-ai-find-and-cite-you-v14.mp4 (27,564,655 B), v14-poster.jpg, api-cta-qr.png and watch-v14.html against /var/www/influencer-images/youtube. Two more copies of the same size exist in ~/aideazz-api-film-v14/out/. The served v14 is live (watch-v14.html references it). Nothing references the /tmp folder."
+    },
+    {
+     "path": "/tmp/api-film-out-v15",
+     "keep": false,
+     "evidence": "cmp shows SAME for can-ai-find-and-cite-you-v15.mp4 (20,107,445 B), v15-poster.jpg, api-cta-qr.png and watch-v15.html against /var/www/influencer-images/youtube. More same-size copies: ~/backups/youtube-published-20260913/can-ai-find-and-cite-you-v15.mp4 and two in ~/aideazz-api-film-v15/out/. Nothing references the /tmp folder."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film",
+     "keep": false,
+     "evidence": "All 26 files are cmp-identical to ~/aideazz-api-film/kit/<same path> (the copy is under kit/, not the folder root). 23 of the 26 are also git blobs on origin/cursor/youtube-api-v15-0841, which exists on GitHub (ls-remote 330da41). The 3 that are not in git (compile.mjs 40,350 B, loom/walkthrough.mp4 4.2 MB, loom/walkthrough.id) have ~/aideazz-api-film/kit as their only other copy. CAVEAT: if ~/aideazz-api-film is later archived or removed, those 3 must go to the laptop first; the walkthrough is re-fetchable from Loom with fetch-loom.py. Nothing references the /tmp folder."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v14",
+     "keep": false,
+     "evidence": "I ran git hash-object on every file (read-only) and checked it against the youtube-api branches on the laptop. All scripts and HTML, including compile-v14.mjs, fetch-pixabay-music.py (12,348 B) and api-film-watch-v14.html, plus ui/*.png, qr/*.png and the 5 geo-* fruit jpgs, are git blobs. Only fruit/v14-{starfruit,mango,papaya,dragonfruit,pineapple}.jpg and v14-mango.jpg.flux.json (about 1.27 MB) are not in git. They are intermediates of the v14 look, which commit 4dbfd3d calls rejected, and the v14 film itself is served and cmp-identical in /var/www. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v15 (everything except the 3 scripts below)",
+     "keep": false,
+     "evidence": "CORRECTION to the proposer: ~/aideazz-api-film-v15/ holds NONE of these files (it has clips/out/music/work only). The real copies are ~/aideazz-api-film/kit (ui/*.png, geo-* fruit, qr/*.png, walkthrough.html, make-qr-endcard.py, fetch-loom.py, thumbnail), /tmp/youtube-api-audit-film-v14 (the v14 scripts), and the git branch origin/cursor/youtube-api-v15-0841. git hash-object confirms every file in git except compile-v15.mjs, hero-clip-v15.mjs, fetch-pixabay-music.py (the next item) and api-film-watch-v15.html. That watch page (md5 722fd776) is an older draft, also at /tmp/api-film-watch-v15.html; the served watch-v15.html is eecc70a0. The 10 fruit/v15-*.jpg are not in git, but void-stills-v15.py (in git) rebuilds them for free from pinned Wikimedia Commons URLs. One of them, v15-mango-whole.jpg, is a photo of a person, and NOW.md says to delete it. __pycache__ rebuilds itself. No script in v17-v19 or anywhere in ~ points at this folder: their BASE is their own ~/aideazz-api-film-v1x directory."
+    },
+    {
+     "path": "/tmp/youtube-api-audit-film-v15/{compile-v15.mjs, hero-clip-v15.mjs, fetch-pixabay-music.py}",
+     "keep": true,
+     "evidence": "These are the only copies of their current content. git hash-object of all 3 has no match in any youtube-api branch; origin/cursor/youtube-api-v15-0841 has OLDER versions under the same names. No byte-identical copy exists anywhere in ~/aideazz-api-film*, ~/backups/api-film-kit-20260912 or the other /tmp kits. NOW.md (origin/main ~line 1849) says: 'The whole kit lives ONLY in /tmp/youtube-api-audit-film-v15/ — not in any git repo ... A reboot clears /tmp and the pipeline is gone. Committing it is unclaimed work.' Copy them (60 KB) to the laptop or commit them to the branch, verify, and only then remove them."
+    },
+    {
+     "path": "/tmp/api-film-v14-music",
+     "keep": false,
+     "evidence": "cmp shows the mp3 is SAME as ~/aideazz-api-film-v14/music/v14-under-the-mango-sky-pixabay.mp3 (6,071,808 B). SELECTED.path only points at this /tmp file itself, and no script reads it: the default DEST_DIR in fetch-pixabay-music.py is ~/aideazz-api-film/music. SELECTED.credit ('Under the Mango Sky by DARIOCOIRO | Pixabay') is all the attribution there is. Keep the ~/aideazz-api-film-v14 copy if that folder is archived."
+    },
+    {
+     "path": "/tmp/api-film-v15-music",
+     "keep": false,
+     "evidence": "cmp shows the mp3 is SAME as ~/aideazz-api-film-v15/music/v15-tropical-tropical-house-pixabay.mp3 (5,674,752 B). SELECTED.path points at itself, and nothing reads it. The credit line is 'Tropical (Tropical House) by GiorgioVitté | Pixabay'."
+    },
+    {
+     "path": "/tmp/media/* (8 audio_*.ogg + 8 video_*_compressed.mp4 from 27 and 30 Sep)",
+     "keep": false,
+     "evidence": "The folder holds exactly 8 .ogg and 8 _compressed.mp4 files dated 27/30 Sep, and nothing newer. In espaluz_bridge.py, send_whatsapp_media copies the file into /tmp/media (lines 4360-4363), builds the MediaUrl, and POSTs it to Twilio in the same call. The /media/<filename> route (4462-4485) only serves files on request, and no code lists or re-reads old names (grep for /tmp/media, espaluz_video_ and glob/listdir across EspaLuzWhatsApp *.py). No fd is open on them. No doc in the repo links an /espaluz/media/ URL. They are user content. Delete these 16 named files only — NOT by glob: a file copied seconds before deletion must survive until Twilio fetches it. Keep the directory, which is live."
+    },
+    {
+     "path": "/tmp/espaluz_video_*.mp4 (8 files: 1790515858, 1790516059, 1790516072, 1790516179, 1790789945, 1790795365, 1790795368, 1790795390)",
+     "keep": false,
+     "evidence": "Confirmed in code: espaluz_bridge.py:3708/3947 sets video_path=f'/tmp/espaluz_video_{int(time.time())}.mp4' and passes it to send_whatsapp_media, which removes only the converted temp file. Step 11 cleans only the audio files, so these 8 raw files are leaked leftovers. Each one has its _compressed twin in /tmp/media, no fd is open on them, and no code re-reads an old timestamped name. They are user content. Delete by the 8 exact names, not by glob, because a new espaluz_video_<now>.mp4 can appear while a reply is being sent."
+    },
+    {
+     "path": "/tmp/verify5_soundeden",
+     "keep": false,
+     "evidence": "33 files: 16 mp3 clips (2 are full copies of soundeden-my-love-343626.mp3; the master is ~/aigo-reloc/music/soundeden-my-love-343626.mp3), spectrogram pngs, rms/f0 txt, gem1.json, demucs.log and 6 throwaway gem_*.py/f0_5.py. Soundeden was a rejected candidate: the relocation plan doc records alexrockbeat as the music. No grep hit in ~ scripts or docs, and no process uses it."
+    },
+    {
+     "path": "/tmp/qr",
+     "keep": false,
+     "evidence": "11 files, all PNG frame grabs (f_9..f_103.png, 3 Oct 21:22), and nothing else. No reference in ~ scripts, docs, crontabs, /etc or nginx. They can be re-extracted from the published, served films."
+    },
+    {
+     "path": "/tmp/v1_bluehorizon",
+     "keep": false,
+     "evidence": "16 files: 11 mp3 (the source plus _c/_r/_x/_voxboost chunks) and 4 py + 1 sh throwaway listening scripts. The source equals ~/aigo-reloc/music/53462119-blue-horizon-494393.mp3 (md5 11c91b68 in the proposer's check; master present). Blue-horizon was the rejected 'A' relocation cut. Nothing references the folder."
+    },
+    {
+     "path": "/tmp/reloc_verify3",
+     "keep": false,
+     "evidence": "26 files: 16 mp3 clips/stems (scovinie_578418.mp3; the master is ~/aigo-reloc/music/scoviniebeatz-mwanditaya-ine-578418.mp3), 5 gem*.out, 4 py and demucs.log. Scovinie was a rejected candidate; the final relocation music is alexrockbeat. No references."
+    },
+    {
+     "path": "/tmp/rf",
+     "keep": false,
+     "evidence": "10 files, all PNG frame grabs (r_16.0..r_117.0, 1 Oct 14:18). No scripts and no references anywhere. They can be re-extracted from the published films."
+    },
+    {
+     "path": "/tmp/reloc_verify2",
+     "keep": false,
+     "evidence": "20 files: 7 mp3 (rooted.mp3; the master ~/aigo-reloc/music/djoldcatz-rooted-spirit-460492.mp3 exists, md5 f76023a0 per the proposer), 2 json (g31b/g37), 4 txt, 5 py + 1 sh throwaway, demucs.log. Rooted was a rejected candidate. No references."
+    },
+    {
+     "path": "/tmp/chk",
+     "keep": false,
+     "evidence": "15 files: 12 jpg + 3 png frame grabs (3 Oct 20:05), with no scripts. No reference in ~, /etc or crontabs. They can be re-extracted from the published, served promo films."
+    },
+    {
+     "path": "/tmp/reloc_verify4",
+     "keep": false,
+     "evidence": "7 files: 3 mp3 (alexrockbeat-deep-house-586577.mp3 plus 2 vocal-stem excerpts), 3 py and demucs.log. The mp3 is the published relocation music, but its master is ~/aigo-reloc/music/alexrockbeat-deep-house-586577.mp3 (md5 0ccbab95 per the proposer, present). Keep that master if ~/aigo-reloc is ever archived. No references."
+    },
+    {
+     "path": "/tmp/API_FINAL_1080p_phone.mp4",
+     "keep": false,
+     "evidence": "I ran md5 on both ends myself today. Oracle /tmp gives 3e1c14908dd7a39f8c9571c453a09b8b, and the laptop file D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/API_FINAL_1080p_phone.mp4 (26,472,742 B) gives the same 3e1c14908dd7a39f8c9571c453a09b8b. No nginx route serves /tmp and nothing references it. The laptop copy is untracked in git, so it must stay on D:."
+    },
+    {
+     "path": "/tmp/YACHT_FINAL_1080p_phone.mp4",
+     "keep": false,
+     "evidence": "I ran md5 on both ends myself today. Oracle /tmp gives d4328c4dddc44c565327a2331bce5eca, and the laptop file D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/YACHT_FINAL_1080p_phone.mp4 (24,790,806 B) gives the same d4328c4dddc44c565327a2331bce5eca. Nothing on Oracle references it. The laptop copy is untracked, so it must stay on D:."
+    }
+   ]
+  },
+  {
+   "group": "films",
+   "items": [
+    {
+     "path": "/home/ubuntu/aigo-promo/venv-demucs",
+     "mb": 1089,
+     "verdict": "GARBAGE",
+     "what": "Python venv for demucs (music-stem separation) installed on 1 Oct for the yacht promo music.",
+     "why": "A reinstallable venv. No running process, cron, systemd unit or nginx location uses it: a /proc cwd+fd scan found nothing in it, and neither the dist/ build nor the 17 cron scripts reference aigo-*. Two orphan self-matching pgrep watcher loops (pid 840701 with its child `sleep 15` in ~/aigo-promo, and 1525404 in ~/aigo-reloc) hold a cwd in these folders but read and write nothing. Removing the folders does not affect them; killing them needs Elena's go."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/stock",
+     "mb": 299,
+     "verdict": "GARBAGE",
+     "what": "5 Pixabay stock videos (346372_medium, 371074/6/7_medium, 34734-..._medium) downloaded 30 Sep.",
+     "why": "Third-party stock that can be downloaded again by the ID in each file name. The yacht film they went into is published, and three copies of it are md5-verified (89e91e42…). Nothing live reads this folder."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/{cut2,cut3,cut4,cut5,rough,apim/cut1} (everything except the 5 files in the DUPLICATE item)",
+     "mb": 1227.3,
+     "verdict": "GARBAGE",
+     "what": "Intermediate renders for the yacht and API promos: superseded drafts AIGO_cut_v2..v6, v3_1, v3_berrydeep, rough_cut_v1, AIGO_API_merged_v1..v3; silent picture.mp4/picture_es.mp4 tracks; *_review720 previews; per-segment mp4s; check jpgs.",
+     "why": "These were renders on the way to the final. Both finals are published on YouTube via Make 6263197 and have three md5-verified copies. None of these files is on the laptop (no size match). They are drafts, not deliverables, and no doc records an intent to keep them. If Elena wants the draft history, copy them to D: first."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/music",
+     "mb": 127.1,
+     "verdict": "GARBAGE",
+     "what": "6 Pixabay mp3 downloads (dariocoiro gold-on-the-water, berrydeep, cornist, artissizm, rockot), the derived INSTRUMENTAL mp3, and demucs stems sep/htdemucs/*/vocals.wav + no_vocals.wav (90 MB).",
+     "why": "Every file is either a Pixabay track (its ID is in the file name, so it can be downloaded again) or a stem demucs can regenerate. The music is baked into the published finals. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/rec/node_modules (+ symlinks /home/ubuntu/aigo-med/node_modules and /home/ubuntu/aigo-reloc/node_modules)",
+     "mb": 12.8,
+     "verdict": "GARBAGE",
+     "what": "npm packages for the one-off Playwright screen-recording scripts (rec_audit.mjs, rec_groups.mjs).",
+     "why": "`npm install` from package.json restores them. Browsers come from ~/.cache/ms-playwright, which is never cleaned. The only things pointing here are two symlinks inside the same group."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/cut5/AIGO_FINAL_2026-10-01_1080p.mp4, cut5/AIGO_cut_v7.mp4, cut5/AIGO_cut_v7_review720.mp4, apim/cut1/AIGO_API_FINAL_2026-10-01_1080p.mp4, apim/cut1/AIGO_API_FINAL_review720.mp4",
+     "mb": 140.8,
+     "verdict": "DUPLICATE",
+     "copy_at": "Yacht md5 89e91e420be7f7b767010f048f478f37 = /var/www/influencer-images/youtube/aigo-film-1-yacht.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/API promo campaign/11.09.2026 API video for YouTube campaign/01.10.26 Yacht Promotion.mp4 = D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/AIGO_FINAL_2026-10-01_1080p.mp4 (AIGO_cut_v7 has the same md5). API md5 28d5b97174db9989e935f9ece89a8a31 = /var/www/.../aigo-film-2-api.mp4 = laptop '01.10.26 API promotion.mp4' = deliverables/AIGO_API_FINAL_2026-10-01_1080p.mp4. review720s: df90d1d8… = deliverables/YACHT_FINAL_720p_phone.mp4; 0fa23e77… = deliverables/API_FINAL_720p_phone.mp4",
+     "what": "The published masters of AIGO film 1 (yacht) and film 2 (/api), plus their 720p phone copies.",
+     "why": "md5 run on Oracle and on the laptop today. Every file has at least two identical copies, and one of them is on the laptop."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/clips",
+     "mb": 116.6,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "21 AI-generated video clips (G2..G9 from Venice/Kling) used in the yacht promo.",
+     "why": "Paid generations that can never be reproduced exactly, and there is no laptop copy (no name or size match). They are not live: nothing serves, schedules or reads them."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/rec (recordings: S3_audit_atuona.mp4, S4_audit_groups.mp4, out/*.webm, chk jpgs) + /home/ubuntu/aigo-promo/captures",
+     "mb": 160.2,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Real Playwright recordings of the live audit, plus Elena's own phone screen recording (captures/elena-phone-20260930-take3/S1_chatgpt_recording.mp4, md5 fdf41ea4…) with its private-box blur data.",
+     "why": "These recordings capture a moment that cannot be re-recorded identically, and the phone take is hers. No laptop copy (md5 searched across OneDrive/Desktop, D:/aideazz, Downloads, Telegram Desktop). scripts/villa-cut.py references both files, so a future re-cut needs them. PRIVATE: keep off public repos."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo (everything else: voice/, img/ incl brand_qr.png, v4/, raw/, review*/, es/, apim/assets, apim/vo, top-level scripts, logs, gen.mjs*)",
+     "mb": 57.8,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid ElevenLabs/MiniMax voice takes, generated images, the API request/response logs, review contact sheets and the production scripts for the yacht and API promos.",
+     "why": "Small and not live. img/brand_qr.png is referenced by scripts/med-cut.py, reloc-cut.py and villa-cut.py, so keep it with the rest of the kit if anything is ever re-cut (re-cuts now run on the laptop, the rule since 8 Oct)."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/stock",
+     "mb": 1454.5,
+     "verdict": "GARBAGE",
+     "what": "20 Pexels/Pixabay stock videos (pexels_26591189 alone is 287 MB).",
+     "why": "Can be downloaded again by the ID in each file name. The medtour film is published (Make 6263197, md5 3d1849e4…), with copies on the laptop and in /var/www. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/cut1 (everything except the 3 *_1080p finals and the thumbnails)",
+     "mb": 255.8,
+     "verdict": "GARBAGE",
+     "what": "Intermediate renders: picture.mp4, picture_es.mp4, picture_es_v1.mp4, seg/s00..s34.mp4, 720p phone and 540p preview transcodes, voice.m4a, list/clock files.",
+     "why": "Build intermediates of a published film whose finals are md5-verified elsewhere (see the aigo-med DUPLICATE item). No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/music (all except mus1.mp3, mus2.mp3)",
+     "mb": 70,
+     "verdict": "GARBAGE",
+     "what": "13 Pixabay track downloads tried for medtour, plus the _vocalcheck scripts.",
+     "why": "Can be downloaded again by the Pixabay ID in each name. The film used its own ElevenLabs music (mus1/mus2), which is covered by the DUPLICATE item."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/{sheets,sheets_extra,r2frames}",
+     "mb": 47.7,
+     "verdict": "GARBAGE",
+     "what": "Review contact sheets and frame grabs built from img/ and clips/.",
+     "why": "Derived images that can be rebuilt from the archived img/ and clips. Not served or read."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/cut1/MEDTOUR_FINAL_v1/v2/v3_2026-10-03_1080p.mp4 + music/mus1.mp3, music/mus2.mp3, music_own/mus1.mp3 + cut1/MEDTOUR_thumbnail_EN/ES.jpg",
+     "mb": 163.5,
+     "verdict": "DUPLICATE",
+     "copy_at": "v3 md5 3d1849e4f70c45ccd5ad2c55a8497d6d = /var/www/influencer-images/youtube/aigo-film-5-medtour.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/API promo campaign/11.09.2026 API video for YouTube campaign/03.10.26 Medical Tourism ... v3 - own music 2 (sunset Afro house).mp4; v2 34f1ba43… and v1 daad6e5e… = the same laptop folder (v2 and unsuffixed names); mus1 c9379376… / mus2 58560775… = laptop 'Medical Tourism v2/v3 music - AIdeazz original (ElevenLabs).mp3'; thumb EN eaef8655… = /var/www/.../thumbs/aigo-thumb-medtour-en.jpg + laptop; ES a1e74c06… = laptop",
+     "what": "The published medtour master (v3), the two earlier masters Elena also kept, and the paid original music.",
+     "why": "Every file md5-matched today against a laptop copy, and v3 also against the live served copy."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med (rest: clips/, captures/, rec/, img/, assets/, voice/, faces/, raw/, top-level gate*/cut logs and prompt JSONs)",
+     "mb": 111.5,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid AI clips (Kling etc.), the ChatGPT screen take (captures/chatgpt_take1.mp4, md5 43d40678…), audit recordings, generated images and voice, and the gate prompt/workflow JSONs.",
+     "why": "Not live and not on the laptop (no md5 or name match). Paid or unique material, so keep a copy, just not on the server."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/stock",
+     "mb": 324.1,
+     "verdict": "GARBAGE",
+     "what": "4 Pixabay/Pexels stock videos (351939_large.mp4 is 203 MB).",
+     "why": "Can be downloaded again by ID. The villa film is published (md5 7253d8df…) and copied on the laptop and in /var/www."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/cut1 (everything except VILLA_FINAL and VILLA_v2_B_watermelon)",
+     "mb": 499.1,
+     "verdict": "GARBAGE",
+     "what": "Superseded A/B music drafts (VILLA_v1_A_musinova, v1_B_watermelon, v2_A_musinova, VILLA_cut_v1), 720p review copies, picture/picture_es tracks, segments, overlay PNGs.",
+     "why": "Intermediate renders of a published film. The final is md5-verified in three places. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/music",
+     "mb": 17.1,
+     "verdict": "GARBAGE",
+     "what": "3 Pixabay mp3s (musinova, meditativetiger, watermel0n).",
+     "why": "Can be downloaded again by the Pixabay ID in each name, and the music is baked into the published film."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/cut1/VILLA_FINAL_2026-10-01_1080p.mp4 + cut1/VILLA_v2_B_watermelon.mp4",
+     "mb": 112.9,
+     "verdict": "DUPLICATE",
+     "copy_at": "md5 7253d8df068f8d243cb6ecc3ca0799a5 (both files) = /var/www/influencer-images/youtube/aigo-film-3-villa.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/API promo campaign/11.09.2026 API video for YouTube campaign/01.10.26 Villa + Charter Promotion.mp4 = D:/aideazz/ai-cofounders/cto-aipa/docs/selling/video/deliverables/VILLA_FINAL_2026-10-01_1080p.mp4",
+     "what": "The published villa master and a byte-identical twin of it.",
+     "why": "md5-verified on Oracle and on the laptop today."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa (rest: clips/, img/, assets/, voice/, plan.json, ledger.jsonl, uploads.json, villa-*.py, logs)",
+     "mb": 85.4,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid Kling clips, generated stills, overlay assets, voice, and the spend ledger and plan.",
+     "why": "Not live, and no laptop copy of the clips or images (only contact sheets are in deliverables/). Paid generations."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/stock",
+     "mb": 301.3,
+     "verdict": "GARBAGE",
+     "what": "8 Pexels videos plus 101 verify_*.jpg frame grabs used to pick shots.",
+     "why": "Can be downloaded again by the Pexels ID; the jpgs are derived. The relocation film is published (md5 5ab513a8…)."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/cut1 (everything except the two RELOC_FINAL*_1080p files)",
+     "mb": 298.4,
+     "verdict": "GARBAGE",
+     "what": "A/B music drafts (RELOC_A_bluehorizon, RELOC_B_alexrockbeat), 720p copies, picture/picture_es tracks, segments.",
+     "why": "Intermediate renders. Both published masters are md5-verified elsewhere."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/music",
+     "mb": 30.9,
+     "verdict": "GARBAGE",
+     "what": "5 Pixabay mp3s (alexrockbeat, blue-horizon, djoldcatz, scoviniebeatz, soundeden).",
+     "why": "Can be downloaded again by the Pixabay ID, and the music is baked into the published film."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/cut1/RELOC_FINAL_v2_2026-10-02_1080p.mp4 + cut1/RELOC_FINAL_2026-10-02_1080p.mp4",
+     "mb": 97.4,
+     "verdict": "DUPLICATE",
+     "copy_at": "v2 md5 5ab513a8aa24a09bf387deb10fe226b9 = /var/www/influencer-images/youtube/aigo-film-4-relocation.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/API promo campaign/11.09.2026 API video for YouTube campaign/02.10.26 Relocation - Real Estate + Immigration Lawyers.mp4; v1 md5 20c7f5fcdc251295adeedef6e99b8eda = laptop '02.10.26 Relocation ... (v1 - first YouTube upload).mp4'",
+     "what": "The published relocation master (v2) and the first YouTube upload (v1).",
+     "why": "md5-verified today."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc (rest: clips/, rec/, captures/, img/, assets/, voice/, deliverables/, plan.json, gate*.json, ledger.jsonl, *.py)",
+     "mb": 108.5,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid Kling clips, the audit recording, the ChatGPT capture (S1_chatgpt.mp4, md5 08dca4a5…), WhatsApp/Zoho stills, images, voice, gate sheets and the plan/ledger.",
+     "why": "Not live and not on the laptop (md5 searched). Unique or paid. The captures include client-like screens, so keep them private."
+    },
+    {
+     "path": "/home/ubuntu/aigo-ig/reel_{api,medtour,reloc,villa,yacht}_v1.mp4",
+     "mb": 143.6,
+     "verdict": "DUPLICATE",
+     "copy_at": "/var/www/influencer-images/ig-aigo/reel_*_v1.mp4. md5 identical for all 5 (226c1ec8…, f2655058…, e28c4fd1…, ad7919a3…, ae3f56db…), separate inodes (link count 1)",
+     "what": "The five 9:16 Instagram Reels, the working copies.",
+     "why": "The live copies Make 6505010 and Buffer fetch are in /var/www (reels still scheduled 10 and 12 Oct). WARNING: no laptop copy exists. Once these are removed, the /var/www copies are the only ones, and after 12 Oct nothing reads them, so a future /var/www cleanup could lose them. Copy the 5 reels to D: as part of this cleanup."
+    },
+    {
+     "path": "/home/ubuntu/aigo-ig (overlays/ + aigo-ig-calendar.py, aigo-ig-reel-overlays.py, aigo-ig-reels.sh, reels.log)",
+     "mb": 0.8,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "The Reel overlay PNGs and the build scripts.",
+     "why": "The scripts are also in the repo (scripts/aigo-ig-*.{py,sh}); the overlays are tiny. Nothing live reads them: the Make calendar reads /var/www/.../ig-aigo/posts/*.json."
+    },
+    {
+     "path": "/home/ubuntu/aigo-art",
+     "mb": 4.3,
+     "verdict": "DUPLICATE",
+     "copy_at": "D:/aideazz/ai-cofounders/cto-aipa/docs/selling/ai-growth-operator-deck/art/a-*.jpg (all 11 md5-matched), docs/selling/ai-growth-operator-deck/art-jobs.json and docs/applications/professional-outlook/gen-art.cjs (md5-matched)",
+     "what": "11 generated art images for the AI Growth Operator deck, plus their job file and generator script.",
+     "why": "Every file md5-matched a repo copy on the laptop."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film/out (all mp4 + api-cta-qr.png, api-cta-endcard.png)",
+     "mb": 516.1,
+     "verdict": "DUPLICATE",
+     "copy_at": "/var/www/influencer-images/youtube/can-ai-find-and-cite-you-*.mp4 (each of the 25 out/ mp4s md5-matches a served file, e.g. v13 e5d6485e… is live via watch-v14/v15.html); laptop C:/Users/kirav/OneDrive/Desktop/API promo campaign/can-ai-find-and-cite-you.mp4 holds only the first render (cb85071a…)",
+     "what": "Renders of the 11 Sep 'Can AI find and cite you' API film, v1–v13.",
+     "why": "md5-verified today. COORDINATE: the liveness agent flagged about 25 of the matching /var/www copies (the timestamped files and v2–v12) as served but unreferenced. If someone removes those too, versions v2–v12 are gone everywhere. Decide the two folders together, or pull one set to D: first."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film*/work (6 folders: aideazz-api-film, -v14, -v15, -v17, -v18, -v19)",
+     "mb": 1499.9,
+     "verdict": "GARBAGE",
+     "what": "Per-segment ffmpeg intermediates (fc_*, qr_*, sl_*, x_*, q_*.mp4) and text-overlay txt files from compiling each API-film version.",
+     "why": "Pure build intermediates. The compile scripts rebuild them, and the published versions sit in /var/www (v19 also on the laptop, md5 bd809cc0…). No process, cron or nginx location references these folders."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film-{v14,v15,v18,v19}/out: the unpublished timestamped renders (v14-…T15-45-29, v15-…T17-08-27, v15-…T11-07-39 + v15.mp4 [same md5 94743232], v18-…T13-42-16, v18-…T13-55-57, v19-…T18-03-43, T18-29-49, T18-40-07)",
+     "mb": 190.8,
+     "verdict": "GARBAGE",
+     "what": "Superseded test renders for each version, made minutes before the render that was published.",
+     "why": "md5 matches no served file and no laptop file; the chosen render of each version is served. They are intermediate renders of published versions."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film-{v14,v15,v18,v19}/out: the published renders + posters/QR/endcard/watch-v14.html",
+     "mb": 218.4,
+     "verdict": "DUPLICATE",
+     "copy_at": "/var/www/influencer-images/youtube/: v14 5e2adba4…, v15 a4f76a75… (= the …T17-30-28 and …T17-49-23 files), v16 7a0f07d1…, v18 ae07e2b4… (= v18-dh), v19 bd809cc0… (also on laptop OneDrive/Desktop/API promo campaign/can-ai-find-and-cite-you-v19.mp4); posters, QR, endcard and watch-v14.html also md5-match",
+     "what": "Working copies of the published API film v14, v15, v16, v18 and v19.",
+     "why": "md5-verified against the live served files (v19 also against the laptop). The /var/www copies of these versions are referenced by watch pages and the Make hook, so they stay."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film* (rest: clips/, kit/, loom/, music*/, vo*/, hero/, screen/, v19 shots/, v17 out/, ffmpeg logs, deepseek-motion txt)",
+     "mb": 238.4,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Source assets for the API film: AI clips, v19 hero fruit shots (41 MB), the screen recording, voice-over, music picks, the v19 kit (compile-v19.mjs, generate-hero-fruits.mjs, Make/Buffer helper scripts; not in the repo) and v17, which was never published.",
+     "why": "Not live, and no laptop copy except v19.mp4. scripts/apim-cut.py reads ~/aideazz-api-film/clips and ~/aideazz-api-film-v19/shots, so these are the inputs if the /api promo is ever re-cut. compile-v19.mjs is cited in docs/applications/2026-09-18_pencil_genai_creator.md as portfolio evidence. Keep it, just off the server."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film-v19/fonts",
+     "mb": 0.7,
+     "verdict": "UNSURE_KEEP",
+     "what": "OFL TTFs (Instrument Serif, Manrope, …) pulled from the google/fonts repo.",
+     "why": "scripts/aigo-promo-roughcut.py and roughcut-v2.py hardcode ~/aideazz-api-film-v19/fonts/*.ttf, and NOW.md records why these TTFs had to come from the google/fonts repo (Google's CSS endpoint served unreadable EOT). Tiny. Keep them on Oracle (or move them and update the script paths)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/venv",
+     "mb": 305,
+     "verdict": "GARBAGE",
+     "what": "Python venv for still_motion.py (depth-based parallax on stills).",
+     "why": "Reinstallable; no process uses it."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/models/depth_anything_v2_small.onnx",
+     "mb": 94.5,
+     "verdict": "GARBAGE",
+     "what": "Public Depth-Anything-V2-small ONNX model.",
+     "why": "A public model that can be downloaded again. Not used at runtime."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work (everything except the 3 cuts in the DUPLICATE item and final_v1.mp4)",
+     "mb": 442.9,
+     "verdict": "GARBAGE",
+     "what": "body.mp4 (81 MB), final.mp4 (a rebuild at 14:57 after publishing, never published; md5 4c84f97c… matches nothing), preview_phone.mp4, preview/test renders, depth/probe/cmp frames, segment txts.",
+     "why": "Intermediate renders. The published film is out/could-not-generate-content-…mp4 (md5 7bf02576…), which is also on the laptop. run.log confirms work/final.mp4 is the 'verify, then --publish' scratch output."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/stillclips",
+     "mb": 256.2,
+     "verdict": "GARBAGE",
+     "what": "15 parallax clips rendered from the stills by still_motion.py (A1..T3).",
+     "why": "Derived renders: the source stills are on the laptop, and specs/*.json records each clip's parameters, so they can be rebuilt. The film using them is published and backed up."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/music_research",
+     "mb": 16.1,
+     "verdict": "GARBAGE",
+     "what": "Saved Pixabay search HTML pages and 2 downloaded mp3s.",
+     "why": "A web-page cache plus tracks that can be downloaded again."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work/{final_published_moments.mp4, final_paradise-is-compiled.mp4, final_retitled-centred-stanzas.mp4} + clips/ + stills/",
+     "mb": 326,
+     "verdict": "DUPLICATE",
+     "copy_at": "final_published_moments 7bf025761a3931f261fa8a0973da410a = ~/cto-aipa/data/atuona/films/out/could-not-generate-content-2026-09-22T10-50-15.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/could-not-generate-content-22-09-2026-PUBLISHED.mp4 (+ 20.09.2026 AI Film video/23.09.2026 Final videos/); final_paradise-is-compiled c1fc2136… = laptop .../paradise-is-compiled-21-09-2026-REVIEW.mp4; final_retitled-centred-stanzas 8f172a4f… = laptop .../could-not-generate-content-22-09-2026-REVIEW.mp4; clips/ (19) + stills/ (20) = laptop .../20.09.2026 AI Film video/ (39/39 md5 match)",
+     "what": "Film #7: the published cut, two of the three rollback cuts NOW.md lists, and Elena's source clips and photos.",
+     "why": "md5-verified today. NOW.md: 'atuona-film7/work/ holds three rollback cuts; clear them only with her go-ahead'. Two of the three are byte-identical on her Desktop; the third (final_v1) is in the ARCHIVE item."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work/final_v1.mp4",
+     "mb": 82.5,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Film #7 first cut (21 Sep), one of the three rollback cuts NOW.md lists.",
+     "why": "md5 e247af74… matches nothing on the laptop or elsewhere on Oracle. NOW.md asks for her go-ahead before clearing it, so copy it to D: rather than delete."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7 (rest: vo/, specs/, stanzas.json, film7*.mjs, still_motion.py, verify.sh, title_previews.sh, ffmpeg log)",
+     "mb": 1.6,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Voice-over mp3s, clip specs and the compile scripts.",
+     "why": "Tiny. The compile script is also in the repo as scripts/atuona-film7.mjs."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work/{final.mp4, final_v2_moments-less.mp4, final_v5_published_1632.mp4}",
+     "mb": 306.3,
+     "verdict": "DUPLICATE",
+     "copy_at": "final.mp4 57e71d2b9cc56e2fe5aa3b53aef21d46 = ~/cto-aipa/data/atuona/films/out/crimson-escape-2026-09-22T16-32-00.mp4 (served) = laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/crimson-escape-film8-22-09-2026-PUBLISHED.mp4 (+ .../23.09.2026 Final videos/crimson-escape-2026-09-22T16-32-00.mp4); final_v2_moments-less 5740206c… = laptop .../hungry-earth-film8-22-09-2026-REVIEW.mp4; final_v5_published_1632 aa0ca25d… = Oracle /home/ubuntu/backups/crimson-escape-v1-1632.mp4 (the copy FILM8 doc §10 says to keep; no laptop copy)",
+     "what": "Film #8 Crimson Escape: the republished cut, the 'Hungry Earth' review cut, and the first published cut (16:32).",
+     "why": "md5-verified today. Note: the 16:32 first cut will survive only in ~/backups; pull it to D: if ~/backups is ever trimmed."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work/{final_v1_stockprops, final_v3_hungry-earth-fragments, final_v4_crimson-escape, final_v6_no_s03_s04}.mp4",
+     "mb": 384.2,
+     "verdict": "GARBAGE",
+     "what": "Superseded draft cuts of film #8 from 22 Sep.",
+     "why": "Intermediate renders. The FILM8 doc records keeping only the first published cut (in ~/backups), and the final is published and on the laptop. md5/size match nothing elsewhere. If Elena wants the draft history, copy them to D: first."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work (rest: body.mp4, glitch_*.mp4, bakeoff_grid, bo/, fv/, k2/, cards, p_*.txt, build logs)",
+     "mb": 354.6,
+     "verdict": "GARBAGE",
+     "what": "Compile intermediates: the 100 MB body track, glitch inserts, bake-off grid, frame checks.",
+     "why": "film8.mjs regenerates them from the clips. Not served or read."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/music",
+     "mb": 58.1,
+     "verdict": "GARBAGE",
+     "what": "4 Pixabay tracks as mp3 + wav conversions, plus saved search HTML.",
+     "why": "Can be downloaded again by the Pixabay ID in each name (page_*.html); the wavs are conversions; the music is baked into the published film."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/clips",
+     "mb": 353.4,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid AI clips for film #8 (Grok/Wan/Kling/Veo): s01–s17, b06 bake-off, v1/ and old/ takes.",
+     "why": "Paid generations with no laptop copy. The published film uses clips/v1/s13__wan.mp4 (FILM8 doc), and ~/trailer-sample/build.sh rebuilds the sales trailer from 9 raw film #8 shots. Not live on the server."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8 (rest: img/ keyframes + glitch stills, raw/ API request/response JSON, vo/, plan.json, ledger.jsonl, uploads.json, film8.mjs, gen.mjs, *.sh, logs)",
+     "mb": 40.7,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Paid Flux keyframes, voice-over, the spend ledger and the production scripts.",
+     "why": "Not live and not on the laptop. Small but unique (keyframes, ledger)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film3/clips",
+     "mb": 20.7,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/02.07.2026 AI Film videos for atuona/ (11/11 md5 match); atuona-base.mp4 and atuona-base6.mp4 are also served as ~/cto-aipa/data/atuona/films/shots/098.mp4 and 095.mp4",
+     "what": "Source clips for 'The Secret Exhibition' (2 Jul).",
+     "why": "md5-verified. That film is published in out/ (67b050c2…) and on the laptop twice."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film4/clips/{051,088,090}.mp4",
+     "mb": 22.1,
+     "verdict": "DUPLICATE",
+     "copy_at": "/home/ubuntu/cto-aipa/data/atuona/films/shots/051.mp4, 088.mp4, 090.mp4 (md5 identical; those are LIVE served shots)",
+     "what": "Three Atuona shot clips for the 'reprint' film (3 Jul).",
+     "why": "md5-verified against the live shots/ copies (not on the laptop). film4/clips/022.mp4 and 091.mp4 are unique, so they are in the ARCHIVE item."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film5/clips",
+     "mb": 22.1,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/15.06.2026 recovered movie/ (6/6 md5 match)",
+     "what": "Source clips for 'recovered' (4 Jul).",
+     "why": "md5-verified. The film is published in out/ (77a994be…) and on the laptop (recovered-2026-07-04.mp4, same md5)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-compile/clips",
+     "mb": 45.9,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/24.06.2026 Atuona AI Film studio videos/16.06.2026/ (17/17 md5 match; atuona-base.mp4 also at D:/aideazz/04.04.2026_Atuona Gallery materials/)",
+     "what": "Source clips for 'Between Compile and Run' (17 Jun).",
+     "why": "md5-verified."
+    },
+    {
+     "path": "/home/ubuntu/atuona-montage/clips",
+     "mb": 97.3,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/24.06.2026 Atuona AI Film studio videos/18.06.2026/ (30/30 md5 match; atuona-base (4)/(5)/(7) also in D:/Downloads/Telegram Desktop/)",
+     "what": "Source clips for 'Stanzas' (19 Jun).",
+     "why": "md5-verified."
+    },
+    {
+     "path": "/home/ubuntu/atuona-oneoff/paradise_src.mp4",
+     "mb": 41.2,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/24.06.2026 Atuona AI Film studio videos/16.06.2026/Atuona.xyz__Paradise.js.mp4 (md5 match)",
+     "what": "Source video for the 17 Jun Paradise.js one-off.",
+     "why": "md5-verified."
+    },
+    {
+     "path": "/home/ubuntu/{atuona-film3,atuona-film4,atuona-film5,atuona-compile,atuona-montage}/work",
+     "mb": 276.8,
+     "verdict": "GARBAGE",
+     "what": "June/July compile intermediates (body.mp4, fbody, slow_body, fc_*.mp4 segments).",
+     "why": "Intermediate renders of films that are published in out/ and whose sources are md5-verified on the laptop. The repo compile scripts regenerate them. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/{atuona-film3,atuona-film4,atuona-film5,atuona-compile,atuona-montage,atuona-oneoff} (rest: vo/, film*.mjs, stanzas.json, meta_*.json, chk/g/r/v jpgs, frames/, ocr, film4/clips/022.mp4 + 091.mp4)",
+     "mb": 16.3,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Voice-over mp3s, compile scripts, stanza picks, check frames, and two unique film #4 clips (022, 091; 2 MB).",
+     "why": "Small. The voice and the two clips are unique (no laptop or Oracle md5 match); the scripts are in the repo (scripts/atuona-film3.mjs etc.)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-backups-2026-07-03",
+     "mb": 229.6,
+     "verdict": "DUPLICATE",
+     "copy_at": "laptop C:/Users/kirav/OneDrive/Desktop/June_July_September 2026 Atuona AI Film studio videos/: atuona-paradise-js (both copies) = 24.06.2026.../'Atuona.xyz __ Paradise.js.mp4'; between-compile-and-run (24264928 B) = 24.06.2026.../between-compile-and-run-2026-06-17T13-41-04.mp4; round2/between-compile (28442109 B) = between-compile-and-run-fixedposter.mp4; finding-paradise-reprint + round2/reprint = finding-paradise-reprint-2026-07-03.mp4; stanzas = 24.06.2026.../stanzas-19-06-2026-2026-06-19T14-41-52.mp4; the-secret-exhibition = the-secret-exhibition-02-07-2026.mp4 (+ served out/)",
+     "what": "The 3 Jul safety backup of five films taken before their poster re-encode (8 mp4s), plus r2.sh, r2.log and work/ (0.1 MB).",
+     "why": "All 8 mp4s md5-matched laptop files today (two are also identical to each other). The 0.1 MB of scripts/logs is not duplicated, so keep it if being strict. This copy guards against a repeat of the 01.07 wipe, and that copy now lives on the laptop."
+    },
+    {
+     "path": "/home/ubuntu/atuona-blindtest",
+     "mb": 0.4,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "7 Oct model blind test: prompts, results and the answer key.json.",
+     "why": "Resolved: NOW.md says Elena found 'not so much difference' and wired Fable. key.json exists only on Oracle, so move it rather than delete. Tiny."
+    },
+    {
+     "path": "/home/ubuntu/trailer-sample",
+     "mb": 34.2,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Crimson Escape 30-second 9:16 book-trailer sales sample (v3, approved by Elena 24 Sep), plus build.sh/v1/v2, fonts and caption txts.",
+     "why": "A SALES ASSET for the romance-promo channel-partner outreach (docs/selling/2026-09-23_ROMANCE_PROMO_CHANNEL_PARTNERS.md). Not served, so not live. The doc says it is 'on Elena's Desktop', but no laptop file matches by name or md5 (it went to her by Telegram). Copy it to D: before removing."
+    },
+    {
+     "path": "/home/ubuntu/outlook-art",
+     "mb": 11.4,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "35 generated Professional Outlook art candidates (out/, out-light/) plus job JSONs and gen-art.cjs.",
+     "why": "Not live. The images chosen for the Outlook PDF are in the repo under other names; none of these md5-matches a repo file, so these are the unchosen originals. gen-art.cjs is in the repo."
+    },
+    {
+     "path": "/home/ubuntu/aw-portal",
+     "mb": 136.4,
+     "verdict": "LIVE_KEEP",
+     "what": "AW Client Report Portal (Sagan recruiter test): app.py, .venv (136 MB), data/portal.db, report PDFs.",
+     "why": "systemd aw-portal is active (MainPID 3811716, started 9 Oct 06:00:59 UTC), ExecStart=/home/ubuntu/aw-portal/.venv/bin/uvicorn, WorkingDirectory=/home/ubuntu/aw-portal; nginx serves /aw-portal/. The venv is in use, so nothing here is garbage. Retiring the portal would be Elena's product decision."
+    },
+    {
+     "path": "/home/ubuntu/cto-aipa/data/atuona/films/out (reference: outside the group)",
+     "mb": 383,
+     "verdict": "LIVE_KEEP",
+     "what": "The 8 published Atuona films served at /cto/films; listed here only as the copy target for the film-folder DUPLICATE verdicts above.",
+     "why": "Served by cto-aipa (fds open on 2 of the files). BACKUP GAP: md5 shows 3 of the 8 published files exist ONLY here, with no laptop copy: Atuona.xyz__Paradise.js-2026-05-20 (bd5bb4fb…), between-compile-and-run-2026-06-17 (011836b8…), reprint-2026-07-03 (6bc139e1…); the laptop holds other encodes of those films. The other five md5-match the laptop. Recommend copying those 3 to D:. SESSION NOTE: by mistake I created one 1.8 KB file on Oracle (/tmp/.x_shots_3941118, 13:22 UTC) and removed it within a minute; nothing else was written. Laptop: md5 reads of OneDrive/Desktop files may have triggered OneDrive downloads of some cloud-only files; 18 cloud-only EspaLuz videos refused access (permission denied), and every file used as a copy target here was confirmed local (attributes = Archive only)."
+    }
+   ],
+   "challenges": [
+    {
+     "path": "/home/ubuntu/aigo-promo/venv-demucs",
+     "keep": false,
+     "evidence": "Nothing live points at it: no crontab line, root cron, /etc/cron.d, systemd unit (system or --user), nginx alias, or dist/*.js references any aigo-* path (all grepped 13:40 UTC). The only processes with a cwd in ~/aigo-promo are pid 840701 and its `sleep 15` child. That is a self-matching pgrep loop (`while pgrep -f \"gen.mjs video G7\"`) and it never exits. Its post-loop commands are read-only anyway: grep logs, `gen.mjs ledger`, `ls clips/`. The only documentation is SHOTLIST.md:282, a record of the 1 Oct vocal removal, not a dependency. NOW.md:524 says film renders run on the laptop. The venv can be reinstalled."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/stock",
+     "keep": false,
+     "evidence": "There are 5 files: 346372_medium, 34734-403432565_medium, 371074/371076/371077_medium.mp4, plus _download.done. Every name carries its Pixabay ID, so each can be downloaded again. Nothing live references the folder. The yacht final it fed is md5 89e91e42 on Oracle cut5, in /var/www, on the laptop Desktop and in the repo deliverables/ (I checked both sides)."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/{cut2,cut3,cut4,cut5,rough,apim/cut1} (everything except the 5 files in the DUPLICATE item)",
+     "keep": false,
+     "evidence": "These are drafts v2–v6, v3_1, v3_berrydeep, merged_v1–v3, rough_v1, picture tracks and segments. SHOTLIST.md:271 says 'v3 BerryDeep kept as AIGO_cut_v3_berrydeep.mp4', but that was a working rollback, and Elena later rejected BerryDeep (it is on the 'Never ... BerryDeep' music lists in the RELOC and MEDTOUR plans). Both finals are published and md5-verified off-server. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/music",
+     "keep": false,
+     "evidence": "Listed: artissizm-602927, berrydeep-592396, cornist-543501, dariocoiro-493518 plus its INSTRUMENTAL, rockot-587986 (all Pixabay IDs), screen_scores_2026-10-01.json (7.5 KB) and sep/htdemucs stems. There is no ElevenLabs or paid original track in this folder (the paid medtour music lives in aigo-med). No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/rec/node_modules (+ symlinks /home/ubuntu/aigo-med/node_modules and /home/ubuntu/aigo-reloc/node_modules)",
+     "keep": false,
+     "evidence": "No symlink in /var/www or cto-aipa/data, and nothing in nginx aliases, cron or dist, points here. Only the two sibling symlinks inside the same removal group do. `npm install` restores it, and the Playwright browsers live in ~/.cache/ms-playwright, which is untouched."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/cut5/AIGO_FINAL_2026-10-01_1080p.mp4, cut5/AIGO_cut_v7.mp4, cut5/AIGO_cut_v7_review720.mp4, apim/cut1/AIGO_API_FINAL_2026-10-01_1080p.mp4, apim/cut1/AIGO_API_FINAL_review720.mp4",
+     "keep": false,
+     "evidence": "md5 checked today on both sides. Oracle: AIGO_FINAL and cut_v7 are both 89e91e420be7f7b767010f048f478f37; API_FINAL 28d5b97174db9989e935f9ece89a8a31; v7_review720 df90d1d8497c806b1dda7571247214bd; API_review720 0fa23e776a2610157d5f93d92045b9b4. Laptop: '01.10.26 Yacht Promotion.mp4' and deliverables/AIGO_FINAL are 89e91e42…; '01.10.26 API promotion.mp4' and deliverables/AIGO_API_FINAL are 28d5b971…; deliverables/YACHT_FINAL_720p_phone is df90d1d8…; API_FINAL_720p_phone is 0fa23e77…. The served /var/www aigo-film-1/-2 copies stay."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/clips",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing serves, schedules or reads these clips (no cron, nginx, systemd or dist reference). They are paid and unique, so remove them from the server only after the copy to D: is md5-verified."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo/rec (recordings: S3_audit_atuona.mp4, S4_audit_groups.mp4, out/*.webm, chk jpgs) + /home/ubuntu/aigo-promo/captures",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing live reads them. They are unique, and Elena's phone take is PRIVATE, so copy them to a private D: folder (never a public repo) and md5-verify before removing."
+    },
+    {
+     "path": "/home/ubuntu/aigo-promo (everything else: voice/, img/ incl brand_qr.png, v4/, raw/, review*/, es/, apim/assets, apim/vo, top-level scripts, logs, gen.mjs*)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. pid 840701's loop would only read g3_*.log, the ledger and clips/, and it never reaches that code (self-matching pgrep). No cron or live code references the folder. Archive ledger.jsonl, uploads.json and img/brand_qr.png (used by the *-cut.py scripts) to D: first."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/stock",
+     "keep": false,
+     "evidence": "The 20 files are all named pexels_<id> or pixabay_<id>, so each can be downloaded again. Nothing live reads them. The medtour v3 master is 3d1849e4 in Oracle cut1, /var/www and the laptop (checked)."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/cut1 (everything except the 3 *_1080p finals and the thumbnails)",
+     "keep": false,
+     "evidence": "Contents: 720p and 540p transcodes of the finals, picture/picture_es tracks, segments, voice.m4a. All are build intermediates of v1/v2/v3, and those three are md5-verified on the laptop (daad6e5e / 34f1ba43 / 3d1849e4). No live reader."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/music (all except mus1.mp3, mus2.mp3)",
+     "keep": false,
+     "evidence": "The listing has only Pixabay-ID mp3s (331music-608880 … yurasoop-394717) plus _vocalcheck.py, _vocalcheck_ts.py and _vocalcheck.jsonl. The only paid ElevenLabs tracks are mus1, mus2 and music_own/mus1, and all three are in the DUPLICATE item."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/{sheets,sheets_extra,r2frames}",
+     "keep": false,
+     "evidence": "Derived review contact sheets and frame grabs. They can be rebuilt from img/ and clips/, which are being archived. Not served or read by anything live."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med/cut1/MEDTOUR_FINAL_v1/v2/v3_2026-10-03_1080p.mp4 + music/mus1.mp3, music/mus2.mp3, music_own/mus1.mp3 + cut1/MEDTOUR_thumbnail_EN/ES.jpg",
+     "keep": false,
+     "evidence": "md5 checked today on both sides. Oracle v1 daad6e5e…, v2 34f1ba43…, v3 3d1849e4…; music/mus1 and music_own/mus1 c9379376…; mus2 58560775…; thumb EN eaef8655…; ES a1e74c06…. All match laptop files in 'API promo campaign/11.09.2026 API video for YouTube campaign' (the 3 Medical Tourism mp4s, 'v2 music' = c9379376, 'v3 music 2' = 58560775, the thumbnails EN/ES). The served aigo-film-5-medtour.mp4 stays."
+    },
+    {
+     "path": "/home/ubuntu/aigo-med (rest: clips/, captures/, rec/, img/, assets/, voice/, faces/, raw/, top-level gate*/cut logs and prompt JSONs)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing live reads it. The paid clips and the ChatGPT capture are unique, so copy them to a private D: folder and md5-verify before removing."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/stock",
+     "keep": false,
+     "evidence": "Four files: 351939_large, pexels_19078232, pexels_19078391, pexels_3473599. Every one carries its ID, so each can be downloaded again. Nothing live reads them."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/cut1 (everything except VILLA_FINAL and VILLA_v2_B_watermelon)",
+     "keep": false,
+     "evidence": "Contents: VILLA_cut_v1, v1_A_musinova, v1_B_watermelon, v2_A_musinova, their 720s, and picture/picture_es. These are A/B music drafts (VILLA_FILM_PLAN.md:149/165). The final, 7253d8df, is on the laptop and in /var/www. MusiNova is on the 'Never' music list, so nothing will be re-cut from it."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/music",
+     "keep": false,
+     "evidence": "Three Pixabay-ID mp3s: meditativetiger-367308, musinova-609083, watermel0n-587778. They can be downloaded again and are baked into the published film."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa/cut1/VILLA_FINAL_2026-10-01_1080p.mp4 + cut1/VILLA_v2_B_watermelon.mp4",
+     "keep": false,
+     "evidence": "Both are md5 7253d8df068f8d243cb6ecc3ca0799a5 on Oracle (checked today), matching laptop '01.10.26 Villa + Charter Promotion.mp4' and deliverables/VILLA_FINAL (7253d8df…). The served aigo-film-3-villa.mp4 stays."
+    },
+    {
+     "path": "/home/ubuntu/aigo-villa (rest: clips/, img/, assets/, voice/, plan.json, ledger.jsonl, uploads.json, villa-*.py, logs)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing live reads it. The paid Kling clips and stills are unique, so copy them to D: and md5-verify first."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/stock",
+     "keep": false,
+     "evidence": "8 pexels_<id>.mp4 files, plus the _preview/_verify_ex dirs and verify jpgs. Each video can be downloaded again by its ID, and the jpgs are derived. Nothing live reads them."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/cut1 (everything except the two RELOC_FINAL*_1080p files)",
+     "keep": false,
+     "evidence": "Contents: RELOC_A_bluehorizon, RELOC_B_alexrockbeat, their 720s, RELOC_FINAL_720, picture/picture_es, voice.m4a. I checked whether a separate CRYPTO cut deliverable might be among these. The RELOCATION plan header says 'ONE ChatGPT recording (the crypto wording) -> one film', so no separate crypto deliverable exists."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/music",
+     "keep": false,
+     "evidence": "Five Pixabay-ID mp3s (blue-horizon-494393, alexrockbeat-586577, djoldcatz-460492, scoviniebeatz-578418, soundeden-343626). They can be downloaded again and are baked into the published film."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc/cut1/RELOC_FINAL_v2_2026-10-02_1080p.mp4 + cut1/RELOC_FINAL_2026-10-02_1080p.mp4",
+     "keep": false,
+     "evidence": "Oracle md5 today: v2 5ab513a8…, v1 20c7f5fc…. These match the laptop's '02.10.26 Relocation ….mp4' (5ab513a8) and '(v1 - first YouTube upload).mp4' (20c7f5fc). NOW.md says v1 stays live on YouTube by her decision, which concerns YouTube, not this file. Its master is preserved on the laptop."
+    },
+    {
+     "path": "/home/ubuntu/aigo-reloc (rest: clips/, rec/, captures/, img/, assets/, voice/, deliverables/, plan.json, gate*.json, ledger.jsonl, *.py)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. pid 1525404 has its cwd here, but it is a self-matching pgrep loop (`while pgrep -f \"python3 -u reloc-cut\"`) whose only post-loop step is a read-only tail and ffprobe, and it never exits. Nothing else live. The captures are private, so copy them to D: (private) first."
+    },
+    {
+     "path": "/home/ubuntu/aigo-ig/reel_{api,medtour,reloc,villa,yacht}_v1.mp4",
+     "keep": true,
+     "evidence": "These are finished deliverables, and the off-server copy that removal depends on does not exist. I searched every *.mp4 under C:/Users/kirav (OneDrive, Desktop, Downloads, Videos, Pictures, Documents) and D:/ for the 5 exact sizes (25417142, 32697631, 30778990, 34297883, 27383321) and found no match; the control file was found. The only other copies are /var/www/influencer-images/ig-aigo/reel_*_v1.mp4 (same sizes, separate inodes, link count 1). Those are read by Make 6505010 only until 12 Oct (posts/2026-10-10.json is medtour, 2026-10-12.json is api); after that they are unreferenced and become cleanup targets themselves. Keep until the 5 reels (143.6 MB) are copied to D: and md5-verified; then this item can go."
+    },
+    {
+     "path": "/home/ubuntu/aigo-ig (overlays/ + aigo-ig-calendar.py, aigo-ig-reel-overlays.py, aigo-ig-reels.sh, reels.log)",
+     "keep": false,
+     "evidence": "No cron runs the calendar or reel scripts. Make reads /var/www/.../ig-aigo/posts/*.json, and every post JSON names a /var/www reel URL (grepped). The scripts are in the repo. ARCHIVE the overlays (0.8 MB) to D:."
+    },
+    {
+     "path": "/home/ubuntu/aigo-art",
+     "keep": false,
+     "evidence": "I md5'd all 13 files on Oracle (11 out/a-*.jpg, art-jobs.json, gen-art.cjs). Every hash matches a laptop repo file in docs/selling/ai-growth-operator-deck/art/, art-jobs.json or docs/applications/professional-outlook/gen-art.cjs (13/13 OK)."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film/out (all mp4 + api-cta-qr.png, api-cta-endcard.png)",
+     "keep": false,
+     "evidence": "Sizes of all 25 mp4s match /var/www/influencer-images/youtube files. md5 spot-checks today match: v13 e5d6485e = served v13; v3 7c9312a3 = served v3; out/can-ai-find-and-cite-you.mp4 621a176c = served v11 (not v13); T12-06-22 df6cfeea = served. v13 is safe because its /var/www copy is referenced by watch-v14/v15 and is not in this removal list. Hard condition: remove this folder only while the /var/www timestamped and v2–v12 files are NOT removed in the same pass. Those copies are unreferenced, and no laptop copy of v3–v13 exists (size search found none; the laptop holds only the first render and v19). The out/can-ai-find-and-cite-you-poster.jpg here (120821 B) differs from the served poster (118537 B); it is outside this item, so archive it with the rest."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film*/work (6 folders: aideazz-api-film, -v14, -v15, -v17, -v18, -v19)",
+     "keep": false,
+     "evidence": "The file-name profile is pure ffmpeg intermediates (fc_/qr_/xf_/x_/q_/b_/sl_/lb_/n_/pad_/slide_/live_*.mp4, *_s.txt, t_*.txt, veil*.png), plus small deepseek-*.json motion prompts (about 0.5 KB each). No source recording or unique footage. No cron, nginx, systemd or dist reference."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film-{v14,v15,v18,v19}/out: the unpublished timestamped renders (v14-…T15-45-29, v15-…T17-08-27, v15-…T11-07-39 + v15.mp4 [same md5 94743232], v18-…T13-42-16, v18-…T13-55-57, v19-…T18-03-43, T18-29-49, T18-40-07)",
+     "keep": false,
+     "evidence": "Their sizes (23819204, 24579713, 31382007, 5800763, 23225748, 27384571, 5339455, 27158705) match no served file and nothing on the laptop. The published render of each version is served and referenced: served v15 is 20107445 B = T17-30-28, v16 = 31374204. These are superseded test renders: garbage by the same standard as the AIGO drafts."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film-{v14,v15,v18,v19}/out: the published renders + posters/QR/endcard/watch-v14.html",
+     "keep": false,
+     "evidence": "md5 today, Oracle working copy against the served /var/www copy: v14 and T16-09-17 5e2adba4 = served v14; v15 T17-30-28 and T17-49-23 a4f76a75 = served v15; v16 7a0f07d1 = served; v18 and v18-dh ae07e2b4 = served; v19 and T19-41-20 bd809cc0 = served (and the laptop v19); posters 3c2957c3/fd446bca/bb95f1c4/f077b414 match; qr d1ef2a6c and endcard 13143480 match; watch-v14.html 36b40c2e matches. The served copies are referenced by watch pages and stay. Note: v15/out/watch-v15.html (e13a39e7) differs from the served one (eecc70a0) only by a ?v= cache-buster, so it is trivial."
+    },
+    {
+     "path": "/home/ubuntu/aideazz-api-film* (rest: clips/, kit/, loom/, music*/, vo*/, hero/, screen/, v19 shots/, v17 out/, ffmpeg logs, deepseek-motion txt)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing live reads it: dist has no aideazz-api-film reference, and the Make hook fetches only /var/www v19 files. Copy to D: and md5-verify first: compile-v19.mjs is portfolio evidence, and apim-cut.py inputs live here."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/venv",
+     "keep": true,
+     "evidence": "This venv is NOT unused. It is the still-motion runtime of the in-flight film #9. ~/atuona-film9/run_sm.sh (8 Oct 20:26) runs `nice -n 12 ~/atuona-film7/venv/bin/python still_motion.py render {}`, and that run produced ~/atuona-film9/stillclips/sm_k07b…sm_k36.mp4 on 8 Oct 20:27–20:39. FILM9_HANDOVER_2026-10-08.md:165-171 names this exact venv as film #9's $0 still-motion fallback; clip_choice.json sends REJECT clips to still-motion, and Elena has not yet judged the REVIEW clips. The laptop cannot replace it today: `import onnxruntime` gives ModuleNotFoundError (cv2 5.0.0 is present). The venv holds onnxruntime 1.30.0, opencv-headless 5.0.0 and numpy. Keep until film #9 is done or the laptop still-motion toolchain is set up."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/models/depth_anything_v2_small.onnx",
+     "keep": true,
+     "evidence": "Same dependency as the venv: FILM9_HANDOVER_2026-10-08.md:168 names `~/atuona-film7/models/depth_anything_v2_small.onnx` as film #9's depth model, and there is no copy on the laptop (find for *depth_anything* in D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08, D:/aideazz and Downloads found nothing). It is public and could be downloaded again, but it is the only installed copy for an in-flight film. At minimum copy it (99,060,839 B) to D: before any removal."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work (everything except the 3 cuts in the DUPLICATE item and final_v1.mp4)",
+     "keep": false,
+     "evidence": "Contents: body.mp4, card_*, seg_00–32, preview_*/mi_test, and final.mp4. final.mp4 (85036973 B, 22 Sep 14:57) is the fragments_recut.sh rebuild; Elena declined to republish it (NOW.md:979, 'still says MOMENTS on its card (her call: leave it)'), and no laptop file has its size. The published cut is 7bf02576 in served out/ and twice on the laptop."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/stillclips",
+     "keep": false,
+     "evidence": "These are derived $0 parallax renders. All 20 source stills and 19 clips of film #7 are md5-verified on the laptop (39/39). Film #9 does not read this folder: its run_sm.sh writes ~/atuona-film9/stillclips. Rebuilding them needs the venv and model, which are kept."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/music_research",
+     "keep": false,
+     "evidence": "Saved Pixabay search and track HTML pages plus red-lips-sensual-noir-wbmstudio-pixabay.mp3. That is a web cache and a re-downloadable track. No live reader."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work/{final_published_moments.mp4, final_paradise-is-compiled.mp4, final_retitled-centred-stanzas.mp4} + clips/ + stills/",
+     "keep": false,
+     "evidence": "Oracle md5 today: 7bf02576 / c1fc2136 / 8f172a4f. Laptop md5: could-not-generate-content-22-09-2026-PUBLISHED.mp4 (and 23.09.2026 Final videos/…) = 7bf02576; paradise-is-compiled-21-09-2026-REVIEW.mp4 = c1fc2136; could-not-generate-content-22-09-2026-REVIEW.mp4 = 8f172a4f. All 39 clips and stills match the laptop folder '20.09.2026 AI Film video' (39/39). NOW.md:988 requires Elena's go-ahead to clear the rollback cuts; today's 'remove ... duplicated stuff' covers them. Tell her that the two Desktop '-REVIEW.mp4' files (which NOW.md calls superseded) become the only copies."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7/work/final_v1.mp4",
+     "keep": false,
+     "evidence": "ARCHIVE is correct, and the precondition matters. Nothing anywhere has its size (86455379 B): the laptop-wide search over C:/Users/kirav and D:/ found no match. It is one of the NOW.md:988 rollback cuts, so copy it to D: and md5-verify before removing; never delete it outright."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film7 (rest: vo/, specs/, stanzas.json, film7*.mjs, still_motion.py, verify.sh, title_previews.sh, ffmpeg log)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. still_motion.py is not needed by film #9: ~/atuona-film9/still_motion.py is its own copy (17872 B), and run_sm.sh cds to ~/atuona-film9. Only venv/ and models/ from this folder are needed (kept above)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work/{final.mp4, final_v2_moments-less.mp4, final_v5_published_1632.mp4}",
+     "keep": false,
+     "evidence": "Oracle md5 today: final.mp4 57e71d2b = laptop crimson-escape-film8-22-09-2026-PUBLISHED.mp4 and 23.09.2026 Final videos/crimson-escape-2026-09-22T16-32-00.mp4; v2 5740206c = laptop hungry-earth-film8-22-09-2026-REVIEW.mp4; v5 aa0ca25d = ~/backups/crimson-escape-v1-1632.mp4. That backups copy is the one FILM8_2026-09-22.md:142 designates. v5 then survives only in ~/backups (no laptop copy: size 116677610 not found), so ~/backups/crimson-escape-v1-1632.mp4 must never be trimmed without a D: copy."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work/{final_v1_stockprops, final_v3_hungry-earth-fragments, final_v4_crimson-escape, final_v6_no_s03_s04}.mp4",
+     "keep": false,
+     "evidence": "These are superseded drafts from 22 Sep 14:40–17:45. FILM8 doc §8/§10 records keeping only the first published cut (~/backups); no doc asks to keep these. The published film is on the laptop twice and served."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/work (rest: body.mp4, glitch_*.mp4, bakeoff_grid, bo/, fv/, k2/, cards, p_*.txt, build logs)",
+     "keep": false,
+     "evidence": "Compile intermediates: body, glitch inserts, seg_s*, previews, bake-off grid, frame checks. film8.mjs regenerates them from the clips and img (archived). No live reader."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/music",
+     "keep": false,
+     "evidence": "blackrose, darkroom, ritual and sabbat as mp3 plus wav conversions, and page_*.html / search_*.html. The Pixabay IDs are in the page names (535266, 510321, 575316, 575317). The music is baked into the published film. No live reader. Optional: keep the page_*.html names in the archive so each mp3 maps to its ID."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8/clips",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. They are not live; ~/trailer-sample/build.sh is a manual script with no cron. They are paid and unique, so copy them to D: and md5-verify before removing."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film8 (rest: img/ keyframes + glitch stills, raw/ API request/response JSON, vo/, plan.json, ledger.jsonl, uploads.json, film8.mjs, gen.mjs, *.sh, logs)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. ~/atuona-film9/plan.json notes 'locked reference = atuona-film8/img/kira_ref_healed.jpg' and 'ule_ref2.jpg', but film #9 already holds md5-identical copies: img/kira_ref_pre_1006.jpg = 881aa51c and img/ule_ref_pre_1006.jpg = 00211213. So film #9 does not break. Archive to D: first."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film3/clips",
+     "keep": false,
+     "evidence": "All 11 md5s on Oracle are found among laptop mp4 hashes. My check over the Atuona Desktop folder, D:/aideazz/04.04.2026_Atuona Gallery materials and D:/Downloads/Telegram Desktop found 65/65 of the older-film source clips."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film4/clips/{051,088,090}.mp4",
+     "keep": true,
+     "evidence": "The only other copy is not a stable copy. md5 9a086526 / 1d05c99b / ad016229 equal cto-aipa/data/atuona/films/shots/051/088/090.mp4, but the live bot overwrites shots/<pageId>.mp4 in place. dist/atuona-film-compiler.js:81-88 and :102-103 do `writeFileSync(path.join(shotsDir(), `${pageId}.mp4`))` on every new base video; 023.mp4 and 085.mp4 were rewritten that way on 7 Oct, and pages 051, 088 and 090 are in atuona-state.json. No laptop copy exists: the size search for 19891745/1614330/1694979 over C:/Users/kirav and D:/ found nothing. Keep until these 3 clips (22 MB) are copied to D: (together with 022/091) and md5-verified."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film5/clips",
+     "keep": false,
+     "evidence": "All 6 Oracle md5s are present in the laptop Atuona folders (part of the 65/65 check)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-compile/clips",
+     "keep": false,
+     "evidence": "All 17 Oracle md5s are present in the laptop Atuona folders (part of the 65/65 check)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-montage/clips",
+     "keep": false,
+     "evidence": "All 30 Oracle md5s are present in the laptop Atuona folders or D:/Downloads/Telegram Desktop (part of the 65/65 check)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-oneoff/paradise_src.mp4",
+     "keep": false,
+     "evidence": "Its Oracle md5 is present among laptop Atuona mp4 hashes (part of the 65/65 check)."
+    },
+    {
+     "path": "/home/ubuntu/{atuona-film3,atuona-film4,atuona-film5,atuona-compile,atuona-montage}/work",
+     "keep": false,
+     "evidence": "Compile intermediates of films published in served out/. No cron, nginx, systemd or dist reference; ~/fragments_recut.sh touches only film7/film8 and is not scheduled. The sources are verified on the laptop, except film4 051/088/090/022/091, which are handled in their own items."
+    },
+    {
+     "path": "/home/ubuntu/{atuona-film3,atuona-film4,atuona-film5,atuona-compile,atuona-montage,atuona-oneoff} (rest: vo/, film*.mjs, stanzas.json, meta_*.json, chk/g/r/v jpgs, frames/, ocr, film4/clips/022.mp4 + 091.mp4)",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. 022 (1082419 B) and 091 (1028976 B) match nothing in the laptop search, and the voice files are unique, so copy to D: and md5-verify first. Not live."
+    },
+    {
+     "path": "/home/ubuntu/atuona-backups-2026-07-03",
+     "keep": false,
+     "evidence": "I md5'd all 8 mp4s on Oracle and on the laptop today. paradise-js ×2 = 07300db0 = 'Atuona.xyz __ Paradise.js.mp4'; between 745e4513 = between-compile-and-run-2026-06-17T13-41-04.mp4; round2/between a35c9eaa = between-compile-and-run-fixedposter.mp4; reprint ×2 = 42dc4a7a = finding-paradise-reprint-2026-07-03.mp4; stanzas 33fb5269 = stanzas-19-06-2026-…mp4; secret-exhibition 67b050c2 = two laptop copies. The 0.1 MB r2.sh, logs and work/ cards are not duplicated, so archive them with the rest."
+    },
+    {
+     "path": "/home/ubuntu/atuona-blindtest",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. It is the only folder written after 5 Oct (7 Oct 11:34), from the finished blind test (NOW.md: Elena said 'not so much difference' and Fable was wired). key.json exists only here, so move it to D: rather than delete."
+    },
+    {
+     "path": "/home/ubuntu/trailer-sample",
+     "keep": false,
+     "evidence": "ARCHIVE is correct, and the precondition is critical. It is a sales asset (ROMANCE_PROMO_CHANNEL_PARTNERS.md:62-70). That doc says 'On Elena's Desktop', but the size search for 33819687 B over C:/Users/kirav and D:/ found nothing, so the server copy is the only copy. Copy it to D: and md5-verify before removing. Nothing live serves or schedules it."
+    },
+    {
+     "path": "/home/ubuntu/outlook-art",
+     "keep": false,
+     "evidence": "ARCHIVE is correct. Nothing live reads it (no cron, nginx or dist reference). These are the unchosen originals, and gen-art.cjs is in the repo. Copy the images to D: first."
+    }
+   ]
+  },
+  {
+   "group": "backups",
+   "items": [
+    {
+     "path": "/home/ubuntu/.cursor-server",
+     "mb": 613,
+     "verdict": "GARBAGE",
+     "what": "Cursor Remote-SSH server install: bin/ 366 MB (VS Code server + multiplex-server), data/User/globalStorage/anysphere.cursor-agent-worker 245 MB (cursor-agent CLI binaries 2026.08.25: node 129 MB, file_service .node 27 MB)",
+     "why": "Created in one go on 27 Aug 20:24. Its only log (remoteagent.log) shows a single 27-second connection (20:24:44 to 20:25:11), then it shut down. No file inside is newer than 28 Aug. No process, cron, systemd unit or script references it. Regenerable: Cursor re-downloads the server automatically on the next Remote-SSH connect. No product data inside (logs 1 MB, snapshots empty dirs)."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix/venv",
+     "mb": 319,
+     "verdict": "GARBAGE",
+     "what": "Python venv inside the stale duplicate EspaLuzWhatsApp clone (Jan 2026 snapshot)",
+     "why": "No process, systemd unit, cron or pm2 app runs from jan23_prefix. A depth-2 grep of the cto-aipa scripts, ~/bin, ~/*.sh, the aigo-* folders and atuona-film9 finds no script naming it. Only trace: PIL __pycache__ written 3 Oct 17:21, i.e. one ad-hoc import by a session, not a dependency. Reinstallable from requirements.txt. The live bot uses ~/EspaLuzWhatsApp/venv."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix (.git + unmodified tracked files, incl. codebase_backup_20250921_115922.tar.gz 81 MB and 3 tracked mp4s 51 MB)",
+     "mb": 316,
+     "verdict": "DUPLICATE",
+     "copy_at": "GitHub github.com/ElenaRevicheva/EspaLuzWhatsApp (origin). codebase_backup_20250921_115922.tar.gz is also on the laptop at D:/aideazz/EspaLuzWhatsApp/docs/archive/ (md5 3c958e41d904860fdc3abc5e7b9744ff, same on both)",
+     "what": "Git history (183 MB) and committed working-tree files of a second clone of EspaLuzWhatsApp",
+     "why": "`git log --branches --not --remotes` is empty, so there are no unpushed commits. HEAD 29a51e2 (22 Jan) is contained in origin/main and in the backup-* branches. Stash is empty. The only local branch is main. The 7 Oct 12:01 FETCH_HEAD came from the 7 Oct fleet-sync audit (ORACLE_ALL_PRODUCTS_RESILIENCE.md:1116 says 'Duplicate clone ... 60 behind. No process uses it. Left in place; remove only with Elena's go after a backup'). The codebase tarball and the mp4s are tracked, so they are in GitHub."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix/.wwebjs_auth",
+     "mb": 48,
+     "verdict": "DUPLICATE",
+     "copy_at": "/home/ubuntu/EspaLuzWhatsApp/.wwebjs_auth (live folder) and /home/ubuntu/_session-backups/wwebjs_auth.20260906. All three trees md5 31809c3423d7f01a5be93a5321175e0e, 378 files",
+     "what": "Old whatsapp-web.js session store",
+     "why": "Tree md5 (md5 of every file plus relative path) matches the live folder exactly. The live bot is Python/Twilio: no .js and no package.json in ~/EspaLuzWhatsApp."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix (unique remainder: 9 modified tracked files, 5 untracked files, .env, google_credentials.json, espaluz_bridge.py.bak)",
+     "mb": 1.3,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Uncommitted Jan-2026 edits (espaluz_bridge.py, espaluz_memory.py, integrate_*.py) plus Jan-2026 runtime JSON (subscribers, user_trials, whatsapp_users, family_memory_data, phone_email_mapping) plus old secrets",
+     "why": "These are the only bytes in jan23_prefix that exist nowhere else (git status shows ' M' and '??'; .env and the credentials are gitignored). They hold subscriber PII and secrets, so they go to a PRIVATE laptop folder (e.g. D:/aideazz/_private-backups), never to a public repo. After that copy, the whole 685 MB folder can go, with Elena's go as the resilience doc requires."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_ORACLE_BACKUP_20260131_185049.tgz",
+     "mb": 415,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "31 Jan 2026 tarball of the whole EspaLuzWhatsApp folder (venv about 9,900 entries, .wwebjs_auth, .git, runtime JSON)",
+     "why": "Nothing references it (no service, cron or code). Not live. A name+size search of the whole of D:, both Desktops, Downloads and Pictures finds no laptop copy (435,146,928 B). It holds Jan-31 runtime and subscriber state, which is PII, so the destination is a private folder. Most of its bulk is a venv, but it cannot be split without repacking."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzWhatsApp.pre-llm-chain.20260816-1828.tgz",
+     "mb": 513,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "16 Aug rollback snapshot of EspaLuzWhatsApp before the LLM-chain change (.git 350 MB, docs 82 MB, .wwebjs_auth 46 MB, demo mp4s 51 MB)",
+     "why": "The change it guarded went live 7+ weeks ago. Restoring it today would also roll back runtime data. Nothing references the file. No laptop copy (name+size search over D: and the Desktops). It contains .env and subscriber runtime JSON, so keep it private."
+    },
+    {
+     "path": "/home/ubuntu/backups/espaluz-pre-persistence-20260814-170739/ (+ LATEST-espaluz-backup.txt pointer)",
+     "mb": 198,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "14 Aug pre-persistence rollback: EspaLuzWhatsApp.tar.gz 172 MB, EspaLuzFamilybot.tar.gz 36 MB, raw-json/ (19 runtime JSONs: subscribers, paguelofacil_payments, telegram_trials ...)",
+     "why": "Only LATEST-espaluz-backup.txt (a 61-byte pointer) names it; no script reads either. Not live. No laptop copy. Holds subscriber and payment PII, so the destination is a private folder. Move the pointer file together with it."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-convo-chain-20260817-0025.tgz",
+     "mb": 151,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "17 Aug rollback snapshot of EspaLuzFamilybot (venv 272 MB uncompressed, .git 35 MB, looped_video.mp4 30 MB)",
+     "why": "Rollback point for a change shipped 7+ weeks ago. Unreferenced. No laptop copy found by name or size."
+    },
+    {
+     "path": "/home/ubuntu/backups/crimson-escape-v1-1632.mp4",
+     "mb": 111,
+     "verdict": "DUPLICATE",
+     "copy_at": "/home/ubuntu/atuona-film8/work/final_v5_published_1632.mp4 (md5 aa0ca25d35995b188077d57d72a22fd6, same 116,677,610 B)",
+     "what": "First published cut of film #8 Crimson Escape (16:32, 22 Sep), superseded by the 17:54 republish now served from data/atuona/films/out",
+     "why": "Byte-identical twin on Oracle (md5 checked). NOW.md:584 names it as the 'first cut kept'. CAVEAT: there is NO laptop copy (size search over D: and the Desktops finds only the 105,318,076 B republished cut). If ~/atuona-film8/work is later cleared, copy one of these two files to the laptop first."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-llm-chain.20260816-1828.tgz",
+     "mb": 70,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "16 Aug 18:28 Familybot rollback snapshot (.git 35 MB, looped_video.mp4 30 MB)",
+     "why": "Unreferenced, old rollback, no laptop copy. It is NOT identical to the 20:11 snapshot (sizes differ by 2,471 B), so keep both or let Elena pick one."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-llmchain.20260816-2011.tgz",
+     "mb": 70,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "16 Aug 20:11 Familybot rollback snapshot, near-twin of the 18:28 one",
+     "why": "Unreferenced, old rollback, no laptop copy."
+    },
+    {
+     "path": "/home/ubuntu/backups/aela-oracle-copy.20260816-2016.tgz",
+     "mb": 69,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "The only copy of the removed ~/aela project (AELA_Posts.md, AELA_Master.md, judge.py, entity_store.py, CLAUDE.md, .env, shallow .git of github.com/ElenaRevicheva/AELA docs branch, .venv 225 MB uncompressed)",
+     "why": "~/aela no longer exists on Oracle, and no aela folder exists under D:/aideazz, so this tgz may be the last copy of uncommitted AELA files and its .env. Not garbage until that copy is on the laptop. Most of its bulk is the venv."
+    },
+    {
+     "path": "/home/ubuntu/backups/journal-2026-08-10_to_2026-09-28.log.gz",
+     "mb": 38,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Full systemd journal export taken before the 28 Sep 1 GB journal cap (3,468,638 lines, token masked, mode 600)",
+     "why": "Memory reference_oracle_disk_housekeeping: the journal holds VJH judge verdicts (project_vjh_self_learning), and the capped journal no longer has this range. Already gzipped. Unique: no laptop copy."
+    },
+    {
+     "path": "/home/ubuntu/backups/influencer.pre-llm-chain.20260816-1609.tgz",
+     "mb": 34,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "16 Aug EspaLuz_Influencer rollback snapshot (.git 21 MB, venv 10 MB, marketing_engine_images 7 MB)",
+     "why": "Old rollback, unreferenced, no laptop copy."
+    },
+    {
+     "path": "/home/ubuntu/backups/youtube-published-20260913/",
+     "mb": 19,
+     "verdict": "DUPLICATE",
+     "copy_at": "/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v15.mp4 (md5 a4f76a753d2b1d2eb2c2d245a5e60a59) and /var/www/influencer-images/youtube/watch-v15.html (md5 eecc70a00d6e18ef30aa9e4f070454a4)",
+     "what": "13 Sep backup of the then-published v15 promo video plus its watch.html",
+     "why": "Both files are byte-identical to the live served copies (md5 checked). NOW.md:1456 cites it as a backup. No laptop copy of v15 found (size search). Removing it leaves the live file as the only copy, so copy it to the laptop first if Elena wants a rollback that survives an overwrite."
+    },
+    {
+     "path": "/home/ubuntu/backups/whitespace.pre-llm-chain-20260817-1019.tgz",
+     "mb": 17,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "17 Aug rollback snapshot of ~/whitespace (Atlas)",
+     "why": "Old rollback, unreferenced, no laptop copy."
+    },
+    {
+     "path": "/home/ubuntu/backups/atlas-assets-IRREPLACEABLE-20260817-1144.tgz",
+     "mb": 16,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Backup of the 14 Atlas concept assets (7 jpg + 7 mp4)",
+     "why": "All 14 files are md5-identical to the LIVE ~/whitespace/data/assets/ (checked file by file from the tar stream), so on Oracle it duplicates the live folder. Its own name says IRREPLACEABLE and no laptop copy exists (no D:/aideazz/whitespace/data/assets, and debt_finance.mp4 is not found on D:). Copy it to the laptop first; only then is the Oracle copy redundant."
+    },
+    {
+     "path": "/home/ubuntu/backups/influencer-images-20260914/",
+     "mb": 9,
+     "verdict": "UNSURE_KEEP",
+     "what": "Originals of me_01..me_32 + 2 marketing_engine PNGs (34 files) from before the 14 Sep image change",
+     "why": "All 34 md5s DIFFER from the live /var/www/influencer-images files, so these are the only copy of the originals. NOW.md:1322/1366 names this folder as the rollback source. Tiny; not worth the risk."
+    },
+    {
+     "path": "/home/ubuntu/backups (the other 49 small files + 34 small dirs: code .bak copies, crontab backups, outreach-registry snapshots, cto-aipa dist/presync snapshots, CV-by-lane copies, pre-* deploy rollbacks, sync-2026-10-0x, espaluzfamilybot-subscriber-data-20260906 + restore-espaluz-subscriber-data.sh, dragontrade/vjh src tgz)",
+     "mb": 22,
+     "verdict": "UNSURE_KEEP",
+     "what": "Small rollback points from Aug to 7 Oct deploys",
+     "why": "About 20 of these are cited by NOW.md 'VERIFIED BY' lines as the rollback for recent deploys (e.g. pre-price-guard, pre-manual-kit, outreach-registry.pre-*, kit-pre-cvsummary). restore-espaluz-subscriber-data.sh reads espaluzfamilybot-subscriber-data-*. Several hold PII or secrets (.env.bak, subscriber JSON). Total only ~22 MB (4.1 MB files + 17.5 MB dirs), so the space gain does not justify a per-file audit."
+    },
+    {
+     "path": "/home/ubuntu/_session-backups/wwebjs_auth.20260906",
+     "mb": 48,
+     "verdict": "DUPLICATE",
+     "copy_at": "/home/ubuntu/EspaLuzWhatsApp/.wwebjs_auth (live) and ~/EspaLuzWhatsApp_backup_jan23_prefix/.wwebjs_auth; tree md5 31809c3423d7f01a5be93a5321175e0e, 378 files, identical",
+     "what": "6 Sep copy of the WhatsApp-web session store",
+     "why": "Tree md5 equals the live folder's. The folder dates are Jan 23 and Feb 11 2026 in both."
+    },
+    {
+     "path": "/home/ubuntu/_session-backups (everything except wwebjs_auth.20260906)",
+     "mb": 12,
+     "verdict": "LIVE_KEEP",
+     "what": "Write target of the GitHub-token setter, plus recent session rollbacks (atlas-retry-20261005, rebase-jam-20261006, tg-noise/vjh-fix-20261006, openclaw-spar/brief-3day/x-alert-weekly-20261007, brief-own-activity/echo-deals-20261008), git-credentials backups, vjh-resumes.20260907 (old resume PDFs, md5 differ from current), captures.jsonl.pre-pull 2.7 MB",
+     "why": "~/set-ghtoken-stdin.sh:28/68 and ~/bin/github-token-set.sh:16/44 write git-credentials backups here, and the cto-aipa bot spawns set-ghtoken-stdin.sh. NOW.md lines 153-387 cite these exact subfolders as the rollback for 5-8 Oct changes. Small."
+    },
+    {
+     "path": "/home/ubuntu/.local/share/claude/versions/2.1.80",
+     "mb": 226,
+     "verdict": "GARBAGE",
+     "what": "Old Claude Code CLI binary (237,323,990 B, 20 Mar)",
+     "why": "NOT the active binary: ~/.local/bin/claude points to 2.1.81. Nothing references 2.1.80. No cron, systemd unit, pm2 app, dist or script calls the claude CLI (grep of cto-aipa dist/scripts, ~/bin, ~/*.sh and openclaw.json)."
+    },
+    {
+     "path": "/home/ubuntu/.local/share/claude/versions/2.1.81",
+     "mb": 227,
+     "verdict": "GARBAGE",
+     "what": "The ACTIVE Claude Code CLI binary (symlink target of ~/.local/bin/claude)",
+     "why": "Active only in name: ~/.claude.json shows numStartups 3 and autoUpdates false; the newest ~/.claude entries (history.jsonl, sessions, .credentials.json) are 21 Mar; no product, cron or script calls it. Reinstallable with the native installer in one command. Lower priority than the rest, and Elena's call: removing it leaves a dangling ~/.local/bin/claude and no `claude` command on Oracle until it is reinstalled."
+    },
+    {
+     "path": "/home/ubuntu/.cache/pip",
+     "mb": 255,
+     "verdict": "GARBAGE",
+     "what": "pip HTTP download cache (one 196 MB wheel body from 1 Oct = torch for the demucs install)",
+     "why": "A download cache that no runtime reads. The 28 Sep session cleared it (359 MB) with pip's own command and it grew back during the 1 Oct promo-music work. Use `pip cache purge`."
+    },
+    {
+     "path": "/home/ubuntu/.cache/huggingface",
+     "mb": 81,
+     "verdict": "GARBAGE",
+     "what": "HTDemucs model (models--adefossez--HTDemucs, one 84 MB blob, 1 Oct) + xet logs",
+     "why": "The only model in it is the demucs music-separation model used for the 30 Sep-4 Oct promo-film stems (venv in ~/aigo-promo). No live product uses demucs. It downloads again automatically if demucs is ever re-run."
+    },
+    {
+     "path": "/home/ubuntu/.cache/claude + ~/.cache/claude-cli-nodejs + ~/.cache/Microsoft",
+     "mb": 0.13,
+     "verdict": "GARBAGE",
+     "what": "Claude CLI staging and project caches (Mar 2026, incl. one for the deleted ~/aela) and Cursor DeveloperTools cache",
+     "why": "Tool caches from the March Claude CLI and the 27 Aug Cursor session; nothing reads them. Trivial size."
+    },
+    {
+     "path": "/home/ubuntu/.cache/fontconfig",
+     "mb": 0.3,
+     "verdict": "LIVE_KEEP",
+     "what": "fontconfig font cache",
+     "why": "Regenerated automatically and used by any text render (the */10 CV PDF builder with cv-build-fonts, ffmpeg). Trivial size; nothing to gain."
+    },
+    {
+     "path": "/home/ubuntu/.npm/_cacache",
+     "mb": 67,
+     "verdict": "GARBAGE",
+     "what": "npm content-addressable download cache",
+     "why": "Cleared on 28 Sep and regrown. `npm cache clean --force` empties only _cacache; ~/.npm/_npx (NEVER clean, 37 MB) is a separate folder and stays. No cron uses npx (crontab grep = 0)."
+    },
+    {
+     "path": "/home/ubuntu/.npm/_logs",
+     "mb": 0.1,
+     "verdict": "GARBAGE",
+     "what": "npm debug logs (latest 7 Oct)",
+     "why": "Debug output nothing reads."
+    },
+    {
+     "path": "/var/cache/apt (pkgcache.bin 58 MB + srcpkgcache.bin 58 MB)",
+     "mb": 112,
+     "verdict": "GARBAGE",
+     "what": "apt binary package-index caches; archives/ holds 0 .deb files",
+     "why": "Regenerable. BUT apt rebuilds both on its next run: apt-daily rebuilt them today at 04:37 and 06:01 UTC. `apt-get clean` would free 112 MB for less than a day, so it is not real space."
+    },
+    {
+     "path": "/home/ubuntu/VibeJobHunterAIPA_AIMCF/autonomous_data/vjh_checkpoint.db.bak-1782215456",
+     "mb": 105,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "23 Jun 11:50 snapshot of the VJH LangGraph checkpoint SQLite DB, taken at the 23 Jun dedup reset (same epoch as seen_jobs.json.bak-1782215456; VJH commit 21b0d05 'after dedup reset')",
+     "why": "No code references *.bak (grep of src and scripts). No open fd (lsof). The live DB is vjh_checkpoint.db (442 MB, written today). No laptop copy (size search). It is VJH history, so Elena makes the design call (forensics item H). SQLite compresses well for the transfer."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film9/raw",
+     "mb": 502,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "Film #9 generator API logs: 301 files, 293 request/response JSON. 94 request bodies (421 MB) embed base64 copies of the reference images sent to Venice and nano edit calls; the rest are small video queue, quote, music and response JSONs plus 8 txt/log files",
+     "why": "Write-only: gen.mjs:147/165/207/253 write raw/, and nothing reads it. NOT an approved asset (approved = img/, clips/, stillclips/, music/, plan.json per memory project_atuona_film9_approved_assets). Prompts live in plan.json, paid calls in ledger.jsonl, and the input images in img/ and the laptop's 03_ALL_IMAGES. But NO laptop copy exists: the ALL_MATERIAL README says 'Not included: Oracle raw/ (293 API request logs, text only, no pictures)', which understates them (421 MB of embedded images). It sits in Elena's protected film #9 tree, so copy it to D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08/11_RAW_API_LOGS before removing; gen.mjs recreates the empty dir if the film resumes."
+    }
+   ],
+   "challenges": [
+    {
+     "path": "/home/ubuntu/.cursor-server",
+     "keep": false,
+     "evidence": "No cursor/vscode process (ps). No file in data/ newer than 28 Aug (find -newermt 2026-08-29 = empty). sudo lsof finds no open file under it. The only user data is User/History/181d8a06/tQjd.json, a 209 B copy of the LAPTOP's Cursor settings.json (theme + remote.SSH.remotePlatform). No cron or systemd reference. Regenerable: Cursor re-downloads it on the next Remote-SSH connect, which will take ~360 MB again on a disk with 1.4 GB free."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix/venv",
+     "keep": false,
+     "evidence": "No process cwd/fd inside (lsof sweep). jan23_prefix appears in no crontab, systemd, nginx or cron.d entry. A grep of cto-aipa/scripts, ~/aigo-*, ~/bin and ~/*.sh finds no venv path naming it. The only recent writes are PIL/__pycache__/{__init__,_version}.pyc at 2026-10-03 17:21, the same minute as the aigo-med gate1 image run: a one-off `import PIL`, not a dependency. The live bot runs ~/EspaLuzWhatsApp/venv. Reinstallable."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix (.git + unmodified tracked files, incl. codebase_backup_20250921_115922.tar.gz 81 MB and 3 tracked mp4s 51 MB)",
+     "keep": false,
+     "evidence": "Re-verified with --no-optional-locks: `log --branches --not --remotes` is empty, the stash is empty, `log --tags --not --remotes` is empty, and HEAD 29a51e2 is in origin/main and the backup-* branches. Note that origin/main (5fb6b7e, 8 Sep) NO LONGER tracks the tarball or mp4s, so on GitHub they survive only in history. They also exist on the laptop: the tarball md5 3c958e41d904860fdc3abc5e7b9744ff matches at D:/aideazz/EspaLuzWhatsApp/docs/archive/, the 4 mp4s are in D:/aideazz/EspaLuzWhatsApp/, and the laptop clone contains commit 29a51e2. .git mtime 2026-10-09 13:25 comes from another agent's git status (no process, no open fd). Per ORACLE_ALL_PRODUCTS_RESILIENCE.md:1116, removing the whole folder still needs Elena's go."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix/.wwebjs_auth",
+     "keep": false,
+     "evidence": "Recomputed the tree md5: 31809c3423d7f01a5be93a5321175e0e, 378 files, identical to the live ~/EspaLuzWhatsApp/.wwebjs_auth and to ~/_session-backups/wwebjs_auth.20260906. It is also tracked in this clone and in GitHub's origin/backup-* branches. Nothing runs whatsapp-web.js. Safe to drop THIS copy only if the _session-backups copy stays (see that entry)."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_backup_jan23_prefix (unique remainder: 9 modified tracked files, 5 untracked files, .env, google_credentials.json, espaluz_bridge.py.bak)",
+     "keep": false,
+     "evidence": "Archive first, then remove. git status --ignored confirms the list: 9 ' M' (including family_memory_data/*.json, subscribers.json, user_trials.json), 5 '??', and ignored files .env, espaluz_bridge.py.bak, google_credentials.json, oracle_env_setup.sh. oracle_env_setup.sh (b066d4f6...) and google_credentials.json (fac253ca...) are byte-identical to the live ~/EspaLuzWhatsApp copies. The .env differs from live (e626169e vs 7efce3ff), so the old secrets are unique: copy to D:/aideazz/_private-backups with md5 before deleting. Never put it in a public repo (subscriber PII)."
+    },
+    {
+     "path": "/home/ubuntu/EspaLuzWhatsApp_ORACLE_BACKUP_20260131_185049.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. No open fd (sudo lsof), no reference in Oracle code, crontab or units (grep of EspaLuz*, cto-aipa scripts/dist, VJH, whitespace, ~/bin). The repo/memory grep hits only the forensics JSON. It is the only copy of the Jan-31 runtime state, so md5-verified copy to a private laptop folder first (D: has 901 GB free)."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzWhatsApp.pre-llm-chain.20260816-1828.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. Not open (lsof). No code or doc references it beyond the forensics JSON. Laptop D:/aideazz/_backups has pre-llm-chain copies of Influencer, VJH and dragontrade but NOT of EspaLuzWhatsApp, so it is unique: md5-verified private copy first (contains .env and subscriber JSON)."
+    },
+    {
+     "path": "/home/ubuntu/backups/espaluz-pre-persistence-20260814-170739/ (+ LATEST-espaluz-backup.txt pointer)",
+     "keep": false,
+     "evidence": "Archive first, then remove. Not open. LATEST-espaluz-backup.txt (61 B) is the only pointer and nothing reads it. raw-json holds 19 files including paguelofacil_payments.json, subscribers.json and google_credentials.json, so the copy must be private. Missed by the plan: a sibling ~/backups/espaluz-pre-persistence-20260814-170739-pf-rollback.py (20 KB) belongs to this set. Archive it together."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-convo-chain-20260817-0025.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. 157,943,344 B, not open, no code or doc reference. Not on the laptop (_backups/espaluzfamilybot is a different backup). The rollback window passed long ago (the live Familybot has run the chain since Aug)."
+    },
+    {
+     "path": "/home/ubuntu/backups/crimson-escape-v1-1632.mp4",
+     "keep": true,
+     "evidence": "md5 aa0ca25d35995b188077d57d72a22fd6 matches ~/atuona-film8/work/final_v5_published_1632.mp4 (different inodes). BUT the twin sits in ~/atuona-film8, which today's NOW.md claim (row 23: 'Oracle ... ~/atuona-film*') and forensics item G both put up for clearing. Elsewhere it lives only in the work folder of a film the 9 Oct liveness map classes as not live. NOW.md:937 and docs/atuona/FILM8_2026-09-22.md:142 name THIS path as 'first cut kept'. No laptop copy exists (only the 105,318,076 B republish). Removing this as a DUPLICATE while film8/work is cleared as 'published elsewhere' loses the first published cut of film #8 for good: two dedupe decisions, each relying on the other copy. Keep this file. If space is needed, copy it to the laptop with md5 first, then drop the work/ twin, not this one."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-llm-chain.20260816-1828.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. 73,132,511 B, not open, unreferenced. It differs from the 20:11 snapshot (73,134,982 B), so archive both."
+    },
+    {
+     "path": "/home/ubuntu/backups/EspaLuzFamilybot.pre-llmchain.20260816-2011.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. Not open, unreferenced, no laptop copy."
+    },
+    {
+     "path": "/home/ubuntu/backups/aela-oracle-copy.20260816-2016.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. RESILIENCE.md:912 and memory project_aila_symphony call it THE backup of the removed ~/aela, with nothing unique but .claude/ and .env. The laptop has only D:/Downloads/AELA_Master.md, so this tgz is the last full copy. md5-verified private laptop copy first (it holds an .env with API keys), then update those two pointers."
+    },
+    {
+     "path": "/home/ubuntu/backups/journal-2026-08-10_to_2026-09-28.log.gz",
+     "keep": false,
+     "evidence": "Archive first, then remove. Memory project_vjh_self_learning: journal lines are 'the ONLY place judge verdicts appear', and the 1 GB cap keeps only from ~8 Sep, so this file is the only record of 10 Aug-8 Sep VJH verdicts. No script reads it (grep of VJH src/scripts and cto-aipa scripts). Copy privately with md5 (mode 600, token masked but full service logs), then update the NOW.md:1139 pointer."
+    },
+    {
+     "path": "/home/ubuntu/backups/influencer.pre-llm-chain.20260816-1609.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. Not open, unreferenced. The laptop's D:/aideazz/_backups/EspaLuz_Influencer.pre-llm-chain.20260816-1109 is a DIFFERENT, earlier snapshot (11:09 vs 16:09), so it is not a copy of this one."
+    },
+    {
+     "path": "/home/ubuntu/backups/youtube-published-20260913/",
+     "keep": false,
+     "evidence": "Folder holds exactly 2 files. md5 re-verified: can-ai-find-and-cite-you-v15.mp4 a4f76a75... equals the served /var/www/influencer-images/youtube/can-ai-find-and-cite-you-v15.mp4, and watch.html eecc70a0... equals the served watch-v15.html. The served v15 is REFERENCED (watch-v15.html), so it is not in the 'served but unreferenced' cleanup set, and the duplicate is safe. Suggest a laptop copy of v15 anyway, and update the NOW.md:1809 pointer."
+    },
+    {
+     "path": "/home/ubuntu/backups/whitespace.pre-llm-chain-20260817-1019.tgz",
+     "keep": false,
+     "evidence": "Archive first, then remove. Not open, unreferenced; old Atlas rollback; no laptop copy found."
+    },
+    {
+     "path": "/home/ubuntu/backups/atlas-assets-IRREPLACEABLE-20260817-1144.tgz",
+     "keep": false,
+     "evidence": "Remove only after an md5-verified laptop copy. Memory reference_atlas_orphaned_videos and RESILIENCE.md:2820 name it THE irreplaceable-asset backup: the live ~/whitespace/data/assets have been orphaned/clobbered before (4 videos restored 17 Aug). No laptop copy (D:/aideazz/_backups and _private-backups have none). After copying, update both pointers to the laptop path."
+    },
+    {
+     "path": "/home/ubuntu/_session-backups/wwebjs_auth.20260906",
+     "keep": true,
+     "evidence": "Tree md5 is identical to the live folder (31809c34..., 378 files), BUT that live copy is not durable. NOW.md:2759 documents this folder as the backup taken BEFORE the 6 Sep untrack of .wwebjs_auth. Oracle's live ~/EspaLuzWhatsApp is 11 commits behind origin/main, and origin/main tracks 0 .wwebjs_auth files while the live index tracks 378. The next `git pull` there therefore DELETES the live copy. The laptop copy D:/aideazz/EspaLuzWhatsApp/.wwebjs_auth is NOT byte-identical (autocrlf changed leveldb CURRENT/LOG files). GitHub keeps it only in old backup-* branches, which the 6 Sep leak finding argues should be purged. Keep this 48 MB copy (or move it md5-verified, without CRLF conversion, to a private laptop folder) and drop the jan23 copy instead."
+    },
+    {
+     "path": "/home/ubuntu/.local/share/claude/versions/2.1.80",
+     "keep": false,
+     "evidence": "~/.local/bin/claude -> 2.1.81, so nothing points at 2.1.80. No claude process. crontab has 0 'claude' lines. A grep of cto-aipa dist/scripts, ~/bin, ~/*.sh, openclaw.json/workspace, VJH src and whitespace dist finds no spawn of claude or .local/share/claude. OpenClaw uses the API model 'anthropic/claude-sonnet-4-5', not the CLI. Remote Control runs from the laptop (memory reference_claude_remote_control)."
+    },
+    {
+     "path": "/home/ubuntu/.local/share/claude/versions/2.1.81",
+     "keep": false,
+     "evidence": "Same checks: no process, cron, unit or code calls it. ~/.claude newest entries are 2026-03-21 (history.jsonl, sessions). Not a product; reinstallable. Elena's call; removing it leaves the dangling symlink ~/.local/bin/claude (~/.claude/.credentials.json stays, so a reinstall is logged in)."
+    },
+    {
+     "path": "/home/ubuntu/.cache/pip",
+     "keep": false,
+     "evidence": "255 MB download cache. No pip/python install is running; no cron uses pip (crontab grep). Use `pip cache purge` (it regrows during promo/demucs installs)."
+    },
+    {
+     "path": "/home/ubuntu/.cache/huggingface",
+     "keep": false,
+     "evidence": "hub/ holds only models--adefossez--HTDemucs (81 MB). No cron or systemd unit mentions demucs, HF_HOME or huggingface. No live process has it open (lsof). Film/promo audio work moved to the laptop on 8 Oct. Re-downloads on demand."
+    },
+    {
+     "path": "/home/ubuntu/.cache/claude + ~/.cache/claude-cli-nodejs + ~/.cache/Microsoft",
+     "keep": false,
+     "evidence": "Total ~132 KB (8 + 72 + 52 KB). Correction: 'nothing reads them' is not exact. ~/.cache/Microsoft/DeveloperTools/.onnxruntime/onnxruntime.db was written 2026-10-08 20:23 by some onnxruntime run (live dragontrade-main maps onnxruntime-node 1.15.1, though that lib has no 'DeveloperTools' string and holds no fd). It is a device-id/telemetry store that is recreated on use, so removal is harmless. The gain is negligible; skipping it costs nothing."
+    },
+    {
+     "path": "/home/ubuntu/.npm/_cacache",
+     "keep": false,
+     "evidence": "67 MB, a separate directory from ~/.npm/_npx (37 MB, NEVER clean). `npm cache clean --force` touches only _cacache. No npm process running. Regenerable."
+    },
+    {
+     "path": "/home/ubuntu/.npm/_logs",
+     "keep": false,
+     "evidence": "<1 MB npm debug logs (latest 7 Oct 21:03); nothing reads them."
+    },
+    {
+     "path": "/var/cache/apt (pkgcache.bin 58 MB + srcpkgcache.bin 58 MB)",
+     "keep": false,
+     "evidence": "archives/ holds no .deb. Regenerable index caches, so removal is harmless, but apt-daily rebuilds both within hours: zero lasting gain. Not worth the action."
+    },
+    {
+     "path": "/home/ubuntu/VibeJobHunterAIPA_AIMCF/autonomous_data/vjh_checkpoint.db.bak-1782215456",
+     "keep": false,
+     "evidence": "Archive first, then remove. It is NOT redundant: a read-only immutable query shows 2,266 threads / 15,632 checkpoints in the .bak, of which 2,100 threads do NOT exist in the live DB (12,149 threads / 62,149 checkpoints). It is the only record of pre-23-Jun VJH evaluations. No reader: runner.py, sweep_i_act_today.py:97 and link_evidence.py:31 open only vjh_checkpoint.db; no open fd. md5-verified copy (plus PRAGMA integrity_check on the laptop copy) before removal; Elena's design call (item H)."
+    },
+    {
+     "path": "/home/ubuntu/atuona-film9/raw",
+     "keep": false,
+     "evidence": "Archive first, then remove. gen.mjs writes raw/*.request.json only as the curl --data-binary @file body (lines 147/207/253) and the response at line 165, and never reads them back; no .py/.sh in the tree reads raw/. No film9 process; no open fd. The 20 non-request files are at most 3.9 KB (no generated media inside). Not in the approved set (img/, clips/, stillclips/, music/, plan.json). But Elena asked for 'all, absolutely all generated material', and the laptop README excludes raw/, so copy it md5-verified to D:/ATUONA_FILM9_ALL_MATERIAL_2026-10-08/11_RAW_API_LOGS and update the README and FILM9_HANDOVER line 20 before removing."
+    }
+   ]
+  },
+  {
+   "group": "logs",
+   "items": [
+    {
+     "path": "/home/ubuntu/.pm2/pm2__2026-09-28_15-38-05.log",
+     "mb": 841.6,
+     "verdict": "COMPRESS",
+     "what": "The old PM2 God-daemon log from 7 Jan to 28 Sep 2026, split off when pm2-logrotate was installed on 28 Sep. It is DEAD: mtime is 2026-09-28 15:38 and nothing writes it.",
+     "why": "Not written: `lsof -p 3342857` (the God Daemon) shows fds 1w/2w on ~/.pm2/pm2.log only (52,669 B, mtime 13:03 today), not on this file. Content: head is 2026-01-07 'New PM2 Daemon started' and tail is 2026-09-28 pm2-logrotate online. A 2 MB slice from the middle is about 99% restart-loop lines for the paused bots: ~4,170 each of 'App [dragontrade-bybit:2]/[dragontrade-binance:3] starting / online / exited with code [1]'. A 4 MB slice gzips to 186 KB (4.4%), so the whole file should come to about 37 MB, which frees about 805 MB. No copy exists on the laptop (searched D:/aideazz, D:/dragontrade, D:/Downloads, Desktop and Downloads by name). Nothing reads it: a grep of cto-aipa dist/scripts and the ~/*.sh scripts finds no 'pm2__' reader. A `gzip -k` to pm2__2026-09-28_15-38-05.log.gz still matches pm2-logrotate's 'pm2__' retain prefix (delete_old does an indexOf on '<base>__'). Method: the 28 Sep byte-verified one (gzip -k, gzip -t, check zcat|wc -c = 882455872, then rm). Peak extra space is only the ~37 MB .gz. This is the forensics doc's fix B, which has NOT been done yet (still 882,455,872 B)."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/dragontrade-main-out__*.log (10 rotated files, 2026-10-04_00-00-00 to 2026-10-09_00-00-00)",
+     "mb": 320.8,
+     "verdict": "COMPRESS",
+     "what": "Rotated stdout of the LIVE dragontrade-main bot (pm2 id 3). The rotated files are closed and dead. The live file is dragontrade-main-out.log.",
+     "why": "Sizes: 21.3/52.6/22.8/52.6/24.3/52.5/25.9/52.5/27.5/4.4 MB = 336,361,804 B. None is open: lsof +D ~/.pm2/logs shows only the current *.log files, all held by the God Daemon. Content is the 'Health check recorded: DIRECT_API_ONLY - CoinGecko MCP skipped' spam, 4 lines per second. A 4 MB slice gzips to 20.9 KB (0.5%), so compressing frees about 318 MB. They were never compressed because pm2-logrotate's parseBool bug ignored compress:'true'. That bug was patched at 13:03 today (app.js line 39 now accepts boolean true; module restarted at 13:03:34). The patch only affects rotations from 00:00 UTC on 10 Oct; existing files are not compressed after the fact. The spam has stopped: since dragontrade-main restarted on 8 Oct 00:58 UTC, the live log is 1.24 MB for 00:00–13:14 (~2 MB/day, against ~75 MB/day before). That means retain=10 will age all 10 files out by about 19 Oct even if nothing is done; compressing now gets the space back 10 days early. A gzip in place to '__<date>.log.gz' keeps the 'dragontrade-main-out__' prefix, so retain still prunes the files. resend-email-proof.cjs (a manual script, not in crontab) lists ~/.pm2/logs to grep for proof lines and has no .gz handling; this is a minor loss of greppability."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/dragontrade-{bybit,binance}-{out,error}.log.gz (4 files)",
+     "mb": 260.7,
+     "verdict": "UNSURE_KEEP",
+     "what": "Compressed logs of the PAUSED DragonTrade Bybit/Binance bots. They are not in pm2 and were last written 25 May 2026. The 28 Sep session gzipped them.",
+     "why": "Sizes: bybit-error 148.0 MB, bybit-out 48.5, binance-out 48.4, binance-error 28.4 (273,339,091 B). They are not in `pm2 jlist` (the apps there are ids 0-4, 6, 8, 9, 10) and no process has them open. They are already compressed, so gzip gains nothing. The standing rule (memory reference_oracle_disk_housekeeping, plus the liveness map: 'keep the gz per the standing rule') says the paused Bybit/Binance bots are NEVER cleaned. No laptop copy was found (D:/aideazz, D:/dragontrade, Downloads, Desktop). They are listed only so the 261 MB is accounted for. Moving them would need Elena's explicit go plus a laptop copy checked by md5 first."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/dragontrade-main-out.2026-01-16_to_2026-09-28.log.gz",
+     "mb": 52.6,
+     "verdict": "ARCHIVE_TO_LAPTOP",
+     "what": "A hand-made archive from 28 Sep: the 3 GB dragontrade-main stdout from 16 Jan to 28 Sep 2026, already gzipped. Not written by anything.",
+     "why": "55,163,746 B, mtime 2026-09-28 15:31, not open. Memory says it is the 3 GB of repeated 'Health check recorded' lines, so it has almost no information value, but the 28 Sep session chose to keep it rather than delete it. It is already compressed. pm2-logrotate never prunes it: its name has '.2026-' rather than the 'dragontrade-main-out__' prefix that delete_old matches. No copy exists on the laptop (searched by name on D:/aideazz, D:/dragontrade, D:/Downloads, Desktop and Downloads). Copy it to D: with an md5 check before removing it from Oracle; that frees 52.6 MB."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/algom-stream-error__2026-09-29_00-00-00.log",
+     "mb": 39.6,
+     "verdict": "COMPRESS",
+     "what": "Error log of the LIVE algom-stream app (pm2 id 2), covering 15 May to 16 Aug 2026, rotated once on 29 Sep. Dead, and STUCK: it will never be pruned.",
+     "why": "41,512,531 B. Content is a crash loop: '[Stream] Failed to start: maximum allowed connection limit' and later 'account ... does not have any credits', each followed by 'Exiting.'. The live algom-stream-error.log has been 0 bytes since 29 Sep. pm2-logrotate only rotates files with size > 0 (app.js:172), and it calls delete_old only after a rotation, so retain=10 never reaches this file and it stays forever unless handled by hand. A 4 MB slice gzips to 127 KB (3%), so compressing frees about 38 MB."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/dragontrade-dashboard-out__2026-09-29_00-00-00.log",
+     "mb": 32.2,
+     "verdict": "COMPRESS",
+     "what": "Stdout of the LIVE dragontrade-dashboard (pm2 id 0) from 16 Jan to 16 Aug 2026, rotated once on 29 Sep. Dead and stuck.",
+     "why": "33,722,264 B. Content is the startup banner repeated on every restart ('ALGOM DASHBOARD SERVER RUNNING', 'Ready to serve post tracking data'). The live dragontrade-dashboard-out.log has been 0 bytes since 29 Sep, so for the same reason as algom-stream-error (size>0 rotation, delete_old only after a rotation) retain never prunes this file. A 4 MB slice gzips to 116 KB (2.8%), so compressing frees about 31 MB. Not open by any process."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/cto-aipa-{out,error}-{0,5,6,7,8}.log (10 files)",
+     "mb": 2.8,
+     "verdict": "COMPRESS",
+     "what": "Logs from old pm2 ids of cto-aipa, dated 19 Mar to 13 Apr 2026. These pm2 ids are gone; the current process is pm2 id 1, which writes cto-aipa-out-9.log and cto-aipa-error-9.log. Dead.",
+     "why": "2,968,610 B. The largest is cto-aipa-error-7.log at 1.07 MB. None is open. No app in pm2 jlist writes them: cto-aipa's out/err paths end in -9.log. pm2-logrotate never prunes them, because delete_old matches 'cto-aipa-out-9__'. They are the only remaining cto-aipa logs from March and April, so compress rather than delete. cto-aipa-error-7.log gzips to 24.6 KB (2.3%). The space gain is negligible (~2.6 MB)."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/<live-app>__2026-09-30..10-09*.log (rotated: cto-aipa-*-9, algom-poll-*, algom-stream-out, dragontrade-main-error, serpapi-jobs-*, n8n-out, pm2-logrotate-out, whitespace-*__2026-09-29)",
+     "mb": 2.3,
+     "verdict": "LIVE_KEEP",
+     "what": "Normal daily rotations of the 9 live pm2 apps. pm2-logrotate manages them (max_size 50M, retain 10, daily at 00:00). Each file is closed once it is rotated.",
+     "why": "2,374,885 B in total, the largest being cto-aipa-out-9__ at about 1.0 MB. The pm2-logrotate-out.log for 9 Oct shows retain working: '...__2026-09-29... has been deleted'. From tonight, new rotations are written as .gz because of the parseBool patch. Not worth handling by hand. The whitespace-*__2026-09-29 pair (76 KB) is stuck in the same way as the algom-stream-error file, but it is too small to matter."
+    },
+    {
+     "path": "/home/ubuntu/.pm2/logs/*.log (18 current files) + /home/ubuntu/.pm2/pm2.log",
+     "mb": 1.4,
+     "verdict": "LIVE_KEEP",
+     "what": "The current stdout/stderr files of the 9 pm2 apps, plus the daemon log. All are ACTIVELY WRITTEN.",
+     "why": "`sudo lsof -p 3342857` (PM2 v6.0.14 God Daemon) shows 'w' fds on every current file: algom-poll, algom-stream, cto-aipa-*-9, dragontrade-dashboard, dragontrade-main, n8n, pm2-logrotate, serpapi-jobs and whitespace (out and error for each), plus pm2.log on fds 1 and 2. The biggest is dragontrade-main-out.log at 1.24 MB (13:14). cto-aipa scripts _prove-automation-fired.cjs and _audit-abierto-stamps.cjs read cto-aipa-out-9.log."
+    },
+    {
+     "path": "/var/log/espaluz-webhook.log",
+     "mb": 278.1,
+     "verdict": "COMPRESS",
+     "what": "The log of the DUPLICATE espaluz-webhook.service, a second copy of paypal_webhook_server.py that crash-loops on :5000. DEAD since 13:03 UTC today, when the unit was disabled (is-enabled=disabled, is-active=inactive).",
+     "why": "291,584,544 B (root:root), mtime 13:03, held open by no process (lsof). It runs from 2026-01-11 19:12 to 2026-10-09 13:03:27. Almost all of it is 'Address already in use / Port 5000 is in use' loops, plus Feb–Jun scanner traffic, 'Bad request' lines and 'GET /' health checks. It also contains exactly 2 REAL payment webhook hits: 2026-01-11 20:25 'POST /paypal-webhook 200' and 2026-05-13 18:54 'POST /paguelofacil-webhook 200'. Those two lines are the reason to compress rather than delete. A 4 MB slice gzips to 77 KB (1.8%), so the file shrinks to about 5 MB and about 273 MB is freed. The new /etc/logrotate.d/aideazz-app-logs block (su root root, size 20M, rotate 2, copytruncate) WILL rotate and gzip it at 00:00 UTC on 10 Oct. copytruncate first copies the file, though, so about 278 MB must be free at midnight. Nothing writes the file now, so a direct `sudo gzip -k` with a byte check and then rm is cheaper (peak +5 MB). The block has missingok, so a hand-made .gz causes no error."
+    },
+    {
+     "path": "/var/log/oracle-health.log",
+     "mb": 203,
+     "verdict": "COMPRESS",
+     "what": "Output of the health-check cron. ACTIVELY WRITTEN by cron */5 running /home/ubuntu/check_oracle_health.sh (as ubuntu; the script was replaced at 13:03 today). Last write was 13:15.",
+     "why": "212,861,283 B (ubuntu:ubuntu). The file has a '=== <timestamp> ===' header every 5 minutes since 2026-02-13. By month (character count): Feb 18.3, Mar 37.2, Apr 36.5, May 32.4, and only about 0.8 per month for Jun–Oct, so about 99% is old Feb–May noise: pm2 status tables and 'Use --update-env' lines from the old script. A 4 MB slice gzips to 94 KB (2.2%), so about 198 MB can be freed. ⚠️ The 13:03 logrotate rule will NOT do this. Its block for /var/log/{oracle-health,espaluz-familybot,joblist-pipeline,oci-keepalive}.log uses `su ubuntu ubuntu`. /var/log is root:syslog 0775 and ubuntu is not in the syslog group (`id ubuntu` lists only adm, sudo and a few others). `test -w /var/log` as ubuntu returns CANNOT. logrotate 3.21 does the copytruncate under the su euid, so creating oracle-health.log.1 should fail with Permission denied at 00:00 UTC. The installer's `logrotate -d` dry run creates no files, so it cannot catch this. The NOW.md check 'app logs have .1.gz after 00:00 UTC 10 Oct' is therefore expected to FAIL for these 4 files. The fix is `su root adm` in that block (the global /etc/logrotate.conf already uses `su root adm`), with Elena's go. The file is live, so it needs copytruncate, not mv."
+    },
+    {
+     "path": "/var/log/espaluz-familybot.log",
+     "mb": 138.4,
+     "verdict": "COMPRESS",
+     "what": "Stdout/stderr of the LIVE EspaLuz family bot. ACTIVELY WRITTEN by systemd espaluz-familybot (pid 1031870, fds 1w/2w; StandardOutput=append, StandardError=append; active since 1 Oct 06:58).",
+     "why": "145,071,714 B (ubuntu:ubuntu). It grows slowly now (about 180 B/min between 13:16 and 13:17, roughly 0.26 MB/day). Most of it is repeated 'Webhook killer check cycle #N / Webhook is already deleted / No webhook found' lines; dated lines run from Jan to Oct 2026. A 4 MB slice gzips to 145 KB (3.5%), so about 133 MB can be freed. Because systemd opens the file with O_APPEND, copytruncate is safe and the bot keeps its PID. The same su-ubuntu Permission-denied problem as oracle-health.log means tonight's rotation is expected to fail until the block is changed to `su root adm`. EspaLuz is Elena's product, so any action needs her go."
+    },
+    {
+     "path": "/var/log/syslog.1",
+     "mb": 75.4,
+     "verdict": "COMPRESS",
+     "what": "Last week's rsyslog file (27 Sep to 4 Oct), left uncompressed by the stock rule's delaycompress. DEAD, with no open fd.",
+     "why": "79,079,503 B, rotated 2026-10-04 00:00. /etc/logrotate.d/rsyslog uses weekly, rotate 4, compress, delaycompress, so this file becomes syslog.2.gz AUTOMATICALLY at the next weekly run (Sun 11 Oct 00:00 UTC). syslog.2.gz is 6.6 MB, which shows the expected ratio, and a 4 MB slice gzips to 8%, so about 69 MB will be freed. Do NOT gzip it by hand: delaycompress expects the name syslog.1 with no extension, so a hand-made syslog.1.gz would be orphaned and never pruned. Leave it for 2 days."
+    },
+    {
+     "path": "/var/log/kern.log.1",
+     "mb": 19.9,
+     "verdict": "COMPRESS",
+     "what": "Last week's kernel log, uncompressed because of delaycompress. DEAD.",
+     "why": "20,882,982 B, mtime 2026-10-03 23:59, not open. It is compressed automatically on 11 Oct 00:00 by the same rsyslog rule; earlier kern.log.N.gz files are a few KB to 7 KB. Do not gzip it by hand, for the same orphan reason as syslog.1."
+    },
+    {
+     "path": "/var/log/syslog",
+     "mb": 85.3,
+     "verdict": "LIVE_KEEP",
+     "what": "The live system log. ACTIVELY WRITTEN by rsyslogd (pid 2650854, fd 7w).",
+     "why": "89,453,538 B since 4 Oct, about 17 MB/day. The stock weekly rule rotates it. Its top writers in the last 2 MB are systemd (4,751 lines; this included the espaluz-webhook crash-loop restarts until 13:03 today), kernel (2,742; apparmor audit) and python (1,295). It should grow more slowly now that the duplicate webhook is disabled."
+    },
+    {
+     "path": "/var/log/kern.log",
+     "mb": 42.5,
+     "verdict": "LIVE_KEEP",
+     "what": "The live kernel log. ACTIVELY WRITTEN by rsyslogd (pid 2650854, fd 8w).",
+     "why": "44,602,486 B since 4 Oct. Almost all of it is 'audit: apparmor=\"ALLOWED\" operation=\"file_perm\" ... profile=\"snap.oracle-cloud-agent...\" comm=\"gomon\"' lines from the OCI cloud agent. The stock weekly rule rotates it. A rate-limit or audit filter could cut it, but that is a system config change and not part of a cleanup."
+    },
+    {
+     "path": "/var/log/journal/",
+     "mb": 1020,
+     "verdict": "LIVE_KEEP",
+     "what": "The systemd journal. Written by systemd-journald and capped at 1 GB.",
+     "why": "du -sm = 1020 MB, which is the SystemMaxUse=1G cap (/etc/systemd/journald.conf.d/99-aideazz-size.conf, re-asserted by disk-prevention-apply.sh), so journald vacuums it itself. Memory says it holds VJH judge verdicts. One file, system@...journal~ (58.7 MB, 2 Oct), is an unclean-shutdown journal that journald counts toward the cap and vacuums too. The task says to leave it, so it is left."
+    }
+   ],
+   "challenges": [
+    {
+     "path": "/home/ubuntu/.pm2/logs/dragontrade-main-out.2026-01-16_to_2026-09-28.log.gz",
+     "keep": false,
+     "evidence": "I found nothing on Oracle that requires this file to stay there. It may move to the laptop on one condition: the laptop copy must be made and its md5 must match before the Oracle copy is removed. It is the ONLY copy of DragonTrade main's stdout from 16 Jan to 28 Sep, so this is an archive, never a plain delete. What I checked, all read-only: (1) stat: 55,163,746 B, 1 link (inode 539642), mtime and ctime 2026-09-28 15:31:48, last access 2026-10-05 19:51. Nothing has rewritten it since the 28 Sep session made it, and it matches NOW.md:1129 ('live dragontrade-main-out.log 3.0 GB -> 52 MB archive ... live file emptied in place'). (2) `sudo -n lsof | grep dragontrade-main-out.2026`: no open handle in any process. The live bot writes only to dragontrade-main-out.log (1,259,323 B, mtime 2026-10-09 13:23), and pm2-logrotate rotates that into dragontrade-main-out__<date>.log files. (3) Code and schedule references: grep of ~/dragontrade-agent (excluding node_modules and .git) for '.pm2/logs' and 'dragontrade-main-out' found nothing, so the dashboard and bots do not read old pm2 logs. Nothing in the crontab mentions dragontrade. Nothing in ~/cto-aipa/scripts or ~/disk-prevention-2026-10-09 names the file. The new /etc/logrotate.d/aideazz-app-logs rule covers only /var/log/* and ~/logs/*.log, not ~/.pm2/logs. Repo references are documentation only (NOW.md:1129 and the forensics round-1 JSON). (4) The standing rule does not cover it: memory reference_oracle_disk_housekeeping protects the paused Bybit/Binance BOTS (their code is in ~/dragontrade-agent; their state is in the DB and stream_state/engagement_state.json) and their 4 *.gz logs. This file is dragontrade-main's own log. The first lines read with `zcat | head -c 1500` are the 2026-01-16 19:41:02 startup of the ALGOM Twitter agent, not Bybit/Binance. (5) There is room for the copy: laptop D: has 901 GB free. Oracle root is at 98% with 1.4 GB free, so moving it frees 52.6 MB. Caveats for whoever executes: I did not run gzip -t on Oracle, because it would decompress about 3 GB on the 2-CPU box. Check integrity on the laptop copy instead (gzip -t, or zcat | wc -c, which should be about 3.0 GB per the 28 Sep record). Use md5 on both ends of the transfer as the removal gate. The content may include DragonTrade post history and is not only 'Health check recorded' lines, so keep the laptop copy permanently. Coordinate through the NOW.md session board, because another session (disk-prevention, 13:03 UTC today) is active on the box."
+    }
+   ]
+  }
+ ]
+}

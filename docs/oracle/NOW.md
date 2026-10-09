@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (film #9 session) | 09 Oct 13:00 | Oracle disk cleanup + prevention (Elena: "free maximum space without destroying live products; remove only garbage/duplicates; stop it coming back") | Oracle /tmp, ~/aigo-*, ~/atuona-film*, ~/backups, ~/.pm2/logs, /var/log, health_monitor.sh, check_oracle_health.sh, pm2-logrotate, espaluz-webhook (duplicate unit), logrotate.d, sysstat | d66b25a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -524,6 +523,11 @@ git log keeps the record.
   VJH systemd active, health ports 3000/8081/8080/18789/3001 = 200. (OpenClaw is a systemd --user unit: `systemctl --user is-active openclaw-gateway`; also answers on :18789.) **RULE: film renders run on the LAPTOP** (`scripts/atuona-film9.mjs`
   with `FILM9_BASE/WORK/CUT/FONT/MONO`, pip `static-ffmpeg`, fonts `*-nl.ttf` = DejaVu with newline→zero-width for ffmpeg 8),
   never on the bots' box; the script also dissolves in batches of 6 and checks free memory.
+  ✅ **9 Oct 14:08 UTC — ORACLE DISK 98% → 47% (24 GB free), nothing live touched, all bots verified.** Garbage 9.4 GB removed;
+  logs compressed (byte-verified); 12 GB of film/promo working folders + old backups ARCHIVED to the laptop
+  `D:\ORACLE_ARCHIVE_2026-10-09\` (md5-verified file by file, README) then removed. Tools: `scripts/oracle-resilience/{safe-remove,
+  archive-to-laptop,compress-verified}.sh`. Record: `docs/oracle/ORACLE_DISK_FORENSICS_2026-10-09.md` § DONE. film9 `gen.mjs` now
+  refuses paid calls under 3 GB free. Claim released.
   🛡️ **9 Oct 13:03 UTC — DISK PREVENTION DEPLOYED (Elena: "stop it to come back"), re-runnable:**
   `scripts/oracle-resilience/disk-prevention-apply.sh` (staged on Oracle in `~/disk-prevention-2026-10-09/`, backups `*.bak-2026-10-09`).
   ✅ disk alarm → Telegram at 85/90/95 % (fired: "DISK ALERT DELIVERED" in ~/health.log, state `~/.disk_alert_level`) · ✅ health check

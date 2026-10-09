@@ -76,3 +76,24 @@ Cleanups (each needs her go; other sessions' files):
 - **H. VJH data:** prune `ats_cache` / rotate the checkpoint DB — VJH design decision first.
 - **I. Bigger disk:** OCI boot volumes resize online; the shape is VM.Standard.E5.Flex (not Always Free) — check the cost in
   the console first.
+
+## DONE — 9 Oct 2026, with Elena's go ("free up maximum space possible but without destroying live products. Remove only the garbage or duplicated stuff and stop it to come back")
+**Result: 98% (1.4 GB free) → 47% (24 GB free).** All bots verified after every step (ports 3000/8081/8080/18789/3001/5000 = 200,
+PM2 all online, systemd + OpenClaw active, Make-served promo films + public gallery 200).
+How (records in `docs/oracle/disk-cleanup-2026-10-09/`, classification in `disk_cleanup_classification_2026-10-09.json`):
+1. **Classified read-only** by a liveness map (40 live paths: bots, nginx sites, Make-served files, crons, open files) + 4
+   classifiers + skeptics. Skeptics vetoed 8 removals (only copies of the HD upscales and IG reels, film #9's still-motion venv
+   + depth model, the WhatsApp session backup, ...): those were kept or archived first.
+2. **Phase 1 garbage, 9.4 GB** (`phase1_garbage.txt`) via `scripts/oracle-resilience/safe-remove.sh` (dry run first; refuses
+   protected and in-use paths; logs to `~/safe-remove.log`) + `pip cache purge`, `npm cache clean`, `apt-get clean`.
+3. **Logs compressed, byte-verified** (`scripts/oracle-resilience/compress-verified.sh`): 107 rotated PM2 logs + the 842 MB PM2
+   daemon log (→ 39 MB); `/var/log` app logs via the new logrotate rule (health log 212 MB → 4.8 MB, family bot 145 → 5.2,
+   webhook 278 → 8.9).
+4. **Archived to the laptop, md5-verified file by file** (`scripts/oracle-resilience/archive-to-laptop.sh`):
+   `D:\ORACLE_ARCHIVE_2026-10-09\` (12 GB, 63 items, 4,787 files, 0 mismatches, README) — then removed from Oracle (11.5 GB).
+   Two stuck wait-loops from 30 Sep / 2 Oct (`while pgrep …` that matches itself, never exits) held aigo-promo/aigo-reloc;
+   ended, then removed.
+Prevention deployed the same day (see the 🛡️ NOW entry): Telegram disk alarm (delivered 98% and "back to 73%"), compression
+fix, app-log rotation, duplicate webhook disabled, sysstat disk history, and a **free-disk guard in the film generator**
+(`~/atuona-film9/gen.mjs` refuses paid calls under 3 GB free). Still open: VJH data growth (ats_cache, checkpoint DB) — a VJH
+design decision; the OCI disk-resize option (cost unverified).
