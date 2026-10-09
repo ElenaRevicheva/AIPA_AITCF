@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-08 23:30 | Brief "NEW" = deal's own activity; 19 own-address echo deals → closedlost (AUTO-SWEEP label) | cto-aipa src/hubspot-client.ts + src/lead-triage.ts + their dist/; pm2 cto-aipa restart; 19 HubSpot deals | 10e7f8d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,22 @@ git log keeps the record.
   `docs/selling/NO_WEBSITE_BUSINESSES_AUDIT_2026-10-08.md`. Today it would grade Google's or Instagram's page instead of the business.
   Step A ($0, detect social/Maps links → honest "no owned website" diagnosis) and Step B (paid entity mode) are **NOT built**; both wait for Elena.
 
+### ✅ 8 Oct — Brief "old data" again: HubSpot's own rollup re-dated 19 dead deals; brief now ranks by the deal's OWN activity
+- **Cause (3 independent read-only probes agreed):** 19 pre-30-Sep `[HIRING-VJH-LEAD] … @ Aideazz` deals were all linked to ONE contact = Elena's own
+  aipa@ inbox. Every INCOMING email HubSpot logs on that contact recalculates a hidden rollup on all its deals and bumps `hs_lastmodifieddate`
+  (no visible value changes — `sourceType CALCULATED`, 0 `API` writes). The brief called "modified <24h" NEW. Seen live: one Boardy email
+  14:42:31 UTC → all 19 deals re-dated 14:42:51–14:43:03. Not a bot: no cron/VJH/radar/Claude write at 21:08 on 7 Oct.
+- **Fix 1** `879cbb6`: `getActionableHubSpotDeals` ranks/buckets by max(createdate, notes_last_updated, hs_v2_date_entered_current_stage),
+  over-fetches 200 then slices. dist/hubspot-client.js + dist/lead-triage.js scp'd (live diff = only this change), `pm2 restart cto-aipa`
+  23:27:05 > files 23:27:02. Rendered brief: NEW 22 → 1. Backup `~/_session-backups/brief-own-activity-20261008/`.
+- **Fix 2** (Elena approved): the 19 → `closedlost`, Closed Lost Reason `AUTO-SWEEP 2026-10-08: OWN-ADDRESS ECHO …` (VJH learner skips it) + a
+  🧹 note each. Undo: `_private-backups/echo-deals-undo-2026-10-08.json` (laptop) + VJH `autonomous_data/sweep_undo_20261008_own_address_echo.json`.
+  **Learning proof:** they were in the ledger as fake POSITIVES ("employer replied"); after sync 588 → 569, removed = exactly the 19, 0 added,
+  rules identical, "replied" 38 → 19. Backup `~/_session-backups/echo-deals-20261008/`. Real CIMA thread = `[CLIENT-MANUAL] Hospital CIMA`, untouched.
+- **Left as is (Elena decides):** the `[CLIENT-SERVICE-PAID]` $100 deal is her OWN test and still shows NEW whenever a newsletter to her gmail
+  contact is auto-logged on it. `Marshall Bowen — outreach` ×2 (CLIENT-CTO-INGEST/INQUIRY) sit in AGING. cto-aipa log: `Haiku fallback failed:
+  credit balance is too low` — Anthropic API credits at $0.
+
 ### ✅ 7 Oct — Morning brief "stale again" after the 6 Oct cleanup: 3 generators switched off inside existing machinery
 - **Not stale data — live generators.** (1) VJH filed every Boardy email as a new `[HIRING-VJH-LEAD]` deal (17), and reply-radar
   re-noted all 17 per email → always "NEW today". (2) The brief's lead list had no age limit (53/100 rows 2–4 months old) and 48 of
@@ -154,10 +169,7 @@ git log keeps the record.
   dist/lead-triage.js scp'd, `pm2 restart cto-aipa` 22:19:36 > files 22:19:33; live brief Act Today 35 → 0). **E** DragonTrade
   `ALERT_COOLDOWN_H=168` in .env + alerts.mjs reads it at fire time (index.js imports alerts before dotenv — the .env value was
   ignored; `0e6849d`, restarted 00:58 UTC 8 Oct). Next X alert ≥ 14 Oct 17:21 UTC. Backups `~/_session-backups/{brief-3day,x-alert-weekly}-20261007/`.
-- **OPEN (Elena decides):** 19 more pre-30-Sep `[HIRING-VJH-LEAD] … @ Aideazz` deals (own-domain copies: portfolio inquiries,
-  Fermatix, a REAL Hospital CIMA client reply) sit in contractsent and fill the brief's "NEW today" whenever touched; something
-  touched all 19 at 21:08 UTC (not reply-radar, not hs-watch-manual-emails) — unidentified. hs-watch-manual-emails is hitting
-  HubSpot 429 rate limits. reply-radar alerts fail on Resend 422 (newline in subject).
+- **Still open:** hs-watch-manual-emails hits HubSpot 429s; reply-radar alerts fail on Resend 422 (newline in subject).
 
 ### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
 - **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/sources.sh, which reads LIVE: `outlook.txt` = a mechanical extract of
