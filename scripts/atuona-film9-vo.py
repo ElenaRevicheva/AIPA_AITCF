@@ -7,7 +7,10 @@ ENV = open(os.environ.get("FILM9_ENV", "/home/ubuntu/cto-aipa/.env"), encoding="
 KEY = re.search(r"^OPENAI_API_KEY=(.*)$", ENV, re.M).group(1).strip().strip('"')
 CUT = json.load(open(os.environ.get("FILM9_CUT", "cut.json"), encoding="utf-8"))
 VO = os.environ.get("FILM9_VO", "vo")
+# v6 (Elena, 10 Oct: "voice should be one like in other movies"): "onyx" = the narrator of the Atuona films #1-#7, OpenAI tts-1,
+# voice onyx, speed 0.9, no acting direction (FILM_COMPILATION_GUIDE). An entry is (voice, instructions[, model, speed]).
 VOICES = {
+    "onyx": ("onyx", None, "tts-1", 0.9),
     "kira": ("marin", "A Russian woman in her thirties, speaking English with a slight Russian accent. Low, husky, unhurried, "
                       "very close to the microphone, almost a whisper that could break. Raw emotion held back by pride; a poet "
                       "saying her own lines, not performing them. Never sweet, never theatrical, never cheerful. Let each line "
@@ -19,9 +22,13 @@ for it in CUT["items"]:
         continue
     out = f"{VO}/{it['sid']}.mp3"
     if not (os.path.exists(out) and os.path.getsize(out) > 2000):
-        voice, instr = VOICES[it.get("voice", "kira")]
+        voice, instr, *rest = VOICES[it.get("voice", "kira")]
+        model, speed = (rest + ["gpt-4o-mini-tts", None])[:2] if rest else ("gpt-4o-mini-tts", None)
         text = "\n".join(l.strip() for l in it["stanza"].split(" / "))
-        body = json.dumps({"model": "gpt-4o-mini-tts", "voice": voice, "input": text, "instructions": instr, "response_format": "mp3"})
+        req = {"model": model, "voice": voice, "input": text, "response_format": "mp3"}
+        if instr: req["instructions"] = instr
+        if speed: req["speed"] = speed
+        body = json.dumps(req)
         r = subprocess.run(["curl", "-s", "-m", "90", "-o", out, "-w", "%{http_code}", "https://api.openai.com/v1/audio/speech",
                             "-H", f"Authorization: Bearer {KEY}", "-H", "Content-Type: application/json", "--data-binary", "@-"],
                            input=body, capture_output=True, text=True)

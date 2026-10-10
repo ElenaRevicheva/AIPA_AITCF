@@ -43,7 +43,11 @@ const PREVIEW = process.env.PREVIEW === '1';
 // without the music bed. A shot without a `stanza` burns no text (it used to burn the word "undefined"). An item
 // {sid, glitch_only: 'k13.jpg'} is a Crimson flash of that still in place of a moving shot; `glitch_dur` sets a flash's length.
 const NO_VO = process.env.FILM9_NO_VO === '1', NO_MUSIC = process.env.FILM9_NO_MUSIC === '1';
-const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.12, GLITCH_XF = 0.1, GLITCH_D = 1.2;
+// v6 (Elena: voice over every stanza, "music loud but not so much, so that voice and music all fit each other"): the voice's
+// lead-in/tail around each line and the music bed are env-tunable; the defaults are the 8 Oct values, so old cuts rebuild as before.
+const env = (k, d) => (process.env[k] !== undefined && process.env[k] !== '' ? Number(process.env[k]) : d);
+const XFADE_D = 1.3, LEAD = env('FILM9_LEAD', 0.7), TAIL = env('FILM9_TAIL', 1.9), MI_FROM = 1.12, GLITCH_XF = 0.1, GLITCH_D = 1.2;
+const MUSIC_VOL = env('FILM9_MUSIC_VOL', 0.30), DUCK_RATIO = env('FILM9_DUCK_RATIO', 10), VOICE_VOL = env('FILM9_VOICE_VOL', 1.9);
 const CUT = JSON.parse(fs.readFileSync(process.env.FILM9_CUT || BASE + '/cut.json', 'utf8'));
 const MUSIC = path.join(BASE, CUT.music);
 const SLUG = CUT.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -161,6 +165,23 @@ function glitchyChain(d, seed = 0, flow = false) {
     `drawbox=x=0:y=0:w=iw:h=ih:color=black@1:t=fill:enable='${blk}'`;
 }
 
+// v6 (Elena: "put in the end of the movie number of each poem in a clickable format"): the last card lists every poem the film
+// quotes as its deep link on atuona.xyz (atuona.xyz/#p061 opens that poem), in film order, two columns. A video cannot carry
+// a tappable link, so the same list goes into the delivery caption, where links are tappable.
+async function makePoemCard(entries, outFile, d) {
+  const short = t => (t.length > 26 ? t.slice(0, 25).trimEnd() + '…' : t);
+  const rows = entries.map(e => `atuona.xyz/#p${e.num}   ${short(e.title)}`);
+  const half = Math.ceil(rows.length / 2), cols = [rows.slice(0, half), rows.slice(half)];
+  const size = 28, step = size + 16, top = Math.round((VH - (half * step)) / 2) + 40;
+  const hFile = outFile + '_h.txt'; fs.writeFileSync(hFile, track('poems in this film'));
+  let draw = `drawtext=fontfile=${fp(MONO)}:textfile=${fp(hFile)}:expansion=none${TS}:fontcolor=white:fontsize=34:x=(w-text_w)/2:y=${top - 110}`;
+  cols.forEach((c, k) => { if (!c.length) return; const f = `${outFile}_c${k}.txt`; fs.writeFileSync(f, c.join(String.fromCharCode(10)));
+    draw += `,drawtext=fontfile=${fp(MONO)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xDDDDDD:fontsize=${size}:line_spacing=16:x=${k ? 1000 : 150}:y=${top}`; });
+  const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
+  await execFileP('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=black:s=${VW}x${VH}:r=${FPS}:d=${d.toFixed(2)}`, ...silence, '-filter_complex', `[0:v]${draw},${fades}[v]`, '-map', '[v]', '-map', '1:a', '-t', d.toFixed(2), ...enc, outFile], { maxBuffer: 1 << 26, timeout: 300000 });
+  return outFile;
+}
+
 const clipPath = it => path.join(CLIPS, it.clip);
 const voPath = it => path.join(VODIR, `${it.sid}.mp3`);
 
@@ -263,6 +284,7 @@ async function main() {
     if (it.glitch_after) seq.push({ file: await makeGlitch(path.join(IMG, it.glitch_after), path.join(W, `glitch_after_${it.sid}.mp4`)), glitch: true });
   }
   seq.push({ file: await makeCard('ATUONA', OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.2, 84) });
+  if ((CUT.poem_links || []).length) seq.push({ file: await makePoemCard(CUT.poem_links, path.join(W, 'card_poems.mp4'), CUT.poem_card_dur || 7) });
 
   // 3. transition chain: 1.3 s dissolves, a near-hard cut into and out of a glitch (film #8: video-stream lengths, not container)
   const durs = []; for (const c of seq) durs.push(await vdur(c.file));
@@ -306,10 +328,10 @@ async function main() {
   // the graph has three shapes: music ducked under the voice bus (the 8 Oct preview), music alone (FILM9_NO_VO), voice alone
   // (FILM9_NO_MUSIC); with neither, the body's silent track is kept as it is
   const mixIn = ['-i', body]; if (musicOn) mixIn.push('-i', MUSIC); voAt.forEach(v => mixIn.push('-i', v.file));
-  let mf = musicOn ? `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.30,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];` : '';
+  let mf = musicOn ? `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${MUSIC_VOL},afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];` : '';
   const vl = []; voAt.forEach((v, k) => { mf += `[${k + (musicOn ? 2 : 1)}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`; vl.push(`[v${k}]`); });
-  if (vl.length) mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9${musicOn ? ',asplit=2[vsc][vmix];' : '[premix];'}`;
-  if (musicOn && vl.length) mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];`;
+  if (vl.length) mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=${VOICE_VOL}${musicOn ? ',asplit=2[vsc][vmix];' : '[premix];'}`;
+  if (musicOn && vl.length) mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=${DUCK_RATIO}:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];`;
   else if (musicOn) mf += `[music]anull[premix];`;
   mf += `[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`;
   if (!musicOn && !vl.length) {
