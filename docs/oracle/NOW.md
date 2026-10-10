@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 18:20 | Film #9 v5: glitch tears FLOW across the frame (Elena), re-render on the LAPTOP, music C | `scripts/atuona-film9.mjs` (new glitchy:"flow"), `docs/atuona/film9_stanza_work/`, laptop render_v5; no Oracle render, no restarts | 0e30c2b |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,13 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 FINAL v5 DELIVERED: glitch tears now FLOW across the frame · music C · edit $0
+- **DONE:** v4 + `glitchy: 'flow'` on all 23 shots (two tears per burst, new height every burst, drifting). 2:15, laptop render.
+  Record: `docs/atuona/FILM9_V3_EDIT_2026-10-10.md` (v4 + v5 sections). Filed in `05_FILM_PREVIEW/v5_FINAL_2026-10-10/`.
+- **NEXT (Elena):** watch; say "publish" for the public gallery (`--publish` with cut_v5, master `render_v5/work/final.mp4`).
+- **VERIFIED BY:** `check_v5.py <render_v5/work> <final.mp4>` → ALL PASS; blackdetect clean; Telegram `ok`, md5 equal.
+- **RISK:** none open. v2–v4 builds and deliveries kept untouched; the latest FINAL is v5.
 
 ### ✅ 10 Oct — Film #9 FINAL (v4) DELIVERED to her Telegram · music C · every shot glitchy · edit $0
 - **DONE:** music C (basement), all 23 shots glitchy (pattern varies per shot), 25 = the video v25, mirror shot 11 at 3.8 s. 2:15,
