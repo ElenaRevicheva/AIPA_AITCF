@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 17:25 | Film #9 v4 = FINAL: music C, every shot glitchy, 25 = video take v25, mirror shot 11 shorter; recompile on the LAPTOP | `scripts/atuona-film9.mjs`, `docs/atuona/film9_stanza_work/` (build_cut_v4), laptop render_v4; no Oracle render, no restarts | dab3dd8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
