@@ -131,9 +131,12 @@ async function makeGlitch(img, outFile, d = GLITCH_D) {
 // 10 Oct 2026 v3 (Elena: the salt-on-skin shot "should return to its initial length and become glitchy"): `glitchy: true` puts
 // the Crimson glitch on the MOVING shot itself, in short irregular bursts (RGB split, torn band, a black stutter frame, heavy
 // grain) with light grain between, so it stays watchable at full length. Drawn before the stanza, so the text stays clean.
-function glitchyChain(d) {
-  const n = Math.round(d * FPS), gaps = [38, 55, 44, 62, 41, 50, 58, 36], lens = [6, 9, 4, 7, 5, 8, 6, 4], bursts = [];
-  for (let f = 12, k = 0; f < n - 8; k++) { const l = lens[k % lens.length]; bursts.push([f, f + l]); f += l + gaps[k % gaps.length]; }
+// v4 (Elena: "make every shot in the film glitchy"): `seed` (the shot's index) rotates the burst pattern and moves the first
+// burst, so 23 glitchy shots in a row never pulse on the same beat.
+function glitchyChain(d, seed = 0) {
+  const n = Math.round(d * FPS), G = [38, 55, 44, 62, 41, 50, 58, 36], L = [6, 9, 4, 7, 5, 8, 6, 4], bursts = [];
+  const gaps = G.map((_, i) => G[(i + seed * 3) % G.length]), lens = L.map((_, i) => L[(i + seed * 5) % L.length]);
+  for (let f = 12 + (seed * 7) % 30, k = 0; f < n - 8; k++) { const l = lens[k % lens.length]; bursts.push([f, f + l]); f += l + gaps[k % gaps.length]; }
   const on = bursts.map(([a, b]) => `between(n,${a},${b})`).join('+');
   const blk = bursts.filter((_, i) => i % 2 === 0).map(([a]) => `eq(n,${a})`).join('+');
   return `,split=2[gm][gt];[gt]crop=iw:135:0:ih*0.42[gband];[gm][gband]overlay=x=72:y=H*0.42:enable='${on}',` +
@@ -224,7 +227,7 @@ async function main() {
       fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}[base];[1:v]chromakey=0x1ea53a:${k.similarity || 0.16}:${k.blend || 0.06},despill=green,scale=-2:${kh}${k.hflip ? ',hflip' : ''}[dog];` +
            `[base][dog]overlay=x=${Math.round(VW * k.x)}:y=${Math.round(VH * k.y)}:shortest=1,format=yuv420p${text}[v]`;
     } else {
-      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}${it.glitchy ? glitchyChain(p.d) : ''},format=yuv420p${text}[v]`;
+      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}${it.glitchy ? glitchyChain(p.d, i) : ''},format=yuv420p${text}[v]`;
     }
     const sIdx = it.composite_of || it.key || it.tail ? 2 : 1;
     await execFileP('ffmpeg', [...args, ...silence, '-filter_complex', fc, '-map', '[v]', '-map', `${sIdx}:a`, '-t', p.d.toFixed(2), ...enc, out], { maxBuffer: 1 << 26, timeout: 3600000 });
