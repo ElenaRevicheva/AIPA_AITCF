@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 21:00 | Film #9 v7: bigger flowing underground stanza text + poem list after ATUONA, then PUBLISH (Elena asked) to the AI Film Studio | `scripts/atuona-film9.mjs` (text), laptop render_v7; Oracle `cto-aipa/data/atuona/films/out/` (publish = add one file); atuona repo film sheet if any; no restarts | 8b785b8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 ATUONA PUBLISHED in the AI Film Studio (1080p master) + film page with every poem linked
+- **DONE:** v7 = v6 + stanzas redesigned (Syne 78 px, crimson chromatic edge, words arriving with the narrator, slow drift), poem
+  list after the ATUONA card (Geologica rows, Cyrillic intact). Studio feed: `atuona-2026-10-10T23-24-23.mp4` (262 MB, md5 equal).
+  Film page https://atuona.xyz/aifilmstudio/atuona/ (atuona `28eb4b44`); all film pages now link poems into the vault.
+  Record: `docs/atuona/FILM9_V7_PUBLISHED_2026-10-10.md`.
+- **NEXT (Elena):** watch it on the site. Any stanza or text tweak = rebuild with `--reuse --reseg=<sid>`, re-publish, replace the file.
+- **VERIFIED BY:** `check_v7.py` ALL PASS; films.json lists it first; film URL 200 + exact length; film page live 200 with 21 links.
+- **RISK:** the feed title comes from the file name ("Atuona"); the film page says "ATUONA". Older v2–v6 builds untouched.
 
 ### ✅ 10 Oct — Film #9 v6 DELIVERED: a whole stanza of her poems on every shot · onyx narrator · poem links at the end · music C
 - **DONE:** 23 whole verbatim stanzas from ATUONA #047–#099 (Mila stanzas on the 4 Mila shots), voiced by the films' onyx
