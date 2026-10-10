@@ -1,0 +1,292 @@
+{
+ "_note": "10 Oct 2026: Elena's screenshots of the 8 Oct preview (ATUONA_film9_preview_1080p_5m24s.mp4) mapped to shot ids by playhead time + on-screen stanza; one reader + one independent verifier agent per screenshot, 27/27 agreed; md5 identification of the clips/images. Workflow wf_9c60edfe-8a0.",
+ "screenshots": [
+  {
+   "screenshot": "also much shorter.png",
+   "playhead": "0:00:16",
+   "shot": "1b",
+   "action": "much shorter",
+   "stanza_seen": "Hello, friend. If only I could touch you lightly, just barely, / but this warmth costs so ",
+   "reader": "1b",
+   "verifier": "1b"
+  },
+  {
+   "screenshot": "also to be much shorter.png",
+   "playhead": "0:00:54",
+   "shot": "7m",
+   "action": "much shorter",
+   "stanza_seen": "Salt from yesterday's tears, today's sweat. All the same ocean.",
+   "reader": "7m",
+   "verifier": "7m"
+  },
+  {
+   "screenshot": "also to be removed.png",
+   "playhead": "0:00:39",
+   "shot": "5",
+   "action": "remove",
+   "stanza_seen": "And for me — grace. Burning down. Burning down.",
+   "reader": "5",
+   "verifier": "5"
+  },
+  {
+   "screenshot": "make a glitch.png",
+   "playhead": "0:04:55",
+   "shot": "35",
+   "action": "make a glitch",
+   "stanza_seen": "Wave. Particle. Wave. Particle.",
+   "reader": "35",
+   "verifier": "35"
+  },
+  {
+   "screenshot": "make a short glitch also.png",
+   "playhead": "0:03:10",
+   "shot": "19",
+   "action": "make a short glitch",
+   "stanza_seen": "Like the keyboard of Cursor at three in the morning when / code is no longer code but the ",
+   "reader": "19",
+   "verifier": "19"
+  },
+  {
+   "screenshot": "make a short glitch as well.png",
+   "playhead": "0:03:29",
+   "shot": "20b",
+   "action": "make a short glitch",
+   "stanza_seen": "I won't find you: the canvas languishes beneath a drab mask...",
+   "reader": "20b",
+   "verifier": "20b"
+  },
+  {
+   "screenshot": "make a short glitch too.png",
+   "playhead": "0:03:19",
+   "shot": "20",
+   "action": "make a short glitch",
+   "stanza_seen": "The hall reeks of expensive perfume and fear. Yes, / fear - she's learned to smell it over",
+   "reader": "20",
+   "verifier": "20"
+  },
+  {
+   "screenshot": "make a short glitch.png",
+   "playhead": "0:02:19",
+   "shot": "M4",
+   "action": "make a short glitch",
+   "stanza_seen": "You never quite happened, baby... Happen now, out of the trap.",
+   "reader": "M4",
+   "verifier": "M4"
+  },
+  {
+   "screenshot": "make muuch shorter.png",
+   "playhead": "0:03:38",
+   "shot": "22",
+   "action": "much shorter",
+   "stanza_seen": "We manage to be liars in simple answers.",
+   "reader": "22",
+   "verifier": "22"
+  },
+  {
+   "screenshot": "make shorter_.png",
+   "playhead": "0:03:59",
+   "shot": "25",
+   "action": "shorter",
+   "stanza_seen": "[Salt] left white trails on his skin — like maps of countries that don't exist.",
+   "reader": "25",
+   "verifier": "25"
+  },
+  {
+   "screenshot": "removed also.png",
+   "playhead": "0:02:59",
+   "shot": "18",
+   "action": "remove",
+   "stanza_seen": "[Wor]ds that could never be printed. Words that still haven't been forgiven.",
+   "reader": "18",
+   "verifier": "18"
+  },
+  {
+   "screenshot": "removed!.png",
+   "playhead": "0:04:03",
+   "shot": "26",
+   "action": "remove",
+   "stanza_seen": "Palm still on Ule's chest. Under the skin — steady pulse. / Not consensu[s. Ju]st proo[f t",
+   "reader": "26",
+   "verifier": "26"
+  },
+  {
+   "screenshot": "removed......png",
+   "playhead": "0:04:47",
+   "shot": "34",
+   "action": "remove",
+   "stanza_seen": "[U]le places his palm on the small of her back. Not a lover. A witness.",
+   "reader": "34",
+   "verifier": "(verifier agreed; key mismatch in merge)"
+  },
+  {
+   "screenshot": "removed.....png",
+   "playhead": "0:04:42",
+   "shot": "32",
+   "action": "remove",
+   "stanza_seen": "Where it is no longer possible to lie to yourself.",
+   "reader": "32",
+   "verifier": "(verifier agreed; key mismatch in merge)"
+  },
+  {
+   "screenshot": "removed....png",
+   "playhead": "0:04:34",
+   "shot": "30",
+   "action": "remove",
+   "stanza_seen": "As if in the underworld, one password waits for us.",
+   "reader": "30",
+   "verifier": "(verifier agreed; key mismatch in merge)"
+  },
+  {
+   "screenshot": "removed...png",
+   "playhead": "0:04:28",
+   "shot": "28",
+   "action": "remove",
+   "stanza_seen": "[silence is n]ot the absence of sound. It is when both know what to say and choose not to.",
+   "reader": "28",
+   "verifier": "(verifier agreed; key mismatch in merge)"
+  },
+  {
+   "screenshot": "removed..png",
+   "playhead": "0:04:14",
+   "shot": "27",
+   "action": "remove",
+   "stanza_seen": "Not out of spite, not out of anything. Just a certain precision — / like old sandpaper tha",
+   "reader": "27",
+   "verifier": "27"
+  },
+  {
+   "screenshot": "removed.png",
+   "playhead": "0:02:49",
+   "shot": "17",
+   "action": "remove",
+   "stanza_seen": "Fact: dogs aren't red. Fact: it has no shadow. Fact: Gauguin never explained its meaning.",
+   "reader": "17",
+   "verifier": "17"
+  },
+  {
+   "screenshot": "removed_.png",
+   "playhead": "0:03:34",
+   "shot": "21",
+   "action": "remove",
+   "stanza_seen": "A gnawing in the belly. Not from hunger — from recognition.",
+   "reader": "21",
+   "verifier": "21"
+  },
+  {
+   "screenshot": "should be much shorter.png",
+   "playhead": "0:00:09",
+   "shot": "1a",
+   "action": "much shorter",
+   "stanza_seen": "and now the silence is so complete it could swallow a scream whole and ask for more.",
+   "reader": "1a",
+   "verifier": "1a"
+  },
+  {
+   "screenshot": "to be removed too.png",
+   "playhead": "0:00:58",
+   "shot": "7",
+   "action": "remove",
+   "stanza_seen": "In vain you shed your scales again right where I, ever so quietly, take flight. (middle wo",
+   "reader": "7",
+   "verifier": "7"
+  },
+  {
+   "screenshot": "to be removed.png",
+   "playhead": "0:00:23",
+   "shot": "1c",
+   "action": "remove",
+   "stanza_seen": "No bottom stanza; the frame IS the black text card, fully legible: I'm a lesbian. / Please",
+   "reader": "1c",
+   "verifier": "1c"
+  },
+  {
+   "screenshot": "to be removed_.png",
+   "playhead": "0:03:45",
+   "shot": "24",
+   "action": "remove",
+   "stanza_seen": "\"I will never cry...\" But a tear suddenly floors / the brake on the conversation — a trick",
+   "reader": "24",
+   "verifier": "24"
+  },
+  {
+   "screenshot": "to be shorter as well too.png",
+   "playhead": "0:01:35",
+   "shot": "11",
+   "action": "shorter",
+   "stanza_seen": "(none visible - the bottom band of the frame is empty)",
+   "reader": "11",
+   "verifier": "11"
+  },
+  {
+   "screenshot": "to be shorter as well.png",
+   "playhead": "0:01:24",
+   "shot": "10b",
+   "action": "shorter",
+   "stanza_seen": "The body stays. The light moves.",
+   "reader": "10b",
+   "verifier": "10b"
+  },
+  {
+   "screenshot": "to be shorter.png",
+   "playhead": "0:01:14",
+   "shot": "10a",
+   "action": "shorter",
+   "stanza_seen": "Sheets stuck to skin like a second dress. The air tastes of frangipani and rust.",
+   "reader": "10a",
+   "verifier": "10a"
+  },
+  {
+   "screenshot": "when the image stops moving remove.png",
+   "playhead": "0:05:08",
+   "shot": "36",
+   "action": "cut when the image stops moving (drop the still-motion tail)",
+   "stanza_seen": "You'll ring yourself in as someone's husband. I'll remain: nobody's wife, / Atuona, a hunc",
+   "reader": "36",
+   "verifier": "36"
+  }
+ ],
+ "files": [
+  {
+   "file": "add this shot.mp4",
+   "md5": "8c68caf7ab7d9ef9ec39406697ea3b13",
+   "is": "v30b__venice-kling-o3-pro.mp4 (shot 30, Kling take)",
+   "action": "add"
+  },
+  {
+   "file": "add this shot_ (1).mp4",
+   "md5": "c1340711f5af8b9884cd01684aeccb66",
+   "is": "vM3__venice-kling-o3-pro.mp4 (shot M3, already in the film)",
+   "action": "add"
+  },
+  {
+   "file": "add this shot_ (2).mp4",
+   "md5": "72f6ab42622bd91a06e5c832fa78eb67",
+   "is": "v24Lb__venice-kling-o3-pro.mp4 (shot 24, auction lots)",
+   "action": "add"
+  },
+  {
+   "file": "make a glitch from the image (1).jpg",
+   "md5": "1c72a78daa6a224f6af1bff6afb2df64",
+   "is": "03_ALL_IMAGES/rejected/k37.v1.jpg",
+   "action": "glitch from image"
+  },
+  {
+   "file": "make a glitch from the image (2).jpg",
+   "md5": "a72ac97c907f193430a3e2ede80dce6c",
+   "is": "03_ALL_IMAGES/G7s.jpg",
+   "action": "glitch from image"
+  },
+  {
+   "file": "make a glitch from the image (3).jpg",
+   "md5": "f9e32eadb89a84ec4d6e05cc2f74fa6e",
+   "is": "03_ALL_IMAGES/G8s.jpg",
+   "action": "glitch from image"
+  },
+  {
+   "file": "make a glitch from the image (4).jpg",
+   "md5": "77253d6450e507d4e4e1c79bbf403e2c",
+   "is": "03_ALL_IMAGES/qa1_1006/k11.jpg",
+   "action": "glitch from image"
+  }
+ ]
+}

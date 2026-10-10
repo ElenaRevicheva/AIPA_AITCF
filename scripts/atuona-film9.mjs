@@ -38,6 +38,11 @@ const TS = WIN ? ':text_shaping=0' : '';
 const VW = 1920, VH = 1080, FPS = 24;
 // PREVIEW=1: the same cut in minutes — no motion interpolation (frames repeat in slow-mo), fastest x264; writes work/preview.mp4
 const PREVIEW = process.env.PREVIEW === '1';
+// 10 Oct 2026 (v2 cut from Elena's screenshots): voice and music are ON HOLD by her word, so FILM9_NO_VO=1 builds without the
+// voice lines (every shot then runs its planned `edit` length instead of being stretched to its voice) and FILM9_NO_MUSIC=1
+// without the music bed. A shot without a `stanza` burns no text (it used to burn the word "undefined"). An item
+// {sid, glitch_only: 'k13.jpg'} is a Crimson flash of that still in place of a moving shot; `glitch_dur` sets a flash's length.
+const NO_VO = process.env.FILM9_NO_VO === '1', NO_MUSIC = process.env.FILM9_NO_MUSIC === '1';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.12, GLITCH_XF = 0.1, GLITCH_D = 1.2;
 const CUT = JSON.parse(fs.readFileSync(process.env.FILM9_CUT || BASE + '/cut.json', 'utf8'));
 const MUSIC = path.join(BASE, CUT.music);
@@ -137,16 +142,18 @@ async function main() {
   }
   fs.mkdirSync(W, { recursive: true });
   const items = CUT.items;
-  const shots = items.filter(it => !it.card);
+  const shots = items.filter(it => !it.card && !it.glitch_only);
   const missing = shots.filter(it => !fs.existsSync(clipPath(it))).map(it => `${it.sid}: ${it.clip}`);
   if (missing.length) throw new Error('missing clips: ' + missing.join(', '));
-  const noVo = shots.filter(it => it.stanza && !fs.existsSync(voPath(it))).map(it => it.sid);
+  const noImg = items.filter(it => it.glitch_only && !fs.existsSync(path.join(IMG, it.glitch_only))).map(it => `${it.sid}: ${it.glitch_only}`);
+  if (noImg.length) throw new Error('missing glitch stills: ' + noImg.join(', '));
+  const noVo = NO_VO ? [] : shots.filter(it => it.stanza && !fs.existsSync(voPath(it))).map(it => it.sid);
   if (noVo.length && !process.argv.includes('--stanza-preview')) throw new Error('missing voice: ' + noVo.join(', ') + ' (run vo9.py)');
 
   // 1. durations: the planned edit length, at least as long as its voice; the clip is slowed by its factor, more if needed
   const plan = [];
   for (const it of shots) {
-    const vd = fs.existsSync(voPath(it)) ? await dur(voPath(it)) : 0;
+    const vd = !NO_VO && fs.existsSync(voPath(it)) ? await dur(voPath(it)) : 0;
     const need = vd ? LEAD + vd + TAIL : 0;
     // `trim`: QC's last clean second of the clip (the rest is never used); `end`: the window ENDS there (1a's lilac turn,
     // 2's exhale, 6's plunge), so the start moves back as the shot gets longer
@@ -163,6 +170,7 @@ async function main() {
   if (process.argv.includes('--stanza-preview')) {
     const PV = path.join(W, 'stanza-preview'); fs.mkdirSync(PV, { recursive: true });
     for (const p of plan) {
+      if (!p.it.stanza) continue;
       const txt = path.join(PV, `${p.it.sid}.txt`), lines = spread(p.it.stanza); fs.writeFileSync(txt, lines);
       await execFileP('ffmpeg', ['-nostdin', '-v', 'error', '-y', '-ss', (p.src / 2).toFixed(2), '-i', clipPath(p.it), '-frames:v', '1', '-vf', fit + textDraw(txt, 99, true), path.join(PV, `${p.it.sid}.png`)]);
       console.log(`${p.it.sid.padEnd(4)} ${p.d.toFixed(1)}s  ${lines.replace(/\n/g, ' ⏎ ')}`);
@@ -178,14 +186,15 @@ async function main() {
   await pool(2, plan.map((p, i) => async () => {
     const { it } = p, out = path.join(W, `${PREVIEW ? 'pv_' : ''}seg_${it.sid}.mp4`);
     if (reuse && !reseg.includes(it.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segOf[it.sid] = out; return; }
-    const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, spread(it.stanza));
+    const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, it.stanza ? spread(it.stanza) : '');
+    const text = it.stanza ? textDraw(txt, p.d) : '';   // a shot without a stanza (24b: the lots after the tear) carries no band
     const interp = !PREVIEW && p.factor >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
     const slow = `setpts=${p.factor.toFixed(5)}*(PTS-STARTPTS),${interp}`;
     const args = ['-y', ...(p.ss ? ['-ss', p.ss.toFixed(2)] : []), '-t', p.src.toFixed(3), '-i', clipPath(it)];
     let fc;
     if (it.composite_of) {   // 35: the same woman twice — the clip over its own mirror image, a few seconds later
       args.push('-ss', String(it.composite_offset), '-t', p.src.toFixed(3), '-i', clipPath(it));
-      fc = `[0:v]${fit}[a];[1:v]${fit},hflip[b];[a][b]blend=all_mode=screen:all_opacity=${it.composite_opacity || 0.55},${slow},format=yuv420p${textDraw(txt, p.d)}[v]`;
+      fc = `[0:v]${fit}[a];[1:v]${fit},hflip[b];[a][b]blend=all_mode=screen:all_opacity=${it.composite_opacity || 0.55},${slow},format=yuv420p${text}[v]`;
     } else if (it.tail) {    // 36: the clean part of the walk at its own pace, then a 1 s dissolve into the still-motion of the
       // same approved frame for the rest of the stanza (QC cut the walk at 4 s; her #003 lines need ~12 s)
       const mainOut = p.src * (it.slow || 1), XF = 1.0, tailOut = p.d - mainOut + XF;
@@ -194,14 +203,14 @@ async function main() {
       const mi = f => !PREVIEW && f >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
       fc = `[0:v]${fit},setpts=${(it.slow || 1).toFixed(4)}*(PTS-STARTPTS),${mi(it.slow || 1)},settb=AVTB[m];` +
            `[1:v]${fit},setpts=${tailF.toFixed(4)}*(PTS-STARTPTS),${mi(tailF)},trim=duration=${tailOut.toFixed(3)},settb=AVTB[t];` +
-           `[m][t]xfade=transition=fade:duration=${XF}:offset=${(mainOut - XF).toFixed(3)},format=yuv420p${textDraw(txt, p.d)}[v]`;
+           `[m][t]xfade=transition=fade:duration=${XF}:offset=${(mainOut - XF).toFixed(3)},format=yuv420p${text}[v]`;
     } else if (it.key) {     // 17: Gauguin's red dog keyed onto the beach, no shadow
       const k = it.key, kh = Math.round(VH * k.plate_h);
       args.push('-loop', '1', '-i', path.join(IMG, k.img));
       fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}[base];[1:v]chromakey=0x1ea53a:${k.similarity || 0.16}:${k.blend || 0.06},despill=green,scale=-2:${kh}${k.hflip ? ',hflip' : ''}[dog];` +
-           `[base][dog]overlay=x=${Math.round(VW * k.x)}:y=${Math.round(VH * k.y)}:shortest=1,format=yuv420p${textDraw(txt, p.d)}[v]`;
+           `[base][dog]overlay=x=${Math.round(VW * k.x)}:y=${Math.round(VH * k.y)}:shortest=1,format=yuv420p${text}[v]`;
     } else {
-      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow},format=yuv420p${textDraw(txt, p.d)}[v]`;
+      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow},format=yuv420p${text}[v]`;
     }
     const sIdx = it.composite_of || it.key || it.tail ? 2 : 1;
     await execFileP('ffmpeg', [...args, ...silence, '-filter_complex', fc, '-map', '[v]', '-map', `${sIdx}:a`, '-t', p.d.toFixed(2), ...enc, out], { maxBuffer: 1 << 26, timeout: 3600000 });
@@ -215,6 +224,7 @@ async function main() {
   const seqOf = {};
   for (const it of items) {
     if (it.card) { seq.push({ file: await makeCard('', '', path.join(W, `card_${it.sid}.mp4`), it.card_dur || 4.5, 0, null, false, it.card) }); continue; }
+    if (it.glitch_only) { seq.push({ file: await makeGlitch(path.join(IMG, it.glitch_only), path.join(W, `glitch_only_${it.sid}.mp4`), it.glitch_dur || GLITCH_D), glitch: true }); continue; }
     if (it.glitch_before) seq.push({ file: await makeGlitch(path.join(IMG, it.glitch_before), path.join(W, `glitch_before_${it.sid}.mp4`)), glitch: true });
     seqOf[it.sid] = seq.length; seq.push({ file: segOf[it.sid] });
     if (it.glitch_after) seq.push({ file: await makeGlitch(path.join(IMG, it.glitch_after), path.join(W, `glitch_after_${it.sid}.mp4`)), glitch: true });
@@ -259,13 +269,22 @@ async function main() {
   // 4. mix: music ducked under the voice bus, loudness-normalized, limited
   const LEN = await dur(body);
   const voAt = plan.filter(p => p.vd).map(p => ({ file: voPath(p.it), t: +(segStart(seqOf[p.it.sid]) + LEAD).toFixed(2) }));
-  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.30,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
-  const vl = []; voAt.forEach((v, k) => { mf += `[${k + 2}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`; vl.push(`[v${k}]`); });
-  mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9,asplit=2[vsc][vmix];`;
-  mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`;
-  const mixIn = ['-i', body, '-i', MUSIC]; voAt.forEach(v => mixIn.push('-i', v.file));
+  const musicOn = !NO_MUSIC;
+  // the graph has three shapes: music ducked under the voice bus (the 8 Oct preview), music alone (FILM9_NO_VO), voice alone
+  // (FILM9_NO_MUSIC); with neither, the body's silent track is kept as it is
+  const mixIn = ['-i', body]; if (musicOn) mixIn.push('-i', MUSIC); voAt.forEach(v => mixIn.push('-i', v.file));
+  let mf = musicOn ? `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.30,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];` : '';
+  const vl = []; voAt.forEach((v, k) => { mf += `[${k + (musicOn ? 2 : 1)}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`; vl.push(`[v${k}]`); });
+  if (vl.length) mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9${musicOn ? ',asplit=2[vsc][vmix];' : '[premix];'}`;
+  if (musicOn && vl.length) mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];`;
+  else if (musicOn) mf += `[music]anull[premix];`;
+  mf += `[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`;
+  if (!musicOn && !vl.length) {
+    await execFileP('ffmpeg', ['-y', '-v', 'error', '-i', body, '-c', 'copy', '-movflags', '+faststart', final], { maxBuffer: 1 << 26, timeout: 900000 });
+    process.stderr.write('no voice, no music: the body is the film\n');
+  } else {
   // music shorter than the film: crossfade the track into itself from its 60 s mark (a steady groove loops cleanly), never cut out
-  if ((await dur(MUSIC)) < LEN) {
+  if (musicOn && (await dur(MUSIC)) < LEN) {
     const ext = path.join(W, 'music_extended.m4a');
     await execFileP('ffmpeg', ['-y', '-v', 'error', '-i', MUSIC, '-i', MUSIC, '-filter_complex', '[1:a]atrim=start=60,asetpts=PTS-STARTPTS[b];[0:a][b]acrossfade=d=4[a]', '-map', '[a]', '-c:a', 'aac', '-b:a', '256k', ext], { maxBuffer: 1 << 26 });
     mixIn[3] = ext;
@@ -273,6 +292,7 @@ async function main() {
 `);
   }
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
+  }
   fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map(p => ({ shot: p.it.sid, clip: p.it.clip, poem: p.it.poem, start: +segStart(seqOf[p.it.sid]).toFixed(2), dur: +p.d.toFixed(2), slow: +p.factor.toFixed(3), vo_at: p.vd ? +(segStart(seqOf[p.it.sid]) + LEAD).toFixed(2) : null, glitch_after: p.it.glitch_after || null })), null, 1));
   console.log(`DONE ${final} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(1)}s, ${plan.length} shots, ${voAt.length} voice lines) — verify, then: node film9.mjs --publish`);
 }
