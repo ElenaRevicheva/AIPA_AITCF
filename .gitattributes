@@ -13,3 +13,6 @@ scripts/aigo-frame-sheet12.sh text eol=lf
 *.zip   binary
 *.mp4   binary
 *.docx  binary
+
+# film #9 helper scripts run in Git Bash on the laptop: CRLF would break them
+docs/atuona/film9_stanza_work/*.sh text eol=lf

@@ -10,6 +10,17 @@ and corrected. Copies: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\00_HANDOVER_FOR_
 
 ## 0. READ FIRST — where it stands
 
+> **10 Oct 2026 — v2 cut built from Elena's own edit.** She watched the 8 Oct preview and named 27 screenshots with the
+> action (removed / shorter / much shorter / make a (short) glitch / "when the image stops moving remove") plus three
+> "add this shot" clips and four "make a glitch from the image" stills, in
+> `02_APPROVED/09.10.2026 shots to be removed from the film/`. Every screenshot was tied to its shot by playhead time +
+> on-screen stanza (27/27 double-verified), the clips/stills by md5. Result: `docs/atuona/FILM9_V2_EDIT_2026-10-10.md`
+> (the table, the decisions, the files). 24 shots + 10 flashes, 2:16, **no voice** (`FILM9_NO_VO=1`; a shot cannot be
+> "much shorter" while stretched to its voice line), music bed kept + a no-music variant. Her verdict on the 8 Oct shots is
+> now explicit: 13 removed (5 1c 7 17 18 21 24 26 27 28 30 32 34), 5 turned into flashes (M4 19 20 20b 35), 8 shortened.
+> Cut `film9_stanza_work/cut_v2_2026-10-10.json` (`build_cut_v2.py`), build folder `…\Atuona-film9-private\render_v2\`.
+> Everything below describes the 8 Oct preview and still applies to recipes, paths and money.
+
 - **Elena watched the preview (8 Oct): "film is ugly. Music is ugly. Only few shots are more or less good."**
 - **Music and voice are ON HOLD by her word** ("Stop with a music for now", "Stop with this for a while"). Do not resume
   them unasked. ⚠️ The compile as written ALWAYS mixes all 39 voice lines and the deep-house track — a rebuild without them
