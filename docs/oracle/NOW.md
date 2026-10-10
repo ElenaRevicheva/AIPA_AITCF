@@ -147,14 +147,14 @@ git log keeps the record.
   changed on `main` (`2806e6c`): FILM9_NO_VO / FILM9_NO_MUSIC / `glitch_only` items / text-free shots — default behaviour unchanged.
 
 
-### 🔴 8 Oct — Oracle hung ~21:00 UTC, recovered by itself (NOT rebooted, uptime 148 d) · 🚨 DISK 100% FULL (120 MB free)
+### 🟢 8 Oct — Oracle hung ~21:00 UTC, recovered by itself (NOT rebooted) · disk was 100% → **RESOLVED 9 Oct: 47%, 24 GB free**
 - **Seen:** webhook HTTP 000 for 60 s, SSH `timed out during banner exchange`. At 22:20 UTC: back, load avg `0.01, 0.09, 8.30`, RAM 2.9/12 GB used, all
   PM2 apps online, `/cto/v1/visibility` 200. **Likely cause (inferred from timestamps, not proven):** the film #9 compile on the 1-OCPU box,
   `~/atuona-film9/work/pv_seg_*.mp4` 20:50–20:52 → `body.mp4` (391 MB) 20:54 UTC.
-- **Disk `/` 44G/45G.** Biggest: `/tmp` 4.0G (`vjh-test-20261006` 1.3G, `demucs_*` ~1.1G, `atuona-hd` 604M), `~/aigo-*` promo dirs ~7.3G, film7/8/9 ~5G,
-  `~/.pm2/logs` 807M, `/var/log` 1.9G. **Nothing deleted, waiting for Elena's go.** Film #9 approved assets: never touch (memory `project_atuona_film9_approved_assets`).
-- **Health-check noise:** `/var/log/oracle-health.log` (212 MB) logs `espaluz-webhook not active, restarting...` every 5 min; `espaluz-webhook.log` 290 MB.
-- **Next agent: check `df -h /` before any render or deploy.** A full disk makes writes fail silently (SQLite, logs, caches).
+- **Disk: SUPERSEDED.** The 100% in this entry is history. The 9 Oct cleanup (Elena's go) took it 98% → 47%; re-checked live 10 Oct 15:28 UTC
+  `df -h /` → `45G 21G 24G 47%`. 12 GB archived to the laptop `D:\ORACLE_ARCHIVE_2026-10-09\`. Duplicate `espaluz-webhook` disabled, Telegram disk
+  alarm at 85/90/95 % live. Full record: `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md` § Disk. Film #9 approved assets: never touch.
+- **Still true: no renders on Oracle** (films build on the laptop) and `df -h /` before any big write.
 - **Question:** can the Visibility API serve no-website businesses (Instagram/WhatsApp/Maps)? Answer + plan:
   `docs/selling/NO_WEBSITE_BUSINESSES_AUDIT_2026-10-08.md`. Today it would grade Google's or Instagram's page instead of the business.
   Step A ($0, detect social/Maps links → honest "no owned website" diagnosis) and Step B (paid entity mode) are **NOT built**; both wait for Elena.
@@ -556,13 +556,13 @@ git log keeps the record.
   not hold: it fixed the incident (logs), not the class — 13.8 GB of film/promo work (30 Sep–8 Oct) landed where no tool looks;
   pm2-logrotate COMPRESSION broken since day one (0/107 .gz, pmx Autocast vs parseBool); the only disk alarm
   (`health_monitor.sh`) writes to a file nobody reads; health check restarted a duplicate `espaluz-webhook` 29,637×. Fix list
-  A–I awaits Elena's go. **Disk 98%, 1.4 GB free — `df -h /` before any write.**
+  A–I → DONE 9 Oct (see the 14:08 entry above: 47%, 24 GB free).
   **8 Oct ~22:30 UTC — Elena watched the preview: "film is ugly. Music is ugly. Only few shots are more or less good."**
   Music + voice ON HOLD by her word. ALL film #9 material collected for her: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\`
   (README + MD5SUMS; stanzas doc in 01_STANZAS; generator/plan/ledger in 10_). **HANDOVER for any agent:**
   `docs/atuona/FILM9_HANDOVER_2026-10-08.md` (= `00_HANDOVER_FOR_NEXT_AGENT.md` there). Oracle `~/atuona-film9/film9.mjs` is renamed
-  `…OLD-froze-oracle…DO-NOT-RUN`; compile only on the laptop. Oracle disk 98% (1.4 GB free after deleting OUR verified-copied
-  `work/`); other /tmp + ~/.cache candidates (~4.3 GB, not ours) await Elena's go — list in the handover §8.
+  `…OLD-froze-oracle…DO-NOT-RUN`; compile only on the laptop. Oracle disk was 98% here; cleaned to 47% on 9 Oct
+  (measured 10 Oct: `/tmp` 4.0 GB → 286 MB, `~/.cache` 686 MB).
   **Elena's move:** which shots are good. Nothing to build.
   **8 Oct evening — COMPILE (superseded by the verdict above; kept for the record).** Elena: "move on with video compilation", "all the frames already
   approved by me should stay", text = ONE sharp stanza per shot from her own poems, emotional fit, atmospheric English; music =
