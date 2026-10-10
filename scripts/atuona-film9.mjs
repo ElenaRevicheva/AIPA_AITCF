@@ -133,13 +133,29 @@ async function makeGlitch(img, outFile, d = GLITCH_D) {
 // grain) with light grain between, so it stays watchable at full length. Drawn before the stanza, so the text stays clean.
 // v4 (Elena: "make every shot in the film glitchy"): `seed` (the shot's index) rotates the burst pattern and moves the first
 // burst, so 23 glitchy shots in a row never pulse on the same beat.
-function glitchyChain(d, seed = 0) {
+// v5 (Elena: "not just one place on the screen but flowing from place to place on each shot"): glitchy: 'flow' replaces the
+// fixed torn band at 42 % with TWO tears per burst, a 135 px band and a thin 56 px one, each starting at a different height
+// every burst and drifting up or down the frame while it lasts (opposite directions, varying sideways slip). glitchy: true
+// keeps the v3/v4 look, so those cuts still rebuild as delivered.
+function flowTears(bursts, seed, on) {
+  const Y = [0.12, 0.63, 0.31, 0.78, 0.22, 0.52, 0.06, 0.70, 0.40, 0.86], X = [72, -96, 48, -60, 110, -40, 84, -120];
+  const path = (h, yo, dir, xs) => bursts.map(([a, b], k) => ({ a, b, h,
+    y0: Math.round(Y[(k + seed + yo) % Y.length] * (VH - h)), v: dir * (k % 2 ? -1 : 1) * (14 + ((k * 5 + seed) % 4) * 6),
+    x: Math.round(X[(k + seed * 3 + yo) % X.length] * xs) }));
+  const ye = P => P.reduceRight((acc, p) => `if(between(n,${p.a},${p.b}),clip(${p.y0}+(n-${p.a})*${p.v},0,${VH - p.h}),${acc})`, '0');
+  const xe = P => P.reduceRight((acc, p) => `if(between(n,${p.a},${p.b}),${p.x},${acc})`, '0');
+  const A = path(135, 0, 1, 1), B = path(56, 5, -1, -0.6);
+  return `,split=3[gm][ga][gb];[ga]crop=iw:135:0:'${ye(A)}'[gbA];[gb]crop=iw:56:0:'${ye(B)}'[gbB];` +
+    `[gm][gbA]overlay=x='${xe(A)}':y='${ye(A)}':enable='${on}'[gm2];[gm2][gbB]overlay=x='${xe(B)}':y='${ye(B)}':enable='${on}',`;
+}
+
+function glitchyChain(d, seed = 0, flow = false) {
   const n = Math.round(d * FPS), G = [38, 55, 44, 62, 41, 50, 58, 36], L = [6, 9, 4, 7, 5, 8, 6, 4], bursts = [];
   const gaps = G.map((_, i) => G[(i + seed * 3) % G.length]), lens = L.map((_, i) => L[(i + seed * 5) % L.length]);
   for (let f = 12 + (seed * 7) % 30, k = 0; f < n - 8; k++) { const l = lens[k % lens.length]; bursts.push([f, f + l]); f += l + gaps[k % gaps.length]; }
   const on = bursts.map(([a, b]) => `between(n,${a},${b})`).join('+');
   const blk = bursts.filter((_, i) => i % 2 === 0).map(([a]) => `eq(n,${a})`).join('+');
-  return `,split=2[gm][gt];[gt]crop=iw:135:0:ih*0.42[gband];[gm][gband]overlay=x=72:y=H*0.42:enable='${on}',` +
+  return (flow ? flowTears(bursts, seed, on) : `,split=2[gm][gt];[gt]crop=iw:135:0:ih*0.42[gband];[gm][gband]overlay=x=72:y=H*0.42:enable='${on}',`) +
     `rgbashift=rh=-21:bh=21:enable='(${on})*lt(mod(n,6),2)',rgbashift=rh=8:gv=-5:bv=5:enable='(${on})*gte(mod(n,6),2)',` +
     `noise=alls=14:allf=t,noise=alls=34:allf=t:enable='${on}',eq=contrast=1.12:enable='${on}',` +
     `drawbox=x=0:y=0:w=iw:h=ih:color=black@1:t=fill:enable='${blk}'`;
@@ -227,7 +243,7 @@ async function main() {
       fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}[base];[1:v]chromakey=0x1ea53a:${k.similarity || 0.16}:${k.blend || 0.06},despill=green,scale=-2:${kh}${k.hflip ? ',hflip' : ''}[dog];` +
            `[base][dog]overlay=x=${Math.round(VW * k.x)}:y=${Math.round(VH * k.y)}:shortest=1,format=yuv420p${text}[v]`;
     } else {
-      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}${it.glitchy ? glitchyChain(p.d, i) : ''},format=yuv420p${text}[v]`;
+      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}${it.glitchy ? glitchyChain(p.d, i, it.glitchy === 'flow') : ''},format=yuv420p${text}[v]`;
     }
     const sIdx = it.composite_of || it.key || it.tail ? 2 : 1;
     await execFileP('ffmpeg', [...args, ...silence, '-filter_complex', fc, '-map', '[v]', '-map', `${sIdx}:a`, '-t', p.d.toFixed(2), ...enc, out], { maxBuffer: 1 << 26, timeout: 3600000 });
