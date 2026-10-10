@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 15:40 | Film #9 v2: new music (dark underground deep house, seductive, no words): generate, mix onto the 2:16 master, send to Telegram | Oracle `~/atuona-film9/plan.json` (music entries, backup first) + `music/`; laptop `render_v2`; no service restarts | e57c0d1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 v2 NEW MUSIC: 3 takes of dark underground deep house, no words · sent to her Telegram · $4.62
+- **DONE:** A noir (117.5 BPM, minimal) · B velvet (123, swung, sultry) · C basement (123, darker, acid, breakdown 65–75 s), 140 s each,
+  ElevenLabs on Replicate via Oracle `gen.mjs`. Each laid under the v2 picture (video md5 identical to body). Record:
+  `docs/atuona/FILM9_V2_MUSIC_2026-10-10.md`. Filed in the material folder `05_FILM_PREVIEW2_music_2026-10-10\` + `06_MUSIC\`.
+- **NEXT (Elena):** listen on Telegram, pick A / B / C or say what to change. Nothing to build until she picks.
+- **VERIFIED BY:** sendVideo `ok` ×3 + sendAudio `ok` ×3; md5 equal laptop/Oracle; `music_check.py` tempos above; ledger $100.71.
+- **RISK:** nobody has listened; "no words" rests on `force_instrumental`. Oracle `plan.json` changed (3 music entries added, backup
+  `plan.json.bak-music-v2-20261010`). The Claude app cannot receive files from this session: Telegram is the phone channel.
+
 
 ### ✅ 10 Oct — Film #9 v2 cut from Elena's screenshot edit · DELIVERED to her Telegram (with music + no-music) · $0
 - **DONE:** her 27 named screenshots of the 8 Oct preview + 3 "add this shot" clips + 4 "make a glitch from the image" stills decoded
