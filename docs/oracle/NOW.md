@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 18:20 | Film #9 v5: glitch tears FLOW across the frame (Elena), re-render on the LAPTOP, music C | `scripts/atuona-film9.mjs` (new glitchy:"flow"), `docs/atuona/film9_stanza_work/`, laptop render_v5; no Oracle render, no restarts | 0e30c2b |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
