@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 16:50 | Film #9 v3 = Elena final edits (back shot full + glitchy, window shot out, car shot shorter, walk = Luma clip), recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (new build_cut_v3), laptop render folder; no Oracle render, no restarts | 7bec495 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
