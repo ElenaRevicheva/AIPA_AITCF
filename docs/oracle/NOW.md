@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 17:25 | Film #9 v4 = FINAL: music C, every shot glitchy, 25 = video take v25, mirror shot 11 shorter; recompile on the LAPTOP | `scripts/atuona-film9.mjs`, `docs/atuona/film9_stanza_work/` (build_cut_v4), laptop render_v4; no Oracle render, no restarts | dab3dd8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 FINAL (v4) DELIVERED to her Telegram · music C · every shot glitchy · edit $0
+- **DONE:** music C (basement), all 23 shots glitchy (pattern varies per shot), 25 = the video v25, mirror shot 11 at 3.8 s. 2:15,
+  laptop render. Record: `docs/atuona/FILM9_V3_EDIT_2026-10-10.md` (v4 section). Filed in `05_FILM_PREVIEW/v4_FINAL_2026-10-10/`.
+- **NEXT (Elena):** say "publish" if it goes to the public gallery (`--publish` with the v4 cut, master from `render_v4/work/final.mp4`).
+- **VERIFIED BY:** `check_v4.py <render_v4/work> <final.mp4>` → ALL PASS; blackdetect: only 1–2 frame stutters + the closing card;
+  Telegram `ok`, md5 equal.
+- **RISK:** v2/v3 builds and all their deliveries are kept and untouched; FINAL is v4 only.
 
 ### ✅ 10 Oct — Film #9 v3 FINAL CUT (her 4 phone edits) · sent with all 3 new music takes · edit $0, music $4.62
 - **DONE:** 13 = full Luma take, 15 shorter (6 s), 22 removed, 25 back to 10 s + glitchy (new compile option `glitchy`). 2:16, 23 shots
