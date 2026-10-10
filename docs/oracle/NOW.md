@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 16:50 | Film #9 v3 = Elena final edits (back shot full + glitchy, window shot out, car shot shorter, walk = Luma clip), recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (new build_cut_v3), laptop render folder; no Oracle render, no restarts | 7bec495 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 v3 FINAL CUT (her 4 phone edits) · sent with all 3 new music takes · edit $0, music $4.62
+- **DONE:** 13 = full Luma take, 15 shorter (6 s), 22 removed, 25 back to 10 s + glitchy (new compile option `glitchy`). 2:16, 23 shots
+  + 10 flashes, 21 poems. Laptop render, 20 segments reused byte-identical. Record: `docs/atuona/FILM9_V3_EDIT_2026-10-10.md`
+  (music record: `docs/atuona/FILM9_V2_MUSIC_2026-10-10.md`). Filed in `05_FILM_PREVIEW/v3_2026-10-10/` of the material folder.
+- **NEXT (Elena):** pick A noir / B velvet / C basement. Then publish the chosen 1080p master to the gallery only with her go.
+- **VERIFIED BY:** `python docs/atuona/film9_stanza_work/check_v3.py <render_v3/work> <final.mp4>` → ALL PASS (24); Telegram `ok` x3.
+- **RISK:** she wrote "near the car" for the cage shot (no car shot exists); if she meant another shot, it is one line in
+  `build_cut_v3.py`. The v2 build in `render_v2` is untouched.
 
 ### ✅ 10 Oct — Film #9 v2 NEW MUSIC: 3 takes of dark underground deep house, no words · sent to her Telegram · $4.62
 - **DONE:** A noir (117.5 BPM, minimal) · B velvet (123, swung, sultry) · C basement (123, darker, acid, breakdown 65–75 s), 140 s each,
