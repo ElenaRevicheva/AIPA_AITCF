@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 14:30 | Film #9 v2 cut: Elena's 9-10 Oct screenshots (remove / shorten / glitch) + 3 clips, laptop compile, Telegram delivery | scripts/atuona-film9.mjs, docs/atuona/film9_stanza_work/*, docs/atuona/FILM9_*; Oracle: only scp + send_preview_tg.sh (no render, no restart) | 99ace5c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
