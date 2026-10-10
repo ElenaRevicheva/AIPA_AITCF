@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 19:30 | Film #9 v6: a whole, fitting stanza from her poems on every shot + poem numbers with links on the end card; laptop render | `docs/atuona/film9_stanza_work/` (new stanza picks v6, build_cut_v6), `scripts/atuona-film9.mjs` (end card), laptop render_v6; no restarts | 941568c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
