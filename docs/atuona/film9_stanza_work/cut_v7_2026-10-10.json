@@ -1,0 +1,482 @@
+{
+ "title": "ATUONA",
+ "cover": "1a",
+ "music": "music/film9_v2_basement.mp3",
+ "moments": "10.10.2026  ·  atuona.xyz Gallery  ·  Fragments\n21 poems  ·  ATUONA",
+ "poems_atuona": "#047 #048 #049 #054 #064 #065 #068 #071 #072 #073 #076 #078 #082 #083 #088 #089 #091 #092 #095 #096 #097",
+ "poems_litprom": "",
+ "items": [
+  {
+   "sid": "1a",
+   "stanza": "\"What about the painting?\" she asked. \"Paradise?\"",
+   "poem": "#092",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v1a__venice-kling-o3-pro.mp4",
+   "edit": 3.8,
+   "slow": 1.2,
+   "end": 10.0,
+   "planned_edit": 8.5,
+   "qc": "PASS; window ends on the lilac turn",
+   "glitchy": "flow",
+   "stanza_id": "S092.16"
+  },
+  {
+   "sid": "1b",
+   "stanza": "Kira stays silent. Knows: don't spook him now.",
+   "poem": "#072",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v1b__venice-kling-o3-pro.mp4",
+   "edit": 3.8,
+   "slow": 1.2,
+   "planned_edit": 8.5,
+   "qc": "REVIEW: his breath shows as white vapour (breath or smoke?)",
+   "glitchy": "flow",
+   "stanza_id": "S072.6"
+  },
+  {
+   "sid": "2",
+   "stanza": "The thaw at the end of January had behaved deceitfully, as usual.",
+   "poem": "#048",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v2__venice-kling-o3-pro.mp4",
+   "edit": 6.5,
+   "slow": 1.2,
+   "end": 10.0,
+   "planned_edit": 6.5,
+   "qc": "REVIEW: the frontal reflection meets her face (her own reflection or another woman?)",
+   "glitchy": "flow",
+   "stanza_id": "S048.7"
+  },
+  {
+   "sid": "6",
+   "stanza": "When I drown,\nAll those who aren't friends,\nI'll drag down with me.",
+   "poem": "#054",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v6__venice-kling-o3-pro.mp4",
+   "edit": 8.5,
+   "slow": 1.2,
+   "end": 9.0,
+   "planned_edit": 8.5,
+   "qc": "REVIEW: her face shows under the surface after 9 s; cut at 9 s",
+   "glitchy": "flow",
+   "stanza_id": "S054.4"
+  },
+  {
+   "sid": "g_G7s",
+   "glitch_only": "G7s.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "7m",
+   "stanza": "She had to wake up. Kira had to wake up.",
+   "poem": "#049",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v7m__venice-kling-o3-pro.mp4",
+   "edit": 3.8,
+   "slow": 1.2,
+   "planned_edit": 5,
+   "qc": "PASS (three feathers hold)",
+   "glitchy": "flow",
+   "stanza_id": "S049.13"
+  },
+  {
+   "sid": "g_G7",
+   "glitch_only": "G7.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "9",
+   "stanza": "Deep breath, like I'm gathering thoughts from the mist of a Panamanian morning.",
+   "poem": "#065",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v9__venice-kling-o3-pro.mp4",
+   "edit": 5,
+   "slow": 1.2,
+   "planned_edit": 5,
+   "qc": "PASS",
+   "glitchy": "flow",
+   "stanza_id": "S065.1"
+  },
+  {
+   "sid": "10a",
+   "stanza": "This morning I was looking at notes about Monet.\nLight. Repetition. Obsession.",
+   "poem": "#071",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v10a__venice-kling-o3-pro.mp4",
+   "edit": 5.0,
+   "slow": 1.2,
+   "trim": 6.25,
+   "planned_edit": 7.5,
+   "qc": "TRIM 6.25 (second look: the honey stripe turns flat mustard after)",
+   "glitchy": "flow",
+   "stanza_id": "S071.2"
+  },
+  {
+   "sid": "10b",
+   "stanza": "The universe expands and contracts.\nTime folds like origami.",
+   "poem": "#078",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v10b__venice-kling-o3-pro.mp4",
+   "edit": 3.6,
+   "slow": 1.2,
+   "planned_edit": 4.5,
+   "qc": "PASS",
+   "glitchy": "flow",
+   "stanza_id": "S078.15"
+  },
+  {
+   "sid": "g_k11q",
+   "glitch_only": "k11_qa1_1006.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "11",
+   "stanza": "Is the world still here?\nAm I still here?",
+   "poem": "#068",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v11__venice-kling-o3-pro.mp4",
+   "edit": 3.8,
+   "slow": 1.2,
+   "trim": 6.2,
+   "planned_edit": 7.4,
+   "qc": "REJECT after 6.25 s (real Kira's strap slips, then exposure) -> clean 0-6.2 s only",
+   "glitch_after": "G8_clean.jpg",
+   "glitchy": "flow",
+   "stanza_id": "S068.15"
+  },
+  {
+   "sid": "M1",
+   "stanza": "He holds her waist like she's another lot with a pre-sale estimate.",
+   "poem": "#082",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "vM1__venice-kling-o3-pro.mp4",
+   "edit": 5.5,
+   "slow": 1.2,
+   "planned_edit": 5.5,
+   "qc": "REVIEW: Jean-Marc's smirk becomes a toothy grin",
+   "glitchy": "flow",
+   "stanza_id": "S082.3"
+  },
+  {
+   "sid": "M2",
+   "stanza": "I recognized them immediately — Jean-Marc Dupont with his fiancée, that one from the latest Saint Laurent campaign.",
+   "poem": "#082",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "vM2__venice-kling-o3-pro.mp4",
+   "edit": 8,
+   "slow": 1.2,
+   "planned_edit": 8,
+   "qc": "REVIEW: Kira's face a little narrower; Jean-Marc looks down at Mila's wrist",
+   "glitchy": "flow",
+   "stanza_id": "S082.1"
+  },
+  {
+   "sid": "13",
+   "stanza": "Kira, baby, I hear your storm inside louder than the one coming outside.",
+   "poem": "#064",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "s13__luma.mp4",
+   "edit": 6.0,
+   "slow": 1.2,
+   "planned_edit": 4,
+   "qc": "Elena 10 Oct: the full Luma take (approved 9 Oct) replaces the 3.5 s Kling 4k trim",
+   "glitchy": "flow",
+   "stanza_id": "S064.6"
+  },
+  {
+   "sid": "14",
+   "stanza": "Just proof that the chain still holds.",
+   "poem": "#096",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v14__venice-kling-o3-pro.mp4",
+   "edit": 5.3,
+   "slow": 1.2,
+   "trim": 4.4,
+   "planned_edit": 5.3,
+   "qc": "REJECT after ~4.5 s (Ule's face drifts, head drops to her hair) -> clean 0-4.4 s, the clasp is in it",
+   "glitch_after": "G6s.jpg",
+   "glitchy": "flow",
+   "stanza_id": "S096.8"
+  },
+  {
+   "sid": "M3",
+   "stanza": "My voice shakes. Mila winces at my fake French like it's cheap perfume.",
+   "poem": "#083",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "vM3__venice-kling-o3-pro.mp4",
+   "edit": 5,
+   "slow": 1.2,
+   "planned_edit": 5,
+   "qc": "REVIEW: the cracks spread and darken (Elena's call: 'mask too tight, cracks by the eyes')",
+   "glitchy": "flow",
+   "stanza_id": "S083.20"
+  },
+  {
+   "sid": "g_M4",
+   "glitch_only": "M4.jpg",
+   "glitch_dur": 0.9
+  },
+  {
+   "sid": "M5",
+   "stanza": "I remember Modigliani's line: \"When I know your soul, I will paint your eyes.\"",
+   "poem": "#082",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "vM5__venice-kling-o3-pro.mp4",
+   "edit": 7.5,
+   "slow": 1,
+   "planned_edit": 7.5,
+   "qc": "PASS",
+   "glitchy": "flow",
+   "stanza_id": "S082.4"
+  },
+  {
+   "sid": "15",
+   "stanza": "Every glance quietly hides as Eternity in the labyrinths of your pupils.",
+   "poem": "#047",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v15__venice-kling-o3-pro.mp4",
+   "edit": 6.0,
+   "slow": 1.2,
+   "planned_edit": 10,
+   "qc": "REVIEW: Ule's mouth opens and closes (speech?)",
+   "glitchy": "flow",
+   "stanza_id": "S047.2"
+  },
+  {
+   "sid": "16b",
+   "stanza": "Ambrette promises warmth that isn't there.",
+   "poem": "#073",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v16b__venice-kling-o3-pro.mp4",
+   "edit": 9.0,
+   "slow": 1.2,
+   "trim": 7.5,
+   "planned_edit": 9.0,
+   "qc": "TRIM 7.5 (flat green wash after)",
+   "glitchy": "flow",
+   "stanza_id": "S073.35"
+  },
+  {
+   "sid": "g_19",
+   "glitch_only": "k19.jpg",
+   "glitch_dur": 0.9
+  },
+  {
+   "sid": "g_20",
+   "glitch_only": "k20.jpg",
+   "glitch_dur": 0.9
+  },
+  {
+   "sid": "g_20b",
+   "glitch_only": "k20b.jpg",
+   "glitch_dur": 0.9
+  },
+  {
+   "sid": "24b",
+   "stanza": "— Bonhams sells Van Gogh's letters to Theo — pages that were once a way to survive, now lot numbers.",
+   "poem": "#076",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v24Lb__venice-kling-o3-pro.mp4",
+   "edit": 10.0,
+   "slow": 1.0,
+   "planned_edit": 9,
+   "qc": "Elena 9 Oct \"add this shot\": the auction lots on black velvet, whole clip; the tears clip v24La is removed",
+   "glitchy": "flow",
+   "stanza_id": "S076.21"
+  },
+  {
+   "sid": "25",
+   "stanza": "Ule wiped his face. Salt left white trails on his skin — like maps of countries that don't exist.",
+   "poem": "#088",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v25__venice-kling-o3-pro.mp4",
+   "edit": 10.0,
+   "slow": 1.0,
+   "planned_edit": 10,
+   "qc": "Elena 10 Oct: the video take (approved 9 Oct) replaces the still-motion; whole clip",
+   "glitchy": "flow",
+   "stanza_id": "S088.15"
+  },
+  {
+   "sid": "30b",
+   "stanza": "Not a lover. A witness.",
+   "poem": "#097",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v30b__venice-kling-o3-pro.mp4",
+   "edit": 5.5,
+   "slow": 1.2,
+   "planned_edit": 5.5,
+   "qc": "Elena 9 Oct \"add this shot\": the Kling take of k30 (her head locked, his throat lit); the still-motion sm_k30 is removed",
+   "glitchy": "flow",
+   "stanza_id": "S097.18"
+  },
+  {
+   "sid": "31",
+   "stanza": "Ule started to say something — and stopped. Not hesitation. Interruption from within.",
+   "poem": "#089",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v31__venice-kling-o3-pro.mp4",
+   "edit": 5,
+   "slow": 1.2,
+   "planned_edit": 5,
+   "qc": "PASS (second look at full resolution overturned the reject)",
+   "glitchy": "flow",
+   "stanza_id": "S089.12"
+  },
+  {
+   "sid": "g_G8s",
+   "glitch_only": "G8s.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "g_35",
+   "glitch_only": "k36_double.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "36",
+   "stanza": "\"You'll find what you're looking for. But it won't be what you expect.\"",
+   "poem": "#091",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v36__venice-kling-o3-pro.mp4",
+   "edit": 4.8,
+   "slow": 1.2,
+   "trim": 4.0,
+   "planned_edit": 4.8,
+   "qc": "REJECT after 4 s (lips part) -> clean 0-4.0 s walk at x1.2, then a 1 s dissolve into the still-motion of the same approved frame (critic fix)",
+   "glitchy": "flow",
+   "stanza_id": "S091.23"
+  },
+  {
+   "sid": "g_k37v1",
+   "glitch_only": "k37.v1.jpg",
+   "glitch_dur": 1.2
+  },
+  {
+   "sid": "37",
+   "stanza": "I will not whiten.",
+   "poem": "#095",
+   "lang": "en",
+   "voice": "onyx",
+   "clip": "v37__venice-kling-o3-pro.mp4",
+   "edit": 3.1,
+   "slow": 1,
+   "trim": 3.1,
+   "planned_edit": 3.1,
+   "qc": "TRIM 3.1 (the take must END on black sand; a new surge comes after)",
+   "glitchy": "flow",
+   "stanza_id": "S095.8"
+  }
+ ],
+ "_note": "v7, 10 Oct 2026: v6 + flowing underground stanza design (text_style 'flow'); see build_cut_v7.py",
+ "poem_links": [
+  {
+   "num": "092",
+   "title": "Hungry Earth"
+  },
+  {
+   "num": "072",
+   "title": "Vanilla Network"
+  },
+  {
+   "num": "048",
+   "title": "The Meeting"
+  },
+  {
+   "num": "054",
+   "title": "I'll Drown"
+  },
+  {
+   "num": "049",
+   "title": "French Snow"
+  },
+  {
+   "num": "065",
+   "title": "Atuona"
+  },
+  {
+   "num": "071",
+   "title": "Crimson Escape"
+  },
+  {
+   "num": "078",
+   "title": "Atuona Morning"
+  },
+  {
+   "num": "068",
+   "title": "Digital Exile"
+  },
+  {
+   "num": "082",
+   "title": "Landing"
+  },
+  {
+   "num": "064",
+   "title": "Code Paradise"
+  },
+  {
+   "num": "096",
+   "title": "Nocturnal Silence"
+  },
+  {
+   "num": "083",
+   "title": "Ultramarine Absence"
+  },
+  {
+   "num": "047",
+   "title": "Лабиринты зрачков"
+  },
+  {
+   "num": "073",
+   "title": "Desert Blooms"
+  },
+  {
+   "num": "076",
+   "title": "Composing"
+  },
+  {
+   "num": "088",
+   "title": "Three Notes"
+  },
+  {
+   "num": "097",
+   "title": "The Yellow Christ"
+  },
+  {
+   "num": "089",
+   "title": "The Contract"
+  },
+  {
+   "num": "091",
+   "title": "Код и Холст"
+  },
+  {
+   "num": "095",
+   "title": "The Secret Exhibition"
+  }
+ ],
+ "poem_card_dur": 7.0,
+ "text_style": "flow"
+}

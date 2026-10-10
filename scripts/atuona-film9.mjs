@@ -174,12 +174,66 @@ async function makePoemCard(entries, outFile, d) {
   const half = Math.ceil(rows.length / 2), cols = [rows.slice(0, half), rows.slice(half)];
   const size = 28, step = size + 16, top = Math.round((VH - (half * step)) / 2) + 40;
   const hFile = outFile + '_h.txt'; fs.writeFileSync(hFile, track('poems in this film'));
-  let draw = `drawtext=fontfile=${fp(MONO)}:textfile=${fp(hFile)}:expansion=none${TS}:fontcolor=white:fontsize=34:x=(w-text_w)/2:y=${top - 110}`;
+  const CF = FLOW && TEXTFONTS ? path.join(TEXTFONTS, 'Syne-600.ttf') : MONO;   // v7: the stanza face
+  let draw = `drawtext=fontfile=${fp(CF)}:textfile=${fp(hFile)}:expansion=none${TS}:fontcolor=white:fontsize=34:x=(w-text_w)/2:y=${top - 110}`;
   cols.forEach((c, k) => { if (!c.length) return; const f = `${outFile}_c${k}.txt`; fs.writeFileSync(f, c.join(String.fromCharCode(10)));
-    draw += `,drawtext=fontfile=${fp(MONO)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xDDDDDD:fontsize=${size}:line_spacing=16:x=${k ? 1000 : 150}:y=${top}`; });
+    draw += `,drawtext=fontfile=${fp(CF)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xDDDDDD:fontsize=${size}:line_spacing=16:x=${k ? 1000 : 150}:y=${top}`; });
   const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
   await execFileP('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=black:s=${VW}x${VH}:r=${FPS}:d=${d.toFixed(2)}`, ...silence, '-filter_complex', `[0:v]${draw},${fades}[v]`, '-map', '[v]', '-map', '1:a', '-t', d.toFixed(2), ...enc, outFile], { maxBuffer: 1 << 26, timeout: 300000 });
   return outFile;
+}
+
+// v7 (Elena, 10 Oct: "make format of stanzas text bigger and design more like underground aesthetic style - so that a viewer
+// pays attention not just to a video but to the text as well and the text should flow, not stand still like being typed on a
+// laptop powershell"): CUT.text_style = 'flow' draws each stanza with libass instead of drawtext: Syne (the atuona.xyz display
+// face) at ~2x the old size, bone white with a crimson chromatic edge, no box, lower-left third. The words arrive one by one IN
+// STEP WITH THE NARRATOR (each fades in as it is spoken, timed by word length across the voice line) and the whole stanza
+// drifts slowly up and opens its letter-spacing while it is on screen. Fonts come from FILM9_TEXTFONTS (Syne-600.ttf).
+const TEXTFONTS = process.env.FILM9_TEXTFONTS || '';
+const FLOW = CUT.text_style === 'flow';
+const FLOW_SIZE = 78, FLOW_COLS = 38, FLOW_X = 120, FLOW_Y = 990;
+function flowLines(text) {
+  const verse = String(text).replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean);
+  if (verse.length > 1 && verse.every(l => l.length <= FLOW_COLS) && verse.length <= 4) return verse;   // her own line breaks
+  return balanced(verse.join(' '), FLOW_COLS).split('\n');
+}
+function assTime(t) { const cs = Math.max(0, Math.round(t * 100)); const h = Math.floor(cs / 360000), m = Math.floor(cs / 6000) % 60, sec = Math.floor(cs / 100) % 60, c = cs % 100; return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(c).padStart(2, '0')}`; }
+function flowAss(stanza, d, voAt, vd, file) {
+  const B = String.fromCharCode(92);
+  const lines = flowLines(stanza);
+  const words = []; lines.forEach((l, li) => l.split(/\s+/).forEach((w, wi) => words.push({ w, br: li > 0 && wi === 0 })));
+  const start = vd ? voAt : 0.5, span = vd ? Math.max(0.6, vd * 0.94) : Math.min(2.5, d * 0.4);
+  const weight = words.map(x => x.w.length + 2), total = weight.reduce((a, b) => a + b, 0);
+  let acc = 0; const at = words.map((x, k) => { const t = start + span * acc / total; acc += weight[k]; return t; });
+  const end = d - 0.15, rise = 26, drift = 14;
+  const posAt = t => { const f = Math.min(1, Math.max(0, t / d)); return [FLOW_X + drift * f, FLOW_Y - rise * f]; };
+  const fspAt = t => (1.2 + 1.6 * Math.min(1, Math.max(0, t / d))).toFixed(2);
+  const ev = [];
+  for (let k = 0; k < words.length; k++) {
+    const t0 = at[k], t1 = k + 1 < words.length ? at[k + 1] : end;
+    if (t1 - t0 < 0.02) continue;
+    const [x0, y0] = posAt(t0), [x1, y1] = posAt(t1), dur = Math.round((t1 - t0) * 1000);
+    const body = (revealA, newA, glowLayer) => words.map((x, j) => {
+      const sep = j === 0 ? '' : (x.br ? B + 'N' : ' ');
+      const a = j < k ? revealA : j === k ? `${B}alpha&HFF&${B}t(0,${Math.min(420, dur)},${B}alpha${newA})` : `${B}alpha&HFF&`;
+      return `${sep}{${j < k ? `${B}alpha${revealA}` : a}}${x.w.replace(/[{}]/g, '')}`;
+    }).join('');
+    const last = k === words.length - 1 ? `${B}fad(0,700)` : '';
+    const mv = `${B}move(${x0.toFixed(1)},${y0.toFixed(1)},${x1.toFixed(1)},${y1.toFixed(1)})${B}fsp${fspAt(t0)}${B}t(${B}fsp${fspAt(t1)})${last}`;
+    ev.push(`Dialogue: 0,${assTime(t0)},${assTime(t1)},Glow,,0,0,0,,{${mv}}` + body('&H28&', '&H28&', true));
+    ev.push(`Dialogue: 1,${assTime(t0)},${assTime(t1)},Verse,,0,0,0,,{${mv}}` + body('&H00&', '&H00&', false));
+  }
+  const head = ['[Script Info]', 'ScriptType: v4.00+', `PlayResX: ${VW}`, `PlayResY: ${VH}`, 'WrapStyle: 2', 'ScaledBorderAndShadow: yes', '',
+    '[V4+ Styles]',
+    'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
+    // Verse: bone white (#F2EEE8), a thin dark edge so it reads on bright frames; Glow: crimson (#C0142F), offset right/down = a chromatic split
+    `Style: Verse,Syne SemiBold,${FLOW_SIZE},&H00E8EEF2,&H00E8EEF2,&H70000000,&H00000000,0,0,0,0,100,100,1.2,0,1,2.2,0,1,0,0,0,1`,
+    `Style: Glow,Syne SemiBold,${FLOW_SIZE},&H002F14C0,&H002F14C0,&H002F14C0,&H00000000,0,0,0,0,100,100,1.2,0,1,0,0,1,0,0,0,1`,
+    '', '[Events]', 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'];
+  // the glow layer sits 4 px right and 3 px down, blurred: the crimson edge
+  const evs = ev.map(e => e.startsWith('Dialogue: 0,') ? e.replace(`{${B}move(`, `{${B}blur2${B}move(`).replace(/move\(([\d.]+),([\d.]+),([\d.]+),([\d.]+)\)/, (m, a, b, c, d2) => `move(${(+a + 5).toFixed(1)},${(+b + 3).toFixed(1)},${(+c + 5).toFixed(1)},${(+d2 + 3).toFixed(1)})`) : e);
+  fs.writeFileSync(file, [...head, ...evs, ''].join('\n'));
+  return file;
 }
 
 const clipPath = it => path.join(CLIPS, it.clip);
@@ -241,7 +295,7 @@ async function main() {
     const { it } = p, out = path.join(W, `${PREVIEW ? 'pv_' : ''}seg_${it.sid}.mp4`);
     if (reuse && !reseg.includes(it.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segOf[it.sid] = out; return; }
     const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, it.stanza ? spread(it.stanza) : '');
-    const text = it.stanza ? textDraw(txt, p.d) : '';   // a shot without a stanza (24b: the lots after the tear) carries no band
+    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
     const interp = !PREVIEW && p.factor >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
     const slow = `setpts=${p.factor.toFixed(5)}*(PTS-STARTPTS),${interp}`;
     const args = ['-y', ...(p.ss ? ['-ss', p.ss.toFixed(2)] : []), '-t', p.src.toFixed(3), '-i', clipPath(it)];
