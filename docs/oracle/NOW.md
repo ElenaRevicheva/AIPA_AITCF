@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-10 14:30 | Film #9 v2 cut: Elena's 9-10 Oct screenshots (remove / shorten / glitch) + 3 clips, laptop compile, Telegram delivery | scripts/atuona-film9.mjs, docs/atuona/film9_stanza_work/*, docs/atuona/FILM9_*; Oracle: only scp + send_preview_tg.sh (no render, no restart) | 99ace5c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,23 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 10 Oct — Film #9 v2 cut from Elena's screenshot edit · DELIVERED to her Telegram (with music + no-music) · $0
+- **DONE:** her 27 named screenshots of the 8 Oct preview + 3 "add this shot" clips + 4 "make a glitch from the image" stills decoded
+  (playhead time + on-screen stanza vs timeline.json; 2 agents each, 27/27 agree; clips/stills by md5) → `cut_v2_2026-10-10.json`:
+  13 shots removed (5 1c 7 17 18 21 24 26 27 28 30 32 34), 8 shortened, 5 became ~1 s flashes (M4 19 20 20b 35), 36 cut when the walk
+  ends, v30b + v24Lb in (30b/24b), 4 new flashes. **No voice** (`FILM9_NO_VO=1`, new switch; her hold + "much shorter" is impossible
+  under a voice-locked shot). Master 2:16, 1080p24, rendered on the LAPTOP (22 min); Oracle only carried the scp + Telegram send.
+  Record: `docs/atuona/FILM9_V2_EDIT_2026-10-10.md`. Files: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\05_FILM_PREVIEW\v2_2026-10-10\`.
+- **NEXT (Elena):** watch both copies; say (a) music / no music / new brief, (b) whether "make a short glitch" meant the shot BECOMES a
+  flash (built) or keeps the shot AND adds a flash (one line per shot in `build_cut_v2.py`), (c) whether v25 (approved 9 Oct, not asked)
+  should replace the still-motion 25. Then the master can go to the public gallery (`--publish`, only with her go).
+- **VERIFIED BY:** `python docs/atuona/film9_stanza_work/check_v2.py <render_v2/work> <final.mp4>` → `ALL PASS` (22 checks);
+  `qc_sheet_master.jpg` (one frame per piece); Telegram `send_preview_tg.sh` printed `ok` twice, md5 equal laptop/Oracle, uploads removed.
+- **RISK:** the 24 stills + 8 clips in her "09.10.2026 ... additionally approved" folders are approvals, not placements — do not
+  generate or place them unasked. The 8 Oct preview build (`render_local\`) is untouched; v2 lives in `render_v2\`. Compile script
+  changed on `main` (`2806e6c`): FILM9_NO_VO / FILM9_NO_MUSIC / `glitch_only` items / text-free shots — default behaviour unchanged.
+
 
 ### 🔴 8 Oct — Oracle hung ~21:00 UTC, recovered by itself (NOT rebooted, uptime 148 d) · 🚨 DISK 100% FULL (120 MB free)
 - **Seen:** webhook HTTP 000 for 60 s, SSH `timed out during banner exchange`. At 22:20 UTC: back, load avg `0.01, 0.09, 8.30`, RAM 2.9/12 GB used, all
