@@ -14,7 +14,7 @@ Jean — stanza is about Mila."**
   the editor's picks are `v6_picks.json`. `build_cut_v6.py` refuses unless every stanza is verbatim in her text, fits the
   spoken length (words ≤ 2.4 × (shot + 0.5 s)), was not used in films #7/#8 (quote- and case-blind check) and no poem repeats.
 - **Mila:** M1, M2, M3, M5 all show Mila with Jean-Marc (frames checked) → stanzas from her Mila poems #082/#083.
-- **Voice = the narrator of films #1–#7:** OpenAI `tts-1`, `onyx`, speed 0.9, one take per shot (`render_v6o\`). All 23
+- **Voice = the narrator of films #1–#7:** OpenAI `tts-1`, `onyx`, speed 0.9, one take per shot (`render_v6\vo\`). All 23
   takes transcribed back with whisper-1 (`v6_vo_check.py`): every take matches (the only flag, "Ambret", is Whisper's spelling
   of "Ambrette"). Lead 0.5 s, tail 1.2 s: a shot grows past her length only by what its line needs.
 - **Mix:** music C at 0.34, gentle duck (ratio 3), voice 1.9, loudnorm −16. **Measured from separated stems:** during speech
@@ -83,6 +83,6 @@ Jean — stanza is about Mila."**
   voice line placed, end card = every poem quoted, plus all earlier edits). `blackdetect`: only 1–2 frame stutters + the fade
   into the outro card. QC sheet `render_v6\qc_sheet_master.jpg`.
 - **Delivered** to her Telegram with the 21-link caption (`ok`, md5 equal laptop/Oracle, uploads removed).
-  **Filed:** `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08_FILM_PREVIEW6_2026-10-10\` (the `_nomusic` master there is the silent
+  **Filed:** `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\05_FILM_PREVIEW\v6_2026-10-10\` (the `_nomusic` master there is the silent
   picture: no music and no voice). **Not published** to the gallery: that waits for her go.
 - **Money:** voice ~$0.05 (tts-1, ~2.3k characters) + transcription check ~$0.01.
