@@ -176,8 +176,11 @@ async function makePoemCard(entries, outFile, d) {
   const hFile = outFile + '_h.txt'; fs.writeFileSync(hFile, track('poems in this film'));
   const CF = FLOW && TEXTFONTS ? path.join(TEXTFONTS, 'Syne-600.ttf') : MONO;   // v7: the stanza face
   let draw = `drawtext=fontfile=${fp(CF)}:textfile=${fp(hFile)}:expansion=none${TS}:fontcolor=white:fontsize=34:x=(w-text_w)/2:y=${top - 110}`;
-  cols.forEach((c, k) => { if (!c.length) return; const f = `${outFile}_c${k}.txt`; fs.writeFileSync(f, c.join(String.fromCharCode(10)));
-    draw += `,drawtext=fontfile=${fp(CF)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xDDDDDD:fontsize=${size}:line_spacing=16:x=${k ? 1000 : 150}:y=${top}`; });
+  // v7: one drawtext per row (a multi-line textfile draws the line break as a glyph in Syne), rows in Geologica (the site's
+  // title face, which has Cyrillic: #047 and #091 keep their Russian titles exactly as the vault shows them)
+  const RF = FLOW && TEXTFONTS && fs.existsSync(path.join(TEXTFONTS, 'Geologica-500.ttf')) ? path.join(TEXTFONTS, 'Geologica-500.ttf') : CF;
+  cols.forEach((c, k) => c.forEach((row, r) => { const f = `${outFile}_c${k}_${r}.txt`; fs.writeFileSync(f, row);
+    draw += `,drawtext=fontfile=${fp(RF)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xDDDDDD:fontsize=${size}:x=${k ? 1000 : 150}:y=${top + r * step}`; }));
   const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
   await execFileP('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=black:s=${VW}x${VH}:r=${FPS}:d=${d.toFixed(2)}`, ...silence, '-filter_complex', `[0:v]${draw},${fades}[v]`, '-map', '[v]', '-map', '1:a', '-t', d.toFixed(2), ...enc, outFile], { maxBuffer: 1 << 26, timeout: 300000 });
   return outFile;
