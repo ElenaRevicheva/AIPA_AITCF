@@ -128,6 +128,20 @@ async function makeGlitch(img, outFile, d = GLITCH_D) {
   return outFile;
 }
 
+// 10 Oct 2026 v3 (Elena: the salt-on-skin shot "should return to its initial length and become glitchy"): `glitchy: true` puts
+// the Crimson glitch on the MOVING shot itself, in short irregular bursts (RGB split, torn band, a black stutter frame, heavy
+// grain) with light grain between, so it stays watchable at full length. Drawn before the stanza, so the text stays clean.
+function glitchyChain(d) {
+  const n = Math.round(d * FPS), gaps = [38, 55, 44, 62, 41, 50, 58, 36], lens = [6, 9, 4, 7, 5, 8, 6, 4], bursts = [];
+  for (let f = 12, k = 0; f < n - 8; k++) { const l = lens[k % lens.length]; bursts.push([f, f + l]); f += l + gaps[k % gaps.length]; }
+  const on = bursts.map(([a, b]) => `between(n,${a},${b})`).join('+');
+  const blk = bursts.filter((_, i) => i % 2 === 0).map(([a]) => `eq(n,${a})`).join('+');
+  return `,split=2[gm][gt];[gt]crop=iw:135:0:ih*0.42[gband];[gm][gband]overlay=x=72:y=H*0.42:enable='${on}',` +
+    `rgbashift=rh=-21:bh=21:enable='(${on})*lt(mod(n,6),2)',rgbashift=rh=8:gv=-5:bv=5:enable='(${on})*gte(mod(n,6),2)',` +
+    `noise=alls=14:allf=t,noise=alls=34:allf=t:enable='${on}',eq=contrast=1.12:enable='${on}',` +
+    `drawbox=x=0:y=0:w=iw:h=ih:color=black@1:t=fill:enable='${blk}'`;
+}
+
 const clipPath = it => path.join(CLIPS, it.clip);
 const voPath = it => path.join(VODIR, `${it.sid}.mp3`);
 
@@ -210,7 +224,7 @@ async function main() {
       fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}[base];[1:v]chromakey=0x1ea53a:${k.similarity || 0.16}:${k.blend || 0.06},despill=green,scale=-2:${kh}${k.hflip ? ',hflip' : ''}[dog];` +
            `[base][dog]overlay=x=${Math.round(VW * k.x)}:y=${Math.round(VH * k.y)}:shortest=1,format=yuv420p${text}[v]`;
     } else {
-      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow},format=yuv420p${text}[v]`;
+      fc = `[0:v]${fit}${it.reverse ? ',reverse' : ''},${slow}${it.glitchy ? glitchyChain(p.d) : ''},format=yuv420p${text}[v]`;
     }
     const sIdx = it.composite_of || it.key || it.tail ? 2 : 1;
     await execFileP('ffmpeg', [...args, ...silence, '-filter_complex', fc, '-map', '[v]', '-map', `${sIdx}:a`, '-t', p.d.toFixed(2), ...enc, out], { maxBuffer: 1 << 26, timeout: 3600000 });
