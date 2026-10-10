@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-10 21:00 | Film #9 v7: bigger flowing underground stanza text + poem list after ATUONA, then PUBLISH (Elena asked) to the AI Film Studio | `scripts/atuona-film9.mjs` (text), laptop render_v7; Oracle `cto-aipa/data/atuona/films/out/` (publish = add one file); atuona repo film sheet if any; no restarts | 8b785b8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
