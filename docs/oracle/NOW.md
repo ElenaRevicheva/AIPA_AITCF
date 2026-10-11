@@ -130,6 +130,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔴 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · every OpenAI-backed service is down · Elena's move
+- **Proof:** a 1-token probe on BOTH Oracle OpenAI keys returns `credit_balance_exhausted` (cto-aipa, OpenClaw, whitespace,
+  dragontrade, EspaLuz_Influencer share one; EspaLuzFamilybot, EspaLuzWhatsApp, VJH share the other — same account, both dry).
+- **OpenClaw coach:** "prep me for …" replies only "You have no credits remaining". Its 4 fallbacks (gemini, grok, gpt-oss,
+  claude-sonnet) did NOT take over: OpenClaw 2026.2.14 passes the billing error to the user instead of failing over.
+- **Fix:** Elena adds OpenAI credits (only she can). Or, with her go, swap the coach's primary to a fallback — config change on
+  a running product, NOT done without her yes. The apply kit's CV/letter steps also need OpenAI; expect them to fail until then.
+- **Coach changes today (deployed, md5 laptop = Oracle):** `scripts/hs-deal-prep.cjs` 7fb5ebae… (`--role=` picks the right deal
+  of a multi-role company; "✅ VERIFIED EXAMPLES" = the 17 reviewed cv-bank bullets, copied word for word into "For example, from
+  my work:"); job-list-filter `docs/openclaw/interview-spar/SKILL.md` (run the reader before replying; one question per message;
+  a misstated title is corrected and flagged in 🔧). Tested before the balance ran out: proof line ✓, right role ✓, title
+  corrected ✓, LIVE example copied verbatim ✓.
+
 ### ✅ 11 Oct — AREAREA REPUBLISHED (v16, 2:41): M4 4.5 s · bed 31 4.2 s + new stanza · shot 9 says Atuona, not Panama
 - **DONE:** 31 = "The air between them thickens." (#083), 9 = "Morning in Atuona doesn't begin with light. / It begins with scent."
   (#068); new onyx takes (whisper: 31 exact; 9 heard "Mourning…Atuana" = homophone/name). End card + film page list the 19 quoted

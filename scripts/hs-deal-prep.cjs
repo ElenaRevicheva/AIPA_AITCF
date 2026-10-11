@@ -3,6 +3,7 @@
  * hs-deal-prep.cjs — print a job deal's prep material from HubSpot, for interview practice. READ-ONLY.
  *
  *   node scripts/hs-deal-prep.cjs --company="Addepto"      # best matching [HIRING-…] deal
+ *   node scripts/hs-deal-prep.cjs --company="Puente" --role="Chief of Staff"   # several deals at one company
  *   node scripts/hs-deal-prep.cjs --deal=<dealId>
  *   node scripts/hs-deal-prep.cjs --digest --out=<file>      # compact sheet of ALL live job deals (≤ 11,000 chars)
  *
@@ -114,13 +115,18 @@ async function digest(outPath) {
     '# LIVE JOB DEALS (HubSpot) — read-only snapshot, refreshed every 30 min by cto-aipa/scripts/hs-deal-prep.cjs --digest',
     `# ${new Date().toISOString()} · ${entries.length} live job deals. Use this for the mock interview: when Elena names a company,`,
     '# take the role and requirements from HERE. Never invent a role. For full notes run hs-deal-prep.cjs --company="<company>".',
-    '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, run that command FIRST. Your first line must be the',
+    '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, RUN that command in that same turn, before writing',
+    '# anything (add --role="<role she named>" — one company can have several deals). Your first line must be the',
     '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly.',
-    '# If you did not run it in this turn, or that line is missing, your first line is "⚠️ Deal NOT fully loaded" — never guess it.',
+    '# Only if the command FAILED or printed no READ-PROOF line: "⚠️ Deal NOT fully loaded" — never guess it, never skip running it.',
+    '# Ask ONE mock question per message (🎙️ Q<n>/<total>) — never list the whole series.',
     '# LIVE RULE (Elena, 11 Oct 2026): if she pastes an INTERVIEWER\'S question (not her answer to your mock question), reply',
     '# "🔴 LIVE — say this:" + ONE first-person answer, 3–5 sentences, true facts from the deal only — no other sections, no next',
     '# question, no voice note. FACTS always: titles exactly "Deputy CEO for Corporate Governance & Chief Legal Officer" (never',
     '# "CEO"); AI agents implement, she decides requirements and tests; no metric she does not have (conversions, revenue, hours).',
+    '# EXAMPLE RULE (Elena, 11 Oct 2026): EVERY answer — polished or LIVE — has a line "For example, from my work:" with ONE true example from HER OWN products,',
+    '# COPIED WORD FOR WORD from the "✅ VERIFIED EXAMPLES" list at the end of the deal output (pick the best fit; never reword',
+    '# or round a number — "18 websites" is not "18 users"). A generic answer with no example from her products is a miss.',
     '# HER CAREER, exactly: 2011–2018 Deputy CEO for Corporate Governance & Chief Legal Officer of a ~60-person regional e-government',
     '# operator — she ran the BOARD PROCESS and the LEGAL side of moving public services online (not product delivery, not IT). 2024–2025',
     '# Operational Co-Founder of OmniBazaar. 2025– she FOUNDED AIdeazz AI Lab (never "co-founded"); she and her AI agents are one unit.',
@@ -162,10 +168,18 @@ async function digest(outPath) {
     }
     // Prefer a live deal (I act TODAY / interview stages) over a closed one.
     const live = found.filter((d) => !/closed/i.test(d.properties.dealstage || ''));
-    const pick = (live.length ? live : found)[0];
+    let pick = (live.length ? live : found)[0];
+    // --role: one company can carry several deals (Puente: seven). Take the one whose title holds the most role words.
+    const roleWords = (arg('role') || '').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2);
+    if (roleWords.length) {
+      const title = (d) => (d.properties.dealname || '').replace(/^\s*\[[^\]]*\]\s*/, '').split(' @ ')[0].toLowerCase();
+      const hits = (d) => roleWords.filter((w) => title(d).includes(w)).length;
+      const best = [...(live.length ? live : found)].sort((a, b) => hits(b) - hits(a))[0];
+      if (hits(best) > 0) pick = best;
+    }
     if (found.length > 1) {
       console.log(`${found.length} matching job deals (newest first):`);
-      for (const d of found.slice(0, 6)) console.log(`  · ${d.properties.dealname} [${d.properties.dealstage}] id=${d.id}`);
+      for (const d of found.slice(0, 12)) console.log(`  · ${d.properties.dealname} [${d.properties.dealstage}] id=${d.id}`);
       console.log('');
     }
     dealId = pick.id;
@@ -196,6 +210,19 @@ async function digest(outPath) {
     if (text.length > MAX_NOTE) cut++;
     console.log(text.length > MAX_NOTE ? `${text.slice(0, MAX_NOTE)} …[cut]` : text);
   }
+  // VERIFIED EXAMPLES (11 Oct 2026, Elena: answers must carry "examples of my true verified situations with my products").
+  // gpt-4.1 paraphrased a CV fact into a false one ("39 audits from 18 real users in one week"), while the 🛡️ line it
+  // copies verbatim never bent — so the example is copied too, from the reviewed CV bank, never re-told.
+  try {
+    const bank = require(require('path').join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'));
+    const told = (t) => t.replace(/^\*\*([^*]+?)\*\*\s*/, (m, lead) => (lead.includes(' — ') ? `${lead.split(' — ')[0]}: ` : ''));
+    // Every reviewed bullet is a true story; "six products", "five junk results" carry numbers in words, so no digit filter.
+    const ex = (bank.bullets || []).map((b) => told(String(b.text || ''))).filter(Boolean);
+    if (ex.length) {
+      console.log('\n===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):');
+      ex.forEach((t, i) => console.log(`${i + 1}. ${t}`));
+    }
+  } catch (e) { console.log(`\n(verified examples unavailable: ${e.message.slice(0, 80)})`); }
   // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
   // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
   // the deal's note count and the first words of its newest note (the top of the Notes tab).
