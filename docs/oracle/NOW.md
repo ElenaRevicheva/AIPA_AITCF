@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-11 17:30 | Film #9 v13 (Elena): dance after M5, lingerie flash, Arearea gallery shot replaces 1a (short), shorter bed/cage/jewellery shots; recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (build_cut_v13), laptop render_v13; published film NOT replaced until Elena says | 39e231d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 11 Oct — Film #9 v13 BUILT + sent for review · NOT published (published = v12 until Elena says "publish")
+- **DONE:** the dance (Arearea v4) after M5, the lingerie frame (kS3) as a 0.9 s flash after it, the Arearea gallery clip replaces 1a's
+  picture (from the rising ghost; 1a keeps "What about the painting?…" + its voice), 15 → 5.0 s, 16b → 5.0 s, 31 → 6.0 s. 2:46.
+  Laptop `render_v13\work\final.mp4` (md5 `3ed9178…`), filed `05_FILM_PREVIEW/v13_2026-10-11/`; phone copy on Telegram (`ok`).
+- **VERIFIED BY:** `check_v13.py` — 21/21 untouched shots same length, 23 stanzas/numbers unchanged, no item removed, 12 reused segments
+  byte-identical; shortest pause 0.90 s (planned 1.0; frame rounding at 9 → 10a). `typed_check` + `vault_check` pass.
+- **NEXT (Elena):** watch; "publish" = replace `atuona-2026-10-10T23-24-23.mp4` in place (same as v10/v12) + film page running time 2:46.
+- **RISK:** "hands lock the jewellery" was read as 16b (the clasp close-up), not 14 (necklace at the throat). Venice balance $0.55.
 
 ### ✅ 11 Oct — Arearea v3 + v4 (standalone): seductive, bodies moving, latest lingerie · Venice balance now $0.55
 - **v3** (Elena: v2 "better but not enough… super seductive… no flute… lingerie"): GPT Flare + Nano 2.1 REFUSED the frame (422, free);
