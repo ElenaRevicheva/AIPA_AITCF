@@ -173,7 +173,7 @@ async function makePoemCard(entries, outFile, d) {
   const rows = entries.map(e => `atuona.xyz/#p${e.num}   ${short(e.title)}`);
   const half = Math.ceil(rows.length / 2), cols = [rows.slice(0, half), rows.slice(half)];
   const size = 28, step = size + 16, top = Math.round((VH - (half * step)) / 2) + 40;
-  const hFile = outFile + '_h.txt'; fs.writeFileSync(hFile, track('poems in this film'));
+  const hFile = outFile + '_h.txt'; fs.writeFileSync(hFile, track(CUT.poem_card_title || 'poems in this film'));   // v10: 'fragments in this film'
   const CF = FLOW && TEXTFONTS ? path.join(TEXTFONTS, TD.cardHeaderFont || 'Syne-600.ttf') : MONO;   // v7: the stanza face; v8: text_design.cardHeaderFont
   let draw = `drawtext=fontfile=${fp(CF)}:textfile=${fp(hFile)}:expansion=none${TS}:fontcolor=white:fontsize=34:x=(w-text_w)/2:y=${top - 110}`;
   // v7: one drawtext per row (a multi-line textfile draws the line break as a glyph in Syne), rows in Geologica (the site's
@@ -260,7 +260,7 @@ function flowAss(stanza, d, voAt, vd, file) {
 // sets its poems in): every character has its slot from the first frame, so nothing shifts while it types.
 function termAss(stanza, poem, d, voAt, vd, file) {
   const B = String.fromCharCode(92);
-  const cmd = `PS C:${B}atuona> Get-Content .${B}p${String(poem || '').replace('#', '')}.txt`;
+  const cmd = `PS C:${B}atuona> Get-Content .${B}${TD.cmdDir || 'fragments'}${B}${String(poem || '').replace('#', '')}.txt`;
   const verse = String(stanza).replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean);
   const body = verse.length > 1 && verse.every(l => l.length <= TD.cols) && verse.length <= 5 ? verse : wrap(verse.join(' '), TD.cols, 9).split('\n');
   // every line gets one trailing slot, so the cursor always has a cell to stand in (also after the last character)
