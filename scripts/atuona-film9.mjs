@@ -547,7 +547,7 @@ async function main() {
   }
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
   }
-  fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map(p => ({ shot: p.it.sid, clip: p.it.clip, poem: p.it.poem, start: +segStart(seqOf[p.it.sid]).toFixed(2), dur: +p.d.toFixed(2), slow: +p.factor.toFixed(3), vo_at: p.vd ? +(segStart(seqOf[p.it.sid]) + LEAD).toFixed(2) : null, glitch_after: p.it.glitch_after || null })), null, 1));
+  fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map(p => ({ shot: p.it.sid, clip: p.it.clip, poem: p.it.poem, start: +segStart(seqOf[p.it.sid]).toFixed(2), dur: +p.d.toFixed(2), slow: +p.factor.toFixed(3), vo_at: p.vd ? +(segStart(seqOf[p.it.sid]) + (p.it.lead ?? LEAD)).toFixed(2) : null, glitch_after: p.it.glitch_after || null })), null, 1));
   console.log(`DONE ${final} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(1)}s, ${plan.length} shots, ${voAt.length} voice lines) — verify, then: node film9.mjs --publish`);
 }
 main().catch(e => { console.error('FAIL:', e.stderr ? String(e.stderr).slice(-800) : e.message); process.exit(1); });

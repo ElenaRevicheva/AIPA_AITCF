@@ -2,7 +2,7 @@
 the libass file the build burned in (work/flow_<sid>.ass) and check its final state: the prompt reads
 Get-Content .\\fragments\\<the shot's true fragment number>.txt and the typed text is the shot's stanza, word for word.
 (Elena: "make sure while movie will be playing real numbers of true poems with true content will be typed on the screen".)
-Usage (repo root): python docs/atuona/film9_stanza_work/typed_check.py <cut.json> <WORK dir>"""
+Usage (repo root): python docs/atuona/film9_stanza_work/typed_check.py <cut.json> <WORK dir> [<earlier WORK dirs of reused segments> ...]"""
 import json, re, sys
 BS = chr(92)
 cut = json.load(open(sys.argv[1], encoding='utf-8'))
@@ -10,9 +10,11 @@ work = sys.argv[2]
 words = lambda s: ' '.join(s.split())
 bad = 0
 for it in cut['items']:
-    if 'clip' not in it:
+    if 'clip' not in it or not it.get('stanza'):
         continue
-    ass = open(f"{work}/flow_{it['sid']}.ass", encoding='utf-8').read()
+    import os
+    src = next((w for w in [work] + sys.argv[3:] if os.path.exists(f"{w}/flow_{it['sid']}.ass")), None)   # reused segments: earlier builds
+    ass = open(f"{src}/flow_{it['sid']}.ass", encoding='utf-8').read()
     last = [l for l in ass.split('\n') if l.startswith('Dialogue: 1,')][-1].split(',,', 1)[1]
     plain = re.sub(r'\{[^}]*\}', '', last).replace(BS + 'h', ' ').replace(BS + 'N', '\n')
     n = it['poem'][1:]

@@ -21,6 +21,9 @@ check(len(same) == len(t10), f'{len(same)}/{len(t10)} shots exactly as long as i
 check('M4' in t12 and abs(t12['M4']['dur'] - 6.0) < 0.05 and t12['M4']['clip'] == 'vM4__venice-kling-o3-pro.mp4', f"M4 is a moving shot of {t12.get('M4', {}).get('dur')} s on vM4")
 check(not [i for i in cut['items'] if i.get('sid') == 'g_M4'], 'the 0.9 s M4 flash is gone')
 check(all(i.get('glitchy') == 'flow' for i in cut['items'] if 'clip' in i), 'every moving shot (M4 too) carries the flowing glitch')
+lead = {i['sid']: i.get('lead', 0.5) for i in cut['items'] if 'clip' in i}
+for t in tl:   # where the MIX starts each line (the v12 build's timeline.json recorded the global 0.5 s)
+    if t.get('vo_at') is not None: t['vo_at'] = round(t['start'] + lead[t['shot']], 2)
 voiced = [t for t in tl if t.get('vo_at') is not None]
 vd = {t['shot']: dur(f'{R12}/vo/{t["shot"]}.mp3') for t in voiced}
 pauses = [(a['shot'], b['shot'], b['vo_at'] - a['vo_at'] - vd[a['shot']]) for a, b in zip(voiced, voiced[1:])]

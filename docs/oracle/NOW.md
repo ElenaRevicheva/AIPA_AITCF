@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-11 16:45 | Film #9 v12: a pause between voice lines (video length unchanged) + M4 (Mila, blue sand) back as a moving glitchy shot, then REPUBLISH (Elena asked); Arearea stays separate | `scripts/atuona-film9.mjs`, `docs/atuona/film9_stanza_work/` (build_cut_v12), laptop render_v12; Oracle studio file (replace in place) | 0d9274d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 11 Oct — Film #9 REPUBLISHED (v12): ≥1 s pause before every voice line · Mila's blue sand moving again · lengths untouched
+- **DONE:** line starts re-planned with every shot pinned to its v10 length (3 lines ×1.03–1.14); M4 = 6 s moving glitchy shot (was a
+  0.9 s flash). Studio file replaced in place (md5 `d509…`, 2:41), film page 2:41. Record: `docs/atuona/FILM9_V12_PUBLISHED_2026-10-11.md`.
+- **VERIFIED BY:** `check_v12.py` 23/23 lengths + pauses ≥ 0.96 s (also from the real mix delays); `typed_check.py` 23/23; `vault_check.py` all match.
+- **RISK:** Arearea stays a separate standalone shot — never add it to this film. Rollback masters: v10 + v7 on the laptop.
 
 ### ✅ 11 Oct — Arearea: a STANDALONE shot, delivered to Telegram · NOT part of the ATUONA film (Elena: "do not rebuild existing Atuona movie")
 - **DONE:** research `docs/atuona/AREAREA_RESEARCH_2026-10-11.md` (sources). Shot: the opening auction-house wall now carries Arearea,

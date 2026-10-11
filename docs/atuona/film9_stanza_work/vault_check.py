@@ -10,7 +10,7 @@ key = lambda x: re.sub(r'[^a-z0-9]+', ' ', html.unescape(x).lower().replace('’
 cut = json.load(open(sys.argv[1], encoding='utf-8'))
 bad = 0
 for it in cut['items']:
-    if 'clip' not in it: continue
+    if 'clip' not in it or not it.get('stanza'): continue
     n = it['poem'][1:]; st = key(it['stanza'])
     where = [m for m, b in body.items() if st in key(b)]
     ok = n in where; bad += not ok
