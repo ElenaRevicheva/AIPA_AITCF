@@ -264,6 +264,12 @@ preference. Never let a model re-tell an incident.
 
 ## 4. Standing rules for this repo
 
+- **Elena sends a job posting by hand → it gets the SAME kit as a VJH deal. Never hand-build one.** Stage it with
+  `node scripts/stage-manual-job.cjs --url=<posting> --title="<role>" --company="<company>" [--info="…"]`, then on Oracle
+  `cd ~/cto-aipa && node scripts/hs-fill-apply-kit.cjs --apply --only=<dealId>` (run it twice: the 📋 Comet note comes on
+  the second pass, after the letter exists). Done = the deal carries 🔎 company brief (Perplexity), 🎯 role defense,
+  🛡️ technical defense + the posting-shaped CV, ✅ cover letter, 📋 Comet prompt — and `node scripts/hs-audit-apply-kit.cjs`
+  on Oracle shows the deal ✓ in every column. Read the notes back from HubSpot before saying it is done.
 - **Never `git add -A`** here — stage named files only.
 - Build locally, `scp` to Oracle, then **always `pm2 restart cto-aipa
   --update-env`**. Node caches modules; a copied file with no restart means the
