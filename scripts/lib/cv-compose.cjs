@@ -49,6 +49,22 @@ function headingOf(s) {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+/**
+ * A posting duty line is often longer than a heading should be. The first clause of a verbatim quote is still a
+ * verbatim quote, so cut at the first clause break that leaves 12-70 characters — never add a word.
+ * (First Oracle dry run, 11 Oct 2026: all four of a Chief of Staff posting's duty headings were whole sentences.)
+ */
+function fitHeading(h) {
+  const t = String(h || '').trim();
+  if (t.length <= 70) return t;
+  const head = t.slice(0, 71);
+  const breaks = [...head.matchAll(/[,:;(—–]|\s-\s/g)].map((m) => m.index).filter((i) => i >= 12);
+  if (breaks.length) return t.slice(0, breaks[breaks.length - 1]).trim();
+  const words = head.slice(0, head.lastIndexOf(' ')).trim().split(' ');
+  while (words.length && /^(the|a|an|and|or|to|of|for|with|that|in|on|by|from|as|so|your|our)$/i.test(words[words.length - 1])) words.pop();
+  return words.join(' ');
+}
+
 /** Share of a's words that already appear in b — a pitch that repeats a chosen summary line is dropped. */
 function overlap(a, b) {
   const wa = norm(a).split(' ').filter((w) => w.length > 3);
@@ -137,7 +153,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     const used = new Set();
     const sections = [];
     for (const s of Array.isArray(pick && pick.sections) ? pick.sections : []) {
-      const heading = String((s && s.heading) || '').trim();
+      const heading = fitHeading((s && s.heading) || '');
       if (heading.length < 12 || heading.length > 70) { problems.push(`heading "${heading.slice(0, 40)}" must be 12-70 characters`); continue; }
       // STRICT substring, not quotedIn(): quotedIn forgives a model-written "label:" in front of a real quote, and that
       // label would print on the CV (code review, 11 Oct 2026). Case, dashes and quote styles still do not matter.
@@ -239,4 +255,4 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
   return { spec: null, reason: lastReason || 'no usable choice' };
 }
 
-module.exports = { composeCv, loadBank, headingOf, overlap, REQUIREMENT_RE, BANK };
+module.exports = { composeCv, loadBank, bankProblem, fitHeading, headingOf, overlap, REQUIREMENT_RE, BANK };
