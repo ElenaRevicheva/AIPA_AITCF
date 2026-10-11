@@ -93,8 +93,8 @@ PAIRS = [
     ('<h3>AI Product &amp; Transformation</h3>', '<h3>Producto y transformación con IA</h3>'),
     ('<li>Prototype the experience</li><li>Connect systems &amp; deploy</li><li>Organise operations around it</li><li>Improve from evidence</li>',
      '<li>Prototipar la experiencia</li><li>Conectar sistemas y desplegar</li><li>Organizar la operación a su alrededor</li><li>Mejorar con evidencia</li>'),
-    ('in 4 weighted categories in my <a href="https://aideazz.xyz/api">AI Visibility Audit API ↗</a> — a live public product: anyone enters a website, no login, and sees how ChatGPT, Perplexity and Claude see that business.',
-     'en 4 categorías ponderadas en mi <a href="https://aideazz.xyz/api">API de auditoría de visibilidad en IA ↗</a> — un producto público en vivo: cualquiera ingresa un sitio web, sin registrarse, y ve cómo ChatGPT, Perplexity y Claude ven ese negocio.'),
+    ('of 18 websites by my <a href="https://aideazz.xyz/api">AI Visibility Audit API ↗</a> in 1–10 October alone — 18 run by people on the public page. Anyone enters a website, no login, and gets 34 checks on how ChatGPT, Perplexity and Claude see it.',
+     'de 18 sitios web con mi <a href="https://aideazz.xyz/api">API de auditoría de visibilidad en IA ↗</a> solo del 1 al 10 de octubre — 18 hechas por personas en la página pública. Cualquiera ingresa un sitio, sin registrarse, y recibe 34 controles de cómo lo ven ChatGPT, Perplexity y Claude.'),
     ('<h3>Creative AI Systems</h3>', '<h3>Sistemas creativos con IA</h3>'),
     ('<li>Concept, narrative &amp; world-building</li><li>Image · video · audio orchestration</li><li>Production pipelines</li><li>Published experiences</li>',
      '<li>Concepto, narrativa y construcción de mundos</li><li>Orquestación de imagen · video · audio</li><li>Pipelines de producción</li><li>Experiencias publicadas</li>'),
@@ -112,8 +112,8 @@ PAIRS = [
      '<div class="rt">Oportunidades procesadas</div><div class="rs">Pipeline LangGraph · decisiones humanas</div><div class="n">11,000+</div><div class="d">Aprende cada hora de las decisiones que registro en el CRM.</div><span class="tag">Descubrimiento y calificación</span>'),
     ('<div class="rt">CRM deals run by agents</div><div class="rs">HubSpot · source attribution</div><div class="n">3,000+</div><div class="d">Plus 1,200+ contacts and 1,800+ companies written in by agents. A send is refused if an attachment fails to load.</div><span class="tag">AI operations · RevOps</span>',
      '<div class="rt">Oportunidades CRM por agentes</div><div class="rs">HubSpot · atribución de origen</div><div class="n">3,000+</div><div class="d">Además, 1,200+ contactos y 1,800+ empresas registrados por agentes. Un envío se rechaza si un adjunto no carga.</div><span class="tag">Operaciones de IA · RevOps</span>'),
-    ('<div class="rt">AI-visibility audits</div><div class="rs">Public API · GEO / AEO</div><div class="n">34 checks</div><div class="d">In 4 weighted categories, with the fix for every failed check. My own hub scores 100/100.</div><span class="tag">GEO · AEO · Tech SEO</span>',
-     '<div class="rt">Auditorías de visibilidad en IA</div><div class="rs">API pública · GEO / AEO</div><div class="n">34 controles</div><div class="d">En 4 categorías ponderadas, con la corrección de cada control fallido. Mi propio sitio obtiene 100/100.</div><span class="tag">GEO · AEO · SEO técnico</span>'),
+    ('<div class="rt">AI-visibility audits</div><div class="rs">Public API · GEO / AEO</div><div class="n">39 audits</div><div class="d">Of 18 websites in 1–10 October (server logs); 18 run by people on the public page. 34 checks each; my own hub scores 100/100.</div><span class="tag">GEO · AEO · Tech SEO</span>',
+     '<div class="rt">Auditorías de visibilidad en IA</div><div class="rs">API pública · GEO / AEO</div><div class="n">39</div><div class="d">Auditorías de 18 sitios web, 1–10 de octubre (registros del servidor); 18 por personas en la página pública. Mi sitio: 100/100.</div><span class="tag">GEO · AEO · SEO técnico</span>'),
     ('<div class="rt">AI film-making machinery</div><div class="rs">ATUONA AI Film Studio</div><div class="n">9 films</div><div class="d"><i>Crimson Escape</i>: 3:36, 16 generated shots, mixed to broadcast loudness (−16 LUFS).</div><span class="tag">Creative AI production</span>',
      '<div class="rt">Maquinaria de cine con IA</div><div class="rs">ATUONA AI Film Studio</div><div class="n">9 películas</div><div class="d"><i>Crimson Escape</i>: 3:36, 16 tomas generadas, mezcla a sonoridad de transmisión (−16 LUFS).</div><span class="tag">Producción creativa con IA</span>'),
     ('<div class="rt">Automated tests</div><div class="rs">Unit · integration · golden set</div><div class="n">600+</div><div class="d">Unit, integration and golden-set tests, plus a 5-provider LLM fallback chain.</div><span class="tag">Reliability &amp; evaluation</span>',
@@ -202,7 +202,7 @@ PAIRS = [
     # portfolio links open the Spanish site
     ('href="https://aideazz.xyz/portfolio"', 'href="https://aideazz.xyz/portfolio?lng=es"'),
     # general figure labels LAST: the slide-5 tile pairs above must see the English first (11 Oct 2026)
-    ('<div class="n">34 checks</div>', '<div class="n">34 controles</div>'),
+    ('<div class="n">39 audits</div>', '<div class="n">39 auditorías</div>'),
     ('<div class="n">9 films</div>', '<div class="n">9 películas</div>'),
 ]
 
