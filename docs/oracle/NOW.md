@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (CV) | 2026-10-11 12:05 | (1) Puente **Product Manager** CV by the 6 Oct recipe; (2) **Elena's go 11 Oct: kit makes CVs the same way** — CV bank of reviewed bullets, model only picks posting headings + bank bullets (🎯 gates), then rebuild the CV on the 8 I-Act-TODAY job deals | `docs/applications/cv-by-job/puente-product-manager/`; kit: `scripts/hs-fill-apply-kit.cjs`, `scripts/lib/job-tailor.cjs`, `scripts/build-lane-cv.cjs`, `scripts/hs-audit-apply-kit.cjs`, `scripts/hs-attach-cv.cjs`, new `scripts/lib/cv-compose.cjs` + `docs/applications/cv-bank.json`; same files on Oracle (deployed 12:40 UTC, md5 = main); HubSpot CV attachments on the I-Act-TODAY job deals (ADDITIVE only). (3) Professional Outlook wording + every figure re-verified from live logs: `docs/applications/professional-outlook/`, aideazz `public/Elena_Revicheva_Professional_Outlook_2026*.pdf` | 9292dcf |
 | Claude Code | 2026-10-11 13:00 | Film #9 Arearea final shot (Elena, separate task): local still-motion + drain dissolve, shot A for cut_v11; NOT published until she sees it | Oracle `~/atuona-film9/plan.json` (kA*/vA* added, backup `plan.json.bak-arearea-*`), `img/kA*.jpg`; laptop `render_v11`, `arearea/` | 1bcbe13 |
 
 **Rules**
@@ -131,6 +130,23 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 11 Oct — Kit builds CVs the 5–6 Oct way · Puente PM CV · Outlook polished + Resume button (Elena's go; claim released)
+- **DONE:** (1) Puente PM CV by the 6 Oct recipe → `docs/applications/2026-10-11_puente_product_manager_APPLICATION.md` (form has a
+  hidden "Company website" bot-trap — never fill). (2) Kit: `scripts/lib/cv-compose.cjs` + `docs/applications/cv-bank.json` — model
+  only picks posting-duty headings + reviewed lines, gpt-5 judges every one; ONE role (tagline = posting duties; no Outlook paragraph,
+  no method block). ADDITIVE ONLY: new CV added next to old ones + "📎 CV FOR THIS POSTING … use this one" line on top; notes backed up
+  to `~/_session-backups/apply-kit-cv/`. On Oracle, md5 = main. Shaped: SIPEngines PM-AI. Chief of Staff carries a ⚠️ line (honest CoS
+  CV not possible from reviewed lines — hand-build or skip). Kept as is (honest gap): Addi, Puente Impl/Solutions, TAM, RevOps; Clara
+  posting unreadable. (3) Outlook: Elena's wording + API/Atlas links + every figure re-proven 11 Oct (91 claims, 27 fixed); aideazz
+  `8310da8` — portfolio **Resume** button opens the Outlook (EN/ES).
+- **NEXT (Elena):** apply to Puente PM with its CV; decide Chief of Staff (hand-build from the FA CV or skip).
+- **VERIFIED BY:** `node scripts/hs-audit-apply-kit.cjs` on Oracle → `9 job deals · complete 4 · gaps 5`; HubSpot read-back md5 =
+  built PDF (PM 0fe684a0…, SIP 27467b83…); aideazz.xyz serves both PDFs md5-equal at 13:17 UTC; site JS has `Professional_Outlook_2026*.pdf?v=20261011`.
+- **RISK:** `--backfill-cv` / `--recompose` are hand-only (model spend). Moving a kit PDF out of `cv-by-job/auto/` makes the guard treat
+  it as hand-built. CV bank + CVs still say "420+ audits / 210+ sites" (counted 28–29 Sep; logs now rotated — only 39 / 18 provable since
+  2 Oct). Outlook dropped them; CVs not yet — Elena's call. The CoS ✓CV in the audit is overridden by the ⚠️ line on the note.
+
 
 ### ✅ 11 Oct — Film #9 REPUBLISHED (v10): stanzas typed like a PowerShell session · true fragment numbers proven · Arearea next
 - **DONE:** `Get-Content .\fragments\NNN.txt` + the stanza typed with the narrator, crimson block cursor, JetBrains Mono; "fragments"
