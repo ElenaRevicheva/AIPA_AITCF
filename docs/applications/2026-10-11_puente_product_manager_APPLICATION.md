@@ -17,8 +17,10 @@ paragraphs, "…the films they make" in the summary, Deputy CEO on page 2, and t
 
 Built by the 5–6 Oct recipe (Supabase v3, Puente Founder's Associate / AI Ops Lead): the posting's own duties as headings
 (specs → roadmap → problems from data → outcome measurement → speed vs quality), only facts that already passed review, then a
-3-reviewer check. On BOTH notes that carried a CV (✅/letter note and 🛡️ note); HubSpot file md5 = local `0fe684a0…`.
-Old CVs only detached, not deleted — backups: `C:\Users\kirav\_session-backups\puente-pm-cv-20261011\`.
+3-reviewer check. ADDED to both notes that carry a CV (✅/letter note and 🛡️ note), next to the older CVs, which stay
+attached (Elena 11 Oct: additive only — a first swap that unhooked them was reversed the same hour from the backup). The 🛡️
+note's new "📎 CV FOR THIS POSTING … use this one" line sits above its original line. HubSpot file md5 = local `0fe684a0…`.
+Backups: `C:\Users\kirav\_session-backups\puente-pm-cv-20261011\`.
 
 | Reviewer | Verdict | What changed because of it |
 |---|---|---|
