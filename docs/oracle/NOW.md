@@ -164,6 +164,7 @@ git log keeps the record.
 - **Audit figure (Elena 11 Oct):** "420+ audits / 210+ sites" and "48 audits / 16 sites" are no longer provable — PM2 logs before 1 Oct were
   deleted by `pm2-logrotate retain 10` (set 28 Sep). Outlook, CV bank, Puente PM v2 and SIPEngines v2 now say **39 audits of 18 websites,
   1–10 Oct, 18 by people on the public page**. Already-sent CVs stay as they are.
+- **Shared working tree, 11 Oct:** commit `f7a10c5` (Cursor rule) also carried the film session's staged `scripts/atuona-film9-gen.mjs` (Venice price-table corrections). Nothing lost — it is on main. Agents sharing this folder: commit with `git commit -- <paths>` so another session's staged files never ride along.
 - **Logs (Elena 11 Oct: "stick to the 9 Oct approach — don't waste Oracle space"):** Oracle keeps its short windows (pm2 retain 10,
   journal 1 GB, app logs rotate 4). Everything that existed on 11 Oct is on the laptop, md5-verified:
   `D:\aideazz\_private-backups\pm2-logs-keep-20261011\` + `logs-keep-20261011\` (journal export back to 22 Sep). To keep history, run
