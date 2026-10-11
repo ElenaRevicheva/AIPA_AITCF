@@ -252,6 +252,76 @@ function flowAss(stanza, d, voAt, vd, file) {
   return file;
 }
 
+// v9 (Elena, 11 Oct: "it looks generic. it should be like somebody is coding on powershell"): text_design.mode = 'terminal'.
+// Each stanza is typed into a PowerShell session at the bottom-left of the frame: a dim prompt line with a real cmdlet,
+// `PS C:\atuona> Get-Content .\p054.txt`, typed fast in the shot's first half second, then the stanza itself typed
+// character by character IN STEP WITH THE NARRATOR (a human rhythm: spaces quicker, a beat after punctuation), a crimson
+// block cursor at the typing head that keeps blinking when the stanza is done. Monospace (JetBrains Mono, the face the vault
+// sets its poems in): every character has its slot from the first frame, so nothing shifts while it types.
+function termAss(stanza, poem, d, voAt, vd, file) {
+  const B = String.fromCharCode(92);
+  const cmd = `PS C:${B}atuona> Get-Content .${B}p${String(poem || '').replace('#', '')}.txt`;
+  const verse = String(stanza).replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean);
+  const body = verse.length > 1 && verse.every(l => l.length <= TD.cols) && verse.length <= 5 ? verse : wrap(verse.join(' '), TD.cols, 9).split('\n');
+  // every line gets one trailing slot, so the cursor always has a cell to stand in (also after the last character)
+  const lines = [cmd, ...body].map(l => [...l, ' ']);
+  const cells = []; lines.forEach((l, li) => l.forEach((ch, ci) => cells.push({ li, ci, ch, slot: ci === l.length - 1, role: li === 0 ? (ci < 14 ? 'prompt' : 'cmd') : 'out' })));
+  const typeable = cells.filter(c => !c.slot);
+  const jitter = i => 0.75 + 0.5 * (Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1);
+  const w = c => (c.ch === ' ' ? 0.55 : /[.,;:!?—–-]/.test(c.ch) ? 2.2 : 1);
+  const cmdCells = typeable.filter(c => c.li === 0), outCells = typeable.filter(c => c.li > 0);
+  const schedule = (list, t0, span) => { const ws = list.map((c, i) => w(c) * jitter(i)); const tot = ws.reduce((a, b) => a + b, 0); let acc = 0; list.forEach((c, i) => { c.t = t0 + span * acc / tot; acc += ws[i]; }); };
+  schedule(cmdCells, 0.06, Math.max(0.3, Math.min(0.9, (vd ? voAt : 0.5) - 0.12)));
+  schedule(outCells, vd ? voAt : 0.6, vd ? Math.max(0.6, vd * 0.95) : Math.min(2.5, d * 0.45));
+  const col = { prompt: TD.promptColour, cmd: TD.cmdColour, out: TD.outColour || TD.colour };
+  // the text of one frame-state: cells before `head` typed, the cell at `head` = cursor (or blank when it blinks off)
+  const state = (head, cursorOn, layer) => {
+    let out = '', cur = null;
+    cells.forEach((c, i) => {
+      if (i > 0 && c.ci === 0) { out += B + 'N'; cur = null; }
+      const typed = i < head && !c.slot, isCur = i === head;
+      let tag, ch = c.ch;
+      if (isCur && cursorOn) { tag = layer === 'Shade' ? `${B}alpha${TD.shadeAlpha}` : `${B}alpha&H00&${B}c${TD.cursorColour}`; ch = TD.cursorChar; }
+      else if (typed) tag = layer === 'Shade' ? `${B}alpha${TD.shadeAlpha}` : `${B}alpha&H00&${B}c${col[c.role]}`;
+      else tag = `${B}alpha&HFF&`;
+      if (tag !== cur) { out += `{${tag}}`; cur = tag; }
+      out += ch === ' ' ? B + 'h' : ch.replace(/[{}]/g, '');
+    });
+    return out;
+  };
+  const order = cells.map((c, i) => i).filter(i => !cells[i].slot);   // typing order = reading order
+  const times = order.map(i => cells[i].t);
+  const ev = [];
+  const push = (t0, t1, head, on, extra = '') => {
+    if (t1 - t0 < 0.02) return;
+    for (const layer of TD.shade ? ['Shade', 'Term'] : ['Term'])
+      ev.push(`Dialogue: ${layer === 'Shade' ? 0 : 1},${assTime(t0)},${assTime(t1)},${layer},,0,0,0,,{${B}pos(${TD.x},${TD.y})${layer === 'Shade' ? `${B}blur${TD.shade.blur}${B}bord${TD.shade.bord}` : ''}${extra}}` + state(head, on, layer));
+  };
+  // before the first keystroke: the cursor blinks on an empty prompt
+  push(0, times[0], 0, true);
+  for (let k = 0; k < order.length; k++) {
+    const t0 = times[k], t1 = k + 1 < order.length ? times[k + 1] : t0 + 0.12;
+    // the head after typing cell order[k]: the next cell in reading order (a slot at the end of a line, or the next char)
+    push(t0, t1, order[k] + 1, true);
+  }
+  // done: the cursor blinks after the last character until the shot ends; the whole block fades with the last blink
+  const doneAt = times[times.length - 1] + 0.12, headEnd = order[order.length - 1] + 1, end = d - 0.1;
+  for (let t = doneAt, on = true; t < end; t += 0.5, on = !on) {
+    const last = t + 0.5 >= end;
+    push(t, Math.min(end, t + 0.5), headEnd, on, last ? `${B}fad(0,450)` : '');
+  }
+  const st = (name, colour, outline, outlineColour) =>
+    `Style: ${name},${TD.font},${TD.size},${colour},${colour},${outlineColour},&H00000000,0,0,0,0,100,100,0,0,1,${outline},0,1,0,0,0,1`;
+  const head = ['[Script Info]', 'ScriptType: v4.00+', `PlayResX: ${VW}`, `PlayResY: ${VH}`, 'WrapStyle: 2', 'ScaledBorderAndShadow: yes', '',
+    '[V4+ Styles]',
+    'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
+    st('Term', TD.colour, TD.outline || 0, TD.outlineColour || '&H00000000'),
+    ...(TD.shade ? [st('Shade', '&H00000000', TD.shade.bord, '&H00000000')] : []),
+    '', '[Events]', 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'];
+  fs.writeFileSync(file, [...head, ...ev, ''].join('\n'));
+  return file;
+}
+
 const clipPath = it => path.join(CLIPS, it.clip);
 const voPath = it => path.join(VODIR, `${it.sid}.mp3`);
 
@@ -311,7 +381,7 @@ async function main() {
     const { it } = p, out = path.join(W, `${PREVIEW ? 'pv_' : ''}seg_${it.sid}.mp4`);
     if (reuse && !reseg.includes(it.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segOf[it.sid] = out; return; }
     const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, it.stanza ? spread(it.stanza) : '');
-    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
+    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(TD.mode === 'terminal' ? termAss(it.stanza, it.poem, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
     const interp = !PREVIEW && p.factor >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
     const slow = `setpts=${p.factor.toFixed(5)}*(PTS-STARTPTS),${interp}`;
     const args = ['-y', ...(p.ss ? ['-ss', p.ss.toFixed(2)] : []), '-t', p.src.toFixed(3), '-i', clipPath(it)];
