@@ -129,7 +129,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     'You arrange a CV for ONE job from a BANK of checked lines. You never write CV text: you only choose ids and headings.',
     'HEADINGS: choose 3-5 headings for her current role. Copy each WORD FOR WORD from one line of the POSTING that describes the WORK of the job (what the person will do, own or deliver) — a contiguous piece of that line, 12-70 characters.',
     'Never use a requirement as a heading (years of experience, a degree, a language level, a certificate, a tool she must already know): every line under a heading claims she has done that work.',
-    'Under each heading put 2-4 BULLET ids that SHOW her doing exactly that work, the strongest first. Each id at most once; 9-14 bullets in total. If no bullet shows a duty, leave the duty out — never stretch a line to fit.',
+    'Under each heading put 2-4 BULLET ids that SHOW her doing exactly that work, the strongest first. Each id at most once; 7-14 bullets in total. If no bullet shows a duty, leave the duty out — never stretch a line to fit.',
     'Also choose: summary 2-3 ids (most relevant first); chips 5-7 ids; tagline 4-6 ids; steps 1 id; intro 1 id; live 4-6 ids; omnibazaar 0-2 ids; egov 1-3 ids. Prefer what THIS posting asks for.',
     'Return one JSON object only.',
   ].join('\n');
@@ -167,18 +167,19 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       if (ids.length) sections.push({ heading: headingOf(heading), ids });
     }
     const total = sections.reduce((n, s) => n + s.ids.length, 0);
-    if (sections.length < 3 || total < 8) problems.push(`only ${sections.length} usable sections / ${total} bullets — need 3-5 sections and 9-14 bullets`);
+    if (sections.length < 3 || total < 7) problems.push(`only ${sections.length} usable sections / ${total} bullets — need 3-5 sections and 7-14 bullets`);
     if (problems.length) { lastReason = problems.slice(0, 4).join('; '); log(`  ↺ compose attempt ${attempt + 1}: ${lastReason}`); continue; }
 
     // ── independent review (the 6 Oct recruiter + skeptic lenses; fact-trace is guaranteed by the bank) ──
     let kept = sections;
     let reviewer = '';
+    let fitNote = '';
     try {
       const revSys = [
         'You review a CV assembled for one job. Every line under a heading claims the candidate did that heading\'s work.',
         'For EACH line: supported=true only if the line itself shows her doing the work its heading names. A related skill, or the same tool used for something else, is NOT support.',
         'For EACH heading: ok=false if it is a requirement (years, degree, language level, credential) rather than a duty of the job, or if it names a way of working that its lines do not show — e.g. "with engineering and design" or "with customers" when no line shows her working with human engineers, designers or customers.',
-        `Finally: does the whole CV read as a CV for "${title}"? Answer reads_as true/false with one short reason.`,
+        `Finally: does the whole CV read as a CV for "${title}"? Answer reads_as true/false with one short reason. This is a note for the candidate, not a verdict on her: gaps in her experience are covered by her honest-gap answers elsewhere.`,
         'Return JSON only.',
       ].join('\n');
       const revUser = [
@@ -207,9 +208,13 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       const left = kept.reduce((n, s) => n + s.ids.length, 0);
       const dropped = [...badLine].map((id) => `${id} (${(lines.find((l) => String(l.id) === id) || {}).why || ''})`.slice(0, 90));
       if (dropped.length || badHead.size) log(`  ✂ review dropped ${badHead.size} heading(s), ${dropped.length} line(s): ${dropped.slice(0, 3).join('; ')}`);
-      if (kept.length < 3 || left < 7 || rj.reads_as !== true) {
-        lastReason = `the reviewer rejected it: ${rj.reads_as === false ? `does not read as a ${title} CV (${rj.reads_as_why || ''}); ` : ''}`
-          + `${dropped.slice(0, 3).join('; ')}. Choose lines that show each duty`;
+      // reads_as is the recruiter lens of the 6 Oct recipe: it informs, it does not veto. Those reviewers fixed lines
+      // and still shipped a "borderline" PM CV with its gaps written down; the first Oracle dry run (11 Oct) showed a
+      // veto here refusing every role she is not a perfect fit for. What gates is honesty: the lines that survive.
+      if (rj.reads_as === false) log(`  ⓘ reviewer fit note: ${String(rj.reads_as_why || '').slice(0, 160)}`);
+      fitNote = rj.reads_as === false ? String(rj.reads_as_why || '').slice(0, 300) : '';
+      if (kept.length < 3 || left < 7) {
+        lastReason = `too few lines survived the review: ${dropped.slice(0, 3).join('; ')}. Choose lines that show each duty`;
         log(`  ↺ compose attempt ${attempt + 1}: ${lastReason.slice(0, 200)}`);
         continue;
       }
@@ -248,7 +253,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       education: bank.education,
       languages: bank.languages,
       note: bank.figures_note,
-      _composed: { provider, reviewer, ids: kept.map((s) => s.ids) },
+      _composed: { provider, reviewer, ids: kept.map((s) => s.ids), fit_note: fitNote },
     };
     return { spec, provider: `${provider} + review ${reviewer}` };
   }
