@@ -117,6 +117,13 @@ async function digest(outPath) {
     '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, run that command FIRST. Your first line must be the',
     '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly.',
     '# If you did not run it in this turn, or that line is missing, your first line is "⚠️ Deal NOT fully loaded" — never guess it.',
+    '# LIVE RULE (Elena, 11 Oct 2026): if she pastes an INTERVIEWER\'S question (not her answer to your mock question), reply',
+    '# "🔴 LIVE — say this:" + ONE first-person answer, 3–5 sentences, true facts from the deal only — no other sections, no next',
+    '# question, no voice note. FACTS always: titles exactly "Deputy CEO for Corporate Governance & Chief Legal Officer" (never',
+    '# "CEO"); AI agents implement, she decides requirements and tests; no metric she does not have (conversions, revenue, hours).',
+    '# HER CAREER, exactly: 2011–2018 Deputy CEO for Corporate Governance & Chief Legal Officer of a ~60-person regional e-government',
+    '# operator — she ran the BOARD PROCESS and the LEGAL side of moving public services online (not product delivery, not IT). 2024–2025',
+    '# Operational Co-Founder of OmniBazaar. 2025– she FOUNDED AIdeazz AI Lab (never "co-founded"); she and her AI agents are one unit.',
     '',
   ].join('\n');
   let body = head;
