@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-11 21:30 | Film #9 AREAREA v16 (Elena): M4 + 31 shorter, new shorter stanza on 31, shot 9 stanza about Atuona (not Panama); recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (build_cut_v16), laptop render_v16, 2 new onyx takes | 46bdb286 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
