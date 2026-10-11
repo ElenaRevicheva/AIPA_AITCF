@@ -58,7 +58,11 @@ function fitHeading(h) {
   const t = String(h || '').trim();
   if (t.length <= 70) return t;
   const head = t.slice(0, 71);
-  const breaks = [...head.matchAll(/[,:;(—–]|\s-\s/g)].map((m) => m.index).filter((i) => i >= 12);
+  // A cut inside brackets leaves "(adoption, accuracy/quality" with no ")" (SIPEngines, 11 Oct): never break
+  // after an unclosed "(" — cut before it instead.
+  const open = head.indexOf('(');
+  const breaks = [...head.matchAll(/[,:;(—–]|\s-\s/g)].map((m) => m.index)
+    .filter((i) => i >= 12 && (open < 0 || i <= open));
   if (breaks.length) return t.slice(0, breaks[breaks.length - 1]).trim();
   const words = head.slice(0, head.lastIndexOf(' ')).trim().split(' ');
   while (words.length && /^(the|a|an|and|or|to|of|for|with|that|in|on|by|from|as|so|your|our)$/i.test(words[words.length - 1])) words.pop();
@@ -230,7 +234,9 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     };
     const summary = take(P.summary, pick.summary, 3, 2).map((x) => x.text);
     const lead = String(pitch || '').replace(/\s+/g, ' ').trim();
-    if (lead && !describesHerAlone(lead) && summary.every((s) => overlap(lead, s) < 0.6)) summary.unshift(lead);
+    // 0.4, not 0.6: the SIPEngines CV printed "requirements, architecture, orchestration…" in the pitch AND in a
+    // chosen summary paragraph (11 Oct) — half the pitch's words repeated is already a repeat.
+    if (lead && !describesHerAlone(lead) && overlap(lead, summary.join(' ')) < 0.4) summary.unshift(lead);
     const steps = P.steps[pick.steps] || Object.values(P.steps).find((s) => s.lanes && s.lanes.includes(lane)) || Object.values(P.steps)[0];
     const egov = take(P.egov, pick.egov, 3, 1);
     const spec = {
