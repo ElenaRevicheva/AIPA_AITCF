@@ -46,11 +46,19 @@ const RULES_PATH = path.join(CV_DIR, 'lanes.json');
 async function hs(method, urlPath, body) {
   // hs-env exports these as FUNCTIONS, not values — interpolating them directly puts the
   // function source into the URL and fetch fails with an unhelpful "Invalid URL".
-  const res = await fetch(`${hubspotBase()}${urlPath}`, {
-    method,
-    headers: { Authorization: `Bearer ${hubspotKey()}`, 'Content-Type': 'application/json' },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  // 11 Oct 2026: this runs straight after the kit in the same cron line, so HubSpot's rate limit (429) is
+  // likely — wait and retry like the kit does, instead of reporting the deal as failed.
+  let res;
+  for (let attempt = 0; ; attempt++) {
+    res = await fetch(`${hubspotBase()}${urlPath}`, {
+      method,
+      headers: { Authorization: `Bearer ${hubspotKey()}`, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (res.status !== 429 || attempt >= 4) break;
+    await res.text();
+    await new Promise((r) => setTimeout(r, Number(res.headers.get('retry-after')) * 1000 || 1500 * (attempt + 1)));
+  }
   const text = await res.text();
   let json = null;
   try { json = JSON.parse(text); } catch { /* non-json error body */ }
