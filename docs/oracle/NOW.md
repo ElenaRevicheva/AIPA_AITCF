@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (CV) | 2026-10-11 11:34 | Puente **Product Manager** deal: the kit's "tailored" CV is the AI-builder CV with a PM headline — build a real PM CV from verified facts, replace it on the deal's notes | new `docs/applications/cv-by-job/puente-product-manager/`; HubSpot notes on the Puente PM deal (attachments only). NOT the kit code. | 2f5b931 |
 | Claude Code | 2026-10-11 11:20 | Film #9 v8: thinner underground stanza type (Elena: Syne looks cartoonish), re-render, replace the published master in place; ATUONA sheet stills removed (atuona cbb28315, done) | `scripts/atuona-film9.mjs` (flow text style), laptop render_v8; Oracle `films/out/atuona-2026-10-10T23-24-23.mp4` (replace in place); atuona still-1 poster | 8a3fa58 |
 
 **Rules**
