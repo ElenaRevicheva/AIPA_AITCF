@@ -56,6 +56,16 @@ async function hs(method, urlPath, body) {
   }
 }
 
+// 11 Oct 2026: a CV made by hand (the 5–6 Oct recipe) is the gold standard, not a gap. Any non-lane CV that the kit
+// did not build (its PDFs live in cv-by-job/auto/; uploadCv may add "_<4 digits>") is hand-built — same rule as the kit.
+const KIT_CVS = (() => {
+  try {
+    return new Set(fs.readdirSync(path.join(__dirname, '..', 'docs', 'applications', 'cv-by-job', 'auto'))
+      .filter((f) => f.endsWith('.pdf')).map((f) => f.toLowerCase()));
+  } catch { return new Set(); }
+})();
+const isKitCv = (fname) => KIT_CVS.has(fname) || KIT_CVS.has(fname.replace(/_\d{4}\.pdf$/, '.pdf'));
+
 function stripHtml(s) {
   return String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -63,7 +73,7 @@ function stripHtml(s) {
 async function auditDeal(d) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId);
-  let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false, shaped = false;
+  let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false, shaped = false, handBuilt = '';
   const notes = [];
   for (const id of ids) notes.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`));
   if (!isJobDeal(d.properties.dealname, notes.map((n) => n.properties?.hs_note_body))) return null;
@@ -83,11 +93,14 @@ async function auditDeal(d) {
     for (const fid of String(n.properties?.hs_attachment_ids || '').split(';').filter(Boolean)) {
       const f = await hs('GET', `/files/v3/files/${fid}`);
       const fname = `${f.name}.${String(f.extension).toLowerCase()}`;
-      if (/^CV_/i.test(fname) && fname.endsWith('.pdf') && !LANE_CVS.has(fname.toLowerCase())) { cv = true; cvName = fname; }
+      if (/^CV_/i.test(fname) && fname.endsWith('.pdf') && !LANE_CVS.has(fname.toLowerCase())) {
+        cv = true; cvName = fname;
+        if (!isKitCv(fname.toLowerCase())) handBuilt = fname;
+      }
     }
   }
-  if (cv && !shaped) cvName = `${cvName} (not shaped to the posting)`;
-  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && shaped, cvName, link, defense, role, comet };
+  if (cv && !shaped) cvName = handBuilt ? `${handBuilt} (hand-built)` : `${cvName} (not shaped to the posting)`;
+  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt), cvName, link, defense, role, comet };
 }
 
 async function telegram(text) {
