@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-11 20:45 | Film #9 v14 (Elena approved): v13 + regraded 24b + bed shot 31 -> 5.6 s; recompile + REPUBLISH in place | `docs/atuona/film9_stanza_work/` (build_cut_v14), laptop render_v14; Oracle studio file (replace); atuona film page time | 5f5fe6c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 11 Oct — Film #9 is now "AREAREA" · PUBLISHED (v15) · 2:44 · https://atuona.xyz/aifilmstudio/arearea/
+- **DONE:** v13 edits (dance after M5, lingerie flash, Arearea gallery shot as 1a, 15/16b shorter) + v14 (24b regraded on the laptop:
+  crimson under-light, red "other Ule", heartbeat; 31 → 5.6 s) + v15 title AREAREA. Studio file `arearea-2026-10-11T20-16-33.mp4`
+  (md5 `d065076e…`, 271.7 MB). The old `atuona-2026-10-10T23-24-23.mp4` (v12) moved to `data/atuona/films/archive/` (kept, md5 intact).
+  Film page `/aifilmstudio/arearea/` (atuona `eed6559d`); `/aifilmstudio/atuona/` redirects there. Phone copy on Telegram.
+- **VERIFIED BY:** check_v14 on v15 (24/24 lengths, stanzas, 23 reused segments identical), typed_check + vault_check pass; feed lists
+  Arearea first; film URL 200 exact length; new page live, old page redirect live.
+- **RISK:** shortest pause 0.90 s (9 → 10a). Venice balance $0.55. The closing card still says ATUONA (the gallery) by design.
 
 ### ⏳ 11 Oct — Film #9 v13 BUILT + sent for review · NOT published (published = v12 until Elena says "publish")
 - **DONE:** the dance (Arearea v4) after M5, the lingerie frame (kS3) as a 0.9 s flash after it, the Arearea gallery clip replaces 1a's
