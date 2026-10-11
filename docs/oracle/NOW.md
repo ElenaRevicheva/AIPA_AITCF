@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-11 21:30 | Film #9 AREAREA v16 (Elena): M4 + 31 shorter, new shorter stanza on 31, shot 9 stanza about Atuona (not Panama); recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (build_cut_v16), laptop render_v16, 2 new onyx takes | 46bdb286 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 11 Oct — AREAREA REPUBLISHED (v16, 2:41): M4 4.5 s · bed 31 4.2 s + new stanza · shot 9 says Atuona, not Panama
+- **DONE:** 31 = "The air between them thickens." (#083), 9 = "Morning in Atuona doesn't begin with light. / It begins with scent."
+  (#068); new onyx takes (whisper: 31 exact; 9 heard "Mourning…Atuana" = homophone/name). End card + film page list the 19 quoted
+  fragments (#065, #089 left). Studio file replaced in place (`arearea-2026-10-11T20-16-33.mp4`, md5 `79026e03…`); page 2:41 (atuona
+  `22367387`); phone copy on Telegram. Filed `05_FILM_PREVIEW/v16_AREAREA_2026-10-11/`.
+- **VERIFIED BY:** `check_v16.py` ALL PASS (23/23 other shots same length, only 9/31 stanzas changed, 22 reused segments identical, end
+  card = quoted fragments, shortest pause 0.91 s); typed_check + vault_check pass; page live with 19 links.
 
 ### ✅ 11 Oct — Film #9 is now "AREAREA" · PUBLISHED (v15) · 2:44 · https://atuona.xyz/aifilmstudio/arearea/
 - **DONE:** v13 edits (dance after M5, lingerie flash, Arearea gallery shot as 1a, 15/16b shorter) + v14 (24b regraded on the laptop:
