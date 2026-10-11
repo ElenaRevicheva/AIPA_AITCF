@@ -20,6 +20,12 @@ alwaysApply: true
 node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim(); if(!k) throw new Error('HUBSPOT_API_KEY missing in .env'); console.log('HubSpot key present');"
 ```
 
+## A job posting Elena sends by hand — same kit as a VJH deal (mirrors CLAUDE.md §4)
+
+- Never hand-build the CV, letter or defense. Stage: `node scripts/stage-manual-job.cjs --url=<posting> --title="<role>" --company="<company>" [--info="…"]`
+- Then on Oracle: `cd ~/cto-aipa && node scripts/hs-fill-apply-kit.cjs --apply --only=<dealId>` — twice (the 📋 Comet note comes on the second pass).
+- Done = 🔎 company brief (Perplexity) · 🎯 role defense · 🛡️ technical defense + posting-shaped CV · ✅ cover letter · 📋 Comet prompt, and `node scripts/hs-audit-apply-kit.cjs` on Oracle shows the deal ✓ in every column. Read the notes back from HubSpot first.
+
 ## Manual Prospect Play shortcuts
 
 - Playbook: `docs/selling/MANUAL_PROSPECT_PLAY.md`

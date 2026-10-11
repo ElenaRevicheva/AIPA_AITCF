@@ -183,10 +183,11 @@ const resolveImg = async ref => upload(path.join(BASE, 'img', ref.endsWith('.jpg
 const VENICE_IMAGE = {
   'flux-2-max-edit': n => 0.12 + 0.035 * Math.max(0, n - 1),
   'gpt-image-2-5-flare-edit': n => 0.15 + 0.01 * Math.max(0, n - 1),
-  'nano-banana-pro-edit': () => 0.23, 'flux-3-image-edit': () => 0.145,   // 2K, Venice /models 6 Oct 2026
+  'nano-banana-pro-edit': () => 0.23, 'flux-3-image-edit': () => 0.29,   // 2K; flux-3 corrected 11 Oct (Venice /models: 2K $0.29)
+  'nano-banana-2-1-edit': () => 0.14,   // 11 Oct 2026, Venice /models: 2K $0.14
   'grok-imagine-quality-edit': n => 0.09 + 0.012 * n,
   'qwen-edit-uncensored': () => 0.04,
-  'seedream-v5-pro-edit': () => 0.08,   // Venice /models 7 Oct 2026: $0.06 inpaint, rounded up
+  'seedream-v5-pro-edit': n => 0.11 + 0.0035 * Math.max(0, n - 1),   // 11 Oct 2026 corrected: 2K $0.11 + $0.00345 per extra image (was 0.08 = the 1K price)
   'firered-image-edit': () => 0.05,
   'seedream-v5-pro': () => 0.11, 'qwen-image-3-pro': () => 0.09, 'flux-2-max': () => 0.09, 'nano-banana-pro': () => 0.23,
 };
