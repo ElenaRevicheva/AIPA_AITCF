@@ -130,6 +130,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 11 Oct — Arearea v3 + v4 (standalone): seductive, bodies moving, latest lingerie · Venice balance now $0.55
+- **v3** (Elena: v2 "better but not enough… super seductive… no flute… lingerie"): GPT Flare + Nano 2.1 REFUSED the frame (422, free);
+  Elena chose the same brief on Seedream v5 Pro → kS3 (Kira black lace + crimson silk robe, Mila white lace) → Kling O3 4K clip vkS3
+  ($4.62, raw, not finished — she then asked for something different).
+- **v4 THE DANCE** (Elena: "absolutely different… bodies moving… latest trendy lingerie"): kD1 (Seedream) → Kling O3 Pro vkD1 ($1.54):
+  two women dancing in Arearea's colours (Kira sheer black mesh bodysuit + satin corset belt, Mila ivory satin corset set, red idol,
+  red haze, wet colour floor), finished with the flowing glitch + music C, NO text yet. Sent to Telegram (`ok`).
+  Filed `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\11_AREAREA_2026-10-11\v3\`, `\v4\` (md5).
+- **Venice balance (live API): $0.55** — no more Venice video until topped up. Kira's face drifts in vkD1's last seconds (curlier, broader smile).
+- **NEXT (Elena):** keep v4? add #087 typed over it? top up Venice for a 4K pass?
+
 ### ✅ 11 Oct — Arearea v2 (standalone, NOT in the ATUONA film): Gauguin restaged as a living night · newest Venice models · sent to Telegram
 - **DONE:** Elena called v1 (gallery wall + local ghost) ugly → v2: Kira in white looking at us, Mila with a bamboo flute, idol in red
   light, wet-paint vermilion/yellow/emerald ground, no sky; the red dog only as a shapeless orange haze. 3-model frame bake-off
