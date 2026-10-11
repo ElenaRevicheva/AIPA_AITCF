@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-11 17:30 | Film #9 v13 (Elena): dance after M5, lingerie flash, Arearea gallery shot replaces 1a (short), shorter bed/cage/jewellery shots; recompile on the LAPTOP | `docs/atuona/film9_stanza_work/` (build_cut_v13), laptop render_v13; published film NOT replaced until Elena says | 39e231d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
