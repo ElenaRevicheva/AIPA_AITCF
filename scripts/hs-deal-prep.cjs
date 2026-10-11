@@ -114,6 +114,9 @@ async function digest(outPath) {
     '# LIVE JOB DEALS (HubSpot) — read-only snapshot, refreshed every 30 min by cto-aipa/scripts/hs-deal-prep.cjs --digest',
     `# ${new Date().toISOString()} · ${entries.length} live job deals. Use this for the mock interview: when Elena names a company,`,
     '# take the role and requirements from HERE. Never invent a role. For full notes run hs-deal-prep.cjs --company="<company>".',
+    '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, run that command FIRST. Your first line must be the',
+    '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly.',
+    '# If you did not run it in this turn, or that line is missing, your first line is "⚠️ Deal NOT fully loaded" — never guess it.',
     '',
   ].join('\n');
   let body = head;
@@ -178,12 +181,21 @@ async function digest(outPath) {
   }
   if (links.size) console.log(`posting / apply links: ${[...links].slice(0, 3).join(' · ')}`);
 
+  let cut = 0;
   for (const n of notes) {
     const text = stripHtml(n.html);
     if (!text || text.includes(COMET_MARK)) continue; // the Comet prompt only re-quotes the letter
     console.log(`\n===== ${label(text)}`);
+    if (text.length > MAX_NOTE) cut++;
     console.log(text.length > MAX_NOTE ? `${text.slice(0, MAX_NOTE)} …[cut]` : text);
   }
+  // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
+  // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
+  // the deal's note count and the first words of its newest note (the top of the Notes tab).
+  const newest = [...notes].sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0];
+  const newestTitle = newest ? stripHtml(newest.html).split('\n')[0].trim().slice(0, 60) : '';
+  console.log(`\n===== READ-PROOF — copy into your FIRST line: ✅ Loaded: ${deal.properties.dealname.replace(/^\s*\[[^\]]*\]\s*/, '')}`
+    + ` — ${notes.length} notes, newest: "${newestTitle}"${cut ? ` · ⚠️ ${cut} note(s) cut` : ''}`);
 })().catch((e) => {
   console.error(`hs-deal-prep failed: ${e.message}`);
   process.exit(1);
