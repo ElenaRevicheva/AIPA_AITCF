@@ -1,4 +1,6 @@
-r"""11 Oct 2026: the v11 cut of Atuona film #9 = v10 (PowerShell typing, fragments wording) + ONE FINAL SHOT with Arearea.
+r"""DO NOT BUILD (Elena, 11 Oct: "Do not rebuild existing Atuona movie" - Arearea is a separate task; the shot was
+delivered standalone). Kept as the record of how the shot was timed.
+11 Oct 2026: the v11 cut of Atuona film #9 = v10 (PowerShell typing, fragments wording) + ONE FINAL SHOT with Arearea.
 Elena: "search for Arearea history of painting. we need to make one final shot with it - impressionistic, underground aesthetic,
 full of true Gauguin sense, fitting my gallery content."
   shot A (after 37, the last before the outro): clip vA1 (Venice Kling O3 Pro from keyframe kA1: the opening shot's empty

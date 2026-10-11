@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-11 13:00 | Film #9 Arearea final shot (Elena, separate task): local still-motion + drain dissolve, shot A for cut_v11; NOT published until she sees it | Oracle `~/atuona-film9/plan.json` (kA*/vA* added, backup `plan.json.bak-arearea-*`), `img/kA*.jpg`; laptop `render_v11`, `arearea/` | 1bcbe13 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,6 +130,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 11 Oct — Arearea: a STANDALONE shot, delivered to Telegram · NOT part of the ATUONA film (Elena: "do not rebuild existing Atuona movie")
+- **DONE:** research `docs/atuona/AREAREA_RESEARCH_2026-10-11.md` (sources). Shot: the opening auction-house wall now carries Arearea,
+  its colours spill as light on Kira and Ule; as "the painting isn't there" types, the canvas drains (kA1 → kA1d), the painting's
+  ghost lifts off the wall over Kira; fragment #087 "Red Dog" streamed whole in PowerShell, lines 40–46 voiced (onyx). Kling refused
+  the motion (content policy, refunded) → local still-motion + `arearea/ghost.sh`, Elena's choice. Spend $0.32 (4 Seedream frames).
+  Filed: `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\11_AREAREA_2026-10-11\` (preview, clip, frames), md5 appended.
+- **DO NOT** build or publish `cut_v11_2026-10-11.json`: it appends Arearea to the ATUONA film, which Elena refused. The published
+  ATUONA film is v10 (md5 `0633…`), untouched.
+- **NEXT (Elena):** what the Arearea shot is for (its own film / the gallery / later), and whether the narrator's "Arearea" pronunciation is fine.
+- **VERIFIED BY:** Telegram `ok`; studio file md5 still `063386450530f7545fce2aaed28e4198`.
+
 ### ✅ 11 Oct — Kit builds CVs the 5–6 Oct way · Puente PM CV · Outlook polished + Resume button (Elena's go; claim released)
 - **DONE:** (1) Puente PM CV by the 6 Oct recipe → `docs/applications/2026-10-11_puente_product_manager_APPLICATION.md` (form has a
   hidden "Company website" bot-trap — never fill). (2) Kit: `scripts/lib/cv-compose.cjs` + `docs/applications/cv-bank.json` — model
@@ -152,7 +162,7 @@ git log keeps the record.
 - **DONE:** `Get-Content .\fragments\NNN.txt` + the stanza typed with the narrator, crimson block cursor, JetBrains Mono; "fragments"
   wording (cards + film page). Same studio file replaced (md5 `0633…`), film page live with new poster; ATUONA sheet has no stills
   row. Record: `docs/atuona/FILM9_V10_PUBLISHED_2026-10-11.md`.
-- **IN PROGRESS (Claude Code, Elena's separate task): Arearea final shot.** Keyframes kA1/kA2/kA3 on Oracle `img/` (Seedream, $0.24);
+- **Arearea (separate task, see the entry above):** Keyframes kA1/kA2/kA3 on Oracle `img/` (Seedream, $0.24);
   Kling REFUSED vA1 (content policy: the bare-breasted flute player in Gauguin's painting; refunded) → Elena chose LOCAL motion
   (still-motion push-in + a dissolve to the same frame with an empty canvas, $0.08). Cut `cut_v11_2026-10-11.json` (shot A after 37,
   fragment #087 streamed whole, lines 40–46 voiced, voice `render_v11/vo/A.mp3`) is NOT published: she sees the shot first.
