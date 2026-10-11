@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-11 16:45 | Film #9 v12: a pause between voice lines (video length unchanged) + M4 (Mila, blue sand) back as a moving glitchy shot, then REPUBLISH (Elena asked); Arearea stays separate | `scripts/atuona-film9.mjs`, `docs/atuona/film9_stanza_work/` (build_cut_v12), laptop render_v12; Oracle studio file (replace in place) | 0d9274d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
