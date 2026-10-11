@@ -154,8 +154,14 @@ git log keeps the record.
 - **VERIFIED BY:** `node scripts/hs-audit-apply-kit.cjs` on Oracle → `9 job deals · complete 4 · gaps 5`; HubSpot read-back md5 =
   built PDF (PM 0fe684a0…, SIP 27467b83…); aideazz.xyz serves both PDFs md5-equal at 13:17 UTC; site JS has `Professional_Outlook_2026*.pdf?v=20261011`.
 - **RISK:** `--backfill-cv` / `--recompose` are hand-only (model spend). Moving a kit PDF out of `cv-by-job/auto/` makes the guard treat
-  it as hand-built. CV bank + CVs still say "420+ audits / 210+ sites" (counted 28–29 Sep; logs now rotated — only 39 / 18 provable since
-  2 Oct). Outlook dropped them; CVs not yet — Elena's call. The CoS ✓CV in the audit is overridden by the ⚠️ line on the note.
+  it as hand-built. The CoS ✓CV in the audit is overridden by the ⚠️ line on the note.
+- **Audit figure (Elena 11 Oct):** "420+ audits / 210+ sites" and "48 audits / 16 sites" are no longer provable — PM2 logs before 1 Oct were
+  deleted by `pm2-logrotate retain 10` (set 28 Sep). Outlook, CV bank, Puente PM v2 and SIPEngines v2 now say **39 audits of 18 websites,
+  1–10 Oct, 18 by people on the public page**. Already-sent CVs stay as they are.
+- **Logs (Elena 11 Oct: "stick to the 9 Oct approach — don't waste Oracle space"):** Oracle keeps its short windows (pm2 retain 10,
+  journal 1 GB, app logs rotate 4). Everything that existed on 11 Oct is on the laptop, md5-verified:
+  `D:\aideazz\_private-backups\pm2-logs-keep-20261011\` + `logs-keep-20261011\` (journal export back to 22 Sep). To keep history, run
+  `scripts/oracle-resilience/archive-to-laptop.sh` on the rotated logs **at least every 10 days** — otherwise they rotate out.
 
 
 ### ✅ 11 Oct — Film #9 REPUBLISHED (v10): stanzas typed like a PowerShell session · true fragment numbers proven · Arearea next
