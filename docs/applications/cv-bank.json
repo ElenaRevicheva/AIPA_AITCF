@@ -6,7 +6,7 @@
     "fa": "docs/applications/cv-by-job/puente-founders-associate/CV.html (reviewed 6 Oct 2026)",
     "supa": "docs/applications/cv-by-job/supabase-head-ai-native-ops/CV.html (v3, reviewed 5 Oct 2026)"
   },
-  "figures_note": "Figures are minimums from production logs and the live CRM, counted 28–29 September 2026; CRM totals re-checked 6 October 2026; Audit API outside use from logs to 5 October 2026.",
+  "figures_note": "Figures are minimums from production logs and the live CRM, counted 28–29 September 2026; CRM totals re-checked 6 October 2026; Audit API use from the server logs for 1–10 October 2026.",
   "summary": [
     {
       "id": "s-products-end-to-end",
@@ -128,8 +128,8 @@
       "src": "pm"
     },
     {
-      "id": "c-420-audits",
-      "text": "420+ AI-visibility audits",
+      "id": "c-39-audits-october",
+      "text": "39 AI-visibility audits in 1–10 October",
       "src": "pm"
     },
     {
@@ -166,7 +166,7 @@
   "bullets": [
     {
       "id": "b-audit-api-launch",
-      "text": "**AI Visibility Audit API — idea to launch to measured use.** A public product, launched July 2026: anyone pastes a website address and, with no login, gets a score for how well ChatGPT, Perplexity and Claude can find and cite it. I designed the rubric, 34 checks in 4 weighted categories, and an output a non-technical buyer can act on: a grade, and the fix and the reason for every failed check. 420+ audits across 210+ sites, most of them run by my own outreach agents before a new prospect is contacted; in the logs, 48 audits of 16 different sites came from 16 addresses that are not my laptop or our server.",
+      "text": "**AI Visibility Audit API — idea to launch to measured use.** A public product, launched July 2026: anyone pastes a website address and, with no login, gets a score for how well ChatGPT, Perplexity and Claude can find and cite it. I designed the rubric, 34 checks in 4 weighted categories, and an output a non-technical buyer can act on: a grade, and the fix and the reason for every failed check. In the server logs for 1–10 October alone: 39 audits of 18 websites, 18 of them run by people on the public page and the rest by my own outreach agents before a new prospect is contacted.",
       "src": "pm",
       "tags": [
         "launch",
