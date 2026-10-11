@@ -133,10 +133,16 @@ git log keeps the record.
 ### 🔴 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · every OpenAI-backed service is down · Elena's move
 - **Proof:** a 1-token probe on BOTH Oracle OpenAI keys returns `credit_balance_exhausted` (cto-aipa, OpenClaw, whitespace,
   dragontrade, EspaLuz_Influencer share one; EspaLuzFamilybot, EspaLuzWhatsApp, VJH share the other — same account, both dry).
-- **OpenClaw coach:** "prep me for …" replies only "You have no credits remaining". Its 4 fallbacks (gemini, grok, gpt-oss,
-  claude-sonnet) did NOT take over: OpenClaw 2026.2.14 passes the billing error to the user instead of failing over.
-- **Fix:** Elena adds OpenAI credits (only she can). Or, with her go, swap the coach's primary to a fallback — config change on
-  a running product, NOT done without her yes. The apply kit's CV/letter steps also need OpenAI; expect them to fail until then.
+- **OpenClaw coach:** "prep me for …" replies only "You have no credits remaining". The 7 Oct waterfall (`ad14b64e`) did NOT
+  take over. **Cause, proven read-only with OpenClaw's own classifier** (`classifyFailoverReason`, exported as `f` from
+  `dist/pi-embedded-helpers-*.js`): OpenAI's new text "You have no credits remaining" → `null` (no failover); Anthropic's
+  "credit balance" → `billing` ✓; OpenAI's old "exceeded your current quota" → `rate_limit` ✓. v2026.2.14's `ERROR_PATTERNS.billing`
+  lacks OpenAI's new wording. cto-aipa's own waterfalls are fine — they fall through on ANY error (log: "Claude unavailable (400),
+  falling back...").
+- **Fix (needs Elena's go — the root-owned patch was refused by the permission check):** add `"no credits remaining"` to
+  `ERROR_PATTERNS.billing` in the 5 files that hold it (`dist/pi-embedded-helpers-{1VoyogxV,CMPLJuLB,DLeTj87G,CUD7UoUC}.js`,
+  `dist/plugin-sdk/index.js`; back up first), then `systemctl --user restart openclaw-gateway`. An OpenClaw upgrade overwrites it.
+  Or add OpenAI credits (only Elena can).
 - **Coach changes today (deployed, md5 laptop = Oracle):** `scripts/hs-deal-prep.cjs` 7fb5ebae… (`--role=` picks the right deal
   of a multi-role company; "✅ VERIFIED EXAMPLES" = the 17 reviewed cv-bank bullets, copied word for word into "For example, from
   my work:"); job-list-filter `docs/openclaw/interview-spar/SKILL.md` (run the reader before replying; one question per message;
