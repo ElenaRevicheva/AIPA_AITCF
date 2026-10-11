@@ -1,0 +1,167 @@
+{
+ "M4_DUR": 6.0,
+ "G": 1.0,
+ "shots": {
+  "1a": {
+   "edit": 4.99,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 3.29,
+   "pause_after": 1.0
+  },
+  "1b": {
+   "edit": 4.72,
+   "lead": 1.18,
+   "f": 1.0,
+   "line": 3.02,
+   "pause_after": 1.0
+  },
+  "2": {
+   "edit": 6.5,
+   "lead": 1.83,
+   "f": 1.034,
+   "line": 4.32,
+   "pause_after": 1.0
+  },
+  "6": {
+   "edit": 8.5,
+   "lead": 1.99,
+   "f": 1.0,
+   "line": 4.18,
+   "pause_after": 3.75
+  },
+  "7m": {
+   "edit": 4.39,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 2.69,
+   "pause_after": 2.66
+  },
+  "9": {
+   "edit": 7.27,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 5.57,
+   "pause_after": 1.0
+  },
+  "10a": {
+   "edit": 7,
+   "lead": 1.21,
+   "f": 1.0,
+   "line": 5.3,
+   "pause_after": 1.0
+  },
+  "10b": {
+   "edit": 5.85,
+   "lead": 1.85,
+   "f": 1.138,
+   "line": 3.65,
+   "pause_after": 1.84
+  },
+  "11": {
+   "edit": 4.53,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 2.83,
+   "pause_after": 2.64
+  },
+  "M1": {
+   "edit": 5.97,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 4.27,
+   "pause_after": 1.0
+  },
+  "M2": {
+   "edit": 9.69,
+   "lead": 1.16,
+   "f": 1.0,
+   "line": 7.99,
+   "pause_after": 1.0
+  },
+  "13": {
+   "edit": 6.5,
+   "lead": 1.82,
+   "f": 1.11,
+   "line": 4.33,
+   "pause_after": 1.0
+  },
+  "14": {
+   "edit": 5.3,
+   "lead": 2.03,
+   "f": 1.0,
+   "line": 2.5,
+   "pause_after": 2.22
+  },
+  "M3": {
+   "edit": 6.67,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 4.97,
+   "pause_after": 5.03
+  },
+  "M5": {
+   "edit": 7.5,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 5.3,
+   "pause_after": 1.0
+  },
+  "15": {
+   "edit": 6.52,
+   "lead": 0.6,
+   "f": 1.0,
+   "line": 4.82,
+   "pause_after": 1.0
+  },
+  "16b": {
+   "edit": 9,
+   "lead": 1.27,
+   "f": 1.0,
+   "line": 3.0,
+   "pause_after": 7.5
+  },
+  "24b": {
+   "edit": 10,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 6.74,
+   "pause_after": 1.96
+  },
+  "25": {
+   "edit": 10,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 6.74,
+   "pause_after": 1.96
+  },
+  "30b": {
+   "edit": 5.5,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 1.56,
+   "pause_after": 2.56
+  },
+  "31": {
+   "edit": 7.51,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 5.81,
+   "pause_after": 3.72
+  },
+  "36": {
+   "edit": 6.64,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 4.94,
+   "pause_after": 2.61
+  },
+  "37": {
+   "edit": 3.1,
+   "lead": 0.5,
+   "f": 1.0,
+   "line": 1.3,
+   "pause_after": null
+  }
+ }
+}

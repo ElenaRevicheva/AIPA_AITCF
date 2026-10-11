@@ -440,7 +440,7 @@ async function main() {
     const { it } = p, out = path.join(W, `${PREVIEW ? 'pv_' : ''}seg_${it.sid}.mp4`);
     if (reuse && !reseg.includes(it.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segOf[it.sid] = out; return; }
     const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, it.stanza ? spread(it.stanza) : '');
-    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(it.term_stream ? termStreamAss(it, p.d, it.lead ?? LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : TD.mode === 'terminal' ? termAss(it.stanza, it.poem, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
+    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(it.term_stream ? termStreamAss(it, p.d, it.lead ?? LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : TD.mode === 'terminal' ? termAss(it.stanza, it.poem, p.d, it.lead ?? LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : flowAss(it.stanza, p.d, it.lead ?? LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
     const interp = !PREVIEW && p.factor >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
     const slow = `setpts=${p.factor.toFixed(5)}*(PTS-STARTPTS),${interp}`;
     const args = ['-y', ...(p.ss ? ['-ss', p.ss.toFixed(2)] : []), '-t', p.src.toFixed(3), '-i', clipPath(it)];
