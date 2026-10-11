@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (CV) | 2026-10-11 11:34 | Puente **Product Manager** deal: the kit's "tailored" CV is the AI-builder CV with a PM headline — build a real PM CV from verified facts, replace it on the deal's notes | new `docs/applications/cv-by-job/puente-product-manager/`; HubSpot notes on the Puente PM deal (attachments only). NOT the kit code. | 2f5b931 |
+| Claude Code (CV) | 2026-10-11 12:05 | (1) Puente **Product Manager** CV by the 6 Oct recipe; (2) **Elena's go 11 Oct: kit makes CVs the same way** — CV bank of reviewed bullets, model only picks posting headings + bank bullets (🎯 gates), then rebuild the CV on the 8 I-Act-TODAY job deals | `docs/applications/cv-by-job/puente-product-manager/`; kit: `scripts/hs-fill-apply-kit.cjs`, `scripts/lib/job-tailor.cjs`, `scripts/build-lane-cv.cjs`, `scripts/hs-audit-apply-kit.cjs`, new `scripts/lib/cv-*.cjs` + CV bank; same files on Oracle (scp); HubSpot CV attachments on those 8 deals | a9bc5b4 |
 | Claude Code | 2026-10-11 11:20 | Film #9 v8: thinner underground stanza type (Elena: Syne looks cartoonish), re-render, replace the published master in place; ATUONA sheet stills removed (atuona cbb28315, done) | `scripts/atuona-film9.mjs` (flow text style), laptop render_v8; Oracle `films/out/atuona-2026-10-10T23-24-23.mp4` (replace in place); atuona still-1 poster | 8a3fa58 |
 
 **Rules**
