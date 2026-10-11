@@ -63,3 +63,35 @@ AI-citable site, is a real offer.
   the banner, which means the box is up but not responding. The live API could not be tested.
 - ChatGPT's answer that Elena shared (`chatgpt.com/share/6ac804d3…`) renders only via JavaScript; its
   content could not be read, so this plan does not use it.
+
+## 6. ChatGPT's version ("Business AI Discoverability Engine"), evaluated 11 Oct 2026
+
+Elena pasted ChatGPT's design: an entity engine with 5 dimensions (identity, service clarity, trust,
+AI-answer presence, conversion readiness), 3 scores never blended (readiness / observed / technical),
+an optional AI-readable micro-page, and a 4-stage offer (audit → GEO/AEO work → WhatsApp Operator → measurement).
+
+**Right, keep it:**
+- Entity-level framing. Same conclusion as §2 above: with no site, the business is an *entity*, not a page.
+- **Three separate scores, never blended.** A business can be AI-ready and still not appear in answers.
+  This is the honest design and matches `feedback_never_claim_invisible_on_high_audit`.
+- The micro-page as *evidence, not a guarantee*. Same as §3.
+- Permitted access only for Instagram (its terms forbid scraping), and copy-ready fixes as the deliverable.
+
+**Wrong or missing for Elena specifically:**
+1. **It is a new build, and the bottleneck is not product.** 1,898 HubSpot deals, 0 won
+   (`project_root_cause_no_demand_channel`). A bigger engine does not create a buyer. The golden rule says use what is already built.
+2. **The market is assumed, not measured.** Her ICP requires an English site (criterion 5), and the ICP
+   leads measured so far *have* sites (scored 91–99). High-ticket businesses with no site may be rare. Check before building.
+3. **"Observed AI answers" is the expensive, shaky part.** API answers are not the answers people see in the
+   ChatGPT app (location, personalisation and web search differ), they vary run to run (repeat sampling needed), and every run costs money.
+   Google Business Profile data beyond the public listing needs the owner's access or the paid Places API.
+4. **Stage 3 is the AI Growth Operator agency that was shelved on 18 Aug** because it runs on demand generation.
+5. No price, no first buyer, no validation protocol. ChatGPT says so itself.
+
+**Recommendation: sell it by hand before building it (concierge MVP).**
+- The $100 Diagnostic (`aideazz.xyz/pay/analisis-tecnico`) already exists. Let its intake accept
+  an Instagram or Maps link instead of a website, and run ChatGPT's 5 dimensions as a **manual checklist**.
+- Build only Step A ($0): stop the free API from grading Google or Instagram when given a social link.
+- Automate dimensions only after **3 people have paid** for the manual version. Their reports are the spec.
+- First, a free measurement: how many existing ICP prospects in HubSpot have no website at all?
+  That number decides whether this is a market or an anecdote.
