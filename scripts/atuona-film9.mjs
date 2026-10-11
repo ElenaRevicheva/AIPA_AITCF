@@ -322,6 +322,65 @@ function termAss(stanza, poem, d, voAt, vd, file) {
   return file;
 }
 
+// v11 (Elena, 11 Oct: the final Arearea shot, from her fragment #087 "Red Dog", which has no stanza breaks): an item with
+// `term_stream: {lines, voiced: [a, b]}` behaves like real `Get-Content`: the WHOLE fragment prints into the terminal and
+// scrolls (a window of TD.window lines), fast, until it reaches the voiced lines [a..b], which type character by character with
+// the narrator; then the rest of the fragment prints slower and the cursor blinks on the last line. The voice starts at
+// `it.lead` (when the voiced lines begin), not at LEAD.
+function termStreamAss(it, d, lead, vd, file) {
+  const B = String.fromCharCode(92), WIN = TD.window || 9;
+  const cmd = `PS C:${B}atuona> Get-Content .${B}${TD.cmdDir || 'fragments'}${B}${it.poem.replace('#', '')}.txt`;
+  const [va, vb] = it.term_stream.voiced, src = it.term_stream.lines;
+  const rows = [{ text: cmd, role: 'cmd' }, ...src.map((t, i) => ({ text: t.replace(/[{}]/g, ''), role: i >= va && i <= vb ? 'voiced' : 'out' }))];
+  // timeline of states: [time, number of complete rows, chars typed in the row being typed]
+  const st = [];
+  const cmdT0 = 0.06, cmdT1 = Math.min(0.5, lead - 0.2);
+  for (let c = 0; c <= cmd.length; c++) st.push([cmdT0 + (cmdT1 - cmdT0) * c / cmd.length, 0, c]);
+  const before = va, fast = (lead - 0.15 - cmdT1) / Math.max(1, before);
+  for (let i = 1; i <= before; i++) st.push([cmdT1 + fast * i, i, 0]);       // rows 1..va print one by one (row 0 = cmd done)
+  const voicedChars = []; for (let r = va + 1; r <= vb + 1; r++) for (let c = 1; c <= rows[r].text.length; c++) voicedChars.push([r, c]);
+  const wts = voicedChars.map(([r, c]) => { const ch = rows[r].text[c - 1]; return ch === ' ' ? 0.55 : /[.,;:!?—–-]/.test(ch) ? 2.2 : 1; });
+  const tot = wts.reduce((a, b) => a + b, 0); let acc = 0;
+  voicedChars.forEach(([r, c], k) => { acc += wts[k]; st.push([lead + Math.max(0.6, vd * 0.95) * acc / tot, r - 1, c]); });
+  const after0 = lead + vd + 0.2, rest = rows.length - (vb + 2), slow = Math.min(0.3, Math.max(0.12, (d - 1.6 - after0) / Math.max(1, rest)));
+  for (let i = 0; i < rest; i++) st.push([after0 + slow * (i + 1), vb + 2 + i, 0]);
+  const col = { cmd: TD.cmdColour, out: TD.dimColour || TD.promptColour, voiced: TD.outColour || TD.colour };
+  const render = (done, typing, cursorOn, layer) => {
+    // rows 0..done-1 complete, row `done` has `typing` chars (cursor after them); show the last WIN rows of what exists
+    const last = Math.min(rows.length - 1, done), first = Math.max(0, last - WIN + 1);
+    let out = '';
+    for (let r = first; r <= last; r++) {
+      if (r > first) out += B + 'N';
+      const txt = rows[r].text, n = r < done ? txt.length : typing;
+      const vis = layer === 'Shade' ? `${B}alpha${TD.shadeAlpha}` : `${B}alpha&H00&${B}c${r === 0 ? TD.promptColour : col[rows[r].role]}`;
+      const shown = txt.slice(0, n), hidden = txt.slice(n);
+      if (r === 0 && n > 14) out += `{${layer === 'Shade' ? vis : `${B}alpha&H00&${B}c${TD.promptColour}`}}` + shown.slice(0, 14).replace(/ /g, B + 'h') + `{${layer === 'Shade' ? vis : `${B}alpha&H00&${B}c${TD.cmdColour}`}}` + shown.slice(14).replace(/ /g, B + 'h');
+      else if (shown) out += `{${vis}}` + shown.replace(/ /g, B + 'h');
+      const cur = r === last && cursorOn;
+      out += cur ? `{${layer === 'Shade' ? vis : `${B}alpha&H00&${B}c${TD.cursorColour}`}}${TD.cursorChar}` : `{${B}alpha&HFF&}${B}h`;
+      if (hidden) out += `{${B}alpha&HFF&}` + hidden.replace(/ /g, B + 'h');
+    }
+    return out;
+  };
+  const ev = [];
+  const push = (t0, t1, done, typing, on, extra = '') => {
+    if (t1 - t0 < 0.02) return;
+    for (const layer of TD.shade ? ['Shade', 'Term'] : ['Term'])
+      ev.push(`Dialogue: ${layer === 'Shade' ? 0 : 1},${assTime(t0)},${assTime(t1)},${layer},,0,0,0,,{${B}pos(${TD.x},${TD.y})${layer === 'Shade' ? `${B}blur${TD.shade.blur}${B}bord${TD.shade.bord}` : ''}${extra}}` + render(done, typing, on, layer));
+  };
+  push(0, st[0][0], 0, 0, true);
+  for (let k = 0; k < st.length; k++) push(st[k][0], k + 1 < st.length ? st[k + 1][0] : st[k][0] + 0.15, st[k][1], st[k][2], true);
+  const lastT = st[st.length - 1][0] + 0.15, end = d - 0.1, finalDone = rows.length - 1, finalTyping = rows[finalDone].text.length;
+  for (let t = lastT, on = true; t < end; t += 0.5, on = !on) push(t, Math.min(end, t + 0.5), finalDone, finalTyping, on, t + 0.5 >= end ? `${B}fad(0,450)` : '');
+  const sty = (name, colour, outline) => `Style: ${name},${TD.font},${TD.size},${colour},${colour},&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,${outline},0,1,0,0,0,1`;
+  const head = ['[Script Info]', 'ScriptType: v4.00+', `PlayResX: ${VW}`, `PlayResY: ${VH}`, 'WrapStyle: 2', 'ScaledBorderAndShadow: yes', '',
+    '[V4+ Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
+    sty('Term', TD.colour, 0), ...(TD.shade ? [sty('Shade', '&H00000000', TD.shade.bord)] : []),
+    '', '[Events]', 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'];
+  fs.writeFileSync(file, [...head, ...ev, ''].join('\n'));
+  return file;
+}
+
 const clipPath = it => path.join(CLIPS, it.clip);
 const voPath = it => path.join(VODIR, `${it.sid}.mp3`);
 
@@ -348,7 +407,7 @@ async function main() {
   const plan = [];
   for (const it of shots) {
     const vd = !NO_VO && fs.existsSync(voPath(it)) ? await dur(voPath(it)) : 0;
-    const need = vd ? LEAD + vd + TAIL : 0;
+    const need = vd ? (it.lead ?? LEAD) + vd + TAIL + (it.tail_extra || 0) : 0;   // v11: a term_stream item speaks at it.lead
     // `trim`: QC's last clean second of the clip (the rest is never used); `end`: the window ENDS there (1a's lilac turn,
     // 2's exhale, 6's plunge), so the start moves back as the shot gets longer
     const endAt = Math.min(await vdur(clipPath(it)), it.trim || Infinity, it.end || Infinity);
@@ -381,7 +440,7 @@ async function main() {
     const { it } = p, out = path.join(W, `${PREVIEW ? 'pv_' : ''}seg_${it.sid}.mp4`);
     if (reuse && !reseg.includes(it.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segOf[it.sid] = out; return; }
     const txt = path.join(W, `p_${it.sid}.txt`); fs.writeFileSync(txt, it.stanza ? spread(it.stanza) : '');
-    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(TD.mode === 'terminal' ? termAss(it.stanza, it.poem, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
+    const text = !it.stanza ? '' : FLOW ? `,ass=${fp(it.term_stream ? termStreamAss(it, p.d, it.lead ?? LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : TD.mode === 'terminal' ? termAss(it.stanza, it.poem, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)) : flowAss(it.stanza, p.d, LEAD, p.vd, path.join(W, `flow_${it.sid}.ass`)))}${TEXTFONTS ? `:fontsdir=${fp(TEXTFONTS)}` : ''}` : textDraw(txt, p.d);   // a shot without a stanza carries no band; v7 FLOW = libass words in step with the voice
     const interp = !PREVIEW && p.factor >= MI_FROM ? `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1` : `fps=${FPS}`;
     const slow = `setpts=${p.factor.toFixed(5)}*(PTS-STARTPTS),${interp}`;
     const args = ['-y', ...(p.ss ? ['-ss', p.ss.toFixed(2)] : []), '-t', p.src.toFixed(3), '-i', clipPath(it)];
@@ -463,7 +522,7 @@ async function main() {
 
   // 4. mix: music ducked under the voice bus, loudness-normalized, limited
   const LEN = await dur(body);
-  const voAt = plan.filter(p => p.vd).map(p => ({ file: voPath(p.it), t: +(segStart(seqOf[p.it.sid]) + LEAD).toFixed(2) }));
+  const voAt = plan.filter(p => p.vd).map(p => ({ file: voPath(p.it), t: +(segStart(seqOf[p.it.sid]) + (p.it.lead ?? LEAD)).toFixed(2) }));
   const musicOn = !NO_MUSIC;
   // the graph has three shapes: music ducked under the voice bus (the 8 Oct preview), music alone (FILM9_NO_VO), voice alone
   // (FILM9_NO_MUSIC); with neither, the body's silent track is kept as it is

@@ -21,7 +21,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (CV) | 2026-10-11 12:05 | (1) Puente **Product Manager** CV by the 6 Oct recipe; (2) **Elena's go 11 Oct: kit makes CVs the same way** — CV bank of reviewed bullets, model only picks posting headings + bank bullets (🎯 gates), then rebuild the CV on the 8 I-Act-TODAY job deals | `docs/applications/cv-by-job/puente-product-manager/`; kit: `scripts/hs-fill-apply-kit.cjs`, `scripts/lib/job-tailor.cjs`, `scripts/build-lane-cv.cjs`, `scripts/hs-audit-apply-kit.cjs`, `scripts/hs-attach-cv.cjs`, new `scripts/lib/cv-compose.cjs` + `docs/applications/cv-bank.json`; same files on Oracle (deployed 12:40 UTC, md5 = main); HubSpot CV attachments on the I-Act-TODAY job deals (ADDITIVE only). (3) Professional Outlook wording + every figure re-verified from live logs: `docs/applications/professional-outlook/`, aideazz `public/Elena_Revicheva_Professional_Outlook_2026*.pdf` | 9292dcf |
-| Claude Code | 2026-10-11 11:20 | Film #9 v8: thinner underground stanza type (Elena: Syne looks cartoonish), re-render, replace the published master in place; ATUONA sheet stills removed (atuona cbb28315, done) | `scripts/atuona-film9.mjs` (flow text style), laptop render_v8; Oracle `films/out/atuona-2026-10-10T23-24-23.mp4` (replace in place); atuona still-1 poster | 8a3fa58 |
+| Claude Code | 2026-10-11 13:00 | Film #9 Arearea final shot (Elena, separate task): local still-motion + drain dissolve, shot A for cut_v11; NOT published until she sees it | Oracle `~/atuona-film9/plan.json` (kA*/vA* added, backup `plan.json.bak-arearea-*`), `img/kA*.jpg`; laptop `render_v11`, `arearea/` | 1bcbe13 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,6 +131,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 11 Oct — Film #9 REPUBLISHED (v10): stanzas typed like a PowerShell session · true fragment numbers proven · Arearea next
+- **DONE:** `Get-Content .\fragments\NNN.txt` + the stanza typed with the narrator, crimson block cursor, JetBrains Mono; "fragments"
+  wording (cards + film page). Same studio file replaced (md5 `0633…`), film page live with new poster; ATUONA sheet has no stills
+  row. Record: `docs/atuona/FILM9_V10_PUBLISHED_2026-10-11.md`.
+- **IN PROGRESS (Claude Code, Elena's separate task): Arearea final shot.** Keyframes kA1/kA2/kA3 on Oracle `img/` (Seedream, $0.24);
+  Kling REFUSED vA1 (content policy: the bare-breasted flute player in Gauguin's painting; refunded) → Elena chose LOCAL motion
+  (still-motion push-in + a dissolve to the same frame with an empty canvas, $0.08). Cut `cut_v11_2026-10-11.json` (shot A after 37,
+  fragment #087 streamed whole, lines 40–46 voiced, voice `render_v11/vo/A.mp3`) is NOT published: she sees the shot first.
+- **VERIFIED BY:** `vault_check.py` + `typed_check.py` → 23/23; `check_v10.py` ALL PASS; film URL 200 exact length; page live.
+- **RISK:** the narrator says "Arearea"/"ATUONA" in English phonetics (Whisper heard "Ariaria"/"Atuana") — her call.
 
 ### ✅ 10 Oct — Film #9 ATUONA PUBLISHED in the AI Film Studio (1080p master) + film page with every poem linked
 - **DONE:** v7 = v6 + stanzas redesigned (Syne 78 px, crimson chromatic edge, words arriving with the narrator, slow drift), poem
