@@ -31,6 +31,8 @@ for it in cut['items']:
     if it.get('sid') == '1a':
         it.update({'clip': '../stillclips/sm_kA1_ghost.mp4', 'ss': 6.6, 'slow': 1.0, 'glitchy': 'flow',
                    'qc': 'Elena 11 Oct: the Arearea gallery shot replaces the empty wall, from the rising ghost; 1a keeps its stanza and voice'})
+        for k in ('trim', 'end', 'tail', 'tail_ss', 'tail_min'):   # the OLD clip's window (1a's 'end' at its lilac turn) does not apply
+            it.pop(k, None)
     if it.get('sid') in NEW_D:
         it['edit'] = NEW_D[it['sid']]
     items.append(it)
