@@ -54,6 +54,9 @@ const { CV_MARK } = tailor;
 // --backfill-cv: rebuild the CV of deals that already have a 🛡️ note but no posting-shaped CV. Run by hand,
 // never from cron: a deal whose posting cannot be shaped would otherwise be retried (and paid for) every 10 min.
 const BACKFILL_CV = process.argv.includes('--backfill-cv');
+// --recompose (with --only=<dealId> only): build that deal's shaped CV again even though it has one — e.g. after
+// the composer changed. Additive like everything else: the new CV and its "use this one" line go on top.
+const RECOMPOSE = process.argv.includes('--recompose') && process.argv.some((a) => a.startsWith('--only='));
 // ── Company brief (28 Sep 2026, Elena: "the HubSpot deal stays the source of truth, always fresh") ──
 // The Perplexity brief used to live only inside the morning HTML page. Now every ACT-TODAY hiring deal
 // gets it as a "🔎 COMPANY BRIEF" note — same research, same cache, so a company is paid for once.
@@ -184,7 +187,7 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   const cachedJson = path.join(AUTO_DIR, shapedName.replace(/\.pdf$/, '.json'));
   try {
     const prev = JSON.parse(fs.readFileSync(cachedJson, 'utf8'));
-    if (String(prev._deal) === String(d.id) && prev.sections && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
+    if (!RECOMPOSE && String(prev._deal) === String(d.id) && prev.sections && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
       return { cvPath: path.join(AUTO_DIR, shapedName), name: shapedName, shaped: true, info: 'reused this deal\'s built CV' };
     }
   } catch { /* not built yet */ }
@@ -264,7 +267,9 @@ async function handBuiltCv(notes) {
   for (const n of notes) {
     for (const id of (await cvIdsOn(n)).cv) {
       const name = String(fileNames.get(id) || '').toLowerCase();
-      if (name && !LANE_CV_NAMES.has(name) && !kit.has(name)) return fileNames.get(id);
+      // uploadCv may have added "_<last 4 of the deal id>" to a kit CV's name — still the kit's.
+      const base = name.replace(/_\d{4}\.pdf$/, '.pdf');
+      if (name && !LANE_CV_NAMES.has(name) && !kit.has(name) && !kit.has(base)) return fileNames.get(id);
     }
   }
   return '';
@@ -362,7 +367,7 @@ async function defensePass(d, notes, bodies, title, company, jobUrl) {
  * removed. A deal that cannot be shaped keeps exactly what it has.
  */
 async function cvPass(d, notes, bodies, title, company, jobUrl) {
-  if (bodies.some((b) => text(b).includes(CV_MARK))) return 'had';
+  if (!RECOMPOSE && bodies.some((b) => text(b).includes(CV_MARK))) return 'had';
   const shield = notes.find((n) => text(n.properties.hs_note_body).includes(DEFENSE_MARK));
   if (!shield) return 'nodefense';
   const mine = await handBuiltCv(notes);

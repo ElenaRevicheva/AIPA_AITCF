@@ -24,6 +24,8 @@ const BANK = path.join(ROOT, 'docs', 'applications', 'cv-bank.json');
 const { norm, describesHerAlone } = require(path.join(ROOT, 'dist', 'cover-letter.js'));
 
 const MIN_JD = 200;
+// Professional Outlook text — it lives in the Outlook, never in a role's CV (Elena, 11 Oct 2026).
+const OUTLOOK_ONLY = new Set(['s-ai-native-daily-tools']);
 // A heading is a claim that she did that work, so a requirement she may lack can never be one.
 // Language words count only as a LEVEL ("English C1", "native speaker"): "AI-native operations" is a duty.
 const REQUIREMENT_RE = /\b\d+\s*\+?\s*years?\b|\byears? of\b|\bexperience (in|with)\b|\bdegree\b|\bbachelor|\bmaster'?s\b|\bcertif|\bproficien|\bbackground in\b|\bfamiliar(ity)? with\b|\bnative (speaker|english|spanish|portuguese|level)\b|\b(english|spanish|portuguese)\s+(fluen|proficien|level|native|[abc][12])/i;
@@ -123,8 +125,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
   const list = (o) => Object.values(o).map((x) => `${x.id}: ${x.text || x.title}`).join('\n');
   const catalog = [
     'BULLETS (for the sections):', bank.bullets.map((b) => `${b.id}: ${b.text}`).join('\n'),
-    '', 'SUMMARY:', list(P.summary), '', 'CHIPS:', list(P.chips), '', 'TAGLINE:', list(P.tagline),
-    '', 'STEPS (pick one set):', Object.values(P.steps).map((s) => `${s.id}: ${s.title} — ${s.items.join(' | ')}`).join('\n'),
+    '', 'SUMMARY:', list(Object.fromEntries(Object.entries(P.summary).filter(([id]) => !OUTLOOK_ONLY.has(id)))), '', 'CHIPS:', list(P.chips),
     '', 'AIDEAZZ INTRO (pick one):', list(P.intro),
     '', 'LIVE WORK:', list(P.live), '', 'OMNIBAZAAR:', list(P.omnibazaar), '', 'E-GOV:', list(P.egov),
   ].join('\n');
@@ -134,12 +135,12 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     'HEADINGS: choose 3-5 headings for her current role. Copy each WORD FOR WORD from one line of the POSTING that describes the WORK of the job (what the person will do, own or deliver) — a contiguous piece of that line, 12-70 characters.',
     'Never use a requirement as a heading (years of experience, a degree, a language level, a certificate, a tool she must already know): every line under a heading claims she has done that work.',
     'Under each heading put 2-4 BULLET ids that SHOW her doing exactly that work, the strongest first. Each id at most once; 7-14 bullets in total. If no bullet shows a duty, leave the duty out — never stretch a line to fit.',
-    'Also choose: summary 2-3 ids (most relevant first); chips 5-7 ids; tagline 4-6 ids; steps 1 id; intro 1 id; live 4-6 ids; omnibazaar 0-2 ids; egov 1-3 ids. Prefer what THIS posting asks for.',
+    'Also choose, for THIS role only: summary 1-2 ids (most relevant first); chips 3-5 ids; intro 1 id; live 3-4 ids; omnibazaar 0-2 ids; egov 1-3 ids.',
     'Return one JSON object only.',
   ].join('\n');
   const user = [
     `JOB: ${title} at ${company}`, '', 'POSTING:', posting, '', 'BANK:', catalog, '',
-    'Return {"sections":[{"heading":"verbatim piece of a posting duty line","ids":["b-…"]}],"summary":[],"chips":[],"tagline":[],"steps":"","intro":"","live":[],"omnibazaar":[],"egov":[]}',
+    'Return {"sections":[{"heading":"verbatim piece of a posting duty line","ids":["b-…"]}],"summary":[],"chips":[],"intro":"","live":[],"omnibazaar":[],"egov":[]}',
   ].join('\n');
 
   let lastReason = '';
@@ -232,20 +233,24 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       const out = [...new Set(ids || [])].filter((id) => pool2[id]).slice(0, n).map((id) => pool2[id]);
       return out.length >= min ? out : Object.values(pool2).slice(0, Math.max(min, n));
     };
-    const summary = take(P.summary, pick.summary, 3, 2).map((x) => x.text);
+    // ── ONE ROLE, not the Professional Outlook (Elena, 11 Oct 2026: "a tailored CV is a tailored CV — it should fit
+    // each role, not repeat the professional outlook"). So: the tagline is this posting's own duties (the headings),
+    // the summary opens with the pitch written for THIS posting, the Outlook's operating-model paragraph and the
+    // "How I …" method block stay in the Outlook, and the figure boxes are the few this role cares about.
+    const roleSummaries = Object.fromEntries(Object.entries(P.summary).filter(([id]) => !OUTLOOK_ONLY.has(id)));
+    const summary = take(roleSummaries, pick.summary, 2, 1).map((x) => x.text);
     const lead = String(pitch || '').replace(/\s+/g, ' ').trim();
-    // 0.4, not 0.6: the SIPEngines CV printed "requirements, architecture, orchestration…" in the pitch AND in a
-    // chosen summary paragraph (11 Oct) — half the pitch's words repeated is already a repeat.
+    // 0.4: the SIPEngines CV printed "requirements, architecture, orchestration…" in the pitch AND in a chosen
+    // summary paragraph (11 Oct) — half the pitch's words repeated is already a repeat.
     if (lead && !describesHerAlone(lead) && overlap(lead, summary.join(' ')) < 0.4) summary.unshift(lead);
-    const steps = P.steps[pick.steps] || Object.values(P.steps).find((s) => s.lanes && s.lanes.includes(lane)) || Object.values(P.steps)[0];
     const egov = take(P.egov, pick.egov, 3, 1);
     const spec = {
       _note: 'Posting-shaped CV by scripts/lib/cv-compose.cjs: headings verbatim from the posting, every line verbatim from docs/applications/cv-bank.json.',
       base_lane: lane,
       cv: cvName,
-      headline: `${title} — ${take(P.tagline, pick.tagline, 6, 3).map((x) => x.text).join(' · ')}`,
+      headline: `${title} — ${kept.map((s) => s.heading).join(' · ')}`,
       summary,
-      chips: take(P.chips, pick.chips, 7, 4).map((x) => x.text),
+      chips: take(P.chips, pick.chips, 5, 3).map((x) => x.text),
       roles: {
         aideazz: { line: bank.roles.aideazz.line, intro: (P.intro[pick.intro] || Object.values(P.intro)[0]).text },
         omnibazaar: { line: bank.roles.omnibazaar.line, bullets: take(P.omnibazaar, pick.omnibazaar, 2).map((x) => x.text) },
@@ -253,8 +258,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
         fundery: bank.roles.fundery,
       },
       sections: kept.map((s) => ({ heading: s.heading, bullets: s.ids.map((id) => byId[id].text) })),
-      steps: { title: steps.title, items: steps.items },
-      live: take(P.live, pick.live, 6, 3).map((x) => ({ text: x.text, links: x.links || [] })),
+      live: take(P.live, pick.live, 4, 3).map((x) => ({ text: x.text, links: x.links || [] })),
       tools: bank.tools,
       education: bank.education,
       languages: bank.languages,
