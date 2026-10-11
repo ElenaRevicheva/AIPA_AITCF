@@ -23,7 +23,9 @@ const { isJobDeal } = require('./lib/hiring-deals.cjs');
 const { COMET_MARK } = require('./lib/comet-prompt.cjs');
 
 const arg = (k) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').slice(k.length + 3).trim();
-const MAX_NOTE = 2500;
+// 11 Oct 2026: 2,500 cut the 🎯 note's honest gaps and the 🛡️ note's last answer mid-sentence (Puente PM). The
+// single-deal read goes into the conversation, not the injected digest, so whole notes fit; the digest keeps its own cap.
+const MAX_NOTE = 10000;
 
 async function hs(method, urlPath, body) {
   for (let attempt = 0; ; attempt++) {
