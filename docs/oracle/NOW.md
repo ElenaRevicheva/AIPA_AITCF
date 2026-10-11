@@ -130,6 +130,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 11 Oct — Arearea v2 (standalone, NOT in the ATUONA film): Gauguin restaged as a living night · newest Venice models · sent to Telegram
+- **DONE:** Elena called v1 (gallery wall + local ghost) ugly → v2: Kira in white looking at us, Mila with a bamboo flute, idol in red
+  light, wet-paint vermilion/yellow/emerald ground, no sky; the red dog only as a shapeless orange haze. 3-model frame bake-off
+  (Nano Banana 2.1 / Flux 3 / GPT Image 2.5 Flare) → Elena picked GPT Flare (kR3); motion Kling O3 4K (her pick). Finished on the laptop:
+  flowing glitch + #087 streamed in PowerShell + onyx lines 40–46 + music C (`arearea/arearea_v2_render.sh`). Filed
+  `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\11_AREAREA_2026-10-11\v2\` (md5). Venice spend on Arearea today ≈ $5.67 (≈ $6.30 left of $12).
+- **Fixed on the way:** gen.mjs under-priced seedream-v5-pro-edit (2K is $0.11, not $0.08) and flux-3 edit (2K $0.29); `add_*.py` is
+  gitignored, so plan scripts are now named `arearea_plan_*.py`.
+- **Coordination note:** the CV/HubSpot Claude session's commit f7a10c5 swept in my staged gen.mjs (a failed `git add` had staged it);
+  verified: content identical, no film file touched; both sessions now commit named paths only.
+- **NEXT (Elena):** watch Arearea v2; what it is for (own film / gallery / later).
+
 ### ✅ 11 Oct — Film #9 REPUBLISHED (v12): ≥1 s pause before every voice line · Mila's blue sand moving again · lengths untouched
 - **DONE:** line starts re-planned with every shot pinned to its v10 length (3 lines ×1.03–1.14); M4 = 6 s moving glitchy shot (was a
   0.9 s flash). Studio file replaced in place (md5 `d509…`, 2:41), film page 2:41. Record: `docs/atuona/FILM9_V12_PUBLISHED_2026-10-11.md`.
