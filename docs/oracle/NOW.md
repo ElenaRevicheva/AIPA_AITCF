@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-11 20:45 | Film #9 v14 (Elena approved): v13 + regraded 24b + bed shot 31 -> 5.6 s; recompile + REPUBLISH in place | `docs/atuona/film9_stanza_work/` (build_cut_v14), laptop render_v14; Oracle studio file (replace); atuona film page time | 5f5fe6c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
