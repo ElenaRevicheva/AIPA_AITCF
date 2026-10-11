@@ -60,7 +60,8 @@ const PROJECTS = {
     title: 'AI Visibility Audit API — public product',
     url: 'https://aideazz.xyz/api',
     show: 'aideazz.xyz/api',
-    body: 'Live scoring for how discoverable a site is to ChatGPT, Perplexity and Claude, not only Google. Same GEO/AEO engine that scores my own hub 100/100. Production floor from Oracle logs, rounded down: 420+ audits, 14,000+ signals, 210+ sites, median 85. Each check returns the fix and why it matters (34 why / 4 fix on a live stripe.com run).',
+    // 11 Oct 2026: "14,000+ signals" removed — the 6 Oct Puente review found it only in the Toptal draft, never re-verified.
+    body: 'Live scoring for how discoverable a site is to ChatGPT, Perplexity and Claude, not only Google. Same GEO/AEO engine that scores my own hub 100/100. Production floor from Oracle logs, rounded down: 420+ audits, 210+ sites, median 85. Each check returns the fix and why it matters (34 why / 4 fix on a live stripe.com run).',
   },
   loop: {
     title: 'Approved-send growth loop — HubSpot + Resend',
@@ -179,8 +180,12 @@ const LANGUAGES_LINE = {
   default: 'English — fluent (professional)  ·  Spanish — intermediate  ·  Russian — native  ·  French — elementary',
 };
 
+// Noto Sans has no arrows and no true minus sign: "trial-signup → HubSpot" printed as "trial-signup  HubSpot"
+// (read back from a kit CV, 11 Oct 2026). Say it in words instead of printing an empty glyph.
+const glyphSafe = (s) => String(s).replace(/\s*→\s*/g, ' to ').replace(/[−‑]/g, '-');
+
 function wrap(font, text, size, maxW) {
-  const words = text.split(/\s+/);
+  const words = glyphSafe(text).split(/\s+/);
   const lines = [];
   let cur = '';
   for (const w of words) {
@@ -216,7 +221,7 @@ async function buildLane(lane, job = null) {
   let page;
   let y;
   const drawText = (text, o) =>
-    page.drawText(text, { x: o.x ?? MARGIN_X, y: o.y, size: o.size, font: o.font, color: o.color ?? INK });
+    page.drawText(glyphSafe(text), { x: o.x ?? MARGIN_X, y: o.y, size: o.size, font: o.font, color: o.color ?? INK });
   const linkText = (label, uri, x, y0, size, f, color) => {
     drawText(label, { x, y: y0, size, font: f, color: color ?? LINK });
     const w = f.widthOfTextAtSize(label, size);
@@ -244,7 +249,12 @@ async function buildLane(lane, job = null) {
     }
     drawText('ELENA REVICHEVA', { y: PAGE_H - 38, size: 20, font: bold, color: WHITE });
     drawText(title, { y: PAGE_H - 58, size: 11, font: regular, color: rgb(0.82, 0.86, 0.92) });
-    if (tagline) drawText(tagline, { y: PAGE_H - 76, size: 8.5, font: italic, color: rgb(0.72, 0.78, 0.86) });
+    if (tagline) {
+      // A posting-shaped tagline is a list ("a · b · c"): drop whole items from the end until it fits one line.
+      let tl = glyphSafe(tagline);
+      while (italic.widthOfTextAtSize(tl, 8.5) > CONTENT_W && tl.includes(' · ')) tl = tl.slice(0, tl.lastIndexOf(' · '));
+      drawText(tl, { y: PAGE_H - 76, size: 8.5, font: italic, color: rgb(0.72, 0.78, 0.86) });
+    }
     let cx = MARGIN_X;
     const cy = PAGE_H - 96;
     const bits = [
@@ -309,88 +319,230 @@ async function buildLane(lane, job = null) {
   };
   const roleLine = (text, detail) => {
     ensure(30);
-    drawText(text, { y, size: 9, font: bold });
-    y -= 12;
+    // Wraps: her full E-GOV title (11 Oct 2026) ran past the right margin on one line.
+    for (const line of wrap(bold, text, 9, CONTENT_W)) {
+      ensure(14);
+      drawText(line, { y, size: 9, font: bold });
+      y -= 12;
+    }
     if (detail) para(detail);
     y -= 6;
   };
 
   const executiveRoles = () => {
+    // 11 Oct 2026: her exact title and the sentence the 6 Oct Puente reviewers checked against her own words
+    // (user profile). The old "IT, legal and compliance" line is held until she confirms it.
     roleLine(
-      'Deputy CEO & Chief Legal Officer — JSC “E-GOV OPERATOR”  ·  2011–2018',
-      'Seven years at board level on large-scale public-sector digital transformation: IT, legal and compliance in a heavily regulated environment.',
+      'Deputy CEO for Corporate Governance & Chief Legal Officer — JSC “E-GOV OPERATOR”  ·  2011–2018',
+      'A ~60-person company moving the delivery of public services into electronic form for the regional government. I owned the board process and drove the board\'s decisions through to implementation.',
     );
     roleLine('Deputy CEO, Business Development — Fundery LLC (fintech)  ·  2017–2018');
   };
 
-  addPage(true);
-
-  section('Summary');
-  // 28 Sep 2026 — the through-line opens every lane: one person, one pattern (lanes.json).
-  para(plain(LANES_JSON.through_line), bold, 9.2, 12);
-  y -= 2;
-  para(plain(cfg.profile), regular, 9, 12);
-  y -= 6;
-
-  section('Experience');
-  roleLine(
-    'Founder & AI Product and Solutions Lead — AIdeazz.xyz  ·  Panama / Remote  ·  2025–Present',
-    'Founder-led AI lab. I design, build and operate its production AI systems end to end — the architect, the reviewer and the on-call.',
-  );
-  if (lane === 'language') {
-    for (const f of LANES_JSON.facts.filter((x) => x.tags.includes('language'))) {
-      project({ title: plain(f.lead), body: plain(f.body) });
+  const laneBody = () => {
+    section('Summary');
+    // 28 Sep 2026 — the through-line opened every lane. 11 Oct 2026, Elena: film CVs only — the 6 Oct
+    // reviewers cut "…the films they make" from an operations CV as off-target.
+    if (lane === 'creative') {
+      para(plain(LANES_JSON.through_line), bold, 9.2, 12);
+      y -= 2;
     }
-  } else {
-    for (const k of (job && job.order) || ORDER[lane] || ORDER.default) project(PROJECTS[k]);
-  }
-  roleLine('Operational Co-Founder — OmniBazaar, decentralised e-commerce  ·  2024–2025');
-  // 1 Oct 2026, Elena: "put my CLO on the 1st page". For legal / compliance / contracts postings
-  // (job-tailor sets executive_first) the executive roles are Experience, not a footnote on page 2.
-  if (cfg.executive_first) executiveRoles();
+    para(plain(cfg.profile), regular, 9, 12);
+    y -= 6;
 
-  section('Proof Hub');
-  const colW = CONTENT_W / 2;
-  PROOFS.forEach((p, i) => {
-    if (i % 2 === 0) ensure(16);
-    const x = MARGIN_X + (i % 2) * colW;
-    drawText(p.label, { x, y, size: 7.5, font: bold });
-    linkText(p.show, p.url, x + 92, y, 7.2, regular);
-    if (i % 2 === 1 || i === PROOFS.length - 1) y -= 13;
-  });
-  y -= 8;
+    section('Experience');
+    roleLine(
+      'Founder & AI Product and Solutions Lead — AIdeazz.xyz  ·  Panama / Remote  ·  2025–Present',
+      'Founder-led AI lab. I design, build and operate its production AI systems end to end — the architect, the reviewer and the on-call.',
+    );
+    if (lane === 'language') {
+      for (const f of LANES_JSON.facts.filter((x) => x.tags.includes('language'))) {
+        project({ title: plain(f.lead), body: plain(f.body) });
+      }
+    } else {
+      for (const k of (job && job.order) || ORDER[lane] || ORDER.default) project(PROJECTS[k]);
+    }
+    roleLine('Operational Co-Founder — OmniBazaar, decentralised e-commerce  ·  2024–2025');
+    // 1 Oct 2026, Elena: "put my CLO on the 1st page". For legal / compliance / contracts postings
+    // (job-tailor sets executive_first) the executive roles are Experience, not a footnote on page 2.
+    if (cfg.executive_first) executiveRoles();
 
-  section('How I work');
-  para(
-    plain(LANES_JSON.operating_model) + ' I judge a new data source by running it through the live gate before integrating it: the source added in August cleared 72% against ~6% for the rest of the fleet. I write the failure down and name it — clients can read how I debug before they hire me.',
-  );
-  y -= 8;
+    section('Proof Hub');
+    const colW = CONTENT_W / 2;
+    PROOFS.forEach((p, i) => {
+      if (i % 2 === 0) ensure(16);
+      const x = MARGIN_X + (i % 2) * colW;
+      drawText(p.label, { x, y, size: 7.5, font: bold });
+      linkText(p.show, p.url, x + 92, y, 7.2, regular);
+      if (i % 2 === 1 || i === PROOFS.length - 1) y -= 13;
+    });
+    y -= 8;
 
-  section('Available for');
-  for (const line of (job && job.available) || AVAILABLE[lane] || AVAILABLE.default) {
-    ensure(16);
-    drawText('–  ' + line, { y, size: 8.8, font: regular });
-    y -= 14;
-  }
-  y -= 6;
+    section('How I work');
+    // 11 Oct 2026: no baseline next to the 72% — NOW.md 5 Oct, VJH's own comments disagree (~5.6% vs ~21%).
+    para(
+      plain(LANES_JSON.operating_model) + ' I judge a new data source by running it through the live gate before integrating it: a job source added in August cleared my live filter 72% of the time, across all 345 of its postings, so it stayed. I write the failure down and name it — clients can read how I debug before they hire me.',
+    );
+    y -= 8;
 
-  section(lane === 'language' ? 'Language & audio toolkit' : 'Stack');
-  para(lane === 'language' && cfg.foundation ? plain(cfg.foundation) : STACK[lane] || STACK.default);
-  y -= 8;
+    section('Available for');
+    for (const line of (job && job.available) || AVAILABLE[lane] || AVAILABLE.default) {
+      ensure(16);
+      drawText('–  ' + line, { y, size: 8.8, font: regular });
+      y -= 14;
+    }
+    y -= 6;
 
-  if (!cfg.executive_first) {
-    section('Earlier');
-    executiveRoles();
-  }
+    section(lane === 'language' ? 'Language & audio toolkit' : 'Stack');
+    para(lane === 'language' && cfg.foundation ? plain(cfg.foundation) : STACK[lane] || STACK.default);
+    y -= 8;
 
-  section('Education');
-  para(
-    'MA Social Psychology — Penza State University · 2018. Blockchain Regulation — MGIMO, Moscow · 2017. Presidential Program for Executive Management — RANEPA · 2015. Polkadot Blockchain Academy, PBA-X Wave 3 · 2025. How-To-DAO Cohort · 2025. Anthropic Academy — Claude Certification Program · 2026, in progress. Internship — Nyskapingsparken Innovation Park, Bergen, Norway.',
-  );
-  y -= 8;
+    if (!cfg.executive_first) {
+      section('Earlier');
+      executiveRoles();
+    }
 
-  section('Languages');
-  para(LANGUAGES_LINE[lane] || LANGUAGES_LINE.default);
+    section('Education');
+    para(
+      'MA Social Psychology — Penza State University · 2018. Blockchain Regulation — MGIMO, Moscow · 2017. Presidential Program for Executive Management — RANEPA · 2015. Polkadot Blockchain Academy, PBA-X Wave 3 · 2025. How-To-DAO Cohort · 2025. Anthropic Academy — Claude Certification Program · 2026, in progress. Internship — Nyskapingsparken Innovation Park, Bergen, Norway.',
+    );
+    y -= 8;
+
+    section('Languages');
+    para(LANGUAGES_LINE[lane] || LANGUAGES_LINE.default);
+  };
+
+  // ── Posting-shaped CV (11 Oct 2026, Elena: "fix the kit so every deal gets CVs like this") ──────────
+  // The 5–6 Oct hand-built CVs (Supabase v3, Puente Founder's Associate / AI Ops Lead / PM) put checked
+  // bullets under the POSTING's own headings. scripts/lib/cv-compose.cjs chooses the headings (verbatim from
+  // the posting) and the lines (verbatim from docs/applications/cv-bank.json); this only lays them out.
+  const space = (size) => regular.widthOfTextAtSize(' ', size);
+  /** "**Lead.** rest" → a bold lead-in, as on the hand-built CVs. */
+  const runs = (s) => {
+    const m = String(s).match(/^\*\*(.+?)\*\*\s*([\s\S]*)$/);
+    return m ? [{ t: m[1], f: bold }, { t: m[2], f: regular }] : [{ t: String(s), f: regular }];
+  };
+  /** Wrap mixed bold/regular text; consecutive same-font words are drawn as one string so ATS parsers read words, not letters. Returns where the last line ended. */
+  const richPara = (segs, x0, maxW, size = 8.5, leading = 11) => {
+    const words = segs.flatMap((sg) => glyphSafe(sg.t).split(/\s+/).filter(Boolean).map((w) => ({ w, f: sg.f })));
+    const lines = [];
+    let cur = [];
+    let curW = 0;
+    for (const wd of words) {
+      const ww = wd.f.widthOfTextAtSize(wd.w, size);
+      if (cur.length && curW + space(size) + ww > maxW) { lines.push(cur); cur = []; curW = 0; }
+      curW += (cur.length ? space(size) : 0) + ww;
+      cur.push(wd);
+    }
+    if (cur.length) lines.push(cur);
+    let endX = x0;
+    for (const ln of lines) {
+      ensure(leading + 2);
+      let x = x0;
+      const groups = [];
+      for (const wd of ln) {
+        const g = groups[groups.length - 1];
+        if (g && g.f === wd.f) g.t += ` ${wd.w}`;
+        else groups.push({ t: wd.w, f: wd.f });
+      }
+      groups.forEach((g, i) => {
+        if (i) x += space(size);
+        page.drawText(g.t, { x, y, size, font: g.f, color: INK });
+        x += g.f.widthOfTextAtSize(g.t, size);
+      });
+      endX = x;
+      y -= leading;
+    }
+    return { endX, lastY: y + leading };
+  };
+  const bullet = (s, size = 8.5) => {
+    ensure(26);
+    drawText('–', { x: MARGIN_X + 2, y, size, font: regular });
+    const r = richPara(runs(s), MARGIN_X + 12, CONTENT_W - 12, size);
+    y -= 1.5;
+    return r;
+  };
+  const subhead = (t) => {
+    ensure(36);
+    drawText(t, { y, size: 9, font: bold, color: NAVY });
+    y -= 12;
+  };
+  const chips = (list) => {
+    const size = 7.8;
+    const padX = 5;
+    const h = 13;
+    let x = MARGIN_X;
+    ensure(h + 8);
+    for (const c of list.map(glyphSafe)) {
+      const w = bold.widthOfTextAtSize(c, size) + padX * 2;
+      if (x + w > MARGIN_X + CONTENT_W) { x = MARGIN_X; y -= h + 4; ensure(h + 8); }
+      page.drawRectangle({ x, y: y - 3.5, width: w, height: h, borderColor: RULE, borderWidth: 0.8 });
+      drawText(c, { x: x + padX, y, size, font: bold, color: NAVY });
+      x += w + 5;
+    }
+    y -= h + 6;
+  };
+  const sectionedBody = () => {
+    const R = job.roles;
+    section('Summary');
+    for (const line of job.summary) { richPara(runs(line), MARGIN_X, CONTENT_W, 9, 12); y -= 3; }
+    if (job.chips && job.chips.length) chips(job.chips);
+    y -= 2;
+
+    section('Experience');
+    roleLine(R.aideazz.line, R.aideazz.intro);
+    for (const s of job.sections) {
+      subhead(s.heading);
+      for (const b of s.bullets) bullet(b);
+      y -= 3;
+    }
+    if (R.omnibazaar) { roleLine(R.omnibazaar.line); for (const b of R.omnibazaar.bullets || []) bullet(b); y -= 3; }
+    if (R.egov) { roleLine(R.egov.line, R.egov.intro); for (const b of R.egov.bullets || []) bullet(b); y -= 3; }
+    if (R.fundery) roleLine(R.fundery.line);
+
+    if (job.steps && job.steps.items.length) {
+      section(job.steps.title);
+      job.steps.items.forEach((s, i) => {
+        ensure(26);
+        drawText(`${i + 1}.`, { x: MARGIN_X + 2, y, size: 8.5, font: bold });
+        richPara(runs(s), MARGIN_X + 14, CONTENT_W - 14);
+        y -= 1;
+      });
+      y -= 5;
+    }
+
+    if (job.live && job.live.length) {
+      section('Live work — links');
+      for (const item of job.live) {
+        const end = bullet(item.text);
+        // Links ride on the item's last line when they fit, else on a line of their own.
+        const links = item.links || [];
+        const sep = '  ·  ';
+        const linksW = links.reduce((w, l, i) => w + (i ? regular.widthOfTextAtSize(sep, 7.8) : 0) + regular.widthOfTextAtSize(l.label, 7.8), 0)
+          + regular.widthOfTextAtSize(sep, 7.8);
+        let lx = end.endX + regular.widthOfTextAtSize(sep, 7.8);
+        let ly = end.lastY;
+        if (links.length && end.endX + linksW > MARGIN_X + CONTENT_W) { ensure(13); lx = MARGIN_X + 12; ly = y; y -= 11; }
+        links.forEach((l, i) => {
+          if (i) { drawText(sep, { x: lx, y: ly, size: 7.8, font: regular, color: MUTED }); lx += regular.widthOfTextAtSize(sep, 7.8); }
+          lx += linkText(l.label, l.url, lx, ly, 7.8, regular);
+        });
+      }
+      y -= 5;
+    }
+
+    for (const [title, body] of [['Tools', job.tools], ['Education & professional development', job.education], ['Languages', job.languages]]) {
+      if (!body) continue;
+      section(title);
+      para(body, regular, 8.5, 11);
+      y -= 6;
+    }
+    if (job.note) para(job.note, italic, 7.6, 10, MUTED);
+  };
+
+  addPage(true);
+  if (job && job.sections) sectionedBody();
+  else laneBody();
 
   footer(page, pages.length);
   const n = pages.length;
@@ -419,9 +571,23 @@ async function buildLane(lane, job = null) {
   const jobArg = (process.argv.find((a) => a.startsWith('--job=')) || '').split('=')[1];
   if (jobArg) {
     const job = { ...JSON.parse(fs.readFileSync(jobArg, 'utf8')), _path: path.resolve(jobArg) };
-    const r = await buildLane(job.base_lane, job);
-    console.log(`  job ${job.cv}  ${r.pages} page(s)  ${r.bytes} bytes  (base lane ${job.base_lane})`);
-    return;
+    // A posting-shaped CV must fit 2 pages: drop the lowest-ranked line of the longest section and render
+    // again (cv-compose lists each section's lines best first). Never below one line per section.
+    for (let trimmed = 0; ; trimmed++) {
+      try {
+        const r = await buildLane(job.base_lane, job);
+        console.log(`  job ${job.cv}  ${r.pages} page(s)  ${r.bytes} bytes  (base lane ${job.base_lane})`
+          + (job.sections ? `  sections ${job.sections.length}  trimmed ${trimmed}` : ''));
+        return;
+      } catch (e) {
+        if (!job.sections || !/a CV is at most 2/.test(e.message)) throw e;
+        // Below 7 posting lines it is no longer the shaped CV: give up, and the kit builds the job-tailor CV instead.
+        const total = job.sections.reduce((n, s) => n + s.bullets.length, 0);
+        const longest = job.sections.reduce((a, b) => (b.bullets.length > a.bullets.length ? b : a));
+        if (total <= 7 || longest.bullets.length <= 1) throw e;
+        longest.bullets.pop();
+      }
+    }
   }
   const one = (process.argv.find((a) => a.startsWith('--lane=')) || '').split('=')[1];
   const lanes = one ? [one] : Object.keys(LANES_JSON.lanes);

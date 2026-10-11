@@ -69,6 +69,13 @@ const LEGAL_AVAILABLE = [
 // loop = fail-closed send of signed documents + CRM audit · evalloop = rules enforced in code · chain = traceable output
 const LEGAL_ORDER = ['loop', 'evalloop', 'chain'];
 
+// 11 Oct 2026: the line the kit writes on the 🛡️ note when the CV was shaped to the posting by
+// scripts/lib/cv-compose.cjs (posting headings + reviewed lines). The audit gives ✓CV only for it, and
+// hs-attach-cv.cjs leaves such a deal alone — so no generic lane CV is stapled next to it again.
+const CV_MARK = '📎 CV FOR THIS POSTING';
+// The older 🛡️ line (selection-only CV) — still a tailored CV for hs-attach-cv's purposes.
+const OLD_CV_LINE = 'Tailored CV attached to this note';
+
 const low = (s) => String(s || '').toLowerCase();
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /**
@@ -173,4 +180,4 @@ function renderDefenseHtml({ title, company, entries, frame, cvName, mark }) {
   return parts.filter(Boolean).join('');
 }
 
-module.exports = { LEGAL_LEAD, tailorJob, pickDefense, renderDefenseHtml, cleanTitle, slugOf, loadBank, PROJECT_TAGS };
+module.exports = { LEGAL_LEAD, tailorJob, pickDefense, renderDefenseHtml, cleanTitle, slugOf, loadBank, PROJECT_TAGS, CV_MARK, OLD_CV_LINE };

@@ -33,6 +33,7 @@ const path = require('path');
 const { hubspotKey, hubspotBase } = require(path.join(__dirname, 'hs-env.cjs'));
 const { uploadOutreachFile, addNoteAttachments, findOutreachNoteId, filesScopeOk } =
   require(path.join(__dirname, 'hs-files.cjs'));
+const { CV_MARK, OLD_CV_LINE } = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
@@ -67,6 +68,25 @@ function loadRules() {
     lanes: r.lanes,
     rules: r.rules.map((x) => ({ lane: x.lane, re: new RegExp(x.pattern, 'i') })),
   };
+}
+
+/**
+ * 11 Oct 2026: a deal whose 🛡️ note already carries a tailored CV keeps ONLY that CV. Stapling the generic
+ * lane CV onto its letter note every 10 minutes is how the Puente PM deal showed two different CVs — and the
+ * stale one on the first note is the one Elena picks (feedback, 29 Sep).
+ */
+async function hasTailoredCv(dealId) {
+  // A HubSpot error (429/5xx) must not read as "no tailored CV" — that would staple the lane CV next to it.
+  const a = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes?limit=100`);
+  if (!a.ok) throw new Error(`notes of deal ${dealId}: ${a.status}`);
+  const ids = (a.json?.results || []).map((x) => ({ id: String(x.toObjectId) }));
+  if (!ids.length) return false;
+  const r = await hs('POST', '/crm/v3/objects/notes/batch/read', { inputs: ids, properties: ['hs_note_body'] });
+  if (!r.ok) throw new Error(`note bodies of deal ${dealId}: ${r.status}`);
+  return (r.json?.results || []).some((n) => {
+    const body = String(n.properties?.hs_note_body || '');
+    return body.includes(CV_MARK) || body.includes(OLD_CV_LINE);
+  });
 }
 
 function inferLane(title, rules) {
@@ -128,7 +148,7 @@ function titleOf(dealname) {
   console.log(`read ${deals.length} deals in "${STAGE}"${DRY ? '  (DRY RUN — nothing will change)' : ''}`);
 
   const uploaded = new Map();   // lane -> fileId, so each CV uploads at most once per run
-  let attached = 0, already = 0, noNote = 0, failed = 0;
+  let attached = 0, already = 0, noNote = 0, failed = 0, tailored = 0;
   const spread = {};
 
   for (const d of deals) {
@@ -142,6 +162,7 @@ function titleOf(dealname) {
     if (DRY) { console.log(`  · ${lane.padEnd(12)} ${title.slice(0, 52).padEnd(54)} ${meta.cv}`); continue; }
 
     try {
+      if (await hasTailoredCv(d.id)) { tailored++; continue; }
       const noteId = await findOutreachNoteId(d.id);
       if (!noteId) { console.log(`  · ${title.slice(0, 48)} — no note on the deal, skipped`); noNote++; continue; }
 
@@ -161,7 +182,7 @@ function titleOf(dealname) {
 
   console.log(`\nlane spread: ${JSON.stringify(spread)}`);
   if (DRY) { console.log('DRY RUN — HubSpot was only read.'); return; }
-  console.log(`attached ${attached} · already had it ${already} · no note ${noNote} · failed ${failed}`);
+  console.log(`attached ${attached} · already had it ${already} · has a tailored CV (left alone) ${tailored} · no note ${noNote} · failed ${failed}`);
   console.log('Only note attachments were added (union). No deal, stage or letter was modified.');
   if (failed) process.exitCode = 1;
 })();

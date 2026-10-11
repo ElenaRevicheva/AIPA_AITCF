@@ -2,7 +2,9 @@
 /**
  * hs-audit-apply-kit.cjs — prove every "🔥 I Act TODAY" JOB deal (VJH or hand-staged) carries the FULL kit:
  *   LINK  a clickable apply link (<a href>) in a note        L   a cover letter (not a stub)
- *   CV    a TAILORED CV — a CV_*.pdf that is not one of the generic lane CVs
+ *   CV    a CV SHAPED TO THE POSTING — a CV_*.pdf that is not a generic lane CV AND the 🛡️ note's
+ *         "📎 CV FOR THIS POSTING" line (11 Oct 2026). A different file name alone proved nothing: the Puente
+ *         PM deal passed ✓CV with the AI-builder CV under a "Product Manager" headline.
  *   D     the 🛡️ TECHNICAL DEFENSE note                        R   the 🎯 ROLE DEFENSE note (written for this posting)
  *   C     the 📋 COMET PROMPT note (1 Oct 2026) — paste into Comet; it fills the form and stops
  * (29 Sep 2026, Elena: "no matter hand or auto staged, the deal … should be automatically genuinely stuffed".)
@@ -20,6 +22,7 @@ const path = require('path');
 const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
 const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
 const { COMET_MARK } = require(path.join(__dirname, 'lib', 'comet-prompt.cjs'));
+const { CV_MARK } = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 
 const TELEGRAM = process.argv.includes('--telegram');
 const STAGE = 'qualifiedtobuy';
@@ -60,7 +63,7 @@ function stripHtml(s) {
 async function auditDeal(d) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId);
-  let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false;
+  let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false, shaped = false;
   const notes = [];
   for (const id of ids) notes.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`));
   if (!isJobDeal(d.properties.dealname, notes.map((n) => n.properties?.hs_note_body))) return null;
@@ -73,6 +76,7 @@ async function auditDeal(d) {
     if (html.includes('TECHNICAL DEFENSE')) defense = true;
     if (html.includes('🎯 ROLE DEFENSE')) role = true;
     const body = stripHtml(html);
+    if (body.includes(CV_MARK)) shaped = true;
     const at0 = STUB_RE.test(body);
     const at = body.search(LETTER_RE);
     if (!at0 && at >= 0 && body.length - at >= MIN_LETTER_CHARS) letter = true;
@@ -82,7 +86,8 @@ async function auditDeal(d) {
       if (/^CV_/i.test(fname) && fname.endsWith('.pdf') && !LANE_CVS.has(fname.toLowerCase())) { cv = true; cvName = fname; }
     }
   }
-  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv, cvName, link, defense, role, comet };
+  if (cv && !shaped) cvName = `${cvName} (not shaped to the posting)`;
+  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && shaped, cvName, link, defense, role, comet };
 }
 
 async function telegram(text) {
@@ -111,7 +116,7 @@ async function telegram(text) {
     catch (e) { rows.push({ id: d.id, name: d.properties.dealname, error: e.message }); }
   }
 
-  const missing = (r) => [!r.link && 'no apply link', !r.letter && 'no letter', !r.cv && 'no tailored CV',
+  const missing = (r) => [!r.link && 'no apply link', !r.letter && 'no letter', !r.cv && 'no CV shaped to the posting',
     !r.defense && 'no 🛡️ defense', !r.role && 'no 🎯 role defense', !r.comet && 'no 📋 Comet prompt'].filter(Boolean);
   const gaps = rows.filter((r) => r.error || missing(r).length);
   for (const r of rows) {
