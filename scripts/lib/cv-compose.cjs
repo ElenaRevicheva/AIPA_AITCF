@@ -26,6 +26,8 @@ const { norm, describesHerAlone } = require(path.join(ROOT, 'dist', 'cover-lette
 const MIN_JD = 200;
 // Professional Outlook text — it lives in the Outlook, never in a role's CV (Elena, 11 Oct 2026).
 const OUTLOOK_ONLY = new Set(['s-ai-native-daily-tools']);
+// The shape a cached CV must have to be reused: a CV built before a composer change is built again.
+const SHAPE = 'one-role-2026-10-11';
 // A heading is a claim that she did that work, so a requirement she may lack can never be one.
 // Language words count only as a LEVEL ("English C1", "native speaker"): "AI-native operations" is a duty.
 const REQUIREMENT_RE = /\b\d+\s*\+?\s*years?\b|\byears? of\b|\bexperience (in|with)\b|\bdegree\b|\bbachelor|\bmaster'?s\b|\bcertif|\bproficien|\bbackground in\b|\bfamiliar(ity)? with\b|\bnative (speaker|english|spanish|portuguese|level)\b|\b(english|spanish|portuguese)\s+(fluen|proficien|level|native|[abc][12])/i;
@@ -263,11 +265,11 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       education: bank.education,
       languages: bank.languages,
       note: bank.figures_note,
-      _composed: { provider, reviewer, ids: kept.map((s) => s.ids), fit_note: fitNote },
+      _composed: { shape: SHAPE, provider, reviewer, ids: kept.map((s) => s.ids), fit_note: fitNote },
     };
     return { spec, provider: `${provider} + review ${reviewer}` };
   }
   return { spec: null, reason: lastReason || 'no usable choice' };
 }
 
-module.exports = { composeCv, loadBank, bankProblem, fitHeading, headingOf, overlap, REQUIREMENT_RE, BANK };
+module.exports = { composeCv, loadBank, bankProblem, fitHeading, headingOf, overlap, REQUIREMENT_RE, BANK, SHAPE };

@@ -49,7 +49,7 @@ const tailor = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 // them only lines that already passed a fact-trace / recruiter / skeptic review (docs/applications/cv-bank.json).
 // A model only chooses; code checks every heading against the posting and every line against the bank; a gpt-5
 // reviewer drops any line that does not show its duty. If any of that fails, the old job-tailor CV is built.
-const { composeCv } = require(path.join(__dirname, 'lib', 'cv-compose.cjs'));
+const { composeCv, SHAPE: CV_SHAPE } = require(path.join(__dirname, 'lib', 'cv-compose.cjs'));
 const { CV_MARK } = tailor;
 // --backfill-cv: rebuild the CV of deals that already have a 🛡️ note but no posting-shaped CV. Run by hand,
 // never from cron: a deal whose posting cannot be shaped would otherwise be retried (and paid for) every 10 min.
@@ -187,7 +187,8 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   const cachedJson = path.join(AUTO_DIR, shapedName.replace(/\.pdf$/, '.json'));
   try {
     const prev = JSON.parse(fs.readFileSync(cachedJson, 'utf8'));
-    if (!RECOMPOSE && String(prev._deal) === String(d.id) && prev.sections && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
+    if (String(prev._deal) === String(d.id) && prev._composed && prev._composed.shape === CV_SHAPE
+      && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
       return { cvPath: path.join(AUTO_DIR, shapedName), name: shapedName, shaped: true, info: 'reused this deal\'s built CV' };
     }
   } catch { /* not built yet */ }
