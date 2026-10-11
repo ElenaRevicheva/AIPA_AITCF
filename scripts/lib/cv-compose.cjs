@@ -185,7 +185,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       const revSys = [
         'You review a CV assembled for one job. Every line under a heading claims the candidate did that heading\'s work.',
         'For EACH line: supported=true only if the line itself shows her doing the work its heading names. A related skill, or the same tool used for something else, is NOT support.',
-        'For EACH heading: ok=false if it is a requirement (years, degree, language level, credential) rather than a duty of the job, or if it names a way of working that its lines do not show — e.g. "with engineering and design" or "with customers" when no line shows her working with human engineers, designers or customers.',
+        'For EACH heading: ok=false if it is a requirement (years, degree, language level, credential) rather than a duty of the job, or if it names a way of working that its lines do not show — e.g. "with engineering and design", "with customers", "cross-functional" teams, "stakeholders", or team rituals such as "standups" and "sprint/release planning" when no line shows her doing that WITH OTHER PEOPLE. Her lines describe work with AI agents, not with a human team: a heading that implies a human team is ok=false unless a line shows one.',
         `Finally: does the whole CV read as a CV for "${title}"? Answer reads_as true/false with one short reason. This is a note for the candidate, not a verdict on her: gaps in her experience are covered by her honest-gap answers elsewhere.`,
         'Return JSON only.',
       ].join('\n');
