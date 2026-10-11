@@ -391,7 +391,7 @@
   },
   {
    "sid": "A",
-   "clip": "vA1__venice-kling-o3-pro.mp4",
+   "clip": "../stillclips/sm_kA1_ghost.mp4",
    "poem": "#087",
    "lang": "en",
    "voice": "onyx",
@@ -464,7 +464,7 @@
    },
    "lead": 3.35,
    "tail_extra": 2.2,
-   "slow": 1.2,
+   "slow": 1.0,
    "glitchy": "flow",
    "edit": 17.5,
    "planned_edit": 17.5,

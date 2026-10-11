@@ -20,9 +20,12 @@ inv = {s['id']: s for s in json.load(open(f'{W}/v6_stanza_inventory.json', encod
 assert inv['S087.1']['text'].split('\n') == L[:57], 'stream != her stanza S087.1'
 lead = 0.5 + 0.06 * 40 + 0.45            # the command, then 40 lines printing fast, then the voiced lines
 after = 0.22 * (57 - 47)                  # lines 47..56 print slower
-item = {'sid': 'A', 'clip': 'vA1__venice-kling-o3-pro.mp4', 'poem': '#087', 'lang': 'en', 'voice': 'onyx',
+# Kling refused vA1 (content policy: the bare-breasted flute player in the painting; refunded). Elena chose LOCAL motion:
+# still-motion push-in on kA1 dissolving into kA1d (empty canvas), then arearea/ghost.sh (the painting's ghost, halation,
+# underground grade, afterimage) -> stillclips/sm_kA1_ghost.mp4, $0 beyond the $0.08 frame
+item = {'sid': 'A', 'clip': '../stillclips/sm_kA1_ghost.mp4', 'poem': '#087', 'lang': 'en', 'voice': 'onyx',
         'stanza': '\n'.join(L[40:47]), 'stanza_id': 'S087.1', 'term_stream': {'lines': L[:57], 'voiced': [40, 46]},
-        'lead': round(lead, 2), 'tail_extra': round(after, 2), 'slow': 1.2, 'glitchy': 'flow',
+        'lead': round(lead, 2), 'tail_extra': round(after, 2), 'slow': 1.0, 'glitchy': 'flow',
         'edit': round(lead + VD + 1.2 + after, 2), 'planned_edit': round(lead + VD + 1.2 + after, 2),
         'qc': 'Elena 11 Oct: the Arearea final shot (keyframe kA1, fragment #087 Red Dog)'}
 items = cut['items']; i37 = [k for k, x in enumerate(items) if x.get('sid') == '37'][0]
