@@ -22,7 +22,6 @@ agents keep it honest.
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 | Claude Code (bot fix) | 2026-10-12 22:30 | Telegram bot: typed text → Trello like voice, "wire this link" → card description, Kira≠daughter colour fix, image reading via the model waterfall (Elena's go) | src/telegram-bot.ts, src/trello-voice.ts, src/llm-resilience.ts + their dist, scripts/test-trello-voice-dates.cjs, scripts/test-llm-resilience.ts; pm2 restart cto-aipa ONLY after the 22:18 apply-kit row is clear or agrees | 68ecb0ca |
-| Claude Code | 2026-10-12 22:18 | Apply kit: feed the existing generators the verified evidence (Elena: "just make it work", no new machinery) | src/cover-letter.ts, dist/cover-letter.js, scripts/hs-fill-apply-kit.cjs, scripts/lib/cv-compose.cjs, docs/applications/cv-bank.json, docs/interview/defense-bank.json; Oracle cto-aipa (named-file scp, cron job, no PM2 restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -132,6 +131,21 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct ~23:05 UTC — APPLY KIT now draws every piece from the verified evidence (Elena: "just make it work, no bicycles") · live on Oracle · claim released
+- **DONE:** `docs/oracle/2026-10-12_apply_kit_profound_plan.md` (cause + what was built). Letter and 🎯 read `cv-bank.json` (one pool);
+  bank +6 reviewed lines from the CodeRoad v3 CV (verbatim check 0 misses); defense bank +3 (hallucination, cost, stakeholders); the
+  kit's ✅ letter runs on every deal (VJH's ⚠️ draft no longer blocks it) and carries the deal's own CV; composer: one lab summary,
+  E-GOV lines for stakeholder postings, exact word forms in headings, `fit_note` printed on the 🛡️ CV line. Commits ce95f79d, 9201d521, 4117f202.
+- **VERIFIED BY:** md5 laptop = Oracle for the 5 files; `test-cover-letter-model.cjs` 15/15; Oracle dry run on the CodeRoad posting:
+  `pickDefense → code, stakeholders, product, hallucination, cost`; `composeCv → 4 verbatim duty headings / 9 bullets / 1 summary / 3 egov`;
+  cron 22:30 `already had a letter 2 · wrote 8`; SIPEngines ✅ note 118392023980 read back = bank facts; 7 ✅ notes given the deal's own CV (additive).
+- **NEXT (Elena's):** apply to CodeRoad (v3 CV + ✉️ letter + 📝 answers). Read one new ✅ letter on your phone and say if the tone is right —
+  the prompt rule is one line in `src/cover-letter.ts` if it needs tightening.
+- **RISK:** existing 🛡️/🎯 notes are NOT regenerated (additive) — only new deals get the richer defenses; `--backfill-cv` / `--recompose`
+  stay hand-only (model spend). A posting whose "backlog" lines the gpt-5 reviewer rejects still falls back to the generic job-tailor CV
+  (`(not shaped: …)` in the kit log, ✖CV in the audit) — the composer cannot put a heading over a past role (not built, by her rule).
+
 
 ### ✅ 12 Oct ~21:40 UTC — CodeRoad Senior AI Product Owner: hand-built CV v3 on the deal (above v2 and the kit's v1) + 📝 FORM ANSWERS · Elena's move: apply · claim released
 - **DONE:** Elena asked "is it a profound resume for this role?" Three readers agreed the kit's v1 was not: the kit's own gpt-5 reviewer

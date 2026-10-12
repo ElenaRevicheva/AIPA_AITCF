@@ -57,3 +57,23 @@ rewritten (additive rule). VJH's own letter generator is not touched. Existing h
 
 ## Her call
 Build and deploy A–F? Or A–D + E(i)(ii) only, leaving the composer's past-role sections (E iii) for later.
+
+## Built and verified the same evening (Elena: "make it work what already exists, no inventing bicycles")
+
+Scope kept to data and wiring inside the existing files; the composer's past-role headings (E iii) were NOT built.
+
+| Change | File | Proof |
+|---|---|---|
+| Letter + 🎯 read the CV bank (one evidence pool); hand-typed lines only as fallback; live tool facts + honest negatives in `ROLE_PROFILE`; one letter rule (every sentence carries a verified fact) | `src/cover-letter.ts` → `dist/cover-letter.js` | `tsc` clean; `node scripts/test-cover-letter-model.cjs` 15/15; dry letter on Oracle for the CodeRoad posting = bank facts, no invented claim |
+| cv-bank +6 bullets (hallucination guardrail, inquiry concierge, fail-closed send, golden-set tests, hard gates, degrade-not-stop), +1 summary, +2 live lines, +1 E-GOV, +1 OmniBazaar, tools + figures note = the v3 wording; `_sources.coderoad` | `docs/applications/cv-bank.json` | verbatim check in code: 0 misses across 23 bullets / 5 summaries / 9 live / 4 egov / 3 omnibazaar |
+| 3 verified 🛡️ answers: hallucination, cost, stakeholders | `docs/interview/defense-bank.json` | dry `pickDefense` on the CodeRoad posting → `code, stakeholders, product, hallucination, cost` |
+| ✅ letter skipped only on the kit's own ✅ note or a hand-written ✉️; the letter note carries the deal's own CV from the 🛡️ note; the composer's `fit_note` printed on the CV line | `scripts/hs-fill-apply-kit.cjs` | 22:30 UTC cron: `already had a letter 2 · wrote 8` (Addi, SIPEngines, David Kennedy, Puente ×4, Scale Army); SIPEngines ✅ read back from HubSpot; 7 of those notes then given the deal's own CV additively (repair script, lane CV kept) |
+| One lab summary at most; all E-GOV lines for stakeholder postings; scale-only chips; headings keep the posting's exact word forms | `scripts/lib/cv-compose.cjs` | dry `composeCv` on the CodeRoad posting: 4 verbatim duty headings, 9 bullets incl. the hallucination guardrail, 1 summary, 3 egov, chips `6 products · 15 services | 600+ tests | 11,000+ postings`, fit_note captured (first dry lost 2 of 3 attempts to "drive"/"driving" → the word-form rule) |
+
+Deploy: named-file scp, md5 equal laptop = Oracle for all five files; backups `~/_session-backups/apply-kit-20261012/` on Oracle and
+`C:\Users\kirav\_session-backups\coderoad-cv-v2-20261012\` on the laptop. The kit is a cron job (every 10 min, flock) — no PM2 restart.
+Existing 🛡️ / 🎯 notes are not regenerated (additive rule): new deals get the richer defenses; existing deals got the ✅ letter only.
+Hand-built CVs stay protected by the hand-built guard. VJH's own letter generator untouched.
+
+Not done, by design: the composer still cannot put a posting heading over a past role; a reviewer that drops every job-search line
+for a "backlog" heading leaves the kit on the generic job-tailor CV for that deal (the `(not shaped: …)` log line + ✖CV in the audit).
