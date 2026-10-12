@@ -131,6 +131,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟡 12 Oct — VJH delivered no fresh jobs since 10 Oct: Bright Data SUSPENDED 7 Oct (unpaid) · Elena topped up $10 · fixes await her go
+- **Diagnosis:** `docs/oracle/2026-10-12_vjh_no_fresh_jobs_diagnosis.md` (5 investigators + 2 adversarial verifiers, read-only).
+- **Cause 1:** Bright Data suspended 7 Oct 14:28 UTC → 180/180 searches empty, each run logged a normal `Done — new jobs: 0`.
+  **After the top-up:** `/status` active; VJH-style job-board query → 10 results in 3 s. Next serpapi-jobs run ~18:50 UTC 12 Oct.
+- **Cause 2:** Torre refuses outside requests since 2 Oct (HTTP 400) — no code fix allowed (its terms); partner access = Elena's call.
+- **Awaiting Elena's go:** (a) run serpapi-jobs now · (b) judge PT/MT hours · (c) HN by date · (d)/(f) failure counts in logs ·
+  (e) Telegram ping on an all-failed run (new check). Nothing changed on Oracle except removing this session's /dev/shm log copies.
+
 ### ✅ 12 Oct — OpenClaw menu says how the coach works now · session files synced laptop = git = Oracle · claim released
 - **DONE:** new /menu (HELP.md = IDENTITY.md). Retired figures (420+ audits, median 85, self-scored 100/100, "2,800+ deals" as acquisition)
   removed from what the kit and coach READ: `docs/interview/defense-bank.json`, `scripts/build-lane-cv.cjs` (fallback CV), the coach's
@@ -140,7 +148,7 @@ git log keeps the record.
 - **NEXT:** nothing owed. OpenAI top-up = Elena's call (Gemini serving). Already-sent CVs keep their old figures by design (additive).
 - **RISK:** Oracle's ~/cto-aipa .gitignore (4 Sep) lacks `cv-by-job/auto/` → never `git add -A` there (CVs would be committed).
 
-### 🟡 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · waterfalls serving (coach on Gemini) · top-up is Elena's call
+### ✅ 11 Oct ~22:40 → 12 Oct ~11:19 UTC — OpenAI credit was EXHAUSTED, answers again since (1-token probes 200 on both keys); Anthropic still empty
 - **Proof:** a 1-token probe on BOTH Oracle OpenAI keys returns `credit_balance_exhausted` (cto-aipa, OpenClaw, whitespace,
   dragontrade, EspaLuz_Influencer share one; EspaLuzFamilybot, EspaLuzWhatsApp, VJH share the other — same account, both dry).
 - **OpenClaw coach:** "prep me for …" replies only "You have no credits remaining". The 7 Oct waterfall (`ad14b64e`) did NOT
