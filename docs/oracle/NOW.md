@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-10-12 | Arearea v17 (Elena): new stanza on 10a (no second "morning"), closing card AREAREA + a verified art-history note; recompile + republish | `scripts/atuona-film9.mjs` (outro), `docs/atuona/film9_stanza_work/` (build_cut_v17), laptop render_v17; Oracle studio file | 1c9adf52 |
-| Claude Code | 2026-10-12 | OpenClaw menu (how the coach works now) + laptop/git/Oracle sync of this session's files | OpenClaw workspace HELP.md/IDENTITY.md, openclaw-gateway; md5 checks of cto-aipa kit/CV/coach files | 15dcc1cb |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,6 +130,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct — OpenClaw menu says how the coach works now · session files synced laptop = git = Oracle · claim released
+- **DONE:** new /menu (HELP.md = IDENTITY.md). Retired figures (420+ audits, median 85, self-scored 100/100, "2,800+ deals" as acquisition)
+  removed from what the kit and coach READ: `docs/interview/defense-bank.json`, `scripts/build-lane-cv.cjs` (fallback CV), the coach's
+  `references/outlook.txt` (re-extracted from the 11 Oct Outlook). `hs-deal-prep.cjs --examples` = the verified list for `spar` mode.
+- **VERIFIED BY:** live /menu reply = new text; spar test: Gemini first invented "2,500+ analyses in its first month", after the fix copied
+  "39 audits of 18 websites…" word for word; deal mode READ-PROOF intact. md5 (CR-stripped) laptop = Oracle for every deployed file.
+- **NEXT:** nothing owed. OpenAI top-up = Elena's call (Gemini serving). Already-sent CVs keep their old figures by design (additive).
+- **RISK:** Oracle's ~/cto-aipa .gitignore (4 Sep) lacks `cv-by-job/auto/` → never `git add -A` there (CVs would be committed).
 
 ### 🟡 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · waterfalls serving (coach on Gemini) · top-up is Elena's call
 - **Proof:** a 1-token probe on BOTH Oracle OpenAI keys returns `credit_balance_exhausted` (cto-aipa, OpenClaw, whitespace,
@@ -367,7 +375,7 @@ git log keeps the record.
 
 ### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
 - **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/sources.sh, which reads LIVE: `outlook.txt` = a mechanical extract of
-  `docs/applications/professional-outlook/outlook.html` (re-extract when it changes), `cto-aipa/docs/interview/defense-bank.json`, `~/aideazz/content/ai-ops-wiki/incidents/*.md`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
+  `docs/applications/professional-outlook/outlook.html` (re-extract when it changes — `references/extract_outlook.py`, proven byte-identical to the 7 Oct extract; re-extracted 12 Oct with the verified figures), `cto-aipa/docs/interview/defense-bank.json`, `~/aideazz/content/ai-ops-wiki/incidents/*.md`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
   Flow: "spar"/"prep me for <role>" → full MOCK INTERVIEW (8 Qs in real order; "quick"=4, "deep"=10; debrief at the end), each → Elena answers in English, her way → ✅ polished /
   💡 what it means / 🎯 why the role asks it / ➕ proof / 🔧 fixed → card appended to `~/.openclaw/workspace/interview-cards/<role>.md`.
   No VJH, cto-aipa or OpenClaw code touched; no gateway restart. Backups `~/_session-backups/openclaw-spar-20261007/`.
@@ -400,9 +408,11 @@ git log keeps the record.
   chars), Q2 = a posting requirement. BUT a fake "💾 saved" (cards folder empty), no proof, and double audio (tts tool + tag). Fixed: cards rebuilt from
   her UUID session files by `skills/interview-spar/references/build-cards.py` (cron */10, `~/logs/interview-cards.log`); ➕ = verbatim line from the deal's
   🛡️ TECHNICAL DEFENSE (verified by grep); tts tool forbidden. Re-test: proof present + verbatim, 0 tts tool calls, 0 "💾".
-- **Menu (7 Oct, last):** /menu = exact HELP text (menu copied verbatim into IDENTITY.md = always in context; 4/4 runs exact). Telegram "/" list =
+- **Menu (12 Oct, last — job-list-filter 913801b):** /new first → `prep me for <company> <role>` → ✅ Loaded proof line → one question at a time →
+  polished + verified example + 🔧 → 🔴 LIVE for a real interview. HELP.md = IDENTITY.md menu, word for word (live reply checked 12 Oct). Telegram "/" list =
   only /menu /spar /cards /shortlist /linkedin (`commands.native:false`). /cards reads `cards/TOOLS.md` (injected, 2/2 showed her real card).
-  **SYNC VERIFIED 7 Oct:** cto-aipa laptop = GitHub; 7 deployed files identical on Oracle. openclaw repo `docs` = laptop = Oracle workspace/skill files.
+  **SYNC VERIFIED 12 Oct:** read-only audit of every file this session touched (43, from the session log) — laptop = git = Oracle; aideazz
+  laptop fast-forwarded to 6849292. **SYNC VERIFIED 7 Oct:** cto-aipa laptop = GitHub; 7 deployed files identical on Oracle. openclaw repo `docs` = laptop = Oracle workspace/skill files.
   Full map: openclaw-vibejob-shortlist `docs/openclaw/ORACLE_LIVE_SETUP.md`. Known, not fixed: `oracle-products.conf` openclaw entry is wrong (dir + restart).
 - **NEXT:** Elena pauses. Her next mock interview: check one card in `cards/TOOLS.md` + that the ➕ line is from the deal's 🛡️ defense. If her old Telegram session does not pick the skill up, send `/new` once.
 
