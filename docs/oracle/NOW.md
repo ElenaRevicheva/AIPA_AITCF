@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (Atlas deck+video+Cc) | 2026-10-12 23:40 | Elena: every Atlas email carries the AIGO ES deck PDF + the niche's YouTube promo + Cc to her; backfill today's 8 Atlas leads | scripts/atlas-lead-machine.cjs, docs/selling/prospect-meta.cjs (read), Oracle registry rows/drafts of the 8 `-atlas` slugs + their HubSpot notes; no PM2 | — |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 | Claude Code (bot fix) | 2026-10-12 22:30 | Telegram bot: typed text → Trello like voice, "wire this link" → card description, Kira≠daughter colour fix, image reading via the model waterfall (Elena's go) | src/telegram-bot.ts, src/trello-voice.ts, src/llm-resilience.ts + their dist, scripts/test-trello-voice-dates.cjs, scripts/test-llm-resilience.ts; pm2 restart cto-aipa ONLY after the 22:18 apply-kit row is clear or agrees | 68ecb0ca |
 
