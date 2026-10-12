@@ -122,3 +122,17 @@ closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (th
 > The films carry ATUONA's underground aesthetic: crimson silk, black volcanic sand, 3 AM light. They are adult in mood and never explicit. Every line on screen is a whole stanza in the poet's own words, typed into a PowerShell session as the narrator reads it, under the number of the fragment it comes from. Code and verse share one screen, because in her work they are one practice.
 >
 > AREAREA (2026), her ninth film, takes its name from Gauguin's 1892 painting in the Musée d'Orsay, the canvas Paris mocked as "Le Chien rouge". It follows Kira, a woman who will not whiten, and Ule, a witness who is not a lover, across an island that sells everything, even a tear, by the lot.
+
+**Niio Bio / About, broader version (12 Oct, 2078 of 2500; Elena: "mention my broader skills"; figures from the Professional Outlook, re-counted 11 Oct 2026). USE THIS ONE:**
+
+> Kira Velerevich is the pen name of Elena Revicheva, a poet, AI filmmaker and AI-native systems builder based in Panama.
+>
+> For seven years she was Deputy CEO and Chief Legal Officer of a regional e-government operator, where she ran the board process and the legal side of moving public services online. Today she leads AIdeazz AI Lab. She designs AI systems, directs their implementation through AI coding agents, and operates them in production: more than 15 live services and 25 scheduled jobs, agents that have written over 3,000 records into a CRM, and a public AI Visibility Audit API that shows how ChatGPT, Perplexity and Claude see a website.
+>
+> Those same tools became her film studio. ATUONA, her gallery and studio, is named after the village in the Marquesas where Paul Gauguin is buried. The vault at atuona.xyz holds 99 fragments, roughly half in Russian and half in English. LITPROM published 46 of them. She directs her poems as films, with AI as the camera and her own verse on the screen, through a production pipeline she designed and operates with her AI agents: image, motion, voice, music and edit run as one system. Nine films are finished, the first released in May 2026.
+>
+> The films carry ATUONA's underground aesthetic: crimson silk, black volcanic sand, 3 AM light. They are adult in mood and never explicit. Every line on screen is a whole stanza in the poet's own words, typed into a PowerShell session as the narrator reads it, under the number of the fragment it comes from. Code and verse share one screen, because in her work they are one practice.
+>
+> AREAREA (2026), her ninth film, takes its name from Gauguin's 1892 painting in the Musée d'Orsay, the canvas Paris mocked as "Le Chien rouge". It follows Kira, a woman who will not whiten, and Ule, a witness who is not a lover, across an island that sells everything, even a tear, by the lot.
+>
+> She works in English and Russian. Her practice sits where executive judgment, production engineering and poetry meet: she designs the system, directs the AI that builds it, and answers for what it makes.
