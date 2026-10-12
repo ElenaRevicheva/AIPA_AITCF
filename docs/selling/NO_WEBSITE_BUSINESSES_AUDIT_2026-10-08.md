@@ -114,3 +114,25 @@ an optional AI-readable micro-page, and a 4-stage offer (audit → GEO/AEO work 
 **Small fixes worth Elena's go (protect paying customers, not new features):**
 1. Step A: the audit says "no owned website" for social/Maps links instead of grading Google/Instagram.
 2. `diagnostic-delivery.ts:67-72` parsing (`https://none`, line-swallowing regex).
+
+## 8. Instagram-only and WhatsApp-only businesses (12 Oct 2026, code-read)
+
+**Partly built, three pieces:**
+1. **Atlas (whitespace) already reads the Meta Ad Library** via Bright Data (`whitespace/src/capture.ts:52-53`,
+   `brightdata.ts bdMetaAdLibraryFetch`) and records the **advertiser** (page name) for each ad (`ad-sources.ts:47,89`).
+   A high-ticket Instagram/WhatsApp business that pays for ads shows up there, and paying for ads is the best proof it has money.
+   Limits: `country=US` hardcoded in the library URL (`capture.ts:53`); seed verticals are affiliate niches, but
+   `registerTrackedVertical` accepts any label (e.g. "yacht charter Panama"); phone/email in ad copy is **redacted on purpose**
+   before commit (`atlas-capture-cron.sh:41-47`, the DataVendor PII rule). It was built to find ad angles, not leads.
+   The official `meta-api.ts` covers political/social-issue ads only (its own note, `:4`).
+2. **The lead machine already finds Instagram profiles, then drops them.** Its Bright Data search returns
+   instagram.com / wa.me / linktr.ee results, and `atlas-lead-machine.cjs:1229` (`PLATFORM_DOMAINS`) drops them as "unsellable".
+3. **Places** (`prospect-places.ts`): many Instagram-first businesses still have a Maps listing with a phone, which it keeps.
+
+**Not built, and should not be:** reading Instagram profiles (no permitted API; scraping breaks Instagram's terms).
+**WhatsApp-only has no discovery path at all:** WhatsApp has no public directory. Such a business is findable only through
+an Instagram bio, a Maps phone, or a click-to-WhatsApp ad. That is the pitch: AI cannot recommend what is not public.
+
+**Cheapest test ($0, 10 min, by hand):** open facebook.com/ads/library, country Panama, search "yacht charter" /
+"implantes dentales" / "relocation Panama", and count advertisers with no website. That count decides whether piece 1 is worth a small change
+(country + tracked vertical).
