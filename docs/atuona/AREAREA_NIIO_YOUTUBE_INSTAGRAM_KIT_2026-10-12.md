@@ -12,7 +12,7 @@ work is welcome to submit when the poems, direction and edit are hers; curators 
 | Instagram Reel | sent to her Telegram 12 Oct | 1080×1920, 24 fps, 2:49, 47 MB (the whole 16:9 frame on black, title above, signature below; same folder: `AREAREA_Instagram_Reel_9x16.mp4`) |
 
 **Why 1080p and not 4K:** every source clip is 1080p (19 at 1920×1080, 6 at 1928×1072). A 4K file would be an upscale with no
-new detail, and Niio renders 2160p itself for 4K screens. Niio asks for "HD/4K single channel" and takes files up to 300 GB, so
+new detail, and Niio renders 2160p itself for 4K screens. Niio asks for "HD/4K single channel" and takes master files up to 5 GB (niio.com/site/artists), so
 the master is the 1080p film with the web 14 Mbit/s cap removed (x264 CRF 16, AAC 320k), built from the same near-lossless
 intermediates as the verified v17 (`FILM9_MASTER_CRF=16`).
 
@@ -87,7 +87,7 @@ intermediates as the verified v17 (`FILM9_MASTER_CRF=16`).
 
 Painting facts: `docs/atuona/AREAREA_RESEARCH_2026-10-11.md` (Orsay text via Google Arts & Culture, Larousse, Wikipedia,
 Wildenstein Plattner). Niio specs: help.niio.com 6141860 (formats, 2160p/1080p rendering), the Open Call page (HD/4K single
-channel, high-resolution file + full description, transfer to the Curatorial Committee), Niio help (single files up to 300 GB).
+channel, high-resolution file + full description, transfer to the Curatorial Committee), niio.com/site/artists (master files up to 5 GB; an older help article says 300 GB).
 Credits: the film sheet in the atuona repo. Clip resolutions: ffprobe of the 25 clips of cut_v17, 12 Oct.
 
 ## Sound fix in this master (12 Oct)
