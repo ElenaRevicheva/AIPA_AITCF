@@ -140,7 +140,9 @@ git log keeps the record.
   every shot · vault_check 19/19 against live atuona.xyz · master audio 169.08 s with music to the fade · Oracle md5 = laptop · films.json 1559.2 MB.
 - **Sent to Elena's Telegram:** Instagram Reel (9:16, 47 MB) + caption · Niio steps + description · YouTube title/description/link.
   Kit: `docs/atuona/AREAREA_NIIO_YOUTUBE_INSTAGRAM_KIT_2026-10-12.md`; laptop master `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\05_FILM_PREVIEW\v17\`.
-- **NEXT (Elena):** Niio upload + Open Call transfer (her login); YouTube + Instagram uploads. Agent: HubSpot note on the Niio deal not yet written.
+- **✅ NIIO SUBMITTED 12 Oct 15:11 UTC** (Open Call · Art Program S1, AREAREA only). Deal renamed + moved to ⏳Sent — passive wait; confirmation note;
+  stale 25 Sep follow-up closed; task 26 Oct = check aipa@ inbox + My Submissions. Reply Radar skips site@niio.email (automated) — correct, so record by hand.
+  YouTube is up (Premiere 12 Oct); unpublish its automatic captions after the Premiere. Instagram Reel = Elena's move.
 - **RISK:** a ~74 Mbit/s file may buffer on weak phone connections in the studio; the 14 Mbit/s web encode is one env var away
   (build without FILM9_MASTER_CRF). Laptop `render_v17/work/final.mp4` still has the OLD music bug — never publish it.
 
