@@ -5,6 +5,7 @@
  *   node scripts/hs-deal-prep.cjs --company="Addepto"      # best matching [HIRING-…] deal
  *   node scripts/hs-deal-prep.cjs --company="Puente" --role="Chief of Staff"   # several deals at one company
  *   node scripts/hs-deal-prep.cjs --deal=<dealId>
+ *   node scripts/hs-deal-prep.cjs --examples               # only the ✅ VERIFIED EXAMPLES list (spar, no deal)
  *   node scripts/hs-deal-prep.cjs --digest --out=<file>      # compact sheet of ALL live job deals (≤ 11,000 chars)
  *
  * --digest (7 Oct 2026): the mock interview must not depend on a model REMEMBERING to call this script — gpt-4.1
@@ -141,7 +142,25 @@ async function digest(outPath) {
   console.log(`digest: ${entries.length} live job deals → ${outPath} (${body.length} chars)`);
 }
 
+// VERIFIED EXAMPLES (11 Oct 2026, Elena: answers must carry "examples of my true verified situations with my products").
+// gpt-4.1 paraphrased a CV fact into a false one ("39 audits from 18 real users in one week"), while the 🛡️ line it
+// copies verbatim never bent — so the example is copied too, from the reviewed CV bank, never re-told.
+// --examples (12 Oct 2026): the same list for `spar` (no deal loaded) — without it Gemini invented "2,500+ analyses".
+function printVerifiedExamples() {
+  try {
+    const bank = require(require('path').join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'));
+    const told = (t) => t.replace(/^\*\*([^*]+?)\*\*\s*/, (m, lead) => (lead.includes(' — ') ? `${lead.split(' — ')[0]}: ` : ''));
+    // Every reviewed bullet is a true story; "six products", "five junk results" carry numbers in words, so no digit filter.
+    const ex = (bank.bullets || []).map((b) => told(String(b.text || ''))).filter(Boolean);
+    if (ex.length) {
+      console.log('\n===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):');
+      ex.forEach((t, i) => console.log(`${i + 1}. ${t}`));
+    }
+  } catch (e) { console.log(`\n(verified examples unavailable: ${e.message.slice(0, 80)})`); }
+}
+
 (async () => {
+  if (process.argv.includes('--examples')) return printVerifiedExamples();
   if (process.argv.includes('--digest')) {
     const out = arg('out');
     if (!out) { console.error('--digest needs --out=<file>'); process.exit(2); }
@@ -210,19 +229,7 @@ async function digest(outPath) {
     if (text.length > MAX_NOTE) cut++;
     console.log(text.length > MAX_NOTE ? `${text.slice(0, MAX_NOTE)} …[cut]` : text);
   }
-  // VERIFIED EXAMPLES (11 Oct 2026, Elena: answers must carry "examples of my true verified situations with my products").
-  // gpt-4.1 paraphrased a CV fact into a false one ("39 audits from 18 real users in one week"), while the 🛡️ line it
-  // copies verbatim never bent — so the example is copied too, from the reviewed CV bank, never re-told.
-  try {
-    const bank = require(require('path').join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'));
-    const told = (t) => t.replace(/^\*\*([^*]+?)\*\*\s*/, (m, lead) => (lead.includes(' — ') ? `${lead.split(' — ')[0]}: ` : ''));
-    // Every reviewed bullet is a true story; "six products", "five junk results" carry numbers in words, so no digit filter.
-    const ex = (bank.bullets || []).map((b) => told(String(b.text || ''))).filter(Boolean);
-    if (ex.length) {
-      console.log('\n===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):');
-      ex.forEach((t, i) => console.log(`${i + 1}. ${t}`));
-    }
-  } catch (e) { console.log(`\n(verified examples unavailable: ${e.message.slice(0, 80)})`); }
+  printVerifiedExamples();
   // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
   // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
   // the deal's note count and the first words of its newest note (the top of the Notes tab).

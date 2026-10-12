@@ -61,14 +61,16 @@ const PROJECTS = {
     url: 'https://aideazz.xyz/api',
     show: 'aideazz.xyz/api',
     // 11 Oct 2026: "14,000+ signals" removed — the 6 Oct Puente review found it only in the Toptal draft, never re-verified.
-    body: 'Live scoring for how discoverable a site is to ChatGPT, Perplexity and Claude, not only Google. Same GEO/AEO engine that scores my own hub 100/100. Production floor from Oracle logs, rounded down: 420+ audits, 210+ sites, median 85. Each check returns the fix and why it matters (34 why / 4 fix on a live stripe.com run).',
+    // 12 Oct 2026: "420+ audits, 210+ sites, median 85" and the self-scored "100/100" retired — log rotation deleted the
+    // history behind them; the October figure is what the server logs still show (same sentence as cv-bank and the Outlook).
+    body: 'Live scoring for how discoverable a site is to ChatGPT, Perplexity and Claude, not only Google. In the server logs for 1–10 October alone: 39 audits of 18 websites, 18 of them run by people on the public page. Each check returns the fix and why it matters (34 why / 4 fix on a live stripe.com run).',
   },
   loop: {
     title: 'Approved-send growth loop — HubSpot + Resend',
     // 29 Sep 2026: counts from the live HubSpot API that day (2,870 deals · 1,371 contacts · 2,127
     // companies), rounded down like the API block. Audit sentence: docs/interview/
     // MICRO1_AI_WORKFLOW_SPECIALIST_PREP.md + the 16 Jul log-verified audit.
-    body: 'The acquisition loop I run in production: research, qualify, draft, one human tap, send, then delivery and open written back to the CRM. 2,800+ deals, 1,300+ contacts, 2,100+ companies attributed by the agents. Send is fail-closed: if a PDF or signed .docx fails to load, the email is refused so it cannot claim an attachment it did not carry. I audit the CRM from the receiving end, not the sender\'s log: that found a trial-signup → HubSpot integration silently broken since launch — 28 real users never recorded; root-caused, fixed, backfilled all 28.',
+    body: 'The acquisition loop I run in production: research, qualify, draft, one human tap, send, then delivery and open written back to the CRM. 3,000+ CRM records written by the agents: 1,800+ job leads from my own job search and 800+ business prospects. Send is fail-closed: if a PDF or signed .docx fails to load, the email is refused so it cannot claim an attachment it did not carry. I audit the CRM from the receiving end, not the sender\'s log: that found a trial-signup → HubSpot integration silently broken since launch — 28 real users never recorded; root-caused, fixed, backfilled all 28.',
   },
   espaluz: {
     title: 'EspaLuz — paying WhatsApp / Telegram tutor',

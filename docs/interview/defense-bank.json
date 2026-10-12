@@ -245,7 +245,7 @@
         "pipeline management"
       ],
       "q": "Walk me through your CRM automation.",
-      "a": "My acquisition loop runs in production: research, qualify, draft, one human tap, send, then delivery and opens written back to HubSpot — 2,800+ deals so far. Every writer tags its deals with a source prefix, and a daily read-back audit re-reads HubSpot to prove the notes and attachments really landed.",
+      "a": "My acquisition loop runs in production: research, qualify, draft, one human tap, send, then delivery and opens written back to HubSpot — 800+ business prospects so far. Every writer tags its deals with a source prefix, and a daily read-back audit re-reads HubSpot to prove the notes and attachments really landed.",
       "push": "Why read back? — Because 'the API said OK' is not proof: reconciliation checks the result, not the request."
     },
     {
@@ -264,7 +264,7 @@
         "content strategy"
       ],
       "q": "What is GEO/AEO, and how do you measure it?",
-      "a": "Generative and answer-engine optimization: making a company visible and quotable in ChatGPT, Perplexity and Claude, not only Google. My public AI Visibility Audit API scores a site with 34 automated checks; it has run 420+ audits with a median score of 85, and my own hub scores 100/100.",
+      "a": "Generative and answer-engine optimization: making a company visible and quotable in ChatGPT, Perplexity and Claude, not only Google. My public AI Visibility Audit API scores a site with 34 automated checks; in the server logs for 1–10 October alone it ran 39 audits of 18 websites, 18 of them by people on the public page.",
       "push": "How is it different from SEO? — The same foundations (crawlability, structured data), plus access for AI crawlers and content an answer engine can quote."
     },
     {
