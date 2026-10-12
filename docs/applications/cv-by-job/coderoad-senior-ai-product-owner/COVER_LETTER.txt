@@ -1,0 +1,12 @@
+Dear CodeRoad team,
+
+I am applying for the Senior AI Product Owner role. I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions.
+
+Since 2025 I have owned six AI products end to end, with 15 production services live: I decide what gets built and in what order, write the requirements, decide the tests a change must pass, launch it, and measure the result in production. My acceptance criteria are tests, 600+ of them on my job-discovery pipeline across unit, integration and golden-set layers, and a change that measures worse does not ship: a RAG upgrade to my screening judge scored lower on a replay of my own past decisions and stayed switched off. When a vendor retired the models my services used, I moved all six products onto a five-provider fallback chain that week, with no outage. My daily publisher writes only from facts measured on the running system; a number or technology absent from that evidence is rejected.
+
+Before that, seven years as Deputy CEO and Chief Legal Officer of a regulated e-government operator taught me to treat constraints as product inputs: I ran the board process for stakeholders drawn mainly from the regional government and carried its decisions through to implementation. In my AI systems that means hard rules in code, fail-closed defaults, a human approval before anything irreversible, and no number shown unless it traces back to a record.
+
+I am based in Panama City (UTC-5), available immediately, and would welcome the chance to walk you through a live system I run. Portfolio: aideazz.xyz/portfolio
+
+Best regards,
+Elena Revicheva

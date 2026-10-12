@@ -165,3 +165,9 @@ a team size she led · "14,000+ signals" · "131 tests" · "420+ audits / 210+ s
   spending-cap story is the cost-control example for this role, and that vendor was a video engine, not an LLM.
 - 🛡️ note: v1 stays attached for the record; the top "📎 CV FOR THIS POSTING" line names **v2**.
 - The 📋 Comet prompt leaves the four free-text years/salary questions blank by design — fill them from the table above / the 📝 note.
+
+## Cover letter (polished 12 Oct, on the deal as the ✉️ note)
+
+Text: `cv-by-job/coderoad-senior-ai-product-owner/COVER_LETTER.txt`. Keeps the approved operating-model sentence verbatim; every fact is on the v3 CV
+(six products, 15 services, 600+ tests on the job-discovery pipeline, the RAG replay, the five-provider chain, the grounded publisher,
+the E-GOV board process, the defense-bank "constraints as product inputs" line). The kit's earlier letter on the ⚠️ note stays untouched.
