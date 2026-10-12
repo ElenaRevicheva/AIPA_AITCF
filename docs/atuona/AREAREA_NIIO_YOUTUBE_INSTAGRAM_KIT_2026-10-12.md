@@ -97,3 +97,16 @@ ended at about 151 s while the picture ran to 162 s. The voice bus ended with th
 shortest input, so it took the music with it. `apad` now holds the voice bus to the film's length. The music plays through the
 AREAREA card and the fragment list and fades over the last 5 s. The two quiet seconds right after the last line are the track's
 own breakdown (measured in the music file itself), and the beat comes back under the AREAREA card.
+
+## Niio Open Call - Art Program S1 form (12 Oct, Elena on the submission page)
+
+The event has four steps: 1 Information, 2 Questionnaire, 3 Select Artworks (up to 10), 4 Submit; changes allowed until the
+closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (the earlier films are 1280×720).
+
+**Artist bio (paste in step 1; every fact is from her own 25 Sep letter to Niio):**
+
+> Kira Velerevich is the pen name of Elena Revicheva, a poet and AI filmmaker based in Panama. Her gallery and film studio,
+> ATUONA, is named after the village in the Marquesas where Gauguin is buried. The vault holds 99 fragments, roughly half in
+> Russian and half in English; LITPROM published 46 of them. She is also the founder of AIdeazz AI Lab, where she builds
+> products with AI. Those same tools became her film studio: she directs her poems as films, with AI as the camera and her own
+> verse on the screen. AREAREA (2026) is her ninth film.
