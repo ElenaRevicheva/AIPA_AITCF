@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 | Claude Code (bot fix) | 2026-10-12 22:30 | Telegram bot: typed text → Trello like voice, "wire this link" → card description, Kira≠daughter colour fix, image reading via the model waterfall (Elena's go) | src/telegram-bot.ts, src/trello-voice.ts, src/llm-resilience.ts + their dist, scripts/test-trello-voice-dates.cjs, scripts/test-llm-resilience.ts; pm2 restart cto-aipa ONLY after the 22:18 apply-kit row is clear or agrees | 68ecb0ca |
 | Claude Code | 2026-10-12 22:18 | Apply kit: feed the existing generators the verified evidence (Elena: "just make it work", no new machinery) | src/cover-letter.ts, dist/cover-letter.js, scripts/hs-fill-apply-kit.cjs, scripts/lib/cv-compose.cjs, docs/applications/cv-bank.json, docs/interview/defense-bank.json; Oracle cto-aipa (named-file scp, cron job, no PM2 restart) | — |
 
