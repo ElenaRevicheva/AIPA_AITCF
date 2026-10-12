@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-12 22:18 | Apply kit: feed the existing generators the verified evidence (Elena: "just make it work", no new machinery) | src/cover-letter.ts, dist/cover-letter.js, scripts/hs-fill-apply-kit.cjs, scripts/lib/cv-compose.cjs, docs/applications/cv-bank.json, docs/interview/defense-bank.json; Oracle cto-aipa (named-file scp, cron job, no PM2 restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
