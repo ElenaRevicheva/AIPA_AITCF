@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-12 | Arearea v17 (Elena): new stanza on 10a (no second "morning"), closing card AREAREA + a verified art-history note; recompile + republish | `scripts/atuona-film9.mjs` (outro), `docs/atuona/film9_stanza_work/` (build_cut_v17), laptop render_v17; Oracle studio file | 1c9adf52 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,20 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct — AREAREA v17 LIVE (uncapped 1080p master, Niio-ready) · Niio submission = Elena's move · claim released
+- **DONE:** 10a = S093.24 "Paradise is not painted. / Paradise is compiled. / One brushstroke at a time." (#093; no second "morning" after 9);
+  closing card AREAREA + 4 verified Gauguin facts (`makeOutro`); **music bug fixed** — the voice bus ended with the last line and
+  sidechaincompress/amix stopped with it, so every film #9 cut went silent ~11-16 s before the end (apad to film length, 5 s fade).
+  Studio file replaced in place (same name), now the uncapped master: CRF 16, ~74 Mbit/s, 1.56 GB, md5 d75dab88…; v16 backup
+  `~/cto-aipa/backups/films/arearea-v16-2026-10-11.mp4`. Film sheet 2:49 / 25 shots / #093 (atuona `524b83db`).
+- **VERIFIED BY:** check_v17 ALL PASS (25/25 lengths = v16, 24 reused segments byte-identical, closing card text) · typed_check
+  every shot · vault_check 19/19 against live atuona.xyz · master audio 169.08 s with music to the fade · Oracle md5 = laptop · films.json 1559.2 MB.
+- **Sent to Elena's Telegram:** Instagram Reel (9:16, 47 MB) + caption · Niio steps + description · YouTube title/description/link.
+  Kit: `docs/atuona/AREAREA_NIIO_YOUTUBE_INSTAGRAM_KIT_2026-10-12.md`; laptop master `D:\ATUONA_FILM9_ALL_MATERIAL_2026-10-08\05_FILM_PREVIEW\v17\`.
+- **NEXT (Elena):** Niio upload + Open Call transfer (her login); YouTube + Instagram uploads. Agent: HubSpot note on the Niio deal not yet written.
+- **RISK:** a ~74 Mbit/s file may buffer on weak phone connections in the studio; the 14 Mbit/s web encode is one env var away
+  (build without FILM9_MASTER_CRF). Laptop `render_v17/work/final.mp4` still has the OLD music bug — never publish it.
 
 ### 🟡 12 Oct — VJH delivered no fresh jobs since 10 Oct: Bright Data SUSPENDED 7 Oct (unpaid) · Elena topped up $10 · fixes await her go
 - **Diagnosis:** `docs/oracle/2026-10-12_vjh_no_fresh_jobs_diagnosis.md` (5 investigators + 2 adversarial verifiers, read-only).
