@@ -576,6 +576,14 @@ async function briefPass(d, bodies, title, company) {
       }
 
       if (APPLY) {
+        // 12 Oct 2026: when an earlier run (or a hand build) already put the deal's CV on the 🛡️ note, the letter
+        // carries THAT CV — the 22:30 run attached the generic lane CV to 8 letters whose deals already had a shaped
+        // or hand-built one. The lane CV is only for a deal that has no CV of its own yet.
+        if (!DEAL_CV.has(String(d.id))) {
+          const shield = notes.find((n) => text(n.properties.hs_note_body).includes(DEFENSE_MARK));
+          const own = shield ? (await cvIdsOn(shield)).cv : [];
+          if (own.length) DEAL_CV.set(String(d.id), own[own.length - 1]);
+        }
         const body = [
           `<strong>${READY_MARK} — drafted against this posting (${esc(drafted.provider || 'llm')}, ${via}). Read it, then paste. ---</strong>`,
           jobUrl ? `<p>Apply: <a href="${esc(jobUrl)}">${esc(jobUrl)}</a></p>` : '',
