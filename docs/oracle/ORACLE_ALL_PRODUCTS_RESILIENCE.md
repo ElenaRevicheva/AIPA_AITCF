@@ -2901,6 +2901,14 @@ Instagram, Twine and beBee. **The reciprocal half — those profiles linking bac
 
 ## ⚠️ Oracle-only code with NO git backup
 
+> **Updated 12 Oct 2026 (fleet sync audit):** the module IS in git now — canonical copy
+> `deploy/espaluz-familybot/aideazz_service_payments.py` in this repo (commit `30c62216`, md5
+> `6e0263804e8de01df26cf20b1428ebce` = the live Oracle file). The 10-line `AIDEAZZ_SVC_HOOK_START/END` block in
+> Oracle's `paypal_webhook_server.py` is still Oracle-only by design; its text lives in
+> `scripts/oracle-deploy-service-payments.sh`. After ANY Familybot deploy:
+> `grep -c AIDEAZZ_SVC_HOOK_START ~/EspaLuzFamilybot/paypal_webhook_server.py` must print 1 — re-apply only the
+> python patch block of that script, never the whole script. The text below is the 17 Aug state.
+
 `EspaLuzFamilybot/aideazz_service_payments.py` (4,065 b, Jul 4) is **untracked and live** —
 `paypal_webhook_server.py` wires it via an `AIDEAZZ_SVC_HOOK_START/END` block that is
 also not in git, and `espaluz-payments-webhook` is active. This is **money code with no

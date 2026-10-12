@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-12 19:20 | FLEET SYNC (Elena): audit done — now applying: cto-aipa src/.gitignore to Oracle, restarts vibejobhunter-web · serpapi-jobs · whitespace, OpenClaw /cards | all repos read-only; deploys/restarts only after the audit, one service at a time | a584282e |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct ~19:30 UTC — FLEET SYNCED: every running process runs its newest code · laptop = GitHub everywhere · claim released
+- **DONE:** `docs/oracle/2026-10-12_fleet_sync_audit.md`. Backed up the Oracle-only Atlas commit `782abc2` (laptop `_private-backups/
+  atlas-stranded-20261012/`, bundle verified); Oracle cto-aipa `src/`+`.gitignore` = origin (build trap removed, dist untouched);
+  restarted vibejobhunter-web, serpapi-jobs (now on the 12 Oct judge), whitespace (+ff 48ecab5); OpenClaw /cards fixed (job-list-filter `9b5038f`).
+- **VERIFIED BY:** per-process start time ≥ newest code it loads, for all 15 processes; cto-aipa 93/93 dist = origin build; `/health` 200 on
+  vibejobhunter-web and whitespace; cards rebuild `6 answers across 2 role(s)`; Bright Data run 18:58 `Done — new jobs: 78`.
+- **NEXT (Elena's):** EspaLuz PII-refactor deploy (deliberately held) · 2 unmerged Cursor branches · Lambda CodeSha256 check.
+- **RISK:** never `git pull/reset/clean` Oracle cto-aipa / EspaLuz / dragontrade checkouts; never deploy cto-aipa via `deploy-product.sh`
+  (reset --hard would wipe the Atlas commits). Keep the `AIDEAZZ_SVC_HOOK` block in Oracle's Familybot payment server.
 
 ### ✅ 12 Oct — AREAREA v17 LIVE (uncapped 1080p master, Niio-ready) · Niio submission = Elena's move · claim released
 - **DONE:** 10a = S093.24 "Paradise is not painted. / Paradise is compiled. / One brushstroke at a time." (#093; no second "morning" after 9);
