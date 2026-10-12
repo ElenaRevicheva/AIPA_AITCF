@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-12 | OpenClaw menu (how the coach works now) + laptop/git/Oracle sync of this session's files | OpenClaw workspace HELP.md/IDENTITY.md, openclaw-gateway; md5 checks of cto-aipa kit/CV/coach files | 15dcc1cb |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
