@@ -523,25 +523,32 @@ async function main() {
     // 12 Oct 2026 (Elena: "highest quality and size movie fitting niio requirements"): FILM9_MASTER_CRF=<n> drops the 14 Mbit/s
     // streaming cap for the delivery master (Niio takes HD/4K files up to 300 GB); the intermediates stay near-lossless either way.
     const MCRF = process.env.FILM9_MASTER_CRF;
-    const v = last ? (MCRF && !PREVIEW ? ['-preset', 'slow', '-crf', MCRF, '-tune', 'film'] : ['-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M'])
+    const v = last ? (MCRF && !PREVIEW ? ['-preset', 'medium', '-crf', MCRF, '-tune', 'film'] : ['-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M'])
                    : ['-preset', PREVIEW ? 'ultrafast' : 'veryfast', '-crf', PREVIEW ? '16' : '12'];
     await execFileP('ffmpeg', ['-y', '-threads', '2', '-filter_threads', '1', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`,
       '-c:v', 'libx264', ...v, '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', out], { maxBuffer: 1 << 27, timeout: 7200000 });
     return merged;
   }
   const body = path.join(W, 'body.mp4');
+  // FILM9_REUSE_BODY=1: the picture is already built (body.mp4) and only the sound changes — skip the dissolve chain.
+  const reuseBody = process.env.FILM9_REUSE_BODY === '1' && fs.existsSync(body) && fs.statSync(body).size > 1e6;
+  let merged = 0;
+  if (!reuseBody) {
   const starts = []; for (let i = 0; i < seq.length; i += CHUNK) starts.push(i);
   const chunkFiles = [];
   for (const [g, s0] of starts.entries()) {
     const ks = Array.from({ length: Math.min(CHUNK, seq.length - s0) }, (_, j) => s0 + j);
     const f = path.join(W, `${PREVIEW ? 'pv_' : ''}chunk_${g}.mp4`);
-    await chain(ks.map(k => seq[k].file), ks.map(k => durs[k]), ks.map((k, j) => j === 0 ? 0 : joinD[k]), f, false);
+    // FILM9_REUSE_CHUNKS=1: keep finished batches of an interrupted run (they depend only on the segments and cards)
+    if (!(process.env.FILM9_REUSE_CHUNKS === '1' && fs.existsSync(f) && fs.statSync(f).size > 1e6))
+      await chain(ks.map(k => seq[k].file), ks.map(k => durs[k]), ks.map((k, j) => j === 0 ? 0 : joinD[k]), f, false);
     chunkFiles.push(f);
     process.stderr.write(`dissolve batch ${g + 1}/${starts.length}\n`);
   }
   const cds = []; for (const f of chunkFiles) cds.push(await vdur(f));
-  const merged = await chain(chunkFiles, cds, starts.map((s0, g) => g === 0 ? 0 : joinD[s0]), body, true);
+  merged = await chain(chunkFiles, cds, starts.map((s0, g) => g === 0 ? 0 : joinD[s0]), body, true);
   process.stderr.write(`dissolve chain: ${seq.length} segments in ${starts.length} batches, ${merged.toFixed(1)}s\n`);
+  } else process.stderr.write('body.mp4 reused (FILM9_REUSE_BODY): sound only\n');
 
   // 4. mix: music ducked under the voice bus, loudness-normalized, limited
   const LEN = await dur(body);
@@ -550,9 +557,13 @@ async function main() {
   // the graph has three shapes: music ducked under the voice bus (the 8 Oct preview), music alone (FILM9_NO_VO), voice alone
   // (FILM9_NO_MUSIC); with neither, the body's silent track is kept as it is
   const mixIn = ['-i', body]; if (musicOn) mixIn.push('-i', MUSIC); voAt.forEach(v => mixIn.push('-i', v.file));
-  let mf = musicOn ? `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${MUSIC_VOL},afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];` : '';
+  let mf = musicOn ? `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${MUSIC_VOL},afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 5).toFixed(2)}:d=5[music];` : '';
+  // 12 Oct 2026 (Elena: after "I will not whiten" the music "stops immediately ... like it is torn"): the voice bus ended with
+  // the last line, and sidechaincompress + amix stop with their shortest input, so the whole soundtrack ended there while the
+  // closing cards ran on in silence (16 s in v17). apad holds the voice bus open to the film's length, so the music plays
+  // through the cards and fades over the last 5 s.
   const vl = []; voAt.forEach((v, k) => { mf += `[${k + (musicOn ? 2 : 1)}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`; vl.push(`[v${k}]`); });
-  if (vl.length) mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=${VOICE_VOL}${musicOn ? ',asplit=2[vsc][vmix];' : '[premix];'}`;
+  if (vl.length) mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=${VOICE_VOL},apad=whole_dur=${LEN.toFixed(2)}${musicOn ? ',asplit=2[vsc][vmix];' : '[premix];'}`;
   if (musicOn && vl.length) mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=${DUCK_RATIO}:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];`;
   else if (musicOn) mf += `[music]anull[premix];`;
   mf += `[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`;
