@@ -110,3 +110,15 @@ closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (th
 > Russian and half in English; LITPROM published 46 of them. She is also the founder of AIdeazz AI Lab, where she builds
 > products with AI. Those same tools became her film studio: she directs her poems as films, with AI as the camera and her own
 > verse on the screen. AREAREA (2026) is her ninth film.
+
+**Niio profile Bio / About (12 Oct, 1268 of 2500 characters):**
+
+> Kira Velerevich is the pen name of Elena Revicheva, a poet and AI filmmaker based in Panama.
+>
+> Her gallery and film studio, ATUONA, is named after the village in the Marquesas where Paul Gauguin is buried. The vault at atuona.xyz holds 99 fragments, roughly half in Russian and half in English. LITPROM published 46 of them.
+>
+> She is also the founder of AIdeazz AI Lab, where she builds products with AI. Those same tools became her film studio. She directs her poems as films, with AI as the camera and her own verse on the screen. Nine films are finished, the first released in May 2026.
+>
+> The films carry ATUONA's underground aesthetic: crimson silk, black volcanic sand, 3 AM light. They are adult in mood and never explicit. Every line on screen is a whole stanza in the poet's own words, typed into a PowerShell session as the narrator reads it, under the number of the fragment it comes from. Code and verse share one screen, because in her work they are one practice.
+>
+> AREAREA (2026), her ninth film, takes its name from Gauguin's 1892 painting in the Musée d'Orsay, the canvas Paris mocked as "Le Chien rouge". It follows Kira, a woman who will not whiten, and Ule, a witness who is not a lover, across an island that sells everything, even a tear, by the lot.
