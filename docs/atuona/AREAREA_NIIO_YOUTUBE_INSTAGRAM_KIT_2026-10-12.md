@@ -160,3 +160,7 @@ closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (th
 > The artist owns the architecture. The revelation belongs to no one.
 >
 > atuona.xyz · atuona.xyz/aifilmstudio · litprom.ru/profil69387.html · aideazz.xyz/portfolio
+
+**Niio artist statement (12 Oct, under 100 words):**
+
+> I write poems and build the systems in which they live. ATUONA, my gallery and film studio, holds 99 fragments in Russian and English; my films turn them into moving image through an AI pipeline I designed and direct. Crimson silk, black volcanic sand, the light of 3 a.m.: my films explore desire, exile, memory and the commodification of intimacy. My stanzas appear inside a PowerShell terminal as the narrator reads, because code and verse share one screen in my work. AI is not my author; it is my medium. I own the architecture. The revelation belongs to no one.
