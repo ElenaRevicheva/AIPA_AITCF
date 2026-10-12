@@ -135,6 +135,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
   const system = [
     'You arrange a CV for ONE job from a BANK of checked lines. You never write CV text: you only choose ids and headings.',
     'HEADINGS: choose 3-5 headings for her current role. Copy each WORD FOR WORD from one line of the POSTING that describes the WORK of the job (what the person will do, own or deliver) — a contiguous piece of that line, 12-70 characters.',
+    'Keep the posting\'s exact word forms and punctuation inside the piece you copy ("driving feature scope", not "drive feature scope"; "managing project roadmaps", not "manage project roadmaps"): a heading that is not a character-for-character substring of the posting is rejected and costs an attempt.',
     'Never use a requirement as a heading (years of experience, a degree, a language level, a certificate, a tool she must already know): every line under a heading claims she has done that work.',
     'The headings sit under her CURRENT role (AIdeazz AI Lab), so their ids come ONLY from BULLETS (ids starting with "b-"); E-GOV ("eg-") and OmniBazaar ("om-") ids go only in their own lists.',
     'Under each heading put 2-4 BULLET ids that SHOW her doing exactly that work, the strongest first. Each id at most once; 7-14 bullets in total. If no bullet shows a duty, leave the duty out — never stretch a line to fit.',
