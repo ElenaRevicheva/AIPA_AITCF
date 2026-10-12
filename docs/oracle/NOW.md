@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-12 | Arearea v17 (Elena): new stanza on 10a (no second "morning"), closing card AREAREA + a verified art-history note; recompile + republish | `scripts/atuona-film9.mjs` (outro), `docs/atuona/film9_stanza_work/` (build_cut_v17), laptop render_v17; Oracle studio file | 1c9adf52 |
 | Claude Code | 2026-10-12 | OpenClaw menu (how the coach works now) + laptop/git/Oracle sync of this session's files | OpenClaw workspace HELP.md/IDENTITY.md, openclaw-gateway; md5 checks of cto-aipa kit/CV/coach files | 15dcc1cb |
 
 **Rules**
