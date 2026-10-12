@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-12 | VJH judge: Pacific/Mountain hours compatible (Elena's go) | VJH src/core/llm_judge.py; restart vibejobhunter (+ serpapi-jobs to load it) | c2cb7f88 |
 | Claude Code | 2026-10-12 | Arearea v17 (Elena): new stanza on 10a (no second "morning"), closing card AREAREA + a verified art-history note; recompile + republish | `scripts/atuona-film9.mjs` (outro), `docs/atuona/film9_stanza_work/` (build_cut_v17), laptop render_v17; Oracle studio file | 1c9adf52 |
 
 **Rules**
