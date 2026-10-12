@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-12 20:32 | CodeRoad Senior AI Product Owner: CV v2 by the 6 Oct recipe + form answers (deal 65888373398) | docs/applications/cv-by-job/coderoad-senior-ai-product-owner/, docs/applications/2026-10-12_coderoad_*.md, HubSpot notes on deal 65888373398 (additive only), NOW.md | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,28 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct ~21:40 UTC — CodeRoad Senior AI Product Owner: hand-built CV v3 on the deal (above v2 and the kit's v1) + 📝 FORM ANSWERS · Elena's move: apply · claim released
+- **DONE:** Elena asked "is it a profound resume for this role?" Three readers agreed the kit's v1 was not: the kit's own gpt-5 reviewer
+  (`_composed.fit_note`: "lacks evidence of … human cross-functional teams and stakeholder-facing product ownership" — a note that never
+  reaches HubSpot), ChatGPT (8/10), this session (3 of 5 posting duties, summary glued twice, no hallucination-guardrail story, no
+  stakeholder/compliance section). Rebuilt by the 6 Oct recipe: 5 duty headings verbatim (checked in code), reviewed lines + 6 traced
+  sentences (23 Aug grounded-publisher incident, defense-bank 5/9/15, Outlook), 2 pages, 13 links 200. Four-lens review (fact-trace ·
+  hiring manager · recruiter/ATS · Elena's rules) + one skeptic per finding, 18 agents: 11 confirmed fixes applied (incl. a real mislabel —
+  "LLM cost" over the 22 Sep VIDEO-engine spending cap → "Vendor cost"; the guardrail tail now says what the 23 and 26 Aug records agree on).
+  Record + form answers + honest gaps: `docs/applications/2026-10-12_coderoad_senior_ai_product_owner_APPLICATION.md`; source
+  `docs/applications/cv-by-job/coderoad-senior-ai-product-owner/CV.html`.
+- **VERIFIED BY:** HubSpot read-back after each write: 🛡️ note 118384846861 attachments `224202811549;224212619630;224212620379`
+  (v1;v2;v3), first 📎 line names v3, the v2 and v1 lines untouched; 📝 note 118391227494 posted (+ one pointer line to v3); Oracle
+  `node scripts/hs-audit-apply-kit.cjs` → `✓LINK ✓L ✓CV ✓D ✓R ✓C … CodeRoad_v3.pdf`, `10 job deals · complete 5`. Note backups
+  `C:/Users/kirav/_session-backups/coderoad-cv-v2-20261012/`. LangChain proven on Oracle (langchain 1.2.6 imports in both live EspaLuz venvs).
+- **NEXT (Elena's):** apply on Greenhouse with v3 + the 📝 note's answers. Her calls: years-in-related-roles dropdown (6+ recommended, 2+ if only
+  product ownership), U.S. clients (No unless she knows otherwise), salary (5,000 suggested; floor 3,500).
+- **RISK:** the 🎯 note's gap 7 ("haven't used LangChain") is wrong — say the 📝 line instead. The AI Visibility Audit API makes NO model call
+  (direct page fetches) — never list it as an LLM application; the spending-cap vendor was a video engine — never "LLM cost". The kit's
+  composer can only put posting headings over the CURRENT role, so stakeholder/compliance evidence from E-GOV never gets a section in a
+  machine CV, and its `fit_note` is written only to the JSON in `cv-by-job/auto/` — read it there before calling a machine CV "profound".
+
 
 ### ✅ 12 Oct ~19:30 UTC — FLEET SYNCED: every running process runs its newest code · laptop = GitHub everywhere · claim released
 - **DONE:** `docs/oracle/2026-10-12_fleet_sync_audit.md`. Backed up the Oracle-only Atlas commit `782abc2` (laptop `_private-backups/
