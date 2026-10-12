@@ -35,5 +35,85 @@ check('"…ты должен отредактировать…" reaches it', v.i
 check('"edit the card" reaches it', v.isManagementCommand('Please edit the card: it is for Marshall'));
 check('"aclara que…" reaches it', v.isManagementCommand('Aclara que la cita es para Marshall'));
 
+// ── 12 Oct 2026 — typed text, links on cards, a title that is only the column, Kira ≠ daughter ──────────────
+const M1 = 'Crea la tarea para el 16 de octubre 10 am para Kira Octubre Cita y conecta este enlace Here’s the Google Meet link for your intro with Natalia: https://meet.google.com/jcj-wpxs-utd';
+const M3 = 'Wire this link into this task into task description Here’s the Google Meet link for your intro with Natalia: https://meet.google.com/jcj-wpxs-utd';
+const MEET = 'https://meet.google.com/jcj-wpxs-utd';
+check('"…into task description…" (her 12 Oct message) reaches the edit path', v.isManagementCommand(M3));
+check('Spanish "descripción" reaches it', v.isManagementCommand('Agrega este enlace a la descripción de la tarea'));
+check('"attach this link to the card" reaches the classifier (link request)', v.isLinkAttachRequest('Attach this link to the card'));
+check('Russian "прикрепи ссылку" reaches it (link request)', v.isLinkAttachRequest('Прикрепи ссылку к задаче'));
+check('"rename it to …" reaches it', v.isManagementCommand('Rename it to Intro with Natalia'));
+check('her create message stays a CREATE (not an edit)', !v.isManagementCommand(M1));
+check('a plain Russian new task stays a create', !v.isManagementCommand('Добавь задачу купить молоко'));
+check('"Post on LinkedIn" stays a create', !v.isManagementCommand('Post on LinkedIn about the audit'));
+
+check('the Meet link is extracted exactly', JSON.stringify(v.extractUrls(M3)) === JSON.stringify([MEET]));
+check('trailing punctuation is not part of a link', JSON.stringify(v.extractUrls(`see ${MEET}.`)) === JSON.stringify([MEET]));
+check('"wire this link into this task" is a link request', v.isLinkAttachRequest(M3));
+check('"wire this link to the task" (no link yet) is a link request', v.isLinkAttachRequest('wire this link to the task'));
+check('Spanish "agrega el enlace" is a link request', v.isLinkAttachRequest('agrega el enlace a la tarea'));
+check('Russian "добавь ссылку" is a link request', v.isLinkAttachRequest('добавь ссылку в описание'));
+check('a CREATE that carries a link is NOT a link request', !v.isLinkAttachRequest(M1));
+check('"add the LinkedIn post" is NOT a link request', !v.isLinkAttachRequest('Add the LinkedIn post to my tasks'));
+check('merge keeps the old description and adds below', v.mergeDescription('Voice note: 10/12/2026', MEET) === `Voice note: 10/12/2026\n\n${MEET}`);
+check('merge is idempotent (link already there)', v.mergeDescription(`a\n\n${MEET}`, MEET) === `a\n\n${MEET}`);
+check('merge into an empty description', v.mergeDescription('', MEET) === MEET);
+check('a link she sent passes the verbatim check', v.urlsAreVerbatim(`Meet: ${MEET}`, M3));
+check('a link the model invented is refused', !v.urlsAreVerbatim('https://meet.google.com/abc-defg-hij', M3));
+
+const base = { isTask: true, description: '', category: 'family', urgency: 'dated', boardTarget: 'kira_current_month',
+  listTarget: 'dated', labelColor: 'red', subtasks: null, confidence: 0.9, reasoning: '' };
+const ceta = v.guardTitle({ ...base, title: 'CETA', boardNameHint: 'Kira Octubre', listNameHint: 'Cita', dueDate: '2026-10-16', dueTime: '10:00' });
+check('title "CETA" (the column, misheard) becomes "Cita October 16, 10:00 AM"', ceta.title === 'Cita October 16, 10:00 AM' && ceta.titleGuessed === true);
+// The live classifier (dry run 12 Oct) returned listNameHint "CETA" itself — the placeholder still says "Cita".
+const cetaHint = v.guardTitle({ ...base, title: 'CETA', boardNameHint: 'Kira Octubre 2026', listNameHint: 'CETA', dueDate: '2026-10-16', dueTime: '10:00' });
+check('misheard column "CETA" in the hint still gives "Cita October 16, 10:00 AM"', cetaHint.title === 'Cita October 16, 10:00 AM');
+const noSubject = { success: true, transcript: 'x', classification: { ...ceta, labelColor: 'red' }, card: { id: '1', name: ceta.title, url: '', shortUrl: 'https://trello.com/c/x' }, boardName: 'B', listName: 'L' };
+check('a card with no subject is shown with no colour, not red', /no colour yet/.test(v.formatVoiceTrelloReply(noSubject)) && !/🔴/.test(v.formatVoiceTrelloReply(noSubject)));
+check('a reply never carries a raw link (Markdown-safe)', !/meet\.google\.com/.test(v.formatVoiceTrelloReply({ ...noSubject, transcript: M1, classification: { ...ceta, description: `Meet: ${MEET}` } })));
+const empty = v.guardTitle({ ...base, title: '', boardNameHint: 'Kira Octubre', listNameHint: 'Cita', dueDate: '2026-10-16', dueTime: '10:00' });
+check('an empty title gets the same honest placeholder', empty.title === 'Cita October 16, 10:00 AM' && empty.titleGuessed === true);
+const real = v.guardTitle({ ...base, title: 'Intro with Natalia', boardNameHint: 'Kira Octubre', listNameHint: 'Cita', dueDate: '2026-10-16' });
+check('a real subject is left alone', real.title === 'Intro with Natalia' && !real.titleGuessed);
+const doc = v.guardTitle({ ...base, title: 'Cita Dr. Fernando Aguilar nefrólogo', listNameHint: 'Cita', dueDate: '2026-10-15' });
+check('"Cita Dr. Fernando Aguilar…" is left alone', doc.title === 'Cita Dr. Fernando Aguilar nefrólogo' && !doc.titleGuessed);
+// ── Adversarial review, 12 Oct 2026: the link shortcut must never swallow a task or edit the wrong card ────────
+for (const t of ['Add a task to send Marshall the link to the deck tomorrow',
+  'Remind me to add the Stripe payment link to the landing page tomorrow',
+  'Agrega una tarea: mandar el enlace a Natalia', 'Добавь задачу отправить ссылку Маршаллу в пятницу',
+  'Add a task to watch La Liga', 'Add the LinkedIn post to my tasks']) {
+  check(`new task is NOT a link request: "${t.slice(0, 48)}"`, !v.isLinkAttachRequest(t));
+}
+check('"remind me to add the Stripe link…" is a task creation', v.isTaskCreation('Remind me to add the Stripe payment link to the landing page tomorrow'));
+const NAT = 'Intro with Natalia';
+check('"wire this link to the task" points only at the card just made', v.pointsOnlyAtRecentCard('wire this link to the task', NAT));
+check('"agrega este enlace a la tarea <url>" points only at it', v.pointsOnlyAtRecentCard(`agrega este enlace a la tarea ${MEET}`, NAT));
+check('"add this link to the Natalia task <url>" points at it (its own title word)', v.pointsOnlyAtRecentCard(`add this link to the Natalia task ${MEET}`, NAT));
+check('"attach this link to the DENTIST card" names another card → classifier', !v.pointsOnlyAtRecentCard('Attach this link to the dentist appointment: https://clinic.example/book', NAT));
+check('her M3 (mentions Google Meet) goes to the classifier, not the shortcut', !v.pointsOnlyAtRecentCard(M3, NAT));
+check('a link request naming a card reaches the classifier gate', v.isLinkAttachRequest(`Add this link to the Boardy intro card ${MEET}`));
+check('"Can you describe how the apply kit works?" is not an edit', !v.isManagementCommand('Can you describe how the apply kit works?'));
+check('"Attach the invoice to the email tomorrow" is not an edit', !v.isManagementCommand('Attach the invoice to the email tomorrow'));
+check('a link with parentheses is kept whole', JSON.stringify(v.extractUrls('see https://en.wikipedia.org/wiki/Foo_(bar)')) === JSON.stringify(['https://en.wikipedia.org/wiki/Foo_(bar)']));
+check('an unbalanced closing ")" is not part of the link', JSON.stringify(v.extractUrls(`(see ${MEET})`)) === JSON.stringify([MEET]));
+check('a TRUNCATED link is refused (whole-URL check)', !v.urlsAreVerbatim('Zoom: https://zoom.us/j/123', 'join https://zoom.us/j/123?pwd=abc'));
+
+// ── Re-check, 12 Oct 2026: modal / pointer phrases are ATTACH requests, not new tasks ──────────────────────────
+for (const t of [`Add this link to the new task ${MEET}`, `Agrega este enlace a la nueva tarea ${MEET}`,
+  `Agrega este enlace a la tarea que acabas de crear ${MEET}`, `Нужно добавить ссылку в эту задачу ${MEET}`,
+  `Надо прикрепить ссылку к задаче ${MEET}`, `I need to add this link to the task ${MEET}`]) {
+  check(`attach, not a new task: "${t.slice(0, 50)}"`, v.isLinkAttachRequest(t) && v.pointsOnlyAtRecentCard(t, NAT));
+}
+check('her Spanish create (M1) is still a task creation', v.isTaskCreation(M1));
+check('"Создай задачу на 16 октября…" is a task creation', v.isTaskCreation('Создай задачу на 16 октября на 10 утра в Kira octubre'));
+check('"Add a task to send Marshall the link" is a task creation', v.isTaskCreation('Add a task to send Marshall the link to the deck tomorrow'));
+const emojiAt79 = 'Remind me tomorrow to call the bank about the mortgage refinance paperwork pls 🙏 thanks a lot';
+const e80 = v.echo80(emojiAt79);
+check('the reply echo never cuts an emoji in half', !/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(e80));
+
+const src = require('fs').readFileSync(path.join(__dirname, '..', 'src', 'trello-voice.ts'), 'utf8');
+check('the colour prompt no longer says "Kira=daughter"', !/Kira\s*=\s*daughter/i.test(src) && /daughter Alisa/.test(src));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -51,6 +51,7 @@ interface CardClassification {
   subtasks: string[] | null; // 2-5 subtask titles if task naturally decomposes; null for single-step tasks
   confidence: number;      // 0-1, how certain the AI is
   reasoning: string;       // AI explanation for routing decision
+  titleGuessed?: boolean;  // set by guardTitle: she said where/when but no subject (12 Oct 2026, "CETA")
 }
 
 /**
@@ -138,6 +139,7 @@ export interface TrelloCard {
   idBoard?: string;
   idList?: string;
   closed?: boolean;
+  desc?: string;
 }
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -682,6 +684,54 @@ function removeTriggerPhrase(transcript: string): string {
  * belongs to the code. Asking a model for both invites them to disagree, and
  * the disagreement is silent because both values are individually plausible.
  */
+/** Edit distance ≤ 1 — Whisper hears "CETA" for "Cita". */
+function withinOneEdit(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+
+const PLACE_WORDS = ['task', 'tarea', 'задача', 'задачу', 'card', 'tarjeta', 'карточка', 'карточку', 'kira', 'cita', 'датировано'];
+
+/**
+ * A title that only repeats WHERE/WHEN she filed it is no title (12 Oct 2026): "Создай задачу на 16 октября на
+ * 10 утра в Kira octubre, датировано CETA" became a card named "CETA" — the column name, misheard. The title
+ * slot is required, so the model filled it with the only word left. When nothing but board/column words remain,
+ * name the card "<column> <date>" and say so in the reply, so she can rename it in one sentence.
+ */
+export function guardTitle(c: CardClassification): CardClassification {
+  const split = (s: string) => String(s || '').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const place = [...split(`${c.boardNameHint ?? ''} ${c.listNameHint ?? ''}`).filter((w) => w.length >= 3), ...PLACE_WORDS];
+  const words = split(c.title).filter((w) => w.length >= 2);
+  const onlyPlace = words.every((w) => place.some((p) => w === p || (w.length >= 4 && p.length >= 4 && withinOneEdit(w, p))));
+  if (!onlyPlace) return c;
+  const hint = (c.listNameHint || '').trim();
+  // The dated column is "Cita" — say it right even when it was misheard ("CETA").
+  const where = !hint || c.listTarget === 'dated' || withinOneEdit(hint.toLowerCase(), 'cita') ? 'Cita' : hint;
+  const when = c.dueDate ? formatDueForReply(c.dueDate, c.dueTime) : '';
+  return { ...c, title: [where, when].filter(Boolean).join(' '), titleGuessed: true };
+}
+
+/** Markdown-safe echo: a URL inside *…* or _…_ (underscores!) makes Telegram reject the whole reply. */
+function stripUrls(s: string): string {
+  return String(s || '').replace(URL_RE, '🔗');
+}
+
+/**
+ * The first 80 characters of her message for the reply — counted by code point, so an emoji is never cut in half.
+ * A lone surrogate makes Telegram reject the reply ("strings must be encoded in UTF-8") after the card was made.
+ */
+export function echo80(s: string | undefined): string {
+  const chars = Array.from(stripUrls(s ?? ''));
+  return chars.slice(0, 80).join('') + (chars.length > 80 ? '...' : '');
+}
+
 function applyCategoryColor(c: CardClassification): CardClassification {
   const derived = CATEGORY_COLOR_MAP[c.category];
   if (!derived) return c;
@@ -754,8 +804,11 @@ that are 4+ months away or have no specific month at all.
 - "done"             = "Сделано!!! / Gane!!!!" → already completed
 
 ═══ ELENA'S COLOR SYSTEM (life sphere, NOT urgency) ═══
-🔴 red    = FAMILY — family members (Kira=daughter, Alisa, husband), home, relationships
-🟠 orange = BUSINESS — work, AI projects, clients, VibeJob, Aldeazz, EspaLuz, Algom, revenue, tech
+🔴 red    = FAMILY — her household: her daughter Alisa, husband, parents/stepfather, home, relationships
+🟠 orange = BUSINESS — work, AI projects, clients, VibeJob, Aldeazz, EspaLuz, Algom, revenue, tech — and every
+            work meeting: intro calls and networking (e.g. arranged by Boardy), recruiters, interviews, client calls
+"Kira …" (Kira Octubre, Kira Ano 2026, Kira Horario …) is the NAME of her boards — never a person and never a
+sphere signal. Her daughter is Alisa. A message that only says "Kira Octubre, Cita" carries no sphere at all.
 🟣 purple = MINDFULNESS/SPIRITUAL/CREATIVE — AA, meditation, Atuona poetry, NFT art, soul work
 🟢 green  = HEALTH — doctors, medical appointments, fitness, nutrition, wellness, vaccinations
 🟩 lime   = HOBBY — personal interests, fun learning, travel, leisure, non-work projects
@@ -805,8 +858,8 @@ Only decompose when steps are explicitly enumerated OR naturally distinct (not j
 Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 {
   "isTask": true,
-  "title": "Parent task title (used when subtasks is null)",
-  "description": "Any extra detail from the speech, or empty string",
+  "title": "WHAT the task is — its subject (used when subtasks is null). Never just the board, the column (Cita, Датировано, Поток) or the date/time; if she named only where/when, return \"\"",
+  "description": "Any extra detail from the speech, or empty string. Copy every link (https://…) character for character",
   "category": "family|business|spiritual|health|hobby",
   // category rule: anything belonging to HER COMPANY -- brand, products, clients,
   // income, marketing, merchandise -- is "business" even when the object sounds
@@ -1104,6 +1157,7 @@ export async function handleVoiceToTrello(
  */
 export async function createTrelloCardFromTranscript(
   transcript: string,
+  opts: { source?: 'voice' | 'text' } = {},
 ): Promise<VoiceTrelloResult> {
   // Step 1: NLP classification via Claude Haiku
   let classification: CardClassification;
@@ -1119,6 +1173,8 @@ export async function createTrelloCardFromTranscript(
     console.log(`[TrelloVoice] Not a task — falling through to regular handler`);
     return { success: false, notATask: true, transcript, classification };
   }
+  classification = guardTitle(classification);
+  if (classification.titleGuessed) console.log(`[TrelloVoice] no subject said — title set to "${classification.title}"`);
 
   // Step 2: Resolve boards
   let boards: TrelloBoard[];
@@ -1162,8 +1218,10 @@ export async function createTrelloCardFromTranscript(
     return { success: false, transcript, classification, error: 'No suitable list found on board' };
   }
 
-  // Step 4: Duplicate detection — check existing cards on this list
-  try {
+  // Step 4: Duplicate detection — check existing cards on this list.
+  // Not for a placeholder title: "Cita October 16, 10:00 AM" and "Cita October 20, 3:00 PM" share half their words
+  // and would block each other (review, 12 Oct 2026) — two different appointments.
+  if (!classification.titleGuessed) try {
     const existingCards = await getListCards(targetList.id);
     const dup = existingCards.find((c) => titleSimilarity(c.name, classification.title) >= 0.5);
     if (dup) {
@@ -1184,9 +1242,18 @@ export async function createTrelloCardFromTranscript(
   }
 
   // Step 5: Resolve label color
-  const labelId = await resolveOrCreateLabel(board.id, classification.labelColor, classification.category);
+  // No subject said → the sphere is unknowable; no colour beats a wrong one (the Boardy intro was filed red).
+  const labelId = classification.titleGuessed
+    ? null
+    : await resolveOrCreateLabel(board.id, classification.labelColor, classification.category);
 
-  const descBase = classification.description || `Voice note: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`;
+  const stamp = `${opts.source === 'text' ? 'Telegram note' : 'Voice note'}: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`;
+  // Every link she sent goes into the description verbatim, even if the model dropped or reworded it (12 Oct 2026).
+  // A link the model retyped (and may have altered) is dropped from its text; her exact links are appended.
+  const sentUrls = extractUrls(transcript);
+  const modelDesc = (classification.description || '')
+    .replace(URL_RE, (m) => { const u = extractUrls(m)[0]; return u && sentUrls.includes(u) ? m : ''; }).trim();
+  const descBase = [modelDesc || stamp, ...sentUrls.filter((u) => !modelDesc.includes(u))].join('\n');
   const labels = labelId ? [labelId] : [];
 
   // Step 6: Create card(s) — subtask decomposition or single card
@@ -1287,8 +1354,10 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
   }
 
   const { classification, boardName, listName } = result;
-  const colorEmoji = COLOR_EMOJI[classification.labelColor] ?? '⬜';
-  const colorSphere = COLOR_LABEL[classification.labelColor] ?? classification.category;
+  const colorEmoji = classification.titleGuessed ? '⬜' : (COLOR_EMOJI[classification.labelColor] ?? '⬜');
+  const colorSphere = classification.titleGuessed
+    ? 'no colour yet — no subject heard'
+    : (COLOR_LABEL[classification.labelColor] ?? classification.category);
 
   // Format due date for display (YYYY-MM-DD → "May 31")
   let dueLine = '';
@@ -1315,7 +1384,7 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
       ``,
       ...cardLines,
       ``,
-      `_"${result.transcript?.slice(0, 80)}${(result.transcript?.length ?? 0) > 80 ? '...' : ''}"_`,
+      `_"${echo80(result.transcript)}"_`,
     ].filter(Boolean).join('\n');
   }
 
@@ -1332,11 +1401,13 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
     `📌 List: ${listName}`,
     `🎨 Sphere: ${colorSphere}`,
     dueLine,
-    classification.description ? `📝 Note: ${classification.description}` : '',
+    classification.description ? `📝 Note: ${stripUrls(classification.description)}` : '',
+    extractUrls(result.transcript ?? '').length ? `🔗 Link saved in the card description` : '',
+    classification.titleGuessed ? `✏️ No subject heard — say or type "rename it to …" and I'll fix this card.` : '',
     ``,
     `🔗 [Open card](${card.shortUrl})`,
     ``,
-    `_"${result.transcript?.slice(0, 80)}${(result.transcript?.length ?? 0) > 80 ? '...' : ''}"_`,
+    `_"${echo80(result.transcript)}"_`,
   ]
     .filter(Boolean)
     .join('\n');
@@ -1398,11 +1469,120 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
  */
 // 2026-09-28: correction vocabulary added — "Appointment should be changed to 15th of October" never
 // reached the action classifier, so it became a NEW card instead of an edit to the one just made.
-const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь|change|changed|changing|reschedul\p{L}*|postpon\p{L}*|updat\p{L}*|correct\p{L}*|cambi\p{L}*|reprogram\p{L}*|posterg\p{L}*|измен\p{L}*|поменя\p{L}*|исправ\p{L}*|edit\p{L}*|clarif\p{L}*|редакт\p{L}*|отредакт\p{L}*|уточн\p{L}*|подправ\p{L}*|описани\p{L}*|modific\p{L}*|aclar\p{L}*)(?![\p{L}\p{N}])/iu;
+const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь|change|changed|changing|reschedul\p{L}*|postpon\p{L}*|updat\p{L}*|correct\p{L}*|cambi\p{L}*|reprogram\p{L}*|posterg\p{L}*|измен\p{L}*|поменя\p{L}*|исправ\p{L}*|edit\p{L}*|clarif\p{L}*|редакт\p{L}*|отредакт\p{L}*|уточн\p{L}*|подправ\p{L}*|описани\p{L}*|modific\p{L}*|aclar\p{L}*|description|descripci\p{L}*|renam\p{L}*|renombr\p{L}*|переимен\p{L}*)(?![\p{L}\p{N}])/iu;
+// 2026-10-12: + description (EN/ES), rename — "Wire this link into this task into task description …" only matched
+// Russian "описани", so a typed or spoken edit in English or Spanish never reached the update path. Not "describe"
+// (a question) and not "attach" (a new task can say it): link requests reach the classifier via isLinkAttachRequest.
 
 /** True when a transcript must go to the action classifier (move / archive / update) first. */
 export function isManagementCommand(transcript: string): boolean {
   return MGMT_RE.test(transcript);
+}
+
+// ── Links on cards (12 Oct 2026) ──────────────────────────────────────────────
+// Elena: "if I ask 'wire this link to the task' and then send a link, it should be put in the description."
+// That evening "Wire this link into this task …" was saved as an internal note and the Google Meet link for
+// her Boardy intro never reached the card. A link is a fact, not a judgment: it is copied character for
+// character by code, never re-typed by a model, and the card is read back to prove it landed.
+// Parentheses are allowed inside a link (wikipedia "Foo_(bar)"); only an UNBALANCED trailing ")" is dropped.
+const URL_RE = /https?:\/\/[^\s<>"'`\]]+/gi;
+
+/** Every URL in the message, exactly as she sent it (trailing punctuation and an unbalanced ")" stripped). */
+export function extractUrls(text: string): string[] {
+  const out: string[] = [];
+  for (const m of String(text || '').match(URL_RE) ?? []) {
+    let u = m.replace(/[.,;:!?»”’]+$/u, '');
+    while (u.endsWith(')') && (u.match(/\(/g) || []).length < (u.match(/\)/g) || []).length) {
+      u = u.slice(0, -1).replace(/[.,;:!?»”’]+$/u, '');
+    }
+    if (u && !out.includes(u)) out.push(u);
+  }
+  return out;
+}
+
+// Whole words only: "link" must not match "LinkedIn" ("add the LinkedIn post to my tasks" is not a link request).
+const LINK_NOUN_RE = /(?<![\p{L}\p{N}])(links?|urls?|enlaces?|ссылк\p{L}*|линк\p{L}?)(?![\p{L}\p{N}])/iu;
+const ATTACH_VERB_RE = /(?<![\p{L}\p{N}])(wire|attach\p{L}*|add|put|insert|connect|pin|paste|include|conect\p{L}*|agreg\p{L}*|añad\p{L}*|adjunt\p{L}*|pon|ponle|vincul\p{L}*|insert\p{L}*|добав\p{L}*|прикреп\p{L}*|встав\p{L}*|привяж\p{L}*|положи|закин\p{L}*)(?![\p{L}\p{N}])/iu;
+// A NEW task that happens to mention a link ("Add a task to send Marshall the link tomorrow") is a create, never an
+// attach — the review of 12 Oct found six such phrasings the first version would have swallowed.
+// A create verb that GOVERNS a task noun ("add a task", "crea la tarea", "создай задачу"), "remind me", or a message
+// that STARTS with "new task:". Not modal words ("I need to add this link to the task" is an attach) and not a
+// pointer phrase ("add this link to the new task", "la tarea que acabas de crear") — re-check of 12 Oct 2026.
+const CREATE_VERB_RE = /(?<![\p{L}\p{N}])(?:(?:create|crea|crear|cre[aá]\p{L}*|make|add|agreg\p{L}*|añad\p{L}*|pon|создай|создать|заведи|добавь)\s+(?:(?:a|an|una|un|la|el|the|new|nueva|nuevo|новую|новая)\s+){0,2}(?:task|tarea|card|tarjeta|to-?do|задачу|задача|карточку)|add to (?:my )?(?:tasks|list|to-?do)|remind me|recu[eé]rda\p{L}*|напомни)(?![\p{L}\p{N}])|^\s*(?:new task|nueva tarea|nueva tarjeta|новая задача|to-?do)\b/iu;
+
+/** A word that points at a card or task ("the dentist card", "esa tarea", "эту задачу"). */
+const CARD_NOUN_RE = /(?<![\p{L}\p{N}])(cards?|tasks?|tareas?|tarjetas?|задач\p{L}*|карточк\p{L}*)(?![\p{L}\p{N}])/iu;
+
+/** True for "remind me…", "add a task…", "crea la tarea…", "создай задачу…" — a new task, not an edit. */
+export function isTaskCreation(text: string): boolean {
+  return CREATE_VERB_RE.test(String(text || ''));
+}
+
+/** "Wire this link into this task", "agrega este enlace a la tarea", "прикрепи ссылку" — and NOT a create. */
+export function isLinkAttachRequest(text: string): boolean {
+  const t = String(text || '');
+  return LINK_NOUN_RE.test(t) && ATTACH_VERB_RE.test(t) && !CREATE_VERB_RE.test(t);
+}
+
+// Words that only POINT at "this task" and carry no subject of their own (EN / ES / RU).
+const POINTER_WORDS = new Set((
+  'wire attach add put insert connect pin paste include link links url urls this that the a an to into in on onto of ' +
+  'for it its task card description desc please here is s and can you could my me ' +
+  'conecta conectar agrega agregar añade añadir adjunta adjuntar pon ponle vincula inserta este esta ese esa el la lo ' +
+  'al en de del enlace enlaces tarea tarjeta descripción descripcion por favor aquí aqui mi ' +
+  'добавь прикрепи вставь привяжи положи закинь эту эта это этот к в на задаче задачу задача карточке карточку ' +
+  'описание описанию ссылку ссылка ссылки линк пожалуйста сюда мою ' +
+  // "the new task", "the task you just made", "la tarea que acabas de crear", "I need to add…", "нужно добавить…"
+  'new nueva nuevo just made created last latest recent i need have que acabas crear creaste hiciste ' +
+  'новую последнюю созданную нужно надо добавить прикрепить вставить ты только что'
+).split(/\s+/));
+
+/**
+ * True when the message names NO card of its own — only "this/the task" plus the link — so the card just made is
+ * the one she means. "Attach this link to the dentist card <url>" names another card (dentist), so it is false and
+ * the action classifier finds that card by name (with its "N cards match — say which" guard).
+ * Words of the fresh card's own title are allowed ("add this link to the Natalia task" right after making it).
+ */
+export function pointsOnlyAtRecentCard(text: string, recentTitle: string): boolean {
+  const words = (s: string) => String(s || '').replace(URL_RE, ' ').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const own = new Set(words(recentTitle).filter((w) => w.length >= 3));
+  return words(text).every((w) => POINTER_WORDS.has(w) || own.has(w));
+}
+
+/** Add `add` below `base`, once. Idempotent: a link already in the description is not added again. */
+export function mergeDescription(base: string, add: string): string {
+  const b = String(base || '').trim(), a = String(add || '').trim();
+  if (!a) return b;
+  if (b.includes(a)) return b;
+  return [b, a].filter(Boolean).join('\n\n');
+}
+
+/** Every URL in `addition` must appear verbatim in what she sent — a model never invents or rewrites a link. */
+export function urlsAreVerbatim(addition: string, message: string): boolean {
+  // Whole-URL equality, not substring: a model's truncated "…/j/123" of her "…/j/123?pwd=abc" must not pass.
+  const sent = extractUrls(message);
+  return extractUrls(addition).every((u) => sent.includes(u));
+}
+
+/**
+ * Append text (a link, a note) to a card's description and read it back. Never replaces what is there.
+ * Returns ok=false with a reason when the card is archived or Trello stored something else.
+ */
+export async function appendToCardDescription(cardId: string, addition: string):
+    Promise<{ ok: boolean; card?: TrelloCard; already?: boolean; error?: string }> {
+  try {
+    const live = await trelloGet<TrelloCard>(`/cards/${cardId}`, { fields: 'closed,name,desc,shortUrl' });
+    if (live.closed) return { ok: false, card: live, error: `"${live.name}" is archived` };
+    const merged = mergeDescription(live.desc ?? '', addition);
+    if (merged === (live.desc ?? '').trim()) return { ok: true, card: live, already: true };
+    await trelloPut<TrelloCard>(`/cards/${cardId}`, { desc: merged });
+    const back = await trelloGet<TrelloCard>(`/cards/${cardId}`, { fields: 'name,id,shortUrl,due,desc' });
+    const ok = (back.desc ?? '').trim() === merged;
+    console.log(`[TrelloVoice] description ${ok ? 'appended' : 'NOT saved'} on "${back.name}" (+${addition.length} chars)`);
+    return ok ? { ok: true, card: back } : { ok: false, card: back, error: 'Trello saved a different description' };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message.slice(0, 160) : String(e) };
+  }
 }
 
 export interface MultiActionItem {
@@ -1425,6 +1605,7 @@ interface _RawAction {
   newDueTime?: string | null;   // update: "HH:MM" 24h (Panama)
   newTitle?: string | null;     // update: only when she renames the card
   newDescription?: string | null; // update: the corrected description, in her words (replaces the old one)
+  appendDescription?: string | null; // update: a link or note to ADD below the existing description (12 Oct 2026)
   description?: string;
   cardQuery?: string;
   sourceBoardHint?: string;
@@ -1475,8 +1656,13 @@ Action schema:
   {"type":"create","description":"full task description to create as a new card"},
   {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY or exact board name","targetList":"the column the user named, or null"},
   {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"},
-  {"type":"update","cardQuery":"search term or __recent__","sourceBoardHint":"board name or null","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null","newDescription":"corrected description or null"}
+  {"type":"update","cardQuery":"search term or __recent__","sourceBoardHint":"board name or null","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null","newDescription":"corrected description or null","appendDescription":"text or link to ADD below the existing description, or null"}
 ]
+
+ADDING to a card ("add / attach / wire this link to the task", "conecta / agrega este enlace", "добавь / прикрепи
+ссылку к задаче"): this is an UPDATE with appendDescription = the link (copied character for character) plus any
+words she wants with it. newDescription only when she says the description is WRONG and must be replaced. Never a
+"create" for a message that adds something to an existing card.
 
 UPDATE also covers the DESCRIPTION ("edit this task", "make it clear that…", "отредактируй задачу", "это описание…",
 "уточни, что…", "aclara que…"): put the corrected text in newDescription, in her own words and language — it REPLACES
@@ -1562,8 +1748,10 @@ Message: "${transcript}"`;
 export async function processMultiAction(
   transcript: string,
   recentCards: TrelloCard[] = [],
+  source: 'voice' | 'text' = 'voice',
 ): Promise<{ handled: boolean; results: MultiActionItem[] }> {
-  if (!MGMT_RE.test(transcript)) return { handled: false, results: [] };
+  // A link request that names a card ("add this link to the dentist card …") must reach the classifier too.
+  if (!MGMT_RE.test(transcript) && !isLinkAttachRequest(transcript)) return { handled: false, results: [] };
 
   const rawActions = await classifyMultiAction(transcript);
   if (!rawActions.length) return { handled: false, results: [] };
@@ -1573,7 +1761,9 @@ export async function processMultiAction(
   for (const action of rawActions) {
     // ── CREATE ──────────────────────────────────────────────────────────────
     if (action.type === 'create' && action.description) {
-      const r = await createTrelloCardFromTranscript(action.description);
+      // The model paraphrases the task; links from her message are carried over verbatim (12 Oct 2026).
+      const carried = extractUrls(transcript).filter((u) => !action.description!.includes(u));
+      const r = await createTrelloCardFromTranscript([action.description, ...carried].join('\n'), { source });
       results.push({
         type: 'create',
         success: r.success,
@@ -1661,7 +1851,7 @@ export async function processMultiAction(
         }
         const card = cards[0]!;
         // __recent__ comes from the bot's own memory, which does not know if she archived the card since.
-        const live = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'closed,due,name' });
+        const live = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'closed,due,name,desc' });
         if (live.closed) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
             error: `"${card.name}" is archived — say the name of the card to edit` });
@@ -1677,19 +1867,42 @@ export async function processMultiAction(
           when = formatDueForReply(baseDate, action.newDueTime);
         }
         if (action.newTitle && action.newTitle.trim()) body.name = action.newTitle.trim();
-        if (action.newDescription && action.newDescription.trim()) body.desc = action.newDescription.trim();
+        if (action.newDescription && action.newDescription.trim()) {
+          // REPLACE only the card she just made. A card found by SEARCH ("Edit the Datastar cover letter – make it
+          // clear that …") gets the correction ADDED below — a search hit's description is never wiped (12 Oct 2026).
+          body.desc = action.cardQuery === '__recent__'
+            ? action.newDescription.trim()
+            : mergeDescription(live.desc ?? '', action.newDescription.trim());
+        }
+        // ADD to the description (12 Oct 2026): merged below what is there, never replacing it. A link the model
+        // wrote must appear verbatim in her message — otherwise refuse rather than store an invented URL.
+        let added = '';
+        if (action.appendDescription && action.appendDescription.trim()) {
+          const add = [action.appendDescription.trim(),
+            ...extractUrls(transcript).filter((u) => !action.appendDescription!.includes(u))].join('\n');
+          if (!urlsAreVerbatim(add, transcript)) {
+            results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
+              error: 'The link I understood is not exactly the one you sent — nothing changed; send the link again' });
+            continue;
+          }
+          body.desc = mergeDescription(body.desc ?? live.desc ?? '', add);
+          added = add;
+        }
         if (!Object.keys(body).length) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
             error: 'No new date, time, name or description was understood — nothing changed' });
           continue;
         }
         await trelloPut<TrelloCard>(`/cards/${card.id}`, body);
-        const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due' });
-        const ok = !body.due || (back.due ? new Date(back.due).toISOString() === body.due : false);
+        const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due,desc' });
+        const dueOk = !body.due || (back.due ? new Date(back.due).toISOString() === body.due : false);
+        const descOk = body.desc === undefined || (back.desc ?? '').trim() === body.desc.trim();
+        const ok = dueOk && descOk;
         results.push({ type: 'update', success: ok, cardQuery: action.cardQuery, cards: [back],
           detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`,
-            body.desc && `📝 "${body.desc.slice(0, 120)}"`].filter(Boolean).join(' · '),
-          ...(ok ? {} : { error: `Trello saved a different date (${back.due ?? 'none'})` }) });
+            added ? `🔗 added to the description` : body.desc && `📝 "${stripUrls(body.desc).slice(0, 120)}"`]
+            .filter(Boolean).join(' · '),
+          ...(ok ? {} : { error: dueOk ? 'Trello saved a different description' : `Trello saved a different date (${back.due ?? 'none'})` }) });
       } catch (err: unknown) {
         results.push({ type: 'update', success: false, error: err instanceof Error ? err.message : String(err) });
       }
@@ -1732,6 +1945,14 @@ export async function processMultiAction(
     }
   }
 
+  // Only failed "no card found" updates, and the message never pointed at a card or task: it was a NEW task that
+  // mentioned a link or a description ("Put the link in the newsletter on Friday") — let the create path run instead
+  // of answering "No card found" and dropping it (re-check, 12 Oct 2026).
+  if (results.length && results.every((r) => r.type === 'update' && !r.success && /^No card found/.test(r.error ?? ''))
+      && !CARD_NOUN_RE.test(transcript)) {
+    console.log('[TrelloVoice] update found no card and the message names none — treating it as a new task');
+    return { handled: false, results: [] };
+  }
   return { handled: results.length > 0, results };
 }
 

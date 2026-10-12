@@ -7,7 +7,7 @@ import { registerCommunityCallbacks } from './community-notify';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
-import { claudeWithGroqFallback, groqModel } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel, completeWithProfileDetailed } from './llm-resilience';
 import { 
   getRelevantMemory, 
   saveMemory,
@@ -87,6 +87,13 @@ import {
   processMultiAction,
   formatMultiActionReply,
   rollingMonthNames,
+  isManagementCommand,
+  extractUrls,
+  isLinkAttachRequest,
+  isTaskCreation,
+  pointsOnlyAtRecentCard,
+  appendToCardDescription,
+  panamaToday,
 } from './trello-voice';
 import {
   loadRadarLedger,
@@ -217,6 +224,172 @@ interface LastTrelloSession {
 }
 const lastTrelloSession = new Map<number, LastTrelloSession>();
 const TRELLO_SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+/** The cards she made in the last 30 minutes — what "this task" / "it" refers to. */
+function freshTrelloCards(uid: number): TrelloCard[] {
+  const s = lastTrelloSession.get(uid);
+  return s && Date.now() - s.ts <= TRELLO_SESSION_TTL_MS ? s.cards : [];
+}
+
+/**
+ * Trello replies are legacy Markdown, and her own words go into them. Typed text brings snake_case, * and `
+ * (review, 12 Oct 2026: "need to check cto_aipa pm2 logs" → Telegram 400 "can't parse entities" AFTER the card was
+ * made, and she got no reply at all). Retry as plain text: never silence after a write.
+ */
+async function replyMarkdownSafe(ctx: Context, text: string): Promise<void> {
+  // Only ever called AFTER a Trello write, so it must never throw: a throw here sent the outer handler on to
+  // "Trello step failed" + "Task saved!" for a card that WAS made (re-check, 12 Oct 2026).
+  try {
+    await ctx.reply(text, { parse_mode: 'Markdown' });
+  } catch (e) {
+    console.warn(`[trello] reply rejected (${String((e as Error)?.message || e).slice(0, 100)}) — resending as plain text`);
+    // Plain text, with any lone surrogate removed (an emoji cut in half is "not UTF-8" to Telegram).
+    const plain = text.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+    try { await ctx.reply(plain); } catch (e2) {
+      console.error('[trello] plain-text reply failed too:', String((e2 as Error)?.message || e2).slice(0, 120));
+    }
+  }
+}
+
+// "Wire this link to the task" (Elena, 12 Oct 2026): the link goes into the DESCRIPTION of the card she just made —
+// in the same message, or in her very next message. Deterministic: no model decides what the link is or where it goes.
+const PENDING_LINK_TTL_MS = 10 * 60 * 1000;
+const pendingLinkAttach = new Map<number, { card: TrelloCard; ts: number }>();
+
+async function attachLinksAndReply(ctx: Context, uid: number, card: TrelloCard, urls: string[]): Promise<boolean> {
+  const r = await appendToCardDescription(card.id, urls.join('\n'));
+  const name = r.card?.name || card.name;
+  if (r.ok) {
+    const s = lastTrelloSession.get(uid);
+    if (s) s.ts = Date.now(); // a further correction to this card still finds it
+    // Plain text: a URL with "_" inside Markdown makes Telegram reject the whole reply.
+    await ctx.reply(r.already
+      ? `🔗 That link is already in the description of "${name}".`
+      : `🔗 Link added to the description of "${name}".\n${r.card?.shortUrl || card.shortUrl}`);
+  } else {
+    await ctx.reply(`⚠️ Could not add the link to "${name}": ${r.error}. Nothing changed.`);
+  }
+  return true;
+}
+
+/**
+ * Returns true when the message was a link for the card she just made (handled, reply sent).
+ * Strict on purpose (review, 12 Oct 2026): it acts only when the message names NO other card ("attach this link to
+ * the dentist card …" goes to the classifier, which finds the dentist card by name), never on a new task that
+ * mentions a link ("add a task to send Marshall the link"), and a pending "send me the link" is used up by her
+ * very next message — link or not — so a later, unrelated link can never land on this card.
+ */
+async function tryAttachLink(ctx: Context, text: string): Promise<boolean> {
+  const uid = ctx.from?.id || 0;
+  const urls = extractUrls(text);
+  const pending = pendingLinkAttach.get(uid);
+  if (pending) {
+    pendingLinkAttach.delete(uid);
+    const stillFresh = Date.now() - pending.ts <= PENDING_LINK_TTL_MS
+      && freshTrelloCards(uid).some((c) => c.id === pending.card.id);
+    // The link she was asked for: a bare link, a short label + link ("Here's the Google Meet link for your intro
+    // with Natalia: https://…"), or a pointer to this same card. Not a question, not a new task, not a link for
+    // another card she names ("no — add this link to the Boardy card …") — those take the normal path.
+    const label = text.replace(/https?:\/\/\S+/g, '').trim();
+    const forThisCard = pointsOnlyAtRecentCard(text, pending.card.name)
+      || (label.length <= 80 && !label.includes('?') && !isLinkAttachRequest(text));
+    if (stillFresh && urls.length && !isTaskCreation(text) && forThisCard) {
+      return attachLinksAndReply(ctx, uid, pending.card, urls);
+    }
+  }
+  if (!isLinkAttachRequest(text)) return false;
+  const recent = freshTrelloCards(uid);
+  if (recent.length !== 1 || !pointsOnlyAtRecentCard(text, recent[0]!.name)) return false;
+  if (urls.length) return attachLinksAndReply(ctx, uid, recent[0]!, urls);
+  pendingLinkAttach.set(uid, { card: recent[0]!, ts: Date.now() });
+  await ctx.reply(`🔗 Send me the link — I'll put it in the description of "${recent[0]!.name}".`);
+  return true;
+}
+
+/**
+ * Trello for BOTH doors — voice and typed text (12 Oct 2026). On 8 May (55347c6c) the voice handler learned to
+ * create and edit cards; the text handler never did, so "Crea la tarea para el 16 de octubre 10 am para Kira
+ * Octubre Cita …" and "Wire this link into this task …" were answered "✅ Task saved!" in the internal list and
+ * never reached Trello. One function, so the two doors cannot drift apart again. True = Trello handled it.
+ * `allowCreate: false` — an edit-only pass (typed text that is not a task): never turn chat into a card.
+ */
+async function routeToTrello(ctx: Context, text: string, source: 'voice' | 'text',
+    opts: { allowCreate?: boolean; savesToTasks?: boolean } = {}): Promise<boolean> {
+  const { allowCreate = true, savesToTasks = false } = opts;
+  const uid = ctx.from?.id || 0;
+  const recentCards = freshTrelloCards(uid);
+  const tags = source === 'voice' ? 'voice,trello' : 'text,trello';
+  const prefix = source === 'voice' ? 'Voice: ' : 'Text: ';
+
+  const multiResult = await processMultiAction(text, recentCards, source);
+  if (multiResult.handled) {
+    const newlyCreated = multiResult.results
+      .filter(r => r.type === 'create' && r.success)
+      .flatMap(r => r.cards ?? []);
+    if (newlyCreated.length > 0) {
+      lastTrelloSession.set(uid, { cards: newlyCreated, listTarget: 'todo_flow', ts: Date.now() });
+      pendingLinkAttach.delete(uid); // a new card ends "send me the link" for the old one
+    } else if (multiResult.results.some(r => r.type === 'update' && r.success)) {
+      const s = lastTrelloSession.get(uid);
+      if (s) s.ts = Date.now(); // a second correction to the same card still finds it
+    }
+    await replyMarkdownSafe(ctx, formatMultiActionReply(multiResult.results));
+    // Save the note to knowledge_base so the Sprinter morning briefing picks it up
+    const cardTitles = newlyCreated.map((c: { name?: string }) => c.name || '').filter(Boolean);
+    saveKnowledge(uid, 'voice_note', text.substring(0, 100),
+      prefix + text + (cardTitles.length ? '\n\nTrello cards created:\n' + cardTitles.map(t => '- ' + t).join('\n') : ''),
+      tags, undefined, source).catch(() => {});
+    return true;
+  }
+  if (!allowCreate) return false;
+
+  // NLP classifies the message — no trigger phrase required. A task becomes a card; anything else falls through.
+  const trelloResult = await createTrelloCardFromTranscript(text, { source });
+  if (trelloResult.success) {
+    const createdCards = trelloResult.cards ?? (trelloResult.card ? [trelloResult.card] : []);
+    if (createdCards.length > 0) {
+      lastTrelloSession.set(uid, {
+        cards: createdCards,
+        listTarget: trelloResult.classification?.listTarget ?? 'todo_flow',
+        ts: Date.now(),
+      });
+      pendingLinkAttach.delete(uid);
+    }
+    await replyMarkdownSafe(ctx, formatVoiceTrelloReply(trelloResult));
+    const cardTitles = createdCards.map((c: { name?: string }) => c.name || '').filter(Boolean);
+    saveKnowledge(uid, 'voice_note', text.substring(0, 100),
+      prefix + text + (cardTitles.length ? '\n\nTrello cards created:\n' + cardTitles.map((t: string) => '- ' + t).join('\n') : ''),
+      tags, undefined, source).catch(() => {});
+    return true;
+  }
+  if (source === 'text' && trelloResult.duplicate) {
+    // The card exists already. A link she sent with it goes onto THAT card, and the reply says so — never dropped.
+    // Only when it really is the same card (same title, or same day): the duplicate test is fuzzy ("Send follow-up
+    // with Natalia" ~ "Intro with Natalia"), and a fuzzy match must never receive a foreign link.
+    const urls = extractUrls(text);
+    const ex = trelloResult.existingCard;
+    const c = trelloResult.classification;
+    const sameCard = !!ex && !!c && (ex.name.trim().toLowerCase() === (c.title || '').trim().toLowerCase()
+      || (!!ex.due && !!c.dueDate && panamaToday(new Date(ex.due)) === c.dueDate));
+    if (urls.length && ex && !sameCard) {
+      await ctx.reply(`⚠️ A similar card already exists: "${ex.name}" — I did not make a new one or touch it.\nIf your link belongs there, say "add this link to the ${ex.name} card".\n${ex.shortUrl}`);
+      return true;
+    }
+    if (urls.length && trelloResult.existingCard) {
+      const r = await appendToCardDescription(trelloResult.existingCard.id, urls.join('\n'));
+      await ctx.reply(r.ok
+        ? `⚠️ "${trelloResult.existingCard.name}" already exists — I did not make a second card.\n🔗 ${r.already ? 'Your link was already in its description.' : 'Your link is now in its description.'}\n${trelloResult.existingCard.shortUrl}`
+        : `⚠️ "${trelloResult.existingCard.name}" already exists, and I could not add your link to it: ${r.error}.`);
+      return true;
+    }
+    await replyMarkdownSafe(ctx, formatVoiceTrelloReply(trelloResult));
+    return true;
+  }
+  if (source === 'text' && trelloResult.error && !trelloResult.notATask) {
+    await ctx.reply(`⚠️ Trello did not take it (${trelloResult.error.slice(0, 120)})${savesToTasks ? ' — saving it to /tasks instead.' : '.'}`);
+  }
+  return false;
+}
 
 function getConversationContext(userId: number): ConversationContext {
   let ctx = conversationContexts.get(userId);
@@ -7311,8 +7484,28 @@ Ready to commit? Use:
     // Register for alerts when user chats
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
     
-    // Run intent detection for text messages too (same as voice pipeline)
-    const textIntent = await detectPersonalAIIntent(message || '');
+    // Typed messages reach Trello the way voice does (12 Oct 2026). The old comment here said "same as voice
+    // pipeline" — true on 2 Apr, false since 8 May, when only voice learned to create and edit cards.
+    const textUid = ctx.from?.id || 0;
+    let textIntent: Awaited<ReturnType<typeof detectPersonalAIIntent>>;
+    try {
+      if (await tryAttachLink(ctx, message || '')) { syncContextToDb(textUid); return; }
+      textIntent = await detectPersonalAIIntent(message || '');
+      // A task → Trello, like voice. Anything else reaches Trello only as an EDIT of a card made in the last
+      // 30 minutes (never a new card), and a question never does: "Can you describe how the apply kit works?"
+      // is answered, not filed.
+      const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '');
+      if (textIntent.type === 'task') {
+        if (await routeToTrello(ctx, message || '', 'text', { savesToTasks: true })) { syncContextToDb(textUid); return; }
+      } else if (textIntent.type !== 'question' && freshTrelloCards(textUid).length > 0 && editLike) {
+        if (await routeToTrello(ctx, message || '', 'text', { allowCreate: false })) { syncContextToDb(textUid); return; }
+      }
+    } catch (trelloErr) {
+      // Trello or a reply failed: say so in plain text and carry on with the normal handling below.
+      console.error('[text→trello] failed:', (trelloErr as Error)?.message?.slice(0, 200));
+      try { await ctx.reply(`⚠️ Trello step failed (${String((trelloErr as Error)?.message || trelloErr).slice(0, 100)}).`); } catch {}
+      textIntent = await detectPersonalAIIntent(message || '');
+    }
     if (textIntent.type !== 'question' && textIntent.type !== 'conversation' && textIntent.type !== 'command') {
       const handled = await handlePersonalAIAction(ctx, message || '', textIntent, 'text');
       if (handled) {
@@ -7384,74 +7577,11 @@ Ready to commit? Use:
         return;
       }
 
-      // ── Trello Voice Card Creator ──────────────────────────────────────────
-      // ── Multi-action pre-check (move / archive / mixed commands) ──────────
-      // If the transcript contains management vocabulary, ask Claude Haiku to
-      // decompose it into typed actions (create / move / archive) and execute
-      // all of them.  Falls through when the LLM says it is a pure task.
-      {
-        const uid = ctx.from?.id || 0;
-        const session = lastTrelloSession.get(uid);
-        const recentCards = (session && Date.now() - session.ts <= TRELLO_SESSION_TTL_MS)
-          ? session.cards : [];
-
-        const multiResult = await processMultiAction(transcription, recentCards);
-        if (multiResult.handled) {
-          // Keep session updated with any newly created cards
-          const newlyCreated = multiResult.results
-            .filter(r => r.type === 'create' && r.success)
-            .flatMap(r => r.cards ?? []);
-          if (newlyCreated.length > 0) {
-            lastTrelloSession.set(uid, { cards: newlyCreated, listTarget: 'todo_flow', ts: Date.now() });
-          }
-          await ctx.reply(formatMultiActionReply(multiResult.results), { parse_mode: 'Markdown' });
-          // Save voice note to knowledge_base so Sprinter morning briefing picks it up
-          {
-            const voiceUserId = ctx.from?.id || 0;
-            const cardTitles = multiResult.results
-              .filter(r => r.type === 'create' && r.success)
-              .flatMap(r => (r.cards ?? []).map((c: { name?: string }) => c.name || ''))
-              .filter(Boolean);
-            const noteTitle = transcription.substring(0, 100);
-            const noteContent = cardTitles.length
-              ? ('Voice: ' + transcription + (cardTitles.length ? '\n\nTrello cards created:\n' + cardTitles.map(t => '- ' + t).join('\n') : ''))
-              : ('Voice: ' + transcription);
-            saveKnowledge(voiceUserId, 'voice_note', noteTitle, noteContent, 'voice,trello', undefined, 'voice').catch(() => {});
-          }
-          return;
-        }
-      }
-      // ────────────────────────────────────────────────────────────────────
-
-      // NLP classifies every voice message — no trigger phrase required.
-      // If the message is an actionable task, a Trello card is created and
-      // we return. If not a task (question, command, chat), we fall through.
-      const trelloResult = await createTrelloCardFromTranscript(transcription);
-      if (trelloResult.success) {
-        // Store session for "those cards" references in follow-up commands
-        const uid = ctx.from?.id || 0;
-        const createdCards = trelloResult.cards ?? (trelloResult.card ? [trelloResult.card] : []);
-        if (createdCards.length > 0) {
-          lastTrelloSession.set(uid, {
-            cards: createdCards,
-            listTarget: trelloResult.classification?.listTarget ?? 'todo_flow',
-            ts: Date.now(),
-          });
-        }
-        await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
-        // Save voice note to knowledge_base so Sprinter morning briefing picks it up
-        {
-          const voiceUserId2 = ctx.from?.id || 0;
-          const createdCards2 = trelloResult.cards ?? (trelloResult.card ? [trelloResult.card] : []);
-          const cardTitles2 = createdCards2.map((c: { name?: string }) => c.name || '').filter(Boolean);
-          const noteTitle2 = transcription.substring(0, 100);
-          const noteContent2 = 'Voice: ' + transcription + (cardTitles2.length ? '\n\nTrello cards created:\n' + cardTitles2.map((t: string) => '- ' + t).join('\n') : '');
-          saveKnowledge(voiceUserId2, 'voice_note', noteTitle2, noteContent2, 'voice,trello', undefined, 'voice').catch(() => {});
-        }
-        return;
-      }
+      // ── Trello (12 Oct 2026: shared with typed text — routeToTrello / tryAttachLink) ──────────
+      if (await tryAttachLink(ctx, transcription)) return;
+      if (await routeToTrello(ctx, transcription, 'voice')) return;
       // ──────────────────────────────────────────────────────────────────────
-      
+
       // PERSONAL AI UPGRADE: Detect intent from voice message
       const intent = await detectPersonalAIIntent(transcription);
       
@@ -7560,13 +7690,14 @@ Keep response concise for Telegram. Use emojis.`;
         const firstContent = response.content[0];
         analysis = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not analyze image.';
       } catch (visionError: any) {
-        // If Claude credits exhausted, ask user to describe instead
-        const errorMsg = visionError?.error?.error?.message || '';
-        if (errorMsg.includes('credit') || errorMsg.includes('billing')) {
-          await ctx.reply('⚠️ Image analysis temporarily unavailable (API credits). Please describe what you see in the image and I\'ll help!\n\nExample: "I see an error message saying TypeError in my code"');
-          return;
-        }
-        throw visionError;
+        // 12 Oct 2026: any Claude failure falls through to the same model waterfall every product uses
+        // (OpenAI, then Gemini — both see images; text-only tiers refuse). It used to give up on a credit error
+        // with "Image analysis temporarily unavailable" while OpenAI and Gemini were working, and log nothing.
+        const why = String(visionError?.error?.error?.message || visionError?.message || visionError).slice(0, 100);
+        const r = await completeWithProfileDetailed('quality', null, `${AIDEAZZ_CONTEXT}\n\n${analysisPrompt}`, 1500,
+          'telegram/photo', { base64: base64Image, mime: 'image/jpeg' });
+        console.warn(`[telegram/photo] Claude vision failed (${why}) — answered by ${r.provider}`);
+        analysis = r.text;
       }
       
       // Save to memory
@@ -8590,6 +8721,8 @@ const WHISPER_PROMPT = [
   'Move card, create card, add card, archive card, move this card, add task, new task.',
   // Avoid common substitutions
   'Trello card. Kira board. ' + rollingMonthNames().map(m => 'Kira ' + m.split(' ')[0]).join('. ') + '.',
+  // Her column names (12 Oct 2026: "датировано Cita" was heard as "CETA" and became the card's title)
+  'Columns: Cita. Датировано. Надо сделать. Поток. В приоритете.',
 ].join(' ');
 
 async function transcribeAudio(filePath: string): Promise<string | null> {

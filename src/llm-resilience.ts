@@ -69,11 +69,21 @@ const GEMINI_KEY = () => process.env.GEMINI_API_KEY?.trim() || '';
  *  the durable $0 tier for high-volume-but-not-latency-critical work like blog translation —
  *  so coverage never depends on keeping paid Anthropic credits topped up. Throws on any
  *  failure so callers can fall through to the paid/limited Anthropic→Groq→Grok chain. */
+/**
+ * An image travelling with the prompt (12 Oct 2026). Screenshot reading in the Telegram bot called Claude
+ * directly — the one vendor at a zero balance — and answered "Image analysis temporarily unavailable (API
+ * credits)" while Gemini and OpenAI, both able to see images, were never asked. Optional and LAST in every
+ * signature below, so every existing text caller sends exactly what it sent before.
+ */
+export type ChainImage = { base64: string; mime: string };
+
 /** Request body, with or without the thinking guard — see the 400 retry below. */
-function geminiBody(systemPrompt: string | null, userPrompt: string, maxTokens: number, withThinking: boolean) {
+function geminiBody(systemPrompt: string | null, userPrompt: string, maxTokens: number, withThinking: boolean,
+    image?: ChainImage) {
   return {
     ...(systemPrompt ? { systemInstruction: { parts: [{ text: systemPrompt }] } } : {}),
-    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    contents: [{ role: 'user', parts: [{ text: userPrompt },
+      ...(image ? [{ inlineData: { mimeType: image.mime, data: image.base64 } }] : [])] }],
     generationConfig: {
       maxOutputTokens: Math.min(maxTokens, 8192),
       temperature: 0.3,
@@ -90,6 +100,7 @@ export async function geminiComplete(
   label: string,
   /** Override the model — lets short/structured callers pick a PLAIN model. */
   modelOverride?: string,
+  image?: ChainImage,
 ): Promise<string> {
   const key = GEMINI_KEY();
   if (!key) throw new Error('GEMINI_API_KEY missing');
@@ -99,7 +110,7 @@ export async function geminiComplete(
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, true)),
+      body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, true, image)),
       signal: AbortSignal.timeout(120_000),
     },
   );
@@ -120,7 +131,7 @@ export async function geminiComplete(
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, false)),
+          body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, false, image)),
           signal: AbortSignal.timeout(120_000),
         },
       );
@@ -362,18 +373,24 @@ async function callProvider(
   maxTokens: number,
   label: string,
   profile: ChainProfile = 'quality',
+  image?: ChainImage,
 ): Promise<string> {
+  // A model that never saw the picture must never describe it: text-only tiers refuse an image call.
+  if (image && (provider === 'groq' || provider === 'grok')) throw new Error('no vision');
   if (provider === 'gemini') {
     const model = profile === 'classify' ? GEMINI_FAST_MODEL() : GEMINI_MODEL();
-    return (await geminiComplete(systemPrompt, userPrompt, maxTokens, label, model)).trim();
+    return (await geminiComplete(systemPrompt, userPrompt, maxTokens, label, model, image)).trim();
   }
   if (provider === 'grok') return (await grokComplete(systemPrompt, userPrompt, maxTokens, label)).trim();
   if (provider === 'openai') {
     const key = OPENAI_KEY();
     if (!key) throw new Error('no OPENAI_API_KEY');
+    const userContent = image
+      ? [{ type: 'text', text: userPrompt }, { type: 'image_url', image_url: { url: `data:${image.mime};base64,${image.base64}` } }]
+      : userPrompt;
     const messages = systemPrompt
-      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
-      : [{ role: 'user', content: userPrompt }];
+      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }]
+      : [{ role: 'user', content: userContent }];
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
@@ -407,7 +424,10 @@ async function callProvider(
     model: (process.env.CLAUDE_CHAIN_MODEL || 'claude-haiku-4-5-20251001').trim(),
     max_tokens: maxTokens,
     ...(systemPrompt ? { system: systemPrompt } : {}),
-    messages: [{ role: 'user', content: userPrompt }],
+    messages: [{ role: 'user', content: image
+      ? [{ type: 'image' as const, source: { type: 'base64' as const, media_type: image.mime as 'image/jpeg', data: image.base64 } },
+         { type: 'text' as const, text: userPrompt }]
+      : userPrompt }],
   });
   return resp.content
     .filter((b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text')
@@ -450,13 +470,14 @@ export async function completeWithProfileDetailed(
   userPrompt: string,
   maxTokens: number,
   label: string,
+  image?: ChainImage,
 ): Promise<{ text: string; provider: ProviderName; skipped: string[]; ms: number }> {
   const budget = Math.max(maxTokens, MIN_REASONING_TOKENS);
   const reasons: string[] = [];
   const startedAt = Date.now();
   for (const provider of CHAIN_ORDER[profile]) {
     try {
-      const text = await callProvider(provider, systemPrompt, userPrompt, budget, label, profile);
+      const text = await callProvider(provider, systemPrompt, userPrompt, budget, label, profile, image);
       if (text) {
         if (reasons.length) console.warn(`[${label}] ${profile}: ${provider} answered after ${reasons.length} failure(s)`);
         return { text, provider, skipped: reasons, ms: Date.now() - startedAt };
