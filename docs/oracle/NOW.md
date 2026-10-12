@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (Atlas deck+video+Cc) | 2026-10-12 23:40 | Elena: every Atlas email carries the AIGO ES deck PDF + the niche's YouTube promo + Cc to her; backfill today's 8 Atlas leads | scripts/atlas-lead-machine.cjs, docs/selling/prospect-meta.cjs (read), Oracle registry rows/drafts of the 8 `-atlas` slugs + their HubSpot notes; no PM2 | — |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 | Claude Code (bot fix) | 2026-10-12 22:30 | Telegram bot: typed text → Trello like voice, "wire this link" → card description, Kira≠daughter colour fix, image reading via the model waterfall (Elena's go) | src/telegram-bot.ts, src/trello-voice.ts, src/llm-resilience.ts + their dist, scripts/test-trello-voice-dates.cjs, scripts/test-llm-resilience.ts; pm2 restart cto-aipa ONLY after the 22:18 apply-kit row is clear or agrees | 68ecb0ca |
 
@@ -132,6 +131,20 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 12 Oct ~23:55 UTC — ATLAS letters now carry deck PDF + industry promo film + Cc Elena · on `main` (662be30c), NOT on Oracle · awaits Elena's go · claim released
+- **Found:** the deck/films/Cc kit (2 Oct) lived only in `prospect-meta.cjs` (hand-staged). `atlas-lead-machine.cjs` — which staged today's 8
+  `[CLIENT-ATLAS]` leads (Oracle commit 782abc2, 16:04 UTC) — carried none: Oracle registry rows for all 8 have no `cc`, no `attachments`.
+- **DONE (main only):** `docs/selling/aigo-kit.cjs` = one source (deck line, PDF spec, Cc, 5 films + `aigoVideoLinesFor`); prospect-meta
+  imports it (JSON md5 identical before/after). Atlas email + WA, 1st + FU: deck line + film; registry rows get `cc` + `attachments`;
+  the note gets `hs_attachment_ids` (reuses the HubSpot file). Films verified public/playable 12 Oct: yacht kUrKw61Uo4Q · island/charter
+  Tg9N0PprsaI · relocation/legal y1ZhWyqJW0w · clinic v3 e0rMKnH-noI · /api Cz5F7IaXEXc (fallback).
+- **NEXT (needs Elena's go):** scp the 3 files to Oracle (Oracle md5 of prospect-meta/hs-files/wa-link-lib = main, checked) — no PM2 restart,
+  cron Mon 16:00 UTC; run `test-outreach-attachments.cjs` there; backfill the 8 rows (cc + attachments + deck/film lines in the drafts + PDF on note).
+- **RISK:** 4 of the 8 addresses are not real buyers — `nombre.apellido@fourseasons.com` (placeholder), `last@sofitellegendsantaclara.com`
+  (pattern), `consumeraffairs@hyatt.com` (complaints desk), `courtneylmuro@gmail.com` (a blogger). The deck is the one the 11 Oct review
+  paused (10 false lines incl. "Nothing goes out without you"; `[outreach-auto]` still sends unapproved) — sending it is Elena's call.
+  Atlas publish to GitHub FAILED today (`! [rejected] (fetch first)`) — Oracle's registry is local-only; go-wa reads local disk first, so buttons work.
 
 ### ✅ 12 Oct ~23:05 UTC — APPLY KIT now draws every piece from the verified evidence (Elena: "just make it work, no bicycles") · live on Oracle · claim released
 - **DONE:** `docs/oracle/2026-10-12_apply_kit_profound_plan.md` (cause + what was built). Letter and 🎯 read `cv-bank.json` (one pool);
