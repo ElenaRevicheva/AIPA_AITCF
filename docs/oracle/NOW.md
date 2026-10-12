@@ -130,7 +130,7 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🔴 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · every OpenAI-backed service is down · Elena's move
+### 🟡 11 Oct ~22:40 UTC — OpenAI credit balance EXHAUSTED · waterfalls serving (coach on Gemini) · top-up is Elena's call
 - **Proof:** a 1-token probe on BOTH Oracle OpenAI keys returns `credit_balance_exhausted` (cto-aipa, OpenClaw, whitespace,
   dragontrade, EspaLuz_Influencer share one; EspaLuzFamilybot, EspaLuzWhatsApp, VJH share the other — same account, both dry).
 - **OpenClaw coach:** "prep me for …" replies only "You have no credits remaining". The 7 Oct waterfall (`ad14b64e`) did NOT
@@ -139,10 +139,12 @@ git log keeps the record.
   "credit balance" → `billing` ✓; OpenAI's old "exceeded your current quota" → `rate_limit` ✓. v2026.2.14's `ERROR_PATTERNS.billing`
   lacks OpenAI's new wording. cto-aipa's own waterfalls are fine — they fall through on ANY error (log: "Claude unavailable (400),
   falling back...").
-- **Fix (needs Elena's go — the root-owned patch was refused by the permission check):** add `"no credits remaining"` to
-  `ERROR_PATTERNS.billing` in the 5 files that hold it (`dist/pi-embedded-helpers-{1VoyogxV,CMPLJuLB,DLeTj87G,CUD7UoUC}.js`,
-  `dist/plugin-sdk/index.js`; back up first), then `systemctl --user restart openclaw-gateway`. An OpenClaw upgrade overwrites it.
-  Or add OpenAI credits (only Elena can).
+- **✅ FIXED 12 Oct 00:03 UTC (Elena's go):** `"no credits remaining"` added to `ERROR_PATTERNS.billing` in the 5 files that hold
+  it (backups in `~/_session-backups/openclaw-20261011/dist-before-billing-patch/`), gateway restarted. **Verified live:** session
+  log shows `openai gpt-4.1 error` → `google gemini-2.5-flash stop` on every turn; proof line, Q1/4, title corrected in 🔧,
+  verified example word for word, 🔴 LIVE format all ✓ on Gemini. **An OpenClaw upgrade overwrites the patch** — see
+  job-list-filter `docs/openclaw/ORACLE_LIVE_SETUP.md` for the one-line check. OpenAI credits still empty: gpt-4.1 returns
+  as primary automatically once Elena tops up (her call — Gemini is serving meanwhile).
 - **Coach changes today (deployed, md5 laptop = Oracle):** `scripts/hs-deal-prep.cjs` 7fb5ebae… (`--role=` picks the right deal
   of a multi-role company; "✅ VERIFIED EXAMPLES" = the 17 reviewed cv-bank bullets, copied word for word into "For example, from
   my work:"); job-list-filter `docs/openclaw/interview-spar/SKILL.md` (run the reader before replying; one question per message;
