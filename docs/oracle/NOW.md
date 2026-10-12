@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-12 20:32 | CodeRoad Senior AI Product Owner: CV v2 by the 6 Oct recipe + form answers (deal 65888373398) | docs/applications/cv-by-job/coderoad-senior-ai-product-owner/, docs/applications/2026-10-12_coderoad_*.md, HubSpot notes on deal 65888373398 (additive only), NOW.md | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
