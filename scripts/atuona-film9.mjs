@@ -381,6 +381,26 @@ function termStreamAss(it, d, lead, vd, file) {
   return file;
 }
 
+// v17 (Elena, 12 Oct: "change Atuona in the end to the name of the movie Arearea - and nearby paste a little note from the history of
+// art you explored about real Arearea painting"): CUT.outro = {title, note: [lines], sign, dur} replaces the fixed ATUONA closing
+// card. The title in tracked mono, the note lines (verified facts, docs/atuona/AREAREA_RESEARCH_2026-10-11.md) in the stanza face,
+// the sign-off line under them; fades in and out like the other cards.
+async function makeOutro(o, outFile) {
+  const d = o.dur || 10;
+  const tFile = outFile + '_t.txt'; fs.writeFileSync(tFile, track(o.title));
+  const size = Math.min(84, Math.floor(1770 / (track(o.title).length * 0.602)));
+  const F = TD.font && TEXTFONTS && fs.existsSync(path.join(TEXTFONTS, 'JetBrainsMono-400.ttf')) ? path.join(TEXTFONTS, 'JetBrainsMono-400.ttf') : MONO;
+  const lines = o.note || [], step = 46, top = 470;
+  let draw = `drawtext=fontfile=${fp(MONO)}:textfile=${fp(tFile)}:expansion=none${TS}:fontcolor=white:fontsize=${size}:x=(w-text_w)/2:y=${top - 170}`;
+  lines.forEach((l, k) => { const f = `${outFile}_n${k}.txt`; fs.writeFileSync(f, l);
+    draw += `,drawtext=fontfile=${fp(F)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0xD8D8D8:fontsize=30:x=(w-text_w)/2:y=${top + k * step}`; });
+  if (o.sign) { const f = outFile + '_s.txt'; fs.writeFileSync(f, caps(o.sign));
+    draw += `,drawtext=fontfile=${fp(MONO)}:textfile=${fp(f)}:expansion=none${TS}:fontcolor=0x9A9A9A:fontsize=24:x=(w-text_w)/2:y=${top + lines.length * step + 60}`; }
+  const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
+  await execFileP('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=black:s=${VW}x${VH}:r=${FPS}:d=${d.toFixed(2)}`, ...silence, '-filter_complex', `[0:v]${draw},${fades}[v]`, '-map', '[v]', '-map', '1:a', '-t', d.toFixed(2), ...enc, outFile], { maxBuffer: 1 << 26, timeout: 300000 });
+  return outFile;
+}
+
 const clipPath = it => path.join(CLIPS, it.clip);
 const voPath = it => path.join(VODIR, `${it.sid}.mp3`);
 
@@ -482,7 +502,7 @@ async function main() {
     seqOf[it.sid] = seq.length; seq.push({ file: segOf[it.sid] });
     if (it.glitch_after) seq.push({ file: await makeGlitch(path.join(IMG, it.glitch_after), path.join(W, `glitch_after_${it.sid}.mp4`)), glitch: true });
   }
-  seq.push({ file: await makeCard('ATUONA', OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.2, 84) });
+  seq.push({ file: CUT.outro ? await makeOutro(CUT.outro, path.join(W, 'card_outro.mp4')) : await makeCard('ATUONA', OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.2, 84) });
   if ((CUT.poem_links || []).length) seq.push({ file: await makePoemCard(CUT.poem_links, path.join(W, 'card_poems.mp4'), CUT.poem_card_dur || 7) });
 
   // 3. transition chain: 1.3 s dissolves, a near-hard cut into and out of a glitch (film #8: video-stream lengths, not container)
@@ -500,7 +520,10 @@ async function main() {
     if (files.length === 1) { fs.copyFileSync(files[0], out); return ds[0]; }
     const inputs = files.flatMap(f => ['-i', f]); let fc = '', vlab = '0:v', alab = '0:a', merged = ds[0];
     for (let k = 1; k < files.length; k++) { const D = joins[k], ofs = Math.max(0, merged - D).toFixed(3); fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${D}:offset=${ofs}[vc${k}];[${alab}][${k}:a]acrossfade=d=${D}[ac${k}];`; vlab = `vc${k}`; alab = `ac${k}`; merged += ds[k] - D; }
-    const v = last ? ['-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M']
+    // 12 Oct 2026 (Elena: "highest quality and size movie fitting niio requirements"): FILM9_MASTER_CRF=<n> drops the 14 Mbit/s
+    // streaming cap for the delivery master (Niio takes HD/4K files up to 300 GB); the intermediates stay near-lossless either way.
+    const MCRF = process.env.FILM9_MASTER_CRF;
+    const v = last ? (MCRF && !PREVIEW ? ['-preset', 'slow', '-crf', MCRF, '-tune', 'film'] : ['-preset', PREVIEW ? 'ultrafast' : 'medium', '-crf', PREVIEW ? '22' : '18', '-maxrate', '14M', '-bufsize', '28M'])
                    : ['-preset', PREVIEW ? 'ultrafast' : 'veryfast', '-crf', PREVIEW ? '16' : '12'];
     await execFileP('ffmpeg', ['-y', '-threads', '2', '-filter_threads', '1', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`,
       '-c:v', 'libx264', ...v, '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', out], { maxBuffer: 1 << 27, timeout: 7200000 });
@@ -545,7 +568,7 @@ async function main() {
     process.stderr.write(`music ${(await dur(MUSIC)).toFixed(1)}s < film ${LEN.toFixed(1)}s -> extended by a 4 s self-crossfade
 `);
   }
-  await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
+  await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', process.env.FILM9_MASTER_CRF ? '320k' : '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
   }
   fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map(p => ({ shot: p.it.sid, clip: p.it.clip, poem: p.it.poem, start: +segStart(seqOf[p.it.sid]).toFixed(2), dur: +p.d.toFixed(2), slow: +p.factor.toFixed(3), vo_at: p.vd ? +(segStart(seqOf[p.it.sid]) + (p.it.lead ?? LEAD)).toFixed(2) : null, glitch_after: p.it.glitch_after || null })), null, 1));
   console.log(`DONE ${final} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(1)}s, ${plan.length} shots, ${voAt.length} voice lines) — verify, then: node film9.mjs --publish`);
