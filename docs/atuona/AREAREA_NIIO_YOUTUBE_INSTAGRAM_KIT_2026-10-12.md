@@ -161,6 +161,11 @@ closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (th
 >
 > atuona.xyz · atuona.xyz/aifilmstudio · litprom.ru/profil69387.html · aideazz.xyz/portfolio
 
-**Niio artist statement (12 Oct, 95 words of 100):**
+**Niio artist statement (12 Oct, 96 words of 100; "archive", not "gallery", because the next question asks about gallery representation):**
 
-> I write poems and build the systems in which they live. ATUONA, my gallery, holds 99 fragments in Russian and English; I turn them into films through an AI pipeline I designed and direct. Crimson silk, black volcanic sand, the light of 3 a.m.: the films explore desire, exile, memory and the commodification of intimacy. My stanzas appear inside a PowerShell terminal as the narrator reads, because in my work code and verse share one screen. AI is not my author; it is my medium. I own the architecture. The revelation belongs to no one.
+> I write poems and build the systems in which they live. My archive, ATUONA, holds 99 fragments in Russian and English, and I turn them into films through an AI pipeline I designed and direct. Crimson silk, black volcanic sand, the light of 3 a.m.: the films explore desire, exile, memory and the commodification of intimacy. My stanzas appear inside a PowerShell terminal as the narrator reads, because in my work code and verse share one screen. AI is not my author; it is my medium. I own the architecture. The revelation belongs to no one.
+
+
+**Niio: "Are you represented by a Gallery?"**
+
+> No, I am not represented by a gallery. I run my own independent online gallery and film studio, ATUONA (atuona.xyz), from Panama.
