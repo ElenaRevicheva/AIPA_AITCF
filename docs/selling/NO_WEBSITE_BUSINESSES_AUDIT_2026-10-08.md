@@ -95,3 +95,22 @@ an optional AI-readable micro-page, and a 4-stage offer (audit → GEO/AEO work 
 - Automate dimensions only after **3 people have paid** for the manual version. Their reports are the spec.
 - First, a free measurement: how many existing ICP prospects in HubSpot have no website at all?
   That number decides whether this is a market or an anecdote.
+
+## 7. Reuse map: serving a no-website ICP with what is ALREADY built (12 Oct 2026, code-read, nothing changed)
+
+| Stage | Already built (reuse as-is) | Where it assumes a website |
+|---|---|---|
+| **Find** | `src/prospect-places.ts` (Google Places) **keeps** no-website places with Maps URL + phone "for manual follow-up" (`:303-307`, `:360-374`), wired to Telegram `/places_ingest`. Key exists in `.env`; **unverified that it works**. | `atlas-lead-machine.cjs:447` keeps Maps results only with a website; `:1229` drops Instagram/wa.me/linktr.ee as "unsellable". |
+| **Evidence for the letter** | `scripts/competitor-probe.cjs` + `src/ai-answer-competitors.ts`: Perplexity lists **which brands own the AI answer** for a query (manual run). `src/citation-tracker.ts` probes 4 engines weekly. | citation-tracker brand/domain hardcoded to AIdeazz (`:107`, `:137`). |
+| **Stage in HubSpot** | One-click WhatsApp/email notes, HIGH task, `preferredPhone/emailOnlyOk` mechanics. | `stage-manual-prospect.cjs` requires a domain + audit; letters say "Analicé ${domain} … ${score}/100"; FU installer refuses deals without a score. No HubSpot property for Instagram/Maps/WhatsApp. |
+| **Sell** | $100 Diagnostic: the pay form's website field is not URL-validated (an Instagram handle passes); `fitCriteria` already counts Instagram/WhatsApp as channels; prep note handles "no scan". | `diagnostic-delivery.ts:67-72` turns any text into a URL (`none` → `https://none`; `\s*` may swallow the next line) and scans it; the client email promises "how AI sees your website". |
+| **Deliver: citable page** | aideazz.xyz can host a hand-written flat `public/c-<slug>.html` (own title, canonical, LocalBusiness JSON-LD, FAQ, wa.me) + one `_redirects` line, live on push. | None, zero code. Trade-off: on aideazz.xyz it is a third-party page *about* the business, not its own domain. |
+| **Deliver: Instagram content** | `scripts/aigo-ig-*.py/.sh` film → Reel + 4:5 posts + Buffer schedule (proven 4 Oct). | Persona/branding is AIdeazz; **render on the laptop only** (Oracle froze 8 Oct). |
+| **Deliver: WhatsApp operator** | EspaLuz WhatsApp (Twilio, EN/ES, voice, payments) as the skeleton; Concierge draft → one-tap approve pattern. | No client persona/FAQ template. Build only after a client pays for Offer A ($1,500 + $250/mo). |
+| **Measure** | citation-tracker. | Needs the brand passed as a parameter (after a paying client). |
+
+**Zero-build path:** Places finds them → competitor-probe shows who AI recommends instead → hand-written letter with that evidence → $100 Diagnostic (Instagram handle in the website box) → manual 5-dimension checklist → micro-page as a static file → Reels from the existing pipeline.
+
+**Small fixes worth Elena's go (protect paying customers, not new features):**
+1. Step A: the audit says "no owned website" for social/Maps links instead of grading Google/Instagram.
+2. `diagnostic-delivery.ts:67-72` parsing (`https://none`, line-swallowing regex).
