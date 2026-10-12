@@ -136,3 +136,27 @@ closing date. Submit **AREAREA only**: it is the one film delivered at 1080p (th
 > AREAREA (2026), her ninth film, takes its name from Gauguin's 1892 painting in the Musée d'Orsay, the canvas Paris mocked as "Le Chien rouge". It follows Kira, a woman who will not whiten, and Ule, a witness who is not a lover, across an island that sells everything, even a tear, by the lot.
 >
 > She works in English and Russian. Her practice sits where executive judgment, production engineering and poetry meet: she designs the system, directs the AI that builds it, and answers for what it makes.
+
+**Niio Bio / About, FINAL (12 Oct): Elena's own long bio condensed to 2452 of 2500 characters, plain text. USE THIS ONE:**
+
+> Kira Velerevich - Poet · AI Filmmaker · Interdisciplinary Artist
+>
+> "You cannot choose your revelations."
+>
+> Kira Velerevich is the pseudonym of Elena Revicheva, a Panama-based poet, AI filmmaker and AI-native systems architect working where literature, moving image and computation meet. She writes the poems and builds the environments in which they live.
+>
+> For seven years she was Deputy CEO and Chief Legal Officer of a regional e-government operator. Today she leads AIdeazz AI Lab, designing and operating production AI systems built through specialized AI coding agents: more than 15 live services, 25 scheduled processes and multi-provider AI orchestration. The same architecture became the foundation of her art.
+>
+> Her gallery and film studio, ATUONA, is named after the village in the Marquesas where Gauguin is buried. It holds 99 poetic fragments in Russian and English. Forty-six were accepted for publication by LITPROM, the underground literary collective founded in Moscow in 2002, whose editors judged texts, not popularity. Each fragment chooses its own language.
+>
+> Nothing in ATUONA is for sale. Visitors may claim a fragment on the blockchain for the network fee alone, but cannot choose which one. In a culture built to predict desire, the fragment chooses the visitor.
+>
+> Since May 2026 she has completed nine films, made through an AI production pipeline she designed and operates, orchestrating image, motion, voice, music and edit as one artistic system. Crimson silk, black volcanic sand, the light of 3 a.m.: sensual, never explicit, the films explore desire, exile, memory, power and the commodification of intimacy. Her stanzas appear inside a PowerShell terminal under their fragment numbers as the narrator reads. The machine does not replace the poem; it gives the poem another body.
+>
+> Her ninth film, AREAREA (2026), takes its title from Gauguin's 1892 painting in the Musée d'Orsay, once mocked for its red dog. It follows Kira, a woman who refuses to whiten, and Ule, a witness rather than a lover, across an island where everything, even a tear, is priced and sold.
+>
+> For her, AI is neither an autonomous artist nor a shortcut. It is a medium shaped by human intention. She defines the vision, builds the systems, directs them, and answers for what they make.
+>
+> The artist owns the architecture. The revelation belongs to no one.
+>
+> atuona.xyz · atuona.xyz/aifilmstudio · litprom.ru/profil69387.html · aideazz.xyz/portfolio
