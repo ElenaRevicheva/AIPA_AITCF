@@ -41,6 +41,16 @@ const {
   digitsOnly,
   formatPhone507,
 } = require('./wa-link-lib.cjs');
+// The AI Growth Operator kit (Elena, 12 Oct 2026): every Atlas letter carries the deck
+// PDF, the promo film for the lead's industry, and Elena in Cc — the same kit the
+// hand-staged prospects have carried since 2 Oct.
+const {
+  AIGO_DECK_ES_LINE,
+  AIGO_DECK_ES_ATTACHMENT,
+  ELENA_COPY_CC,
+  aigoVideoLinesFor,
+} = require('../docs/selling/aigo-kit.cjs');
+const videoLines = (lead) => aigoVideoLinesFor(`${lead.query || ''} ${lead.company || ''}`);
 
 const ROOT = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(ROOT, '.env'), 'utf8');
@@ -926,7 +936,11 @@ function buildDraft(lead, audit, angle) {
     ``,
     `La auditoría completa es gratuita aquí: https://aideazz.xyz/api`,
     ``,
+    AIGO_DECK_ES_LINE,
+    ``,
     servicesPD(lead),
+    ``,
+    ...videoLines(lead),
     ``,
     `¡Que tengan un excelente día!`,
     `Saludos,`,
@@ -963,7 +977,11 @@ function buildFuDraft(lead, audit, angle) {
     ``,
     `Si les sirve, en 15 minutos les muestro los 3 principales arreglos de esa auditoría y cómo quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita: https://aideazz.xyz/api`,
     ``,
+    AIGO_DECK_ES_LINE,
+    ``,
     servicesPD(lead),
+    ``,
+    ...videoLines(lead),
     ``,
     `Saludos,`,
     `Elena Revicheva`,
@@ -1086,6 +1104,10 @@ async function stageLead(lead, audit, angle) {
     OPERATOR_ES,
     ``,
     `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    ``,
+    AIGO_DECK_ES_LINE,
+    ``,
+    ...videoLines(lead),
     WA_CLOSING,
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
@@ -1107,6 +1129,10 @@ async function stageLead(lead, audit, angle) {
     `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
     ``,
     `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    ``,
+    AIGO_DECK_ES_LINE,
+    ``,
+    ...videoLines(lead),
     WA_CLOSING,
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, fuWaRel), fuWaText, 'utf8');
@@ -1118,6 +1144,10 @@ async function stageLead(lead, audit, angle) {
     score: audit.score,
     ...(deal?.id ? { dealId: String(deal.id) } : {}),
     ...(lead.phone ? { phone: digitsOnly(lead.phone) } : {}),
+    // go-wa.ts reads both: Elena is copied on the send, and the deck rides as a real
+    // PDF (the sender refuses the whole email if the file fails to load).
+    cc: ELENA_COPY_CC,
+    attachments: [AIGO_DECK_ES_ATTACHMENT],
   };
   reg[slug] = { ...common, emailDraft: draftRel, ...(lead.phone ? { draft: waRel } : {}) };
   reg[fuSlug] = { ...common, emailDraft: fuRel, ...(lead.phone ? { draft: fuWaRel } : {}) };
@@ -1157,8 +1187,19 @@ async function stageLead(lead, audit, angle) {
     `<b>Asunto:</b> ${subject}<br><br>`,
     `<pre style="white-space:pre-wrap;font-family:inherit">${body.replace(/</g, '&lt;')}</pre>`,
   ].join('');
+  // The deck must exist IN the CRM too, not only in the Resend payload (CLAUDE.md:
+  // "An attachment must also land IN HubSpot"). Best-effort: a Files-scope failure must
+  // not cost the lead, and the email still attaches the PDF from disk — so it is logged.
+  let attachProps = {};
+  try {
+    const { uploadOutreachFile } = require('./hs-files.cjs');
+    const f = await uploadOutreachFile(path.join(ROOT, AIGO_DECK_ES_ATTACHMENT.path), AIGO_DECK_ES_ATTACHMENT.filename);
+    if (f?.id) attachProps = { hs_attachment_ids: String(f.id) };
+  } catch (e) {
+    console.warn(`      ⚠️ deck not attached to the HubSpot note for ${lead.company}: ${String(e.message).slice(0, 100)}`);
+  }
   const note = await hs('POST', '/crm/v3/objects/notes', {
-    properties: { hs_note_body: noteBody, hs_timestamp: Date.now() },
+    properties: { hs_note_body: noteBody, hs_timestamp: Date.now(), ...attachProps },
   });
   if (note?.id && deal?.id) {
     await hs('PUT', `/crm/v4/objects/notes/${note.id}/associations/default/deals/${deal.id}`, undefined).catch(() => {});

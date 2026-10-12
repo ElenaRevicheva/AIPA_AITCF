@@ -21,23 +21,15 @@
  *   carries them; attachments are also uploaded to HubSpot and attached to the note.
  * Absent fields change nothing: every existing prospect keeps its letter byte-for-byte.
  */
-const AIGO_DECK_ES_LINE =
-  'Nuestra presentación (8 páginas): https://aideazz.xyz/AIdeazz_AI_Growth_Operator_2026_ES.pdf';
-const AIGO_VIDEO_LINES_ES = [
-  'Y dos videos cortos que hicimos con IA para negocios de turismo:',
-  '▶️ Yates: https://youtu.be/kUrKw61Uo4Q',
-  '▶️ Islas, villas y charters: https://youtu.be/Tg9N0PprsaI',
-];
-/** Elena, 2 Oct 2026: the real-estate + immigration-law film fits law firms (Quijano). */
-const AIGO_VIDEO_LINES_LEGAL_ES = [
-  'Y un video corto que hicimos con IA para firmas de inmigración y bienes raíces:',
-  '▶️ https://youtu.be/y1ZhWyqJW0w',
-];
-const AIGO_DECK_ES_ATTACHMENT = {
-  path: 'docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf',
-  filename: 'AIdeazz_AI_Growth_Operator_2026_ES.pdf',
-};
-const ELENA_COPY_CC = 'elena.revicheva2016@gmail.com';
+// The deck, films and Cc now live in one place (aigo-kit.cjs) so the Atlas lead machine
+// sends the same links; the values are unchanged.
+const {
+  AIGO_DECK_ES_LINE,
+  AIGO_VIDEO_LINES_ES,
+  AIGO_VIDEO_LINES_LEGAL_ES,
+  AIGO_DECK_ES_ATTACHMENT,
+  ELENA_COPY_CC,
+} = require('./aigo-kit.cjs');
 
 const PROSPECT_META = {
   // Audited live Aug 6 2026: 82/100 B — aiAccess 95, geo 81, aeo 75, techSeo 79.
