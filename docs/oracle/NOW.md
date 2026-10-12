@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
-| Claude Code (bot fix) | 2026-10-12 22:30 | Telegram bot: typed text → Trello like voice, "wire this link" → card description, Kira≠daughter colour fix, image reading via the model waterfall (Elena's go) | src/telegram-bot.ts, src/trello-voice.ts, src/llm-resilience.ts + their dist, scripts/test-trello-voice-dates.cjs, scripts/test-llm-resilience.ts; pm2 restart cto-aipa ONLY after the 22:18 apply-kit row is clear or agrees | 68ecb0ca |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,6 +130,21 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 12 Oct 23:07 UTC — Telegram bot (AI_TCF_AIdeazz): typed text → Trello like voice · "wire this link" → card description · colours · screenshots via the waterfall
+- **DONE (Elena's go):** cto-aipa `762c7218`, live on Oracle (3 dist files scp'd, md5 = local build, backups `~/_session-backups/botfix-20261013/`,
+  `pm2 restart cto-aipa` 23:06:50 > files 23:06:39, restarts 199, `🤖 Telegram bot started`). One `routeToTrello` for voice AND text (text had
+  never reached Trello since 8 May, 55347c6c); link requests append the URL verbatim to the card's description and read it back; prompt
+  no longer says "Kira=daughter" (work meetings orange; no subject → title "Cita <date>", no colour); vision falls through
+  `completeWithProfileDetailed('quality', …, image)` (OpenAI/Gemini see images; groq/grok refuse).
+- **VERIFIED BY:** `scripts/test-trello-voice-dates.cjs` 72/72; `scripts/test-chain-vision.cjs` 4/4 on Oracle (Claude credit error → OpenAI read the
+  red test image); dry runs on her real 12 Oct messages; two adversarial review rounds (3 + 1 reviewers), every finding fixed or retested.
+  Her Boardy card fixed by hand: "Cita: intro con Natalia (Boardy) · 10:00–10:30", 16 Oct 10:00 Panama, orange, Meet link in the description.
+- **NEXT (Elena's):** first live typed task / screenshot will prove it in the log (`[TrelloVoice] Classification:` → `✅ Card created`; 
+  `[telegram/photo] Claude vision failed … answered by openai`). /tasks cleanup: rows that were Trello commands ("Crea la tarea…", "Wire
+  this link…", "Удали эту задачу.", "Перемести карточку на BoardMay.", "This task to me.") — delete only with her go.
+- **RISK:** typed tasks now become Trello cards (intended; `/task` still saves to the internal list). Card memory is RAM, 30 min — after a
+  restart she names the card. Never deploy cto-aipa via `deploy-product.sh` (reset --hard).
 
 ### ⏳ 12 Oct ~23:55 UTC — ATLAS letters now carry deck PDF + industry promo film + Cc Elena · on `main` (662be30c), NOT on Oracle · awaits Elena's go · claim released
 - **Found:** the deck/films/Cc kit (2 Oct) lived only in `prospect-meta.cjs` (hand-staged). `atlas-lead-machine.cjs` — which staged today's 8
