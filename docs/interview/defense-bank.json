@@ -1,5 +1,5 @@
 {
-  "_note": "Verified technical-defense answers for Elena's interviews (28 Sep 2026). scripts/lib/job-tailor.cjs picks the ones a posting asks about; NO model writes or rewrites any answer. Every number was checked in production (see docs/interview/NIURO_TECHNICAL_DEFENSE.md and docs/oracle/NOW.md). Add an entry only after verifying it; never put 'solo' in an answer.",
+  "_note": "Verified technical-defense answers for Elena's interviews (28 Sep 2026). scripts/lib/job-tailor.cjs picks the ones a posting asks about; NO model writes or rewrites any answer. Every number was checked in production (see docs/interview/NIURO_TECHNICAL_DEFENSE.md and docs/oracle/NOW.md). Add an entry only after verifying it; never put 'solo' in an answer. 12 Oct 2026: entries hallucination / cost / stakeholders added from the published wiki incidents (23 Aug, 26 Aug, 22 Sep 2026) and the reviewed CodeRoad v3 CV lines; the spending-cap vendor was a VIDEO engine, never an LLM.",
   "frame": "I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions.",
   "always": [
     "code"
@@ -342,6 +342,78 @@
       "q": "You don't have an engineering degree — why you?",
       "a": "Because the role is outcomes, not a degree: I find the real bottleneck, get the system built and measured, and explain it to the client. My degree isn't in engineering; since May 2025 I have built and run 15 production services through my AI environment.",
       "push": ""
+    },
+    {
+      "id": "hallucination",
+      "tags": [
+        "hallucinat",
+        "guardrail",
+        "grounding",
+        "grounded",
+        "fabricat",
+        "factual",
+        "content generation",
+        "generative content",
+        "publishing",
+        "trust",
+        "safety",
+        "evaluation framework",
+        "prompt engineering",
+        "prompts",
+        "model drift",
+        "review agent outputs",
+        "release readiness"
+      ],
+      "q": "How do you handle hallucination risk?",
+      "a": "As a production incident, not a prompt problem. My daily publisher once fell to a cheaper fallback model when a provider balance ran out, and for ten weeks it described a database the system has never used while every run reported clean. I stopped it at the source and rebuilt it to write only from a bundle of facts measured on the running system: an article with a number absent from that bundle, or naming infrastructure that is not installed, is rejected and regenerated, and a day with too few verified facts gets no article. Three days later the gate refused a number that had leaked in from the topic prompt itself, so the prompt is now treated as a source too: every number in it is licensed or stripped.",
+      "push": "How do you know the gate works? — It fired in production on 26 August: the run was skipped with 'Grounding gate / unsourced number(s): 40', and the day's article shipped once the brief was cleaned. The named lesson: redundancy protects availability, not truth — a provider downgrade is an editorial event, not only an operational one."
+    },
+    {
+      "id": "cost",
+      "tags": [
+        "cost",
+        "budget",
+        "spend",
+        "token",
+        "consumption",
+        "cloud cost",
+        "cloud consumption",
+        "finops",
+        "pricing",
+        "margin",
+        "cost control",
+        "credits",
+        "billing",
+        "latency"
+      ],
+      "q": "How do you control vendor and LLM cost?",
+      "a": "Hard caps in code, checked against the vendor's real response, and fallbacks that keep service up when a balance runs out. I found a spending cap that could never fire: the budget guard read a price field the vendor never sends, so every price passed. I fixed it against the vendor's actual response and published the postmortem. When a provider's balance ran out, the five-provider fallback chain kept the bots answering, and the same event taught me that a fallback can also change what the model says, so cost events are watched for quality, not only for availability.",
+      "push": "Do you track LLM token spend and latency? — Not as a telemetry stack yet. I track vendor spend per run against a cap and watch balances; token-level and latency telemetry is what I would set up first for a client budget."
+    },
+    {
+      "id": "stakeholders",
+      "tags": [
+        "stakeholder",
+        "compliance",
+        "governance",
+        "sign-off",
+        "data privacy",
+        "data-privacy",
+        "privacy",
+        "workshop",
+        "executive",
+        "leadership",
+        "client leadership",
+        "board",
+        "regulated",
+        "product owner",
+        "alignment",
+        "enterprise client",
+        "non-technical business"
+      ],
+      "q": "How do you align stakeholders and compliance?",
+      "a": "Seven years as Deputy CEO and Chief Legal Officer of a regional e-government operator: I owned the board process for stakeholders drawn mainly from the regional government, drove its decisions through to implementation, and made sure every public service we moved online was lawful under existing legislation. That taught me to treat constraints as product inputs. In my AI systems it means hard rules in code, fail-closed defaults, a human approval before anything irreversible, and no number shown unless it traces back to a record.",
+      "push": "Have you done it with a U.S. enterprise client? — Not yet. I ran delivery at board level for seven years in regulated e-government: vendor coordination, operational delivery, cost and performance reporting; the client-facing part of this role is where I would lean on that."
     }
   ]
 }

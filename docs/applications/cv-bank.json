@@ -4,9 +4,10 @@
     "pm": "docs/applications/cv-by-job/puente-product-manager/CV.html (reviewed 11 Oct 2026)",
     "ops": "docs/applications/cv-by-job/puente-ai-operations-lead/CV.html (reviewed 6 Oct 2026)",
     "fa": "docs/applications/cv-by-job/puente-founders-associate/CV.html (reviewed 6 Oct 2026)",
-    "supa": "docs/applications/cv-by-job/supabase-head-ai-native-ops/CV.html (v3, reviewed 5 Oct 2026)"
+    "supa": "docs/applications/cv-by-job/supabase-head-ai-native-ops/CV.html (v3, reviewed 5 Oct 2026)",
+    "coderoad": "docs/applications/cv-by-job/coderoad-senior-ai-product-owner/CV.html (v3, four-lens review with every finding verified, 12 Oct 2026)"
   },
-  "figures_note": "Figures are minimums from production logs and the live CRM, counted 28–29 September 2026; CRM totals re-checked 6 October 2026; Audit API use from the server logs for 1–10 October 2026.",
+  "figures_note": "Figures are minimums from production logs and the live CRM, counted 28–29 September 2026; CRM totals re-checked 6 October 2026; Audit API use from the server logs for 1–10 October 2026; product start dates from each repository's first commit (EspaLuz: deployed 16–17 May 2025); film count as of 11 October 2026.",
   "summary": [
     {
       "id": "s-products-end-to-end",
@@ -27,6 +28,11 @@
       "id": "s-ai-native-daily-tools",
       "text": "I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions. Claude and ChatGPT are daily tools; priorities, verification and consequential decisions stay with me.",
       "src": "fa"
+    },
+    {
+      "id": "s-regulated-constraints",
+      "text": "Seven years as Deputy CEO and Chief Legal Officer in regulated e-government taught me to treat constraints as product inputs. In my AI systems that means hard rules in code, fail-closed defaults, a human approval before anything irreversible, and no number shown unless it traces back to a record.",
+      "src": "coderoad"
     }
   ],
   "tagline": [
@@ -166,8 +172,8 @@
   "bullets": [
     {
       "id": "b-audit-api-launch",
-      "text": "**AI Visibility Audit API — idea to launch to measured use.** A public product, launched July 2026: anyone pastes a website address and, with no login, gets a score for how well ChatGPT, Perplexity and Claude can find and cite it. I designed the rubric, 34 checks in 4 weighted categories, and an output a non-technical buyer can act on: a grade, and the fix and the reason for every failed check. In the server logs for 1–10 October alone: 39 audits of 18 websites, 18 of them run by people on the public page and the rest by my own outreach agents before a new prospect is contacted.",
-      "src": "pm",
+      "text": "**AI Visibility Audit API — idea to launch to measured use.** A public product, launched July 2026: anyone pastes a website address and, with no login, gets a score for how well ChatGPT, Perplexity and Claude can find and cite it. I designed the rubric, 34 checks in 4 weighted categories, and an output a non-technical buyer can act on: a grade, and the fix and the reason for every failed check. In the server logs for 1–10 October alone: 39 audits of 18 websites — 18 of them run by people on the public page and 21 by my own outreach agents before a new prospect is contacted.",
+      "src": "coderoad",
       "tags": [
         "launch",
         "specs",
@@ -361,6 +367,82 @@
         "process",
         "quality"
       ]
+    },
+    {
+      "id": "b-hallucination-guardrail",
+      "text": "**Hallucination guardrail.** When a provider balance ran out, my daily publisher fell to a cheaper fallback model and for ten weeks described a database the system has never used, while every run reported clean. I stopped it at the source and rebuilt it to write only from facts measured on the running system: an article with a number absent from that bundle, or naming infrastructure that is not installed, is rejected and regenerated; if the model still cannot stay inside that bundle, an evidence-only article is composed from the licensed numbers, and a day with too few verified facts gets no article.",
+      "src": "coderoad",
+      "tags": [
+        "quality",
+        "evaluation",
+        "guardrail",
+        "hallucination",
+        "monitoring",
+        "governance",
+        "publishing",
+        "reliability"
+      ]
+    },
+    {
+      "id": "b-inquiry-concierge",
+      "text": "**Inquiry concierge (Make + Claude, with a backup).** Website form and chat inquiries reach HubSpot at once; a Make.com scenario has Claude draft the reply, and the email goes out only after a one-tap human approval. When Make's AI credits ran out and drafts silently stopped, I added a backup: my server now drafts on a five-provider chain if Make has not answered in time, so an inquiry is never left unanswered. Published as a case study.",
+      "src": "ops",
+      "tags": [
+        "automation",
+        "reliability",
+        "crm",
+        "conversational",
+        "human-in-the-loop",
+        "ai-agents",
+        "launch"
+      ]
+    },
+    {
+      "id": "b-approved-send-fail-closed",
+      "text": "Outreach sends after one human approval, which also moves the deal, stamps delivery and books the follow-up (2,800+ deals). The send is fail-closed: if an attachment fails to load, the email is refused. That sometimes costs one send; a wrong attachment in front of a client costs trust.",
+      "src": "pm",
+      "tags": [
+        "reliability",
+        "governance",
+        "crm",
+        "sales-ops",
+        "quality",
+        "guardrail"
+      ]
+    },
+    {
+      "id": "b-golden-set-tests-minute",
+      "text": "600+ automated tests on the job-discovery pipeline (unit, integration, golden-set), running in about a minute; 11,000+ job postings qualified by the agentic pipeline.",
+      "src": "supa",
+      "tags": [
+        "evaluation",
+        "quality",
+        "measurement",
+        "screening"
+      ]
+    },
+    {
+      "id": "b-hard-gates-before-model",
+      "text": "A proposed RAG upgrade did not beat the baseline on a 38-decision replay, so it stayed off. Location and pay are hard gates in code that run before the model, so the model cannot wave through a job that fails them.",
+      "src": "supa",
+      "tags": [
+        "evaluation",
+        "governance",
+        "guardrail",
+        "screening",
+        "quality"
+      ]
+    },
+    {
+      "id": "b-services-degrade-not-stop",
+      "text": "15 long-running production services and 20 scheduled jobs on one cloud VM, all auto-restarting, with a 5-provider LLM fallback chain so a provider failure degrades service instead of stopping it.",
+      "src": "supa",
+      "tags": [
+        "reliability",
+        "monitoring",
+        "infrastructure",
+        "ai-agents"
+      ]
     }
   ],
   "roles": {
@@ -401,6 +483,11 @@
           "id": "om-dao-llc-setup",
           "text": "Led the legally compliant setup of a DAO LLC in the Marshall Islands, and its governance operations.",
           "src": "pm"
+        },
+        {
+          "id": "om-operating-agreement",
+          "text": "Drafted the Operating Agreement covering the DAO's tokenomics and the enforceability of its smart contracts.",
+          "src": "fa"
         }
       ]
     },
@@ -422,6 +509,11 @@
           "id": "eg-due-diligence-litigation",
           "text": "Conducted due diligence on public contracts and handled the company's court litigation.",
           "src": "fa"
+        },
+        {
+          "id": "eg-board-delivery",
+          "text": "Ran delivery at board level for seven years: vendor coordination, operational delivery, cost and performance reporting.",
+          "src": "coderoad"
         }
       ]
     },
@@ -585,9 +677,35 @@
         }
       ],
       "src": "fa"
+    },
+    {
+      "id": "l-espaluz-conversational",
+      "text": "**EspaLuz** — conversational AI: a bilingual Spanish tutor for expat families on WhatsApp and Telegram that remembers each family's earlier conversations (turns stored as embeddings in Postgres with pgvector; the three most similar retrieved before replying), born from my own family's need · in production since May 2025",
+      "links": [
+        {
+          "label": "WhatsApp",
+          "url": "https://wa.me/50766623757"
+        },
+        {
+          "label": "Telegram",
+          "url": "https://t.me/EspaLuzFamily_bot"
+        }
+      ],
+      "src": "coderoad"
+    },
+    {
+      "id": "l-vibejobhunter",
+      "text": "**VibeJobHunter** — the job-search sourcing and screening pipeline above · since November 2025",
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF"
+        }
+      ],
+      "src": "coderoad"
     }
   ],
-  "tools": "Automation: Make · HubSpot · Resend · webhooks · REST APIs · scheduled jobs (cron) · AI: Claude · ChatGPT · Claude Code · Cursor · LLM APIs (OpenAI, Anthropic, Gemini, Groq) · LangGraph · RAG (pgvector) · Build: Python · TypeScript / Node.js · PostgreSQL · Docker · Oracle Cloud · Git",
+  "tools": "AI: Claude · ChatGPT · Claude Code · Cursor · LLM APIs (OpenAI, Anthropic, Gemini, Groq) · LangGraph · LangChain (conversation memory in EspaLuz) · RAG (pgvector) · multi-provider LLM routing · evaluation systems · human-in-the-loop workflows · Product & CRM: HubSpot · Make · Resend · webhooks · REST APIs · scheduled jobs (cron) · Build: Python · TypeScript / Node.js · FastAPI · PostgreSQL · Docker · Playwright · Oracle Cloud · Git",
   "education": "Anthropic Academy — Claude Certification Program · 2026, in progress · Polkadot Blockchain Academy, PBA-X Wave 3 · 2025 · How-To-DAO Cohort · 2025 · MA, Social Psychology — Penza State University · 2018 · Blockchain Regulation — MGIMO, Moscow · 2017 · Presidential Program for Executive Management — RANEPA · 2015 · Internship — Nyskapingsparken Innovation Park, Bergen, Norway · 2015",
   "languages": "English — fluent, professional (self-assessed C1); my daily working language · Russian — native · Spanish — intermediate (resident in Panama) · French — elementary"
 }

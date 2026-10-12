@@ -28,6 +28,8 @@
  *    provider answered, so a quiet drop back to boilerplate is visible in the
  *    Note rather than discovered months later in the tone of the applications.
  */
+import * as fs from 'fs';
+import * as path from 'path';
 import { completeWithProfileDetailed } from './llm-resilience';
 
 /**
@@ -43,9 +45,38 @@ export const OPERATING_MODEL =
   'implementation execution. I own requirements, architecture, orchestration, evaluation, ' +
   'deployment, monitoring and production decisions.';
 
-/** Verified positioning. EDIT HERE — never let the model invent a claim. */
-const VERIFIED_FACTS = `
-- Her operating model (quote it verbatim): "${OPERATING_MODEL}"
+/**
+ * Verified positioning. The reviewed lines live in ONE place — docs/applications/cv-bank.json (every text verbatim
+ * from a CV that passed a fact-trace / recruiter / skeptic review) — and the letter and the 🎯 role defense read
+ * them from there, so the CV, the letter and the defenses can never drift apart (12 Oct 2026, Elena: "every future
+ * deal … based on examples of my verified prod logs and skills"). The hand-typed lines below stay as the fallback
+ * when the bank cannot be read, and the CREATIVE lines (not in the bank) are always appended.
+ */
+function bankFacts(): string {
+  try {
+    const bank = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'), 'utf8'));
+    const strip = (t: unknown) => String(t || '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+    const lines: string[] = [];
+    for (const s of bank.summary || []) if (s.id !== 's-ai-native-daily-tools') lines.push(strip(s.text));
+    for (const b of bank.bullets || []) lines.push(strip(b.text));
+    for (const c of bank.chips || []) lines.push(`Figure: ${strip(c.text)}`);
+    const r = bank.roles || {};
+    if (r.aideazz) lines.push(`${strip(r.aideazz.line)}. ${strip(((r.aideazz.intros || [])[0] || {}).text)}`);
+    for (const k of ['omnibazaar', 'egov']) {
+      if (!r[k]) continue;
+      lines.push(`${strip(r[k].line)}.${r[k].intro ? ` ${strip(r[k].intro)}` : ''} ${(r[k].bullets || []).map((b: { text: string }) => strip(b.text)).join(' ')}`.trim());
+    }
+    if (r.fundery) lines.push(strip(r.fundery.line));
+    for (const l of bank.live || []) lines.push(`Live: ${strip(l.text)}`);
+    if (bank.tools) lines.push(`Tools she uses: ${strip(bank.tools)}`);
+    if (bank.figures_note) lines.push(strip(bank.figures_note));
+    return lines.filter(Boolean).map((l) => `- ${l}`).join('\n');
+  } catch {
+    return '';
+  }
+}
+
+const FALLBACK_FACTS = `
 - That environment runs 15 long-running production services (8 under PM2, 7 under systemd) on one cloud VM, every one set to restart automatically. Counted on the server 28 Sep 2026.
 - Designs multi-provider LLM fallback chains (five providers) so a single vendor outage or an exhausted balance cannot take a product down.
 - Ships agentic automation end-to-end: Telegram and WhatsApp bots, CRM pipelines, lead triage and scoring, outreach automation, webhook services.
@@ -59,6 +90,13 @@ const VERIFIED_FACTS = `
 - CREATIVE: built the production machinery behind the films: a bot that drives a dozen video and a dozen image models from one command, with an LLM as director and a pre-render budget cap (Crimson Escape cost about $18 in generation).
 - CREATIVE: a poet (pen name Kira Velerevich): 99 poems in Russian and English, 46 published by the LITPROM editorial board; the films are made from them.
 `.trim();
+const CREATIVE_FACTS = FALLBACK_FACTS.split('\n').filter((l) => /^- CREATIVE/.test(l)).join('\n');
+const GENERIC_FALLBACK = FALLBACK_FACTS.split('\n').filter((l) => !/^- CREATIVE/.test(l)).join('\n');
+const VERIFIED_FACTS = [
+  `- Her operating model (quote it verbatim): "${OPERATING_MODEL}"`,
+  bankFacts() || GENERIC_FALLBACK,
+  CREATIVE_FACTS,
+].join('\n');
 
 const MIN_JD_CHARS = 200;
 const FETCH_TIMEOUT_MS = 12_000;
@@ -255,6 +293,7 @@ export async function generateCoverLetter(input: {
     '',
     'STYLE: 150-220 words. Plain, direct, specific. Four short paragraphs at most.',
     'Open with the role. Then the two or three things from the verified facts that most directly match THIS posting, said concretely. Close with a short availability line.',
+    '- After the opening sentence, every sentence carries one concrete verified fact chosen for the duties THIS posting names: a number, a named system, a named incident or a dated result, in the words of the facts. Never write filler such as "this experience has helped me understand", "positions me to" or "I am confident that".',
     'Sign off exactly as: Best regards,\\nElena Revicheva\\nhttps://aideazz.xyz',
   ].join('\n');
 
@@ -319,6 +358,8 @@ const ROLE_PROFILE = `
 - My English is fluent at a professional level; I write and present in English every day.
 - I work with APIs, webhooks and JSON daily: every system I run calls HubSpot, Resend, Telegram and other APIs and exchanges JSON.
 - I am comfortable working with explicit adult (NSFW) content for creative projects (Elena, 29 Sep 2026).
+- Tools I use in production (checked in the live code and on the server, 12 Oct 2026): LangChain (Postgres-backed conversation memory in EspaLuz), LangGraph (the job-screening pipeline), RAG on PostgreSQL with pgvector, Playwright, FastAPI, Make.com, HubSpot, Resend, Telegram and WhatsApp APIs; LLM APIs from OpenAI, Anthropic, Gemini and Groq behind a five-provider fallback chain.
+- I have NOT used: Jira, Confluence, Azure AI, LangSmith, Phoenix, Arize, LlamaIndex, AutoGen. I have never held a Product Owner or Product Manager title, never run sprints with a human engineering team (at my lab the implementation is done by AI coding agents), and have had no U.S. clients. The AI Visibility Audit API makes no model call (direct page fetches): it is a public product, not an LLM application. The spending-cap incident was a paid VIDEO engine, not an LLM cost.
 `.trim();
 
 export interface RoleDefense {

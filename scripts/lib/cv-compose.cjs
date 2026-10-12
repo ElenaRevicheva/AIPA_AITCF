@@ -139,6 +139,8 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     'The headings sit under her CURRENT role (AIdeazz AI Lab), so their ids come ONLY from BULLETS (ids starting with "b-"); E-GOV ("eg-") and OmniBazaar ("om-") ids go only in their own lists.',
     'Under each heading put 2-4 BULLET ids that SHOW her doing exactly that work, the strongest first. Each id at most once; 7-14 bullets in total. If no bullet shows a duty, leave the duty out — never stretch a line to fit.',
     'Also choose, for THIS role only: summary 1-2 ids (most relevant first); chips 3-5 ids; intro 1 id; live 3-4 ids; omnibazaar 0-2 ids; egov 1-3 ids.',
+    'SUMMARY: at most ONE of the two AIdeazz lab summaries (s-products-end-to-end, s-automation-owner). When the posting names stakeholders, clients, compliance, governance, regulated environments or executive leadership, also pick s-cofounder-and-board or s-regulated-constraints, choose ALL the E-GOV lines and both OmniBazaar lines, and prefer bullets that show guardrails, approvals, fail-closed behaviour or cost control.',
+    'CHIPS: scale figures only (products, services, tests, postings screened, executive years); never a chip that reads as a loss or a small count on its own (lost sign-ups, a ten-day audit count) — those belong in their bullets.',
     'Return one JSON object only.',
   ].join('\n');
   const user = [
@@ -241,7 +243,13 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     // the summary opens with the pitch written for THIS posting, the Outlook's operating-model paragraph and the
     // "How I …" method block stay in the Outlook, and the figure boxes are the few this role cares about.
     const roleSummaries = Object.fromEntries(Object.entries(P.summary).filter(([id]) => !OUTLOOK_ONLY.has(id)));
-    const summary = take(roleSummaries, pick.summary, 2, 1).map((x) => x.text);
+    // 12 Oct 2026 (CodeRoad v1): the model picked BOTH lab-era summaries and the CV said "Since 2025 …" twice. At most one
+    // of them; a second paragraph, if any, is the one about the other eras (OmniBazaar / E-GOV / regulated constraints).
+    const LAB_SUMMARIES = new Set(['s-products-end-to-end', 's-automation-owner']);
+    const chosenIds = [...new Set(Array.isArray(pick.summary) ? pick.summary.map(String) : [])].filter((id) => roleSummaries[id]);
+    const firstLab = chosenIds.find((id) => LAB_SUMMARIES.has(id));
+    const summaryIds = chosenIds.filter((id) => !LAB_SUMMARIES.has(id) || id === firstLab).slice(0, 2);
+    const summary = (summaryIds.length ? summaryIds.map((id) => roleSummaries[id]) : take(roleSummaries, pick.summary, 1, 1)).map((x) => x.text);
     const lead = String(pitch || '').replace(/\s+/g, ' ').trim();
     // 0.4: the SIPEngines CV printed "requirements, architecture, orchestration…" in the pitch AND in a chosen
     // summary paragraph (11 Oct) — half the pitch's words repeated is already a repeat.

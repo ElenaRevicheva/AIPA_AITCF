@@ -189,7 +189,8 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
     const prev = JSON.parse(fs.readFileSync(cachedJson, 'utf8'));
     if (String(prev._deal) === String(d.id) && prev._composed && prev._composed.shape === CV_SHAPE
       && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
-      return { cvPath: path.join(AUTO_DIR, shapedName), name: shapedName, shaped: true, info: 'reused this deal\'s built CV' };
+      return { cvPath: path.join(AUTO_DIR, shapedName), name: shapedName, shaped: true, info: 'reused this deal\'s built CV',
+        fitNote: String((prev._composed && prev._composed.fit_note) || '') };
     }
   } catch { /* not built yet */ }
   // A crash here must still end in a CV and a 🛡️ note — otherwise cron would pay for the composer again every
@@ -205,7 +206,8 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
     try {
       const out = runBuilder(jobPath, c.spec, { _deal: d.id, _jd_chars: jd.length });
       const cvPath = path.join(AUTO_DIR, shapedName);
-      if (fs.existsSync(cvPath)) return { cvPath, name: shapedName, shaped: true, info: `${c.provider} · ${out.split('sections')[1] || ''}`.trim() };
+      if (fs.existsSync(cvPath)) return { cvPath, name: shapedName, shaped: true, info: `${c.provider} · ${out.split('sections')[1] || ''}`.trim(),
+        fitNote: String((c.spec._composed && c.spec._composed.fit_note) || '') };
       why = 'builder wrote no file';
     } catch (e) {
       why = String((e.stderr && e.stderr.toString()) || e.message).trim().split('\n').pop().slice(0, 120);
@@ -238,8 +240,12 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
 function cvLineHtml(cv) {
   if (!cv.cvPath) return '';
   if (!cv.shaped) return `<p>📎 <strong>Tailored CV attached to this note — use this one:</strong> ${esc(cv.name)}</p>`;
+  // 12 Oct 2026: the independent reviewer's doubt (cv-compose `fit_note`) used to live only in the JSON on Oracle while
+  // this line said "use this one" — the CodeRoad v1 case. It now travels with the file, so a machine CV never hides its caveat.
   return `<p>${CV_MARK}: <strong>${esc(cv.name)}</strong> — use this one. `
-    + 'Its headings are this posting\'s own duties; every line under them comes from your reviewed CVs. Earlier CVs stay attached for the record.</p>';
+    + 'Its headings are this posting\'s own duties; every line under them comes from your reviewed CVs. Earlier CVs stay attached for the record.'
+    + (cv.fitNote ? `<br>⚠️ <em>Its reviewer's note: ${esc(cv.fitNote)}</em> — read the CV as that hiring manager would before sending; say the gap before they find it.` : '')
+    + '</p>';
 }
 
 /**
@@ -543,7 +549,11 @@ async function briefPass(d, bodies, title, company) {
         try { cvRun[await cvPass(d, notes, bodies, title, company, jobUrl)]++; }
         catch (e) { cvRun.failed++; console.log(`  ✖ cv ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       }
-      if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) {
+      // 12 Oct 2026 (Elena: "profound, not generic kit … just make it work"): the kit's own ✅ letter — the generator
+      // that reads the verified bank — used to be skipped whenever VJH's generic ⚠️ letter was already on the deal,
+      // so on every VJH deal the 🎯 note pointed to a ✅ note that never existed. Now only the kit's own ✅ note, or a
+      // hand-written ✉️ letter, counts as "has a letter"; VJH's ⚠️ draft is superseded, not rewritten.
+      if (bodies.some((b) => text(b).includes(READY_MARK) || text(b).includes('✉️ COVER LETTER'))) {
         ok++;
         try { comet[await cometPass(d, notes, title, company, jobUrl, hadComet)]++; }
         catch (e) { comet.failed++; console.log(`  ✖ comet ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
