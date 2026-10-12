@@ -82,7 +82,7 @@ Same method as `2026-10-06_vjh_no_delivery_diagnosis.md`.
 | # | Fix | Size | Proof it worked |
 |---|---|---|---|
 | a | Run serpapi-jobs now instead of waiting for ~18:50 UTC (`pm2 restart serpapi-jobs`) | restart only | `→ N results`, `Done — new jobs: N` |
-| b | Judge: add PT/MT (PST, PDT, MST, MDT, UTC-7, UTC-8) to the compatible hours, `llm_judge.py:176-177` | 1 line | no `VETO (… Pacific …)` |
+| b | ✅ DONE 12 Oct (VJH 7b4a975 + 6a0a94e): PT/MT compatible — prompt line + code overrule `timezone_veto_is_wrong` (the prompt alone did not stop the live veto) | small | Epoch AI → `criterion-2 veto overruled — US time-zone overlap fits UTC-5` |
 | c | HN source: ask Algolia by DATE (`search_by_date`), `job_monitor.py:610-617` | 1 line | `Hacker News: N jobs` from the current month |
 | d | Count failures in the Done line: `Done — new jobs: 0 — 18/18 searches FAILED` | logging only | next failed run shows the count |
 | e | Telegram ping when every search in a run fails (existing helper `:98-140`) | NEW check — explicit go | ping on an all-failed run |

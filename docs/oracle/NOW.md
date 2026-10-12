@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-12 | VJH judge: Pacific/Mountain hours compatible (Elena's go) | VJH src/core/llm_judge.py; restart vibejobhunter (+ serpapi-jobs to load it) | c2cb7f88 |
 | Claude Code | 2026-10-12 | Arearea v17 (Elena): new stanza on 10a (no second "morning"), closing card AREAREA + a verified art-history note; recompile + republish | `scripts/atuona-film9.mjs` (outro), `docs/atuona/film9_stanza_work/` (build_cut_v17), laptop render_v17; Oracle studio file | 1c9adf52 |
 
 **Rules**
@@ -137,8 +136,12 @@ git log keeps the record.
 - **Cause 1:** Bright Data suspended 7 Oct 14:28 UTC → 180/180 searches empty, each run logged a normal `Done — new jobs: 0`.
   **After the top-up:** `/status` active; VJH-style job-board query → 10 results in 3 s. Next serpapi-jobs run ~18:50 UTC 12 Oct.
 - **Cause 2:** Torre refuses outside requests since 2 Oct (HTTP 400) — no code fix allowed (its terms); partner access = Elena's call.
-- **Awaiting Elena's go:** (a) run serpapi-jobs now · (b) judge PT/MT hours · (c) HN by date · (d)/(f) failure counts in logs ·
-  (e) Telegram ping on an all-failed run (new check). Nothing changed on Oracle except removing this session's /dev/shm log copies.
+- **✅ (b) DONE 12 Oct (Elena's go):** VJH `7b4a975` + `6a0a94e` — Pacific/Mountain hours fit Panama; a prompt line alone did NOT
+  stop the veto (live judge re-vetoed Epoch AI), so it is enforced in code like the LATAM rule (`timezone_veto_is_wrong`). Tests 568/568.
+  Live: `judge_fit(Epoch AI)` → `criterion-2 veto overruled — US time-zone overlap fits UTC-5`. vibejobhunter restarted 12:25:38
+  (file 12:24:04), first cycle errors=0. **serpapi-jobs NOT restarted** (a restart runs a search at once — Elena did not pick that), so
+  the Bright Data door loads the fix at its next restart. Backup `~/_session-backups/vjh-judge-tz-20261012/`.
+- **Still Elena's call:** (a) search now · (c) HN by date · (d)/(f) failure counts · (e) Telegram ping (new check) · Torre partner access.
 
 ### ✅ 12 Oct — OpenClaw menu says how the coach works now · session files synced laptop = git = Oracle · claim released
 - **DONE:** new /menu (HELP.md = IDENTITY.md). Retired figures (420+ audits, median 85, self-scored 100/100, "2,800+ deals" as acquisition)
