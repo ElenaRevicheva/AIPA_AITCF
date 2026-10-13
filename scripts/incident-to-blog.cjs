@@ -222,7 +222,8 @@ async function main() {
   // Dev.to with canonical pointing home, so aideazz.xyz keeps the ranking credit.
   let devtoUrl = null;
   const apiKey = (process.env.DEVTO_API_KEY || '').trim();
-  if (apiKey) {
+  // DEVTO_PAUSED=1 while the Dev.to account is suspended (13 Oct 2026): blog page only, no API call.
+  if (apiKey && process.env.DEVTO_PAUSED !== '1') {
     const body = `Originally published at [aideazz.xyz](${canonical}) — cross-posted here with canonical link.\n\n${markdown}`;
     const res = await fetch('https://dev.to/api/articles', {
       method: 'POST',
@@ -241,7 +242,7 @@ async function main() {
       console.warn(`Dev.to failed (${res.status}): ${(await res.text()).slice(0, 200)}`);
     }
   } else {
-    console.warn('DEVTO_API_KEY missing — blog page only, no cross-post');
+    console.warn(process.env.DEVTO_PAUSED === '1' ? 'DEVTO_PAUSED=1 — blog page only, no cross-post' : 'DEVTO_API_KEY missing — blog page only, no cross-post');
   }
 
   if (devtoUrl) article.devtoUrl = devtoUrl;

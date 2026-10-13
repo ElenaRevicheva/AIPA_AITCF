@@ -152,7 +152,7 @@ function readLocalBlogPost(slug: string): EnglishSource | null {
     const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string }>;
     const entry = cache[slug];
     if (!entry?.markdown) return null;
-    return { title: entry.title, brief: null, markdown: entry.markdown, url: entry.devtoUrl, source: "devto" };
+    return { title: entry.title, brief: null, markdown: entry.markdown, url: entry.devtoUrl || entry.aideazzBlogUrl, source: "devto" };
   } catch { return null; }
 }
 

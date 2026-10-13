@@ -1113,12 +1113,11 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
   devtoUrl: string;
   delisted: boolean;
 }> {
-  const apiKey = process.env.DEVTO_API_KEY?.trim();
-  if (!apiKey) {
-    throw new Error(
-      "DEVTO_API_KEY missing — required for Dev.to-only mode (HASHNODE_ACCESS_TOKEN is not set)"
-    );
-  }
+  // 13 Oct 2026 (Elena): aideazz.xyz is the canonical home and publishes on its own. Dev.to is a
+  // best-effort cross-post — a missing key, a 401 or DEVTO_PAUSED=1 (account suspended 11 Oct)
+  // skips Dev.to; it never stops the daily article on her own site again.
+  const devtoPaused = process.env.DEVTO_PAUSED === "1" || !process.env.DEVTO_API_KEY?.trim();
+  if (devtoPaused) console.log("📰 Dev.to cross-post paused (DEVTO_PAUSED=1 or no key) — aideazz.xyz only today");
 
   const gscQueries = await fetchGscTopQueries();
   const publishedIndices = getPublishedTopicIndices();
@@ -1357,14 +1356,10 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
 
-  // Dev.to canonical points to aideazz.xyz/blog/{slug} — backlink credit to aideazz
-  const devtoUrl = await crossPostToDevTo(finalTitle, parsed.markdown, aideazzBlogUrl);
-  if (!devtoUrl) {
-    throw new Error("Dev.to publishing failed — check DEVTO_API_KEY and rate limits");
-  }
-
+  // Own site FIRST (13 Oct 2026): the article is recorded and shipped to aideazz.xyz before Dev.to
+  // is tried. Until then a Dev.to failure threw here and silenced the site for 11–13 Oct.
   if (index >= 0) writeTopicIndex(index);
-  saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
+  saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl: "", aideazzBlogUrl });
 
   // Canonical GEO page first, then sitemap, then Telegram. Fire-and-forget bulk
   // regen used to (1) skip-ci every existing article in ~15s, (2) tell Telegram
@@ -1374,9 +1369,14 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     slug,
     title: finalTitle,
     markdown: parsed.markdown,
-    devtoUrl,
+    devtoUrl: "",
     aideazzBlogUrl,
   });
+
+  // Then the cross-post, best-effort. Dev.to canonical points to aideazz.xyz/blog/{slug} — backlink credit to aideazz.
+  const devtoUrl = devtoPaused ? "" : (await crossPostToDevTo(finalTitle, parsed.markdown, aideazzBlogUrl)) || "";
+  if (devtoUrl) saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
+  else if (!devtoPaused) console.warn("📰 Dev.to cross-post failed — the article is live on aideazz.xyz anyway");
 
   // ADDITIVE (May 28 2026): also distribute this article to Buffer (LinkedIn etc.) with a
   // UTM-tagged link so click-throughs flow into /marketing/inquiry → triage → HubSpot.
@@ -1409,7 +1409,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       : "   ⚠️ canonical HTML push FAILED — GEO page may 404 until retry.",
     "",
     "2) Dev.to (cross-post):",
-    devtoUrl,
+    devtoUrl || (devtoPaused ? "   skipped — DEVTO_PAUSED (account suspended 11 Oct)" : "   ⚠️ failed — article is live on aideazz.xyz anyway"),
   ];
   await notifyTelegramBlogPublished(finalTitle, lines.join("\n"));
 
