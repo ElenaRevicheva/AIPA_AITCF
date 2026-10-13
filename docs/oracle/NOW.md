@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (AIGO kit sync) | 2026-10-13 01:30 | Elena: sync laptop = git = Oracle for the AIGO kit; Atlas kit behind ATLAS_AIGO_KIT (off) so Monday stays her switch | scripts/atlas-lead-machine.cjs, docs/selling/prospect-meta.cjs, docs/selling/aigo-kit.cjs on Oracle (named-file scp, no PM2) | 797a493e |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 
 **Rules**
