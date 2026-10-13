@@ -51,6 +51,13 @@ const {
   aigoVideoLinesFor,
 } = require('../docs/selling/aigo-kit.cjs');
 const videoLines = (lead) => aigoVideoLinesFor(`${lead.query || ''} ${lead.company || ''}`);
+// Elena's switch (13 Oct 2026: "I prefer to switch it on when I say so"). OFF by default, so
+// syncing this file changes nothing: letters, registry rows and notes stay byte-identical to the
+// pre-kit machine until ATLAS_AIGO_KIT=1 is set (Oracle .env or the cron line).
+const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1';
+const kitDeckLines = () => (AIGO_KIT_ON ? [AIGO_DECK_ES_LINE, ``] : []);
+const kitVideoLines = (lead) => (AIGO_KIT_ON ? [...videoLines(lead), ``] : []);
+const kitWaLines = (lead) => (AIGO_KIT_ON ? [``, AIGO_DECK_ES_LINE, ``, ...videoLines(lead)] : []);
 
 const ROOT = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(ROOT, '.env'), 'utf8');
@@ -936,12 +943,10 @@ function buildDraft(lead, audit, angle) {
     ``,
     `La auditoría completa es gratuita aquí: https://aideazz.xyz/api`,
     ``,
-    AIGO_DECK_ES_LINE,
-    ``,
+    ...kitDeckLines(),
     servicesPD(lead),
     ``,
-    ...videoLines(lead),
-    ``,
+    ...kitVideoLines(lead),
     `¡Que tengan un excelente día!`,
     `Saludos,`,
     `Elena Revicheva`,
@@ -977,12 +982,10 @@ function buildFuDraft(lead, audit, angle) {
     ``,
     `Si les sirve, en 15 minutos les muestro los 3 principales arreglos de esa auditoría y cómo quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita: https://aideazz.xyz/api`,
     ``,
-    AIGO_DECK_ES_LINE,
-    ``,
+    ...kitDeckLines(),
     servicesPD(lead),
     ``,
-    ...videoLines(lead),
-    ``,
+    ...kitVideoLines(lead),
     `Saludos,`,
     `Elena Revicheva`,
     `Fundadora | Ingeniera de IA y Automatización`,
@@ -1006,10 +1009,7 @@ function buildWaDraft(lead, audit) {
     OPERATOR_ES,
     ``,
     `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
-    ``,
-    AIGO_DECK_ES_LINE,
-    ``,
-    ...videoLines(lead),
+    ...kitWaLines(lead),
     WA_CLOSING,
   ].join('\n');
 }
@@ -1023,10 +1023,7 @@ function buildFuWaDraft(lead, audit) {
     `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
     ``,
     `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
-    ``,
-    AIGO_DECK_ES_LINE,
-    ``,
-    ...videoLines(lead),
+    ...kitWaLines(lead),
     WA_CLOSING,
   ].join('\n');
 }
@@ -1156,8 +1153,7 @@ async function stageLead(lead, audit, angle) {
     ...(lead.phone ? { phone: digitsOnly(lead.phone) } : {}),
     // go-wa.ts reads both: Elena is copied on the send, and the deck rides as a real
     // PDF (the sender refuses the whole email if the file fails to load).
-    cc: ELENA_COPY_CC,
-    attachments: [AIGO_DECK_ES_ATTACHMENT],
+    ...(AIGO_KIT_ON ? { cc: ELENA_COPY_CC, attachments: [AIGO_DECK_ES_ATTACHMENT] } : {}),
   };
   reg[slug] = { ...common, emailDraft: draftRel, ...(lead.phone ? { draft: waRel } : {}) };
   reg[fuSlug] = { ...common, emailDraft: fuRel, ...(lead.phone ? { draft: fuWaRel } : {}) };
@@ -1201,12 +1197,14 @@ async function stageLead(lead, audit, angle) {
   // "An attachment must also land IN HubSpot"). Best-effort: a Files-scope failure must
   // not cost the lead, and the email still attaches the PDF from disk — so it is logged.
   let attachProps = {};
-  try {
-    const { uploadOutreachFile } = require('./hs-files.cjs');
-    const f = await uploadOutreachFile(path.join(ROOT, AIGO_DECK_ES_ATTACHMENT.path), AIGO_DECK_ES_ATTACHMENT.filename);
-    if (f?.id) attachProps = { hs_attachment_ids: String(f.id) };
-  } catch (e) {
-    console.warn(`      ⚠️ deck not attached to the HubSpot note for ${lead.company}: ${String(e.message).slice(0, 100)}`);
+  if (AIGO_KIT_ON) {
+    try {
+      const { uploadOutreachFile } = require('./hs-files.cjs');
+      const f = await uploadOutreachFile(path.join(ROOT, AIGO_DECK_ES_ATTACHMENT.path), AIGO_DECK_ES_ATTACHMENT.filename);
+      if (f?.id) attachProps = { hs_attachment_ids: String(f.id) };
+    } catch (e) {
+      console.warn(`      ⚠️ deck not attached to the HubSpot note for ${lead.company}: ${String(e.message).slice(0, 100)}`);
+    }
   }
   const note = await hs('POST', '/crm/v3/objects/notes', {
     properties: { hs_note_body: noteBody, hs_timestamp: Date.now(), ...attachProps },

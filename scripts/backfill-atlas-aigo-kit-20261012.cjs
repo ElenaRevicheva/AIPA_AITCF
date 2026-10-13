@@ -25,6 +25,8 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
+// This one-off IS the kit, so it turns the machine's switch on for its own process only.
+process.env.ATLAS_AIGO_KIT = '1';
 const LM = require(process.env.ATLAS_LM || './atlas-lead-machine.cjs');
 const {
   loadRegistry, saveRegistry, buildHubSpotEmailAnchor, buildHubSpotWaAnchor, digitsOnly, formatPhone507,
