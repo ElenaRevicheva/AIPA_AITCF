@@ -1007,3 +1007,33 @@ function normalizeUrl(input: string): string {
   // Throws TypeError on garbage — caller converts to a 400.
   return new URL(withProto).toString();
 }
+
+/**
+ * A profile on someone else's platform is not a website the business owns. Auditing it
+ * grades the platform: a Google Maps share link redirects to Google, Instagram serves its
+ * login wall (and its 403 would read as "this site blocks AI crawlers"). Returns the
+ * platform's name so callers can say so instead of scoring the wrong page. (13 Oct 2026)
+ */
+const NOT_OWNED_HOSTS: Array<[RegExp, string]> = [
+  [/(^|\.)instagram\.com$/, 'Instagram'],
+  [/(^|\.)(facebook\.com|fb\.com|fb\.me)$/, 'Facebook'],
+  [/(^|\.)(wa\.me|whatsapp\.com)$/, 'WhatsApp'],
+  [/(^|\.)tiktok\.com$/, 'TikTok'],
+  [/(^|\.)linktr\.ee$/, 'Linktree'],
+  [/^(maps\.app\.goo\.gl|share\.google|g\.page|maps\.google\.[a-z.]+)$/, 'Google Maps'],
+];
+
+export function notOwnedWebsitePlatform(input: string): string | null {
+  const s = String(input || '').trim();
+  if (/^@[\w.]{2,30}$/.test(s)) return 'a social profile';
+  let u: URL;
+  try {
+    u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`);
+  } catch {
+    return null;
+  }
+  const host = u.hostname.toLowerCase().replace(/^www\./, '');
+  if ((/^google\.[a-z.]+$/.test(host) || host === 'goo.gl') && /^\/maps(\/|$)/.test(u.pathname)) return 'Google Maps';
+  for (const [re, name] of NOT_OWNED_HOSTS) if (re.test(host)) return name;
+  return null;
+}

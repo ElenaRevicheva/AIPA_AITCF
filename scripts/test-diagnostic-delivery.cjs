@@ -48,6 +48,41 @@ const ok = (cond, name) => {
   ok(loose.channels === null && loose.saleValue === null, 'no structured answers → null');
   ok(d.parseIntake(null).website === null, 'no notes → no website');
 
+  // ── no website of their own (13 Oct 2026) ──
+  const empty = d.parseIntake('Website:\nCustomers reach us via: WhatsApp\nTypical sale value: $500–2,000');
+  ok(empty.website === null, 'empty Website: line does NOT swallow the next line');
+  ok(empty.channels === 'WhatsApp', 'channels still parsed after an empty Website: line');
+  ok(d.parseIntake('Website: none\nCustomers reach us via: WhatsApp').website === null, '"none" → no website (was https://none)');
+  ok(d.parseIntake('Website: No tengo\nCustomers reach us via: WhatsApp').website === null, '"No tengo" → no website');
+  const ig = d.parseIntake('Website: instagram.com/mundodental\nCustomers reach us via: Instagram / social');
+  ok(ig.website === null && ig.presence === 'instagram.com/mundodental', 'Instagram link → presence, never scanned');
+  const maps = d.parseIntake('Website: https://maps.app.goo.gl/abc123');
+  ok(maps.website === null && maps.presence === 'https://maps.app.goo.gl/abc123', 'Maps link → presence');
+  ok(d.parseIntake('Website: @tacosrudos').presence === '@tacosrudos', '@handle → presence');
+  ok(d.parseIntake('Website: clinicadental.com').presence === null, 'a real site has no presence field');
+  const nsOrder = { id: 'o1', sku: 'diagnostic_call', amount_usd: 100, client_name: 'A', client_email: null, company_name: 'X', notes: null, page_url: 'https://aideazz.xyz/pay/analisis-tecnico?lng=en' };
+  const mailNoSite = d.buildClientEmail(nsOrder, ig).text;
+  ok(!/your website/.test(mailNoSite) && /no website needed/.test(mailNoSite), 'no-website email does not promise "your website"');
+  ok(/your website \(https:\/\/clinicadental\.com\)/.test(d.buildClientEmail(nsOrder, intake).text), 'website email unchanged');
+  const mailEs = d.buildClientEmail({ ...nsOrder, page_url: null }, ig).text;
+  ok(/su negocio en internet/.test(mailEs) && !/su sitio web/.test(mailEs), 'ES no-website email');
+  ok(/cómo ven su sitio web los buscadores con IA \(https:\/\/clinicadental\.com\)/.test(d.buildClientEmail({ ...nsOrder, page_url: null }, intake).text), 'ES website email unchanged');
+
+  // ── the audit refuses to grade someone else's platform ──
+  const va = await import(dist('visibility-audit.js'));
+  const p = va.notOwnedWebsitePlatform;
+  ok(p('https://www.instagram.com/mundodental/') === 'Instagram', 'instagram → Instagram');
+  ok(p('https://share.google/2TiMzfddzOwHwWMIC') === 'Google Maps', 'share.google → Google Maps');
+  ok(p('https://www.google.com/maps/place/Foo') === 'Google Maps', 'google.com/maps → Google Maps');
+  ok(p('https://maps.google.com/?cid=123') === 'Google Maps', 'maps.google.com → Google Maps');
+  ok(p('wa.me/50766623757') === 'WhatsApp', 'wa.me → WhatsApp');
+  ok(p('https://www.facebook.com/clinic') === 'Facebook', 'facebook → Facebook');
+  ok(p('https://linktr.ee/clinic') === 'Linktree', 'linktree → Linktree');
+  ok(p('https://www.google.com/search?q=x') === null, 'google search is not Maps');
+  ok(p('https://aideazz.xyz') === null, 'own site passes');
+  ok(p('https://notinstagram.com') === null, 'lookalike domain passes');
+  ok(p('clinicadental.com') === null, 'bare domain passes');
+
   // ── fit criteria are ticked ONLY from what they said ──
   const fit = d.fitCriteria(intake);
   ok(fit.length === 6, 'six criteria from the deck');
