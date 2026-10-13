@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (no-website) | 2026-10-13 21:30 | Elena go 13 Oct: deploy guards (PR #60, Doors 2+3) + Atlas Monday keeps best 2 no-website businesses as deals + 1 Telegram line | src/diagnostic-delivery.ts, src/visibility-audit.ts, src/visibility-api.ts (+dist), scripts/atlas-lead-machine.cjs, scripts/lib/no-website-leads.cjs (new); Oracle cto-aipa scp + pm2 restart cto-aipa | 45b76063 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
