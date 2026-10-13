@@ -130,6 +130,20 @@ if (require.main === module && (!HS || !VIS || (!SERP && !BD_OK))) {
 
 const DRY = process.argv.includes('--dry');
 const MAX_NEW = Number(process.env.LEAD_MAX_NEW || 8);
+// No-website businesses (Elena, 13 Oct 2026): ON TOP of MAX_NEW, stage the best NOWEB_MAX (2)
+// of the Places results this run already paid for that have no website — or only an Instagram/
+// Facebook page as their "website". Most reviews first, high-ticket queries only, ≥5 reviews.
+// So a Monday is at most 8 + 2 = 10 deals. ATLAS_NOWEB=0 turns it off. Logic: lib/no-website-leads.cjs.
+const NOWEB_MAX =
+  (process.env.ATLAS_NOWEB || g('ATLAS_NOWEB')) === '0' ? 0 : Number(process.env.ATLAS_NOWEB_MAX || g('ATLAS_NOWEB_MAX') || 2);
+const noWebsiteSeen = [];
+const {
+  pickNoWebsite,
+  buildNoWebsiteNote,
+  noWebsiteDealName,
+  noWebsiteTelegramLine,
+  socialPlatform,
+} = require('./lib/no-website-leads.cjs');
 /** Below 35 the site is usually broken/parked; above 90 there is no problem to sell. */
 const AUDIT_MIN = Number(process.env.LEAD_AUDIT_MIN || 35);
 // Raised 90 -> 98 on 2026-08-17, and ONLY because buildDraft now has a credential
@@ -499,7 +513,10 @@ async function mapsSearch(target) {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': PLACES_KEY,
         'X-Goog-FieldMask':
-          'places.displayName,places.websiteUri,places.internationalPhoneNumber,places.rating,places.userRatingCount,places.businessStatus',
+          'places.displayName,places.websiteUri,places.internationalPhoneNumber,places.rating,places.userRatingCount,places.businessStatus,' +
+          // 13 Oct 2026, for the no-website leads: the Maps link and type ride on the same request
+          // (Enterprise is already the highest SKU this mask hits, so the price does not change).
+          'places.googleMapsUri,places.primaryType',
       },
       body: JSON.stringify({
         textQuery: `${target.q} ${target.city}`,
@@ -512,6 +529,22 @@ async function mapsSearch(target) {
     if (!r.ok) throw new Error(`Places ${r.status}`);
     const d = await r.json();
     console.log(`[lead-machine] supply: Google Places (${placesUsed()}/${PLACES_MONTHLY_CAP} this month, free cap 1,000)`);
+    // Keep the no-website businesses this request already returned, instead of dropping them.
+    for (const x of d.places || []) {
+      if (x.websiteUri || !x.displayName?.text || (x.businessStatus || 'OPERATIONAL') !== 'OPERATIONAL') continue;
+      noWebsiteSeen.push({
+        company: String(x.displayName.text).trim(),
+        presence: null,
+        phone: x.internationalPhoneNumber ? String(x.internationalPhoneNumber).trim() : null,
+        rating: x.rating ?? null,
+        reviews: x.userRatingCount ?? null,
+        mapsUri: x.googleMapsUri || null,
+        primaryType: x.primaryType || null,
+        city: target.city,
+        query: target.q,
+        highTicket: target.hl === 'en',
+      });
+    }
     return (d.places || [])
       .filter((x) => x.websiteUri && x.displayName?.text && (x.businessStatus || 'OPERATIONAL') === 'OPERATIONAL')
       .map((x) => ({
@@ -521,6 +554,9 @@ async function mapsSearch(target) {
         rating: x.rating ?? null,
         reviews: x.userRatingCount ?? null,
         city: target.city,
+        mapsUri: x.googleMapsUri || null,
+        primaryType: x.primaryType || null,
+        source: 'places',
       }));
   }
   const u =
@@ -1315,6 +1351,63 @@ async function stageLead(lead, audit, angle) {
   return { slug, dealName, dealId: deal?.id || null };
 }
 
+/**
+ * A no-website business (13 Oct 2026): Company + Deal + HIGH task + one note with the
+ * permission-first WhatsApp button. No email, no audit, no registry row — there is no
+ * site to audit and no email to send; WhatsApp from the laptop is the only channel.
+ */
+async function stageNoWebsiteLead(c) {
+  const dealName = noWebsiteDealName(c);
+  if (DRY) return { dealName, dealId: null };
+  const isMobile = MOBILE_RE.test(digitsOnly(c.phone));
+  const company = await hs('POST', '/crm/v3/objects/companies', {
+    properties: {
+      name: c.company,
+      phone: c.phone,
+      city: c.city,
+      description: `No website on Google profile${c.presence ? ` (links ${c.presence})` : ''} — Atlas Monday ${new Date().toISOString().slice(0, 10)}. Business Identity Audit.`,
+    },
+  });
+  const deal = await hs('POST', '/crm/v3/objects/deals', {
+    properties: { dealname: dealName, dealstage: STAGE_ACT_TODAY, pipeline: 'default', hubspot_owner_id: OWNER },
+  });
+  if (!deal?.id) throw new Error('deal not created');
+  if (company?.id) {
+    await hs('PUT', `/crm/v4/objects/deals/${deal.id}/associations/default/companies/${company.id}`, undefined).catch(() => {});
+  }
+  try {
+    const task = await hs('POST', '/crm/v3/objects/tasks', {
+      properties: {
+        hs_task_subject: `Enviar 1er contacto (sin sitio web) — ${c.company}`,
+        hs_task_body:
+          `Lead de Atlas SIN sitio web.\n\nGoogle: ${c.rating ?? '—'}★ (${c.reviews} reseñas)\nTel: ${c.phone}${isMobile ? '' : ' (fijo)'}\n` +
+          `${c.presence ? `Perfil social: ${c.presence}\n` : ''}\nBusca el nombre 1 vez antes de enviar. El botón está en la nota del deal.`,
+        hs_task_status: 'NOT_STARTED',
+        hs_task_priority: 'HIGH',
+        hs_timestamp: Date.now(),
+        hubspot_owner_id: OWNER,
+      },
+    });
+    if (task?.id) {
+      await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${deal.id}`, [
+        { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 },
+      ]).catch(() => {});
+    }
+  } catch (e) {
+    console.warn(`      ⚠️ task not created for ${c.company}: ${String(e.message).slice(0, 80)}`);
+  }
+  const note = await hs('POST', '/crm/v3/objects/notes', {
+    properties: {
+      hs_note_body: buildNoWebsiteNote(c, { isMobile, date: new Date().toISOString().slice(0, 10) }),
+      hs_timestamp: Date.now(),
+    },
+  });
+  if (note?.id) {
+    await hs('PUT', `/crm/v4/objects/notes/${note.id}/associations/default/deals/${deal.id}`, undefined).catch(() => {});
+  }
+  return { dealName, dealId: deal.id };
+}
+
 async function telegram(text) {
   if (!TG || !CHAT) return;
   try {
@@ -1376,6 +1469,11 @@ if (require.main === module) (async () => {
     for (const b of businesses) {
       // A social profile is not a website: skip before spending an audit on it.
       if (isPlatformSite(b.website)) {
+        // An Instagram/Facebook page as the Google "website" = a business with no site of its
+        // own: a no-website candidate (13 Oct 2026). Places only — it carries phone + reviews.
+        if (b.source === 'places' && socialPlatform(b.website)) {
+          noWebsiteSeen.push({ ...b, presence: b.website, query: target.q, highTicket: target.hl === 'en' });
+        }
         skip.noEmail++;
         continue;
       }
@@ -1467,6 +1565,20 @@ if (require.main === module) (async () => {
   }
   if (!DRY) saveYield(yieldLedger);
 
+  // ── No-website businesses: the best NOWEB_MAX, on top of the regular MAX_NEW ──
+  const nowebPicked = pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX);
+  const nowebStaged = [];
+  for (const c of nowebPicked) {
+    try {
+      const r = await stageNoWebsiteLead(c);
+      nowebStaged.push({ ...c, ...r });
+      console.log(`   🧭 ${c.company.slice(0, 32)} · no website · ${c.rating ?? '—'}★ ${c.reviews} · ${c.phone}`);
+    } catch (e) {
+      console.warn(`   ⚠️ no-website lead not staged (${c.company.slice(0, 32)}): ${String(e.message).slice(0, 90)}`);
+    }
+  }
+  console.log(`[lead-machine] no-website: ${noWebsiteSeen.length} seen · ${nowebPicked.length} picked · ${nowebStaged.length} staged (max ${NOWEB_MAX})`);
+
   console.log(
     `[lead-machine] done · staged ${staged.length} · looked at ${skip.seen} · ` +
       `no-email ${skip.noEmail} · already-in-CRM ${skip.dupe} · outside-band ${skip.band} · audit-failed ${skip.noAudit} · crawler-blocked rescued ${skip.rescued}`,
@@ -1486,11 +1598,13 @@ if (require.main === module) (async () => {
   // registry is recoverable from git instead of from memory.
   if (staged.length && !DRY) await publishOutreachArtifacts(staged.length);
 
-  if (staged.length && !DRY) {
+  if ((staged.length || nowebStaged.length) && !DRY) {
+    const nowebLine = noWebsiteTelegramLine(nowebStaged);
     const lines = [
-      `🔥 ${staged.length} nuevos leads listos — 🔥 I Act TODAY`,
+      `🔥 ${staged.length + nowebStaged.length} nuevos leads listos — 🔥 I Act TODAY`,
       ``,
       ...staged.map((s) => `· ${s.company} — ${s.score}/${s.grade} · ${s.city}`),
+      ...(nowebLine ? [``, nowebLine] : []),
       ``,
       `Cada uno ya tiene contacto, deal, tarea y el botón ENVIAR en la nota de HubSpot.`,
       `Revisa y envía: https://app.hubspot.com/contacts/51409153/objects/0-3/views/all/list`,
@@ -1548,4 +1662,4 @@ async function publishOutreachArtifacts(count) {
  * the drift only surfaces when a prospect gets a letter nobody reviewed.
  * Guarded by require.main so exporting never triggers the run above.
  */
-module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, pickBestEmail, mapsSearch, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
+module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, pickBestEmail, mapsSearch, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK, noWebsiteSeen };
