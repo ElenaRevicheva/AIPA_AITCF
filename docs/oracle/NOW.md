@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
-| Claude Code (Atlas Places) | 2026-10-13 03:30 | Elena go: mapsSearch() → Google Places (free allowance only, cap 300/month, Bright Data fallback) | scripts/atlas-lead-machine.cjs; Oracle data/places-usage.json (new ledger); named-file scp, no PM2 | ea9b78ad |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct — Atlas leads come from GOOGLE PLACES again (real businesses + phone) · free allowance only · LIVE for Monday · claim released
+- **DONE (Elena's go):** `mapsSearch()` → Google Places with her key (same output shape; Bright Data = fallback). Google "Text Search Enterprise"
+  SKU = 1,000 free/month; Atlas self-caps at 300/month via Oracle `data/places-usage.json` (gitignored), then Bright Data. `ATLAS_PLACES=0` = off. Commit 65e74faa.
+- **VERIFIED BY:** live on Oracle, Atlas's real targets: 4 requests → 63 businesses with own website, 61 with phone; cap + off-switch skip the call
+  (ledger stayed 4); md5 git = laptop = Oracle `21e699a9…`; backup `~/_session-backups/atlas-true-contacts-20261013/atlas-lead-machine.pre-places.cjs`.
+- **NEXT:** Monday 16:00 UTC — grep `~/logs/atlas-lead-machine.log` for `supply: Google Places` and read the staged deals back (real names, phones).
+  Kit + true-contacts switches still OFF (Elena's call). **Not checked:** her Google Cloud billing console (no login here) — other Places use on
+  the same billing account would share the 1,000.
+- **RISK:** none to sends (Elena still clicks). Places lists some businesses with Instagram as "website" → existing platform filter skips them.
 
 ### ✅ 13 Oct ~19:10 UTC — SPACE44 (AI Solutions Architect, deal 65894501929) re-stuffed with the gated kit · Elena's move: apply
 - **DONE (additive, 9 → 13 notes, nothing removed; backups `~/_session-backups/regen-65894501929-20261013/`):** new 🎯 (pitch passed
