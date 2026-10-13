@@ -53,8 +53,7 @@ const {
 const videoLines = (lead) => aigoVideoLinesFor(`${lead.query || ''} ${lead.company || ''}`);
 // Elena's switch (13 Oct 2026: "I prefer to switch it on when I say so"). OFF by default, so
 // syncing this file changes nothing: letters, registry rows and notes stay byte-identical to the
-// pre-kit machine until ATLAS_AIGO_KIT=1 is set (Oracle .env or the cron line).
-const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1';
+// pre-kit machine until ATLAS_AIGO_KIT=1 is set (Oracle .env or the cron line; AIGO_KIT_ON is below g).
 const kitDeckLines = () => (AIGO_KIT_ON ? [AIGO_DECK_ES_LINE, ``] : []);
 const kitVideoLines = (lead) => (AIGO_KIT_ON ? [...videoLines(lead), ``] : []);
 const kitWaLines = (lead) => (AIGO_KIT_ON ? [``, AIGO_DECK_ES_LINE, ``, ...videoLines(lead)] : []);
@@ -62,6 +61,9 @@ const kitWaLines = (lead) => (AIGO_KIT_ON ? [``, AIGO_DECK_ES_LINE, ``, ...video
 const ROOT = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(ROOT, '.env'), 'utf8');
 const g = (k) => (env.match(new RegExp('^' + k + '=(.+)$', 'm')) || [])[1]?.trim();
+// The kit switch is read from BOTH places: this script parses .env itself (it is never
+// loaded into process.env), so a process.env-only check would ignore ATLAS_AIGO_KIT=1 in .env.
+const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1' || g('ATLAS_AIGO_KIT') === '1';
 
 // This script reads .env itself via g() and never touched process.env — which is
 // fine until it borrows a module that DOES read process.env. dist/brightdata-enrich
