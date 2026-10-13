@@ -121,12 +121,24 @@ function htmlToText(html: string): string {
     .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
+    // 13 Oct 2026: "&#x27;" (hex) was left as-is and "&#39;" (decimal) became a space, so a posting read
+    // "organisation&#x27;s objectives" and the CV composer rejected a heading the model had copied faithfully
+    // (SPACE44). Decode numeric entities to their character; "&amp;" last so "&amp;#x27;" is not decoded twice.
+    .replace(/&#x([0-9a-f]+);/gi, (_m, h: string) => codePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_m, d: string) => codePoint(Number(d)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&#\d+;/g, ' ')
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/** A numeric entity's character, or a space when the number is not a printable code point. */
+function codePoint(n: number): string {
+  if (!Number.isFinite(n) || n < 0x20 || n > 0x10ffff || (n >= 0xd800 && n <= 0xdfff)) return ' ';
+  try { return String.fromCodePoint(n); } catch { return ' '; }
 }
 
 function decodeEntities(s: string): string {
