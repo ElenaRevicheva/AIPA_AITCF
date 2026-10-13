@@ -168,6 +168,9 @@ git log keeps the record.
 - **NEXT (Elena's):** first live typed task / screenshot will prove it in the log (`[TrelloVoice] Classification:` → `✅ Card created`; 
   `[telegram/photo] Claude vision failed … answered by openai`). /tasks cleanup: rows that were Trello commands ("Crea la tarea…", "Wire
   this link…", "Удали эту задачу.", "Перемести карточку на BoardMay.", "This task to me.") — delete only with her go.
+- **SYNC 13 Oct:** laptop = GitHub = Oracle for the bot fix (src + 2 tests copied to Oracle too); fresh build of origin/main = Oracle
+  dist 93/93; Oracle src = origin 93/93 (also `src/cover-letter.ts`, left at its 30 Sep copy by the apply-kit deploy — backup in
+  `~/_session-backups/botfix-20261013/src-before/`); tests 72/72 run ON Oracle; process started 23:06:50 > newest dist 23:06:39.
 - **RISK:** typed tasks now become Trello cards (intended; `/task` still saves to the internal list). Card memory is RAM, 30 min — after a
   restart she names the card. Never deploy cto-aipa via `deploy-product.sh` (reset --hard).
 
