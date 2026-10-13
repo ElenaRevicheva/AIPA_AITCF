@@ -144,6 +144,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 13 Oct — DAILY BLOG STOPPED since 10 Oct: Dev.to SUSPENDED the account (not a key or billing problem) · appeal sent · Elena's move: wait for Dev.to
+- **Proof:** key active + byte-identical to Oracle `.env`; every authenticated call 401 (laptop + Oracle); dev.to/new = "Your account has been suspended".
+  Dev.to maintainer (forem #23675): API returns 401 for flagged accounts. Likely trigger (inference): daily automated posts + pre-25-Aug near-duplicates.
+- **DONE:** appeal sent 20:08 UTC from aipa@aideazz.xyz (Zoho SMTP) → support@dev.to, Cc Elena (verified in Gmail). Record: `docs/oracle/2026-10-13_devto_suspension_appeal.md`.
+- **SIDE EFFECT:** the daily run throws when Dev.to fails → **aideazz.xyz also gets no daily article** since 10 Oct. Micro fix offered (site first, Dev.to optional) — Elena's call.
+- **DO NOT** generate new Dev.to keys or retry publishing in a loop — it is an account suspension; hammering it can only hurt the appeal.
+
 ### ℹ️ 13 Oct — Places key: 5 laptop requests on 12 Oct NOT in the Atlas ledger
 - Claude Code ran 5 Places Text Search requests from the laptop (no-website pilot list, `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md`). Same key as Atlas; `data/places-usage.json` on Oracle does not count them. Tiny vs the free cap, but the ledger is not the whole account. Plan to reuse Atlas instead of laptop searches: `docs/selling/BUSINESS_IDENTITY_AUDIT_MVP_SPEC_2026-10-13.md` §11 (not built, Elena's go).
 
