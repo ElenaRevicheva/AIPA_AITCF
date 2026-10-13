@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (no-website ICP) | 2026-10-13 20:40 | 9 pilot clinics staged in HubSpot (done). NOW: 2 guard clauses written LOCALLY for Elena to review (no-website intake; social/Maps link → honest 422). NOT deployed | src/diagnostic-delivery.ts, src/visibility-audit.ts, src/visibility-api.ts, scripts/test-diagnostic-delivery.cjs; no Oracle, no PM2 until Elena approves | 604e8931 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🦷 13 Oct — No-website pilot: 9 Panama dental clinics staged in HubSpot · guard clauses on a BRANCH (PR #60, NOT deployed)
+- **DONE:** 9 Companies + 9 Deals `[CLIENT-MANUAL] <clinic> — Identity Audit pilot (no website)` in 🔥 I Act TODAY, each with ONE note: permission-first WhatsApp draft (ES) + one-click button (`buildHubSpotWaAnchor`) + evidence (Places 12 Oct, web search 12 Oct) + empty evidence matrix + 5 approval gates. Nothing sent. List + method: `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md`; spec `docs/selling/BUSINESS_IDENTITY_AUDIT_MVP_SPEC_2026-10-13.md` (§11 = max reuse).
+- **VERIFIED BY:** HubSpot note search on the 9 deal ids → `total: 9`. Guards: `npx tsc` clean, `test-diagnostic-delivery.cjs` 69/69, local router run Instagram 422 / share.google 422 / aideazz.xyz 200 100/A+.
+- **Branch `claude/no-website-guards` (`cdb8fe62`, draft PR #60):** no-website intake fix in `diagnostic-delivery.ts` + `notOwnedWebsitePlatform()` 422 in the audit API. **Elena has NOT approved the deploy.** Laptop `dist/` was rebuilt from `main` afterwards, so a `dist/` scp does not ship it. Merging it = deploy decision.
+- **NEXT:** Elena sends the messages (~3/day, laptop). Mobile numbers (WhatsApp likely): Orthox, Dr. González, Vive Feliz, Dr. Cano. 5 list LANDLINES (button labelled "PROBAR… número FIJO"). On a YES: fill the matrix (Instagram + WhatsApp profile), send the 1-page summary, offer $100.
+- **RISK:** `scripts/wa-link-lib.cjs isWhatsAppReachable()` treats any 10+ digit number as WhatsApp, landlines included (not changed). Atlas Monday still DROPS no-website Places results on purpose (Elena: no flood while she works alone, revisit if ≥2 of 9 pay). Do not mass-message: WhatsApp bans + Panama data law.
+
 
 ### ✅/⚠️ 13 Oct ~20:25 UTC — Daily blog publishes to aideazz.xyz FIRST, Dev.to optional · `DEVTO_PAUSED=1` on Oracle · live · claim released
 - **DONE (Elena's go):** `src/daily-blog-publisher.ts` — cache + static page ship first, Dev.to after, best-effort (401 / no key / `DEVTO_PAUSED=1` → skipped, Telegram says so);
