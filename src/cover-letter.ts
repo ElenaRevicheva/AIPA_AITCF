@@ -205,11 +205,11 @@ export function stripLoneSurrogates(s: string): string {
     const c = s.charCodeAt(i);
     if (c >= 0xd800 && c <= 0xdbff) {
       const n = s.charCodeAt(i + 1);
-      if (n >= 0xdc00 && n <= 0xdfff) { out += s[i] + s[i + 1]; i++; }
+      if (n >= 0xdc00 && n <= 0xdfff) { out += s.charAt(i) + s.charAt(i + 1); i++; }
       continue;
     }
     if (c >= 0xdc00 && c <= 0xdfff) continue;
-    out += s[i];
+    out += s.charAt(i);
   }
   return out;
 }
