@@ -156,16 +156,16 @@ git log keeps the record.
   Tg9N0PprsaI · relocation/legal y1ZhWyqJW0w · clinic v3 e0rMKnH-noI · /api Cz5F7IaXEXc (fallback).
 - **NEXT (needs Elena's go):** scp the 3 files to Oracle (Oracle md5 of prospect-meta/hs-files/wa-link-lib = main, checked) — no PM2 restart,
   cron Mon 16:00 UTC; run `test-outreach-attachments.cjs` there; backfill the 8 rows (cc + attachments + deck/film lines in the drafts + PDF on note).
-- **RISK:** 4 of the 8 addresses are not real buyers — `nombre.apellido@fourseasons.com` (placeholder), `last@sofitellegendsantaclara.com`
-  (pattern), `consumeraffairs@hyatt.com` (complaints desk), `courtneylmuro@gmail.com` (a blogger). The deck is the one the 11 Oct review
+- **RISK:** 4 of the 8 addresses are not real buyers — Four Seasons (a placeholder address), Sofitel (a guessed pattern),
+  Hyatt (the complaints desk), a travel blogger (addresses in HubSpot only). The deck is the one the 11 Oct review
   paused (10 false lines incl. "Nothing goes out without you"; `[outreach-auto]` still sends unapproved) — sending it is Elena's call.
   Atlas publish to GitHub FAILED today (`! [rejected] (fetch first)`) — Oracle's registry is local-only; go-wa reads local disk first, so buttons work.
 - **Why it never reached Atlas (dug 13 Oct, Elena asked):** 1 Oct the deck→all-571-CLIENT-deals script (`c792407e`) was PAUSED by Elena, never
   resumed. 2 Oct the kit was built OPT-IN per hand-staged prospect (`9ec2fcfa`, `bbf88c53`: "absent fields change nothing") and used on 4
   prospects; nobody wired it into `atlas-lead-machine.cjs`. **The send path works:** Gmail shows Tours Panama, Grand Tours, Quijano (2 Oct) and
   Ford Realty (6 Oct) arrived with Cc Elena + `AIdeazz_AI_Growth_Operator_2026_ES.pdf` (~6.7 MB). **Already sent 12 Oct 22:43–22:48 WITHOUT the kit**
-  (Resend ledger): dreamsea, surfandyoga, shaka, and cartagena-weddings TWICE to `nombre.apellido@fourseasons.com`. Unsent: two.travel, Sofitel
-  `last@`, Hyatt complaints desk, the blogger. Elena 13 Oct: deck goes out as is.
+  (Resend ledger): dreamsea, surfandyoga, shaka, and cartagena-weddings TWICE to a placeholder address. Unsent: two.travel, Sofitel
+  (guessed), Hyatt complaints desk, the blogger. Elena 13 Oct: deck goes out as is.
 
 ### ✅ 12 Oct ~23:05 UTC — APPLY KIT now draws every piece from the verified evidence (Elena: "just make it work, no bicycles") · live on Oracle · claim released
 - **DONE:** `docs/oracle/2026-10-12_apply_kit_profound_plan.md` (cause + what was built). Letter and 🎯 read `cv-bank.json` (one pool);

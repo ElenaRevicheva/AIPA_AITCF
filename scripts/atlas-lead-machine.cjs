@@ -991,6 +991,46 @@ function buildFuDraft(lead, audit, angle) {
   return { subject, body };
 }
 
+/** First-touch WhatsApp text — email is the tracked channel, WhatsApp is Elena's laptop-only close. */
+function buildWaDraft(lead, audit) {
+  return [
+    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
+    ``,
+    `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
+    // WhatsApp gets the same treatment — it is the channel Elena actually closes
+    // on, so a false "no aparece" line here costs the most.
+    audit.score >= CREDENTIAL_SCORE
+      ? `De los mejores puntajes que he medido en ${lead.city}. No les voy a inventar un problema que no tienen — les escribo por lo que pasa DESPUÉS de que la IA los recomiende.`
+      : `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
+    ``,
+    OPERATOR_ES,
+    ``,
+    `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    ``,
+    AIGO_DECK_ES_LINE,
+    ``,
+    ...videoLines(lead),
+    WA_CLOSING,
+  ].join('\n');
+}
+
+/** Second-touch WhatsApp text. */
+function buildFuWaDraft(lead, audit) {
+  return [
+    `Hola de nuevo 👋 Soy Elena Revicheva (AIdeazz): https://aideazz.xyz/portfolio`,
+    ``,
+    `Les escribí sobre la auditoría de ${lead.website}: ${audit.score}/100 (${audit.grade}).`,
+    `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
+    ``,
+    `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    ``,
+    AIGO_DECK_ES_LINE,
+    ``,
+    ...videoLines(lead),
+    WA_CLOSING,
+  ].join('\n');
+}
+
 async function stageLead(lead, audit, angle) {
   // Truncate the NAME, then append the marker — slicing the joined string cut the
   // "-atlas" off any company whose name ran past 54 chars (caught live on
@@ -1091,25 +1131,7 @@ async function stageLead(lead, audit, angle) {
   // WhatsApp draft — same play as [CLIENT-MANUAL]: email is the tracked channel,
   // WhatsApp is Elena's laptop-only close. Registry needs digits-only phone.
   const waRel = `docs/selling/drafts/${slug}.txt`;
-  const waText = [
-    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
-    ``,
-    `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
-    // WhatsApp gets the same treatment — it is the channel Elena actually closes
-    // on, so a false "no aparece" line here costs the most.
-    audit.score >= CREDENTIAL_SCORE
-      ? `De los mejores puntajes que he medido en ${lead.city}. No les voy a inventar un problema que no tienen — les escribo por lo que pasa DESPUÉS de que la IA los recomiende.`
-      : `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
-    ``,
-    OPERATOR_ES,
-    ``,
-    `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
-    ``,
-    AIGO_DECK_ES_LINE,
-    ``,
-    ...videoLines(lead),
-    WA_CLOSING,
-  ].join('\n');
+  const waText = buildWaDraft(lead, audit);
   if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
 
   // ── Second touch, staged up front ────────────────────────────────────────────
@@ -1122,19 +1144,7 @@ async function stageLead(lead, audit, angle) {
   const fuWaRel = `docs/selling/drafts/${fuSlug}.txt`;
   const fu = buildFuDraft(lead, audit, angle);
   fs.writeFileSync(path.join(ROOT, fuRel), `SUBJECT: ${fu.subject}\n\nTO: ${lead.email}\n\n${fu.body}\n`, 'utf8');
-  const fuWaText = [
-    `Hola de nuevo 👋 Soy Elena Revicheva (AIdeazz): https://aideazz.xyz/portfolio`,
-    ``,
-    `Les escribí sobre la auditoría de ${lead.website}: ${audit.score}/100 (${audit.grade}).`,
-    `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
-    ``,
-    `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
-    ``,
-    AIGO_DECK_ES_LINE,
-    ``,
-    ...videoLines(lead),
-    WA_CLOSING,
-  ].join('\n');
+  const fuWaText = buildFuWaDraft(lead, audit);
   if (lead.phone) fs.writeFileSync(path.join(ROOT, fuWaRel), fuWaText, 'utf8');
 
   const reg = loadRegistry();
@@ -1440,4 +1450,4 @@ async function publishOutreachArtifacts(count) {
  * the drift only surfaces when a prospect gets a letter nobody reviewed.
  * Guarded by require.main so exporting never triggers the run above.
  */
-module.exports = { buildDraft, buildFuDraft, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
+module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
