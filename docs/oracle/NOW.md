@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (Atlas 8 backfill) | 2026-10-13 00:30 | Elena's go: the 8 Atlas deals of 12 Oct get the deck+film+Cc kit; true contacts dug for the bad 4. atlas-lead-machine.cjs NOT deployed (Monday switch = Elena's later call) | Oracle: outreach-registry rows + drafts of the 8 `-atlas` slugs, docs/selling/aigo-kit.cjs (new file), their HubSpot notes/contacts; no PM2 | 26ba7c19 |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 
 **Rules**
@@ -131,6 +130,20 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct — AIGO kit SWITCHED ON for the 8 Atlas deals of 12 Oct (Elena's go) · Monday machine NOT switched on (her call) · claim released
+- **DONE:** `scripts/backfill-atlas-aigo-kit-20261012.cjs --apply` on Oracle (contacts in gitignored `data/atlas-backfill-20261013.json`, never in git).
+  3 Costa Rica camps (1st email already sent 12 Oct without kit) → FU carries it. Four Seasons, Hyatt, Sofitel → real addresses dug from the
+  hotel's own weddings page / press release / venue listing; contact + deal name corrected. Four Seasons + Hyatt audits were HTTP 403 block pages
+  (title "Access Denied", 16 words) → their letters state the block and quote NO score. Two Travel kept. Travel blogger → ⚠️ NO ENVIAR note only.
+  New note per deal (additive) with buttons + PDF; old notes untouched. Backup `~/_session-backups/atlas-aigo-kit-20261013/`.
+- **VERIFIED BY:** confirm page `/go/outreach-email/<slug>` for all 11 buttons → right To, `Cc: Elena`, `AIdeazz_AI_Growth_Operator_2026_ES.pdf (4764 KB)`,
+  both films; HubSpot read-back: 7 notes `hs_attachment_ids=223483883387`, 1 NO ENVIAR; `test-outreach-attachments.cjs` PASS 24; nothing sent.
+- **NEXT (Elena's):** click send; the Cc copy in her Gmail with the PDF is the delivery proof. Monday (cron Mon 16:00 UTC): to switch the machine on =
+  scp main's `scripts/atlas-lead-machine.cjs` (Oracle md5 still 28f62507… = pre-kit). Her decision, not ours.
+- **RISK:** old notes' FIRST-email buttons for the 3 Costa Rica camps still resend the plain 1st letter — use the 🔁 13 Oct note. The Atlas machine's
+  email finder produced 4 bad addresses of 8 (placeholder, guessed pattern, complaints desk, blogger) and scored 2 bot-block pages — before switching
+  the machine on, that is the weak link, not the kit.
 
 ### ✅ 12 Oct 23:07 UTC — Telegram bot (AI_TCF_AIdeazz): typed text → Trello like voice · "wire this link" → card description · colours · screenshots via the waterfall
 - **DONE (Elena's go):** cto-aipa `762c7218`, live on Oracle (3 dist files scp'd, md5 = local build, backups `~/_session-backups/botfix-20261013/`,
