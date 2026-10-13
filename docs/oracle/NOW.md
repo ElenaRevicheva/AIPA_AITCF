@@ -150,8 +150,12 @@ git log keeps the record.
 - **VERIFIED BY:** live on Oracle, Atlas's real targets: 4 requests → 63 businesses with own website, 61 with phone; cap + off-switch skip the call
   (ledger stayed 4); md5 git = laptop = Oracle `21e699a9…`; backup `~/_session-backups/atlas-true-contacts-20261013/atlas-lead-machine.pre-places.cjs`.
 - **NEXT:** Monday 16:00 UTC — grep `~/logs/atlas-lead-machine.log` for `supply: Google Places` and read the staged deals back (real names, phones).
-  Kit + true-contacts switches still OFF (Elena's call). **Not checked:** her Google Cloud billing console (no login here) — other Places use on
-  the same billing account would share the 1,000.
+  Kit + true-contacts switches still OFF (Elena's call).
+- **BILLING CHECKED 13 Oct ~16:20 UTC (Elena's Chrome, read-only, nothing changed):** key (…52bs on Oracle) sits in project **AIdeazz AI Lab**
+  (`aideazz-1775763145287`, "API key 2", restricted to the 33 Maps APIs) — matched by usage, not by revealing the key: the only Places traffic on the
+  account. Maps metrics 30 days: Places API (New) **12 requests, 1 error, all on 13 Oct**. Bill (only billing account, `My Billing Account`):
+  SKU "Places API Text Search Enterprise" **5 count, $0.00** (billing lags). ⚠️ Atlas's ledger counts only Atlas (4) — any other script on this key
+  (hand searches, tests) eats the same 1,000 without the 300 cap seeing it. No Google-side quota set (offered to Elena, needs her yes).
 - **RISK:** none to sends (Elena still clicks). Places lists some businesses with Instagram as "website" → existing platform filter skips them.
 
 ### ✅ 13 Oct ~19:10 UTC — SPACE44 (AI Solutions Architect, deal 65894501929) re-stuffed with the gated kit · Elena's move: apply
