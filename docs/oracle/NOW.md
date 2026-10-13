@@ -101,6 +101,18 @@ agent that pauses without one has lost the work, even if the code is committed.
 - **VERIFIED BY:** the command or log line that proves the DONE claim
 - **RISK:** what will break or mislead if the next agent assumes wrongly
 
+## 6b. 🥇 GOLDEN RULE (Elena, 13 Oct 2026) — no rebuilding
+
+> "I do not want to reinvent the bicycle. I am done with building and rebuilding. I am okay with only surgical, micro, additive
+> fixes that can move the needle inside already encoded stuff — and only if it moves me toward making money, gaining a client,
+> being hired. We built an ecosystem — now we need to make it work. No rebuilding."
+
+Allowed change shape: a prompt line, a config value, a bank entry, one more item in a list an existing reviewer reads, a bug fix
+inside a function that exists — verified from the output read back. Never a new module, flow, pipeline, note type, cron or "v2".
+Each fix names, in one sentence, the paying human or hiring manager it moves her closer to; no sentence → report in NOW.md only.
+Open candidate under this rule (not built, her call): the apply kit's 🎯 pitch and ✅ letter have no claim gate — adding them to the
+reviewer the 🎯 answers already pass through (`src/cover-letter.ts`) is one list item + one call.
+
 ## 7. 🚫 DELIBERATE — these look broken and are not. Do not "fix" them.
 
 | Thing | Why it is like that |
