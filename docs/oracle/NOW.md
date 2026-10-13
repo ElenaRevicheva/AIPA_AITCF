@@ -144,6 +144,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 13 Oct — Atlas FULLY switched on for Monday (Elena's go): Places source + `ATLAS_TRUE_CONTACTS=1` + `ATLAS_AIGO_KIT=1`
+- **DONE:** both lines added to Oracle `~/cto-aipa/.env` (137 → 139 lines, nothing else changed; backup `~/_session-backups/atlas-true-contacts-20261013/env.before-switches`).
+- **VERIFIED BY (Oracle, real module, as configured):** letter carries the deck line + the industry film (dental → clinic film); `nombre.apellido@` and
+  `consumeraffairs@` rejected, `info@` kept; a 403-blocked audit quotes no score. Lead machine = main (`21e699a9…`), Places first, ledger 4/300.
+- **NEXT:** Monday 16:00 UTC run → grep `~/logs/atlas-lead-machine.log` for `supply: Google Places`; read the staged deals back (real names, phones, kit on
+  the confirm page). Off = delete the line(s) in `.env`, no restart.
+- **NOTE:** a check printed the `ATLAS_*` lines of `.env` to a local session transcript, incl. `ATLAS_OUTCOMES_TOKEN` (not pushed anywhere). Rotation = Elena's call.
+
 ### ✅ 13 Oct — Atlas leads come from GOOGLE PLACES again (real businesses + phone) · free allowance only · LIVE for Monday · claim released
 - **DONE (Elena's go):** `mapsSearch()` → Google Places with her key (same output shape; Bright Data = fallback). Google "Text Search Enterprise"
   SKU = 1,000 free/month; Atlas self-caps at 300/month via Oracle `data/places-usage.json` (gitignored), then Bright Data. `ATLAS_PLACES=0` = off. Commit 65e74faa.
