@@ -144,6 +144,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 13 Oct ~17:40 UTC — SYNC CHECK laptop = GitHub = Oracle after 12–13 Oct work (Elena asked)
+- **cto-aipa:** laptop = GitHub (`aa16ca10`); Oracle dist 93/93 = build of GitHub (+ `hashnode-daily.js`, a stale Aug build no cron uses — left);
+  369 tracked scripts/src: 3 stale OLDER Oracle copies refreshed (aigo-promo-gen, check_oracle_health, test-job-tailor; backup `~/_session-backups/sync-20261013/`;
+  test-job-tailor 28/28); live `/home/ubuntu/check_oracle_health.sh` already = GitHub; 39 laptop-only tools (film/promo/resilience) not on Oracle by design.
+  Laptop leftovers NOT mine (12 Oct, untouched): `dist-lambda/sprint/lambda-pkg/handler.js` (Sprinter AWS bundle), `_evaluate_send_report.json`, `_install-wa-fu-notes.json`, `.claude/launch.json`.
+- **aideazz:** Oracle fast-forwarded 955b815 → `a9fab1f` = GitHub (2 wiki entries). VJH `6a0a94e`, Influencer `62f4c82`, whitespace `48ecab5`, atuona, job-list-filter: all equal.
+- **Held on purpose (unchanged):** Oracle EspaLuzFamilybot / EspaLuzWhatsApp / dragontrade-agent lag GitHub — the newer commits untrack customer data; pulling deletes live files. Elena's call.
+
 ### ✅ 13 Oct — Telegram "🔍 Visibility audit lead" noise: repeat outside audits muted · own-key pings unchanged (Elena) · live · claim released
 - **Found:** every audit pinged Telegram. mohave.edu = one Las Vegas IP (Cogent) via the aideazz.xyz demo every ~2 days (6/8/10/13 Oct) — a bot, not a buyer.
 - **DONE:** `src/visibility-api.ts` `logAuditLead`: outside key (demo/other) + same site + same IP within 30 days → log only (`data/visibility-lead-seen.json`);
