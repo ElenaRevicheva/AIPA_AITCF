@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (no-website) | 2026-10-13 21:30 | Elena go 13 Oct: deploy guards (PR #60, Doors 2+3) + Atlas Monday keeps best 2 no-website businesses as deals + 1 Telegram line | src/diagnostic-delivery.ts, src/visibility-audit.ts, src/visibility-api.ts (+dist), scripts/atlas-lead-machine.cjs, scripts/lib/no-website-leads.cjs (new); Oracle cto-aipa scp + pm2 restart cto-aipa | 45b76063 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,14 +143,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🦷 13 Oct — No-website pilot: 9 Panama dental clinics staged in HubSpot · guard clauses on a BRANCH (PR #60, NOT deployed)
-- **DONE:** 9 Companies + 9 Deals `[CLIENT-MANUAL] <clinic> — Identity Audit pilot (no website)` in 🔥 I Act TODAY, each with ONE note: permission-first WhatsApp draft (ES) + one-click button (`buildHubSpotWaAnchor`) + evidence (Places 12 Oct, web search 12 Oct) + empty evidence matrix + 5 approval gates. Nothing sent. List + method: `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md`; spec `docs/selling/BUSINESS_IDENTITY_AUDIT_MVP_SPEC_2026-10-13.md` (§11 = max reuse).
-- **VERIFIED BY:** HubSpot note search on the 9 deal ids → `total: 9`. Guards: `npx tsc` clean, `test-diagnostic-delivery.cjs` 69/69, local router run Instagram 422 / share.google 422 / aideazz.xyz 200 100/A+.
-- **Branch `claude/no-website-guards` (`cdb8fe62`, draft PR #60):** no-website intake fix in `diagnostic-delivery.ts` + `notOwnedWebsitePlatform()` 422 in the audit API. **Elena has NOT approved the deploy.** Laptop `dist/` was rebuilt from `main` afterwards, so a `dist/` scp does not ship it. Merging it = deploy decision.
-- **NEXT:** Elena sends the messages (~3/day, laptop). Mobile numbers (WhatsApp likely): Orthox, Dr. González, Vive Feliz, Dr. Cano. 5 list LANDLINES (button labelled "PROBAR… número FIJO"). On a YES: fill the matrix (Instagram + WhatsApp profile), send the 1-page summary, offer $100.
-- **RISK:** `scripts/wa-link-lib.cjs isWhatsAppReachable()` treats any 10+ digit number as WhatsApp, landlines included (not changed). Atlas Monday still DROPS no-website Places results on purpose (Elena: no flood while she works alone, revisit if ≥2 of 9 pay). Do not mass-message: WhatsApp bans + Panama data law.
-
-
+### 🦷 13 Oct — No-website businesses: 9 pilot clinics in HubSpot · guards LIVE (Doors 2+3) · Atlas Monday stages best 2 no-website (Elena's go)
+- **DONE + LIVE (cto-aipa restarted 21:08:47 UTC > files 21:08:39–44; backups `~/_session-backups/no-website-20261013/`):**
+  - Free audit API: Instagram/Facebook/WhatsApp/TikTok/Linktree/Google Maps link → `422 no_owned_website` + plain message + `[visibility-lead] no-owned-website` log line (`notOwnedWebsitePlatform`, PR #60 merged `06862c94`).
+  - $100 Diagnostic intake: empty `Website:` no longer swallows the next line; "none"/"no tengo" → no website; social/Maps link → `intake.presence` (never scanned); client email says "your business online" instead of "your website".
+  - Atlas Monday (`dc755c0d`): keeps the Places results with no website (+ Instagram/Facebook as "website"); after the regular 8 stages the best `ATLAS_NOWEB_MAX`=2 (high-ticket `hl:en` queries, phone, ≥5 reviews, not already in CRM, most reviews first) as Company + Deal `[CLIENT-ATLAS] <name> — GEO/AEO fix (no website) · no_website` + HIGH task + note (permission-first WA button, Places evidence, "search the name once"). Telegram adds `🧭 N strong no-website … found: …`. Max 10 deals/Monday. `ATLAS_NOWEB=0` = off. Logic `scripts/lib/no-website-leads.cjs`.
+  - Pilot: 9 Panama dental clinics staged by hand 13 Oct (`[CLIENT-MANUAL] … Identity Audit pilot (no website)`), nothing sent. 4 mobiles (Orthox, Dr. González, Vive Feliz, Dr. Cano), 5 landlines.
+- **VERIFIED BY:** live curl: instagram 422, share.google 422, aideazz.xyz 200 100/A+; pm2 log `no-owned-website url=… platform=Instagram`; Oracle `test-no-website-leads.cjs` 32/32; laptop `test-diagnostic-delivery.cjs` 69/69; 1 live Places request through `mapsSearch` → 200 with googleMapsUri/primaryType (2 laptop Places requests, outside the Oracle ledger).
+- **NEXT (agent, Mon 19 Oct after 16:00 UTC):** `grep "no-website:" ~/logs/atlas-lead-machine.log | tail -1` → expect `N seen · M picked · M staged`; check the Telegram 🧭 line and that regular leads still staged. 0 picked is possible (few high-ticket no-website results per query) — not a bug.
+- **RISK:** the message claims only "su perfil de Google no tiene sitio web" (Places-verified). Atlas does NOT web-search, so the note tells Elena to search the name first (Panama Yacht Adventures had a site Google did not link). `wa-link-lib isWhatsAppReachable()` still counts landlines as WhatsApp (not changed).
 ### ✅/⚠️ 13 Oct ~20:25 UTC — Daily blog publishes to aideazz.xyz FIRST, Dev.to optional · `DEVTO_PAUSED=1` on Oracle · live · claim released
 - **DONE (Elena's go):** `src/daily-blog-publisher.ts` — cache + static page ship first, Dev.to after, best-effort (401 / no key / `DEVTO_PAUSED=1` → skipped, Telegram says so);
   `scripts/incident-to-blog.cjs` respects `DEVTO_PAUSED`; `blog-es-bundle` falls back to the aideazz URL. Commit e109bd9c. tsc: only the 2 intended dist files changed.
