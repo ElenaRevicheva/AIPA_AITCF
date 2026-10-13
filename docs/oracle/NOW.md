@@ -21,6 +21,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
+| Claude Code (Atlas Places) | 2026-10-13 03:30 | Elena go: mapsSearch() → Google Places (free allowance only, cap 300/month, Bright Data fallback) | scripts/atlas-lead-machine.cjs; Oracle data/places-usage.json (new ledger); named-file scp, no PM2 | ea9b78ad |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
