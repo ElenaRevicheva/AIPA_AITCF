@@ -19,6 +19,8 @@
  */
 
 import express, { Router, Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import { runVisibilityAudit, AuditFetchError, ENGINE_VERSION } from './visibility-audit';
 import { tgSafeText } from './tg-text';
 
@@ -120,6 +122,43 @@ export function parseRequestUtms(req: Request): {
   };
 }
 
+/** Same site + same visitor within this window pings Telegram once. */
+const REPEAT_MUTE_DAYS = 30;
+const SEEN_PATH = path.join(__dirname, '..', 'data', 'visibility-lead-seen.json');
+
+/** True when this site was already audited from this IP inside the window; otherwise records it. */
+function seenRecently(url: string, ip: string | undefined): boolean {
+  let site = url.toLowerCase();
+  try {
+    site = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    /* keep the raw url */
+  }
+  const id = `${site}|${ip ?? '-'}`;
+  const now = Date.now();
+  const windowMs = REPEAT_MUTE_DAYS * 86_400_000;
+  let seen: Record<string, number> = {};
+  try {
+    seen = JSON.parse(fs.readFileSync(SEEN_PATH, 'utf8'));
+  } catch {
+    /* first run */
+  }
+  const last = seen[id];
+  const hit = typeof last === 'number' && now - last < windowMs;
+  if (!hit) {
+    seen[id] = now;
+    for (const [k, t] of Object.entries(seen)) if (now - t >= windowMs) delete seen[k];
+    try {
+      fs.mkdirSync(path.dirname(SEEN_PATH), { recursive: true });
+      fs.writeFileSync(SEEN_PATH, JSON.stringify(seen) + '\n');
+    } catch (e) {
+      // A disk problem must never cost a real lead its ping.
+      console.warn('[visibility-lead] seen-file write failed:', (e as Error).message);
+    }
+  }
+  return hit;
+}
+
 function logAuditLead(params: {
   url: string;
   score: number;
@@ -157,6 +196,14 @@ function logAuditLead(params: {
         }),
       )
       .catch((e) => console.warn('[visibility-lead] community pin failed:', e?.message ?? e));
+  }
+
+  // Elena, 13 Oct 2026: the same OUTSIDE visitor re-auditing the same site is noise that
+  // buries a real prospect's first audit (a bot from one IP ran mohave.edu through the demo
+  // every ~2 days). Her own key's pings — Atlas, the stagers — stay exactly as they were.
+  if (!key.startsWith('aidz_owner_') && seenRecently(url, ip)) {
+    console.log(`[visibility-lead] repeat within ${REPEAT_MUTE_DAYS}d from the same visitor — logged, not sent to Telegram`);
+    return;
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
