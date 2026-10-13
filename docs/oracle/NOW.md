@@ -110,8 +110,9 @@ agent that pauses without one has lost the work, even if the code is committed.
 Allowed change shape: a prompt line, a config value, a bank entry, one more item in a list an existing reviewer reads, a bug fix
 inside a function that exists — verified from the output read back. Never a new module, flow, pipeline, note type, cron or "v2".
 Each fix names, in one sentence, the paying human or hiring manager it moves her closer to; no sentence → report in NOW.md only.
-Open candidate under this rule (not built, her call): the apply kit's 🎯 pitch and ✅ letter have no claim gate — adding them to the
-reviewer the 🎯 answers already pass through (`src/cover-letter.ts`) is one list item + one call.
+Built on her word the same afternoon (13 Oct, "yes, we need to fix that"): the 🎯 pitch and the ✅ letter now pass the reviewer the 🎯
+answers already had, and the CV composer's floor is 2 sections / 5 lines — see the 13 Oct afternoon section of
+`docs/oracle/2026-10-12_apply_kit_profound_plan.md`.
 
 ## 7. 🚫 DELIBERATE — these look broken and are not. Do not "fix" them.
 
@@ -142,6 +143,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct ~17:40 UTC — claim gates live: 🎯 pitch and ✅ letter now reviewed by gpt-5; CV floor 2/5 · verified by dry run on the SPACE44 posting · claim released
+- **DONE:** Elena's go ("the letter and the pitch are grounded but unguarded … yes, we need to fix that"). Inside existing functions only:
+  pitch appended to the reviewer's answer list (unsupported → redraft; last attempt → dropped, never shipped bent); letter sentences through
+  the same reviewer before posting (sign-off untouched; review outage → gated draft ships, logged); composer floor `MIN_SECTIONS=2 / MIN_LINES=5`;
+  availability line in `ROLE_PROFILE`. Commits 0cd71a14, 8314d446. md5 equal laptop = origin = Oracle (dist laptop = Oracle).
+- **VERIFIED BY:** dry run on the SPACE44 posting: `PITCH: (dropped by the reviewer)`, gap "I haven't held a titled solutions architecture …
+  role for seven years", `review dropped 3 sentence(s)` on the letter (duty-echo opener, filler, unsupported availability), CV composed
+  2 sections / 6 lines with fit_note (used to be NO SPEC → generic lane CV). `tsc` 0 errors; letter test 15/15.
+- **NEXT (Elena's):** apply to CodeRoad. The next VJH deal is the first production proof of the gates — read its ✅ and 🎯 on the phone.
+- **RISK:** a 🎯 note can now ship WITHOUT a pitch (honest) — the CV summary then has no opening line; the letter can be short. Model spend
+  +1 gpt-5 call per new deal. Existing deals keep their old notes (additive). Nothing here creates evidence she does not have.
+
 
 ### ✅ 13 Oct — Atlas "true contacts" = the hand stager's scraper, now shared + behind `ATLAS_TRUE_CONTACTS` (OFF) · deployed · claim released
 - **Found:** the feature Elena remembered = `parseContacts` in `stage-manual-prospect.cjs` (Cloudflare `data-cfemail` decoder, placeholder filter,

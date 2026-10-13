@@ -98,3 +98,21 @@ Re-probe on the SPACE44 posting through the kit's own fetch: 0 lone surrogates; 
 Consistency check (Elena, 13 Oct): every file touched this session is byte-equal on the laptop, origin/main and Oracle's checkout
 (11 files + the gitignored compiled module); the aideazz repo is level with its origin. Oracle's git HEAD stays deliberately old
 (named-file deploys) — a `git diff origin/main` there shows files it does not track as "deleted"; `test -f` + md5 is the real check.
+
+## 13 Oct 2026, afternoon — the claim gates (Elena: "the letter and the pitch are grounded but unguarded … yes, we need to fix that")
+
+Read back from the SPACE44 deal, the first one built by the new code: the 🎯 pitch said "7+ years of experience in solutions
+architecture" (she has 7 years as Deputy CEO & CLO; the number gate passed because 7 is in the evidence, and the pitch was never sent to
+the reviewer), the ✅ letter opened with the posting's own duty sentence rewritten as her experience and closed with "within two weeks"
+(no reviewer on the letter at all), and a posting far from her evidence fell back to the generic lane CV. Three surgical changes, inside
+existing functions, commits 0cd71a14 + 8314d446, deployed by named-file scp, md5 equal laptop = Oracle:
+
+| Change | Where | Dry run on the SPACE44 posting (nothing written) |
+|---|---|---|
+| The pitch is appended to the ANSWERS list the gpt-5 reviewer already judges; unsupported → the drafter retries; on the last attempt the pitch is dropped rather than shipped | `generateRoleDefense` in `src/cover-letter.ts` | `PITCH: (dropped by the reviewer)`; 4 answers kept; 1 honest gap written: "I haven't held a titled solutions architecture … role for seven years" |
+| The letter's sentences pass the same strict reviewer before the note is posted; sign-off never reviewed; if the review cannot run, the mechanically gated draft ships (logged) | `reviewLetterSentences` + `generateCoverLetter` | `review dropped 3 sentence(s)`: the duty-echo opener, "I understand the importance of aligning AI…", and the unsupported availability line; the surviving letter = bank facts only, `openai + review openai:gpt-5` |
+| Composer floor 3 sections / 7 lines → 2 / 5 (`MIN_SECTIONS`, `MIN_LINES`); the prompt still aims for 3-5 / 7-14 | `scripts/lib/cv-compose.cjs` | spec composed where it used to fail: 2 verbatim headings / 6 lines, `fit_note` captured for the 🛡️ line |
+| "Available immediately (no notice period)" added to `ROLE_PROFILE` (it was only in the Comet prompt, so the reviewer rightly cut the availability line); sign-off split into its own paragraph before review | `src/cover-letter.ts` | re-dry: reviewer still active (2 sentences dropped), sign-off on its own lines |
+
+Cost: one extra gpt-5 call per new deal (the letter review). Existing notes untouched (additive). What this cannot do: invent evidence —
+a posting that asks for client-facing discovery or a human engineering team still ends with those gaps said out loud, not papered over.
