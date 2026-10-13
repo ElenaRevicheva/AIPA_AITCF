@@ -159,6 +159,12 @@ git log keeps the record.
   (pattern), `consumeraffairs@hyatt.com` (complaints desk), `courtneylmuro@gmail.com` (a blogger). The deck is the one the 11 Oct review
   paused (10 false lines incl. "Nothing goes out without you"; `[outreach-auto]` still sends unapproved) — sending it is Elena's call.
   Atlas publish to GitHub FAILED today (`! [rejected] (fetch first)`) — Oracle's registry is local-only; go-wa reads local disk first, so buttons work.
+- **Why it never reached Atlas (dug 13 Oct, Elena asked):** 1 Oct the deck→all-571-CLIENT-deals script (`c792407e`) was PAUSED by Elena, never
+  resumed. 2 Oct the kit was built OPT-IN per hand-staged prospect (`9ec2fcfa`, `bbf88c53`: "absent fields change nothing") and used on 4
+  prospects; nobody wired it into `atlas-lead-machine.cjs`. **The send path works:** Gmail shows Tours Panama, Grand Tours, Quijano (2 Oct) and
+  Ford Realty (6 Oct) arrived with Cc Elena + `AIdeazz_AI_Growth_Operator_2026_ES.pdf` (~6.7 MB). **Already sent 12 Oct 22:43–22:48 WITHOUT the kit**
+  (Resend ledger): dreamsea, surfandyoga, shaka, and cartagena-weddings TWICE to `nombre.apellido@fourseasons.com`. Unsent: two.travel, Sofitel
+  `last@`, Hyatt complaints desk, the blogger. Elena 13 Oct: deck goes out as is.
 
 ### ✅ 12 Oct ~23:05 UTC — APPLY KIT now draws every piece from the verified evidence (Elena: "just make it work, no bicycles") · live on Oracle · claim released
 - **DONE:** `docs/oracle/2026-10-12_apply_kit_profound_plan.md` (cause + what was built). Letter and 🎯 read `cv-bank.json` (one pool);
