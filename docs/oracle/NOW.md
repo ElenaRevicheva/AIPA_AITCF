@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (Atlas 8 backfill) | 2026-10-13 00:30 | Elena's go: the 8 Atlas deals of 12 Oct get the deck+film+Cc kit; true contacts dug for the bad 4. atlas-lead-machine.cjs NOT deployed (Monday switch = Elena's later call) | Oracle: outreach-registry rows + drafts of the 8 `-atlas` slugs, docs/selling/aigo-kit.cjs (new file), their HubSpot notes/contacts; no PM2 | 26ba7c19 |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 
 **Rules**
