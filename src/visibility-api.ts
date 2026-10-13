@@ -21,7 +21,7 @@
 import express, { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { runVisibilityAudit, AuditFetchError, ENGINE_VERSION } from './visibility-audit';
+import { runVisibilityAudit, AuditFetchError, ENGINE_VERSION, notOwnedWebsitePlatform } from './visibility-audit';
 import { tgSafeText } from './tg-text';
 
 /** Published demo key — intentionally public, printed on the docs page. */
@@ -382,6 +382,22 @@ export function visibilityRouter(): Router {
       return res.status(400).json({
         error: 'missing_url',
         message: 'Body must be JSON: { "url": "https://example.com" }',
+      });
+    }
+
+    // Instagram / Google Maps / WhatsApp links are not the business's own site: say so
+    // instead of grading Google's or Instagram's page. Logged so a no-website lead is visible.
+    const platform = notOwnedWebsitePlatform(url);
+    if (platform) {
+      console.log(`[visibility-lead] no-owned-website url=${url} platform=${platform} key=${key === DEMO_API_KEY ? 'demo' : 'own'}`);
+      return res.status(422).json({
+        error: 'no_owned_website',
+        platform,
+        message:
+          `This link points to ${platform}, not to a website the business owns. The audit reads a site's own pages, ` +
+          `so grading that page would say nothing about the business. Without a website of its own, ` +
+          `AI engines only have third-party sources (Google reviews, directories) to describe it. ` +
+          `That gap is fixable without building a full site: https://aideazz.xyz/portfolio`,
       });
     }
 

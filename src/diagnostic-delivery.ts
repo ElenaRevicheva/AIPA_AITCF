@@ -20,6 +20,7 @@
 import { getServiceProduct } from './aideazz-service-catalog.js';
 import { getResendApiKey } from './marketing-notify.js';
 import type { AuditResult } from './visibility-audit.js';
+import { notOwnedWebsitePlatform } from './visibility-audit.js';
 
 export interface PaidOrder {
   id: string;
@@ -48,15 +49,23 @@ export function orderLang(pageUrl: string | null): Lang {
 
 export interface Intake {
   website: string | null;
+  /** An Instagram / Google Maps / WhatsApp link given in place of a website — checked by hand, never scanned. */
+  presence: string | null;
   channels: string | null;
   saleValue: string | null;
   freeText: string | null;
 }
 
+/** "none", "no tengo", "sin web"… typed into the website box: the client has no website. */
+const NO_WEBSITE_ANSWER =
+  /^(none|no|n\/?a|nope|not yet|no website|no web|-+|—|ninguno|ninguna|no tengo|no tenemos|no hay|todav[ií]a no|a[uú]n no|sin (sitio|web|p[aá]gina)( web)?)\.?$/i;
+
 /**
  * The pay page writes the intake into `notes` as labelled lines
  * ("Website: …", "Customers reach us via: …", "Typical sale value: …", "Notes: …").
  * A client who skipped the fields may still have pasted a URL — take the first one.
+ * Labels match on their own line only ([ \t]*, not \s*): an empty "Website:" line used to
+ * swallow the next line, so "Customers reach us via: WhatsApp" became the website.
  */
 export function parseIntake(notes: string | null): Intake {
   const text = String(notes || '');
@@ -64,17 +73,24 @@ export function parseIntake(notes: string | null): Intake {
     const m = text.match(label);
     return m?.[1]?.trim() || null;
   };
-  let website = line(/^Website:\s*(.+)$/im);
+  let website = line(/^Website:[ \t]*(.+)$/im);
+  if (website && NO_WEBSITE_ANSWER.test(website)) website = null;
   if (!website) {
     const url = text.match(/https?:\/\/[^\s,;]+/i)?.[0] || text.match(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)+\.[a-z]{2,}\b/i)?.[0];
     website = url || null;
+  }
+  let presence: string | null = null;
+  if (website && notOwnedWebsitePlatform(website)) {
+    presence = website;
+    website = null;
   }
   if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`;
   const structured = /^(Website|Customers reach us via|Typical sale value):/im.test(text);
   return {
     website,
-    channels: line(/^Customers reach us via:\s*(.+)$/im),
-    saleValue: line(/^Typical sale value:\s*(.+)$/im),
+    presence,
+    channels: line(/^Customers reach us via:[ \t]*(.+)$/im),
+    saleValue: line(/^Typical sale value:[ \t]*(.+)$/im),
     freeText: structured ? line(/^Notes:\s*([\s\S]+)$/im) : text.trim() || null,
   };
 }
@@ -130,6 +146,14 @@ export function buildClientEmail(order: PaidOrder, intake: Intake): { lang: Lang
   const lang = orderLang(order.page_url);
   const product = getServiceProduct(order.sku);
   const site = intake.website ? ` (${intake.website})` : '';
+  // No website of their own → promise what will actually be checked, not "your website".
+  const seen = intake.presence ? `: ${intake.presence}` : '';
+  const whatEn = intake.website
+    ? `your website${site}`
+    : `your business online (Google, Instagram, WhatsApp${seen}; no website needed)`;
+  const whatEs = intake.website
+    ? `su sitio web los buscadores con IA${site}`
+    : `su negocio en internet los buscadores con IA (Google, Instagram, WhatsApp${seen}; no necesita sitio web)`;
   if (lang === 'en') {
     const title = product?.titleEn || order.sku;
     return {
@@ -141,7 +165,7 @@ export function buildClientEmail(order: PaidOrder, intake: Intake): { lang: Lang
         `Order: ${order.id}`,
         '',
         'What happens next:',
-        `1. Elena runs your diagnostic: how AI search engines see your website${site}, and which AI Growth Operator modules fit your business — and which do not.`,
+        `1. Elena runs your diagnostic: how AI search engines see ${whatEn}, and which AI Growth Operator modules fit your business — and which do not.`,
         `2. You receive the results in writing by email, together with a link to book a ${CALL_MINUTES}-minute video call with Elena to go through them.`,
         '3. On the call: what an installation would take, and whether it is worth it for you now.',
         '',
@@ -163,7 +187,7 @@ export function buildClientEmail(order: PaidOrder, intake: Intake): { lang: Lang
       `Orden: ${order.id}`,
       '',
       'Próximos pasos:',
-      `1. Elena realiza su diagnóstico: cómo ven su sitio web los buscadores con IA${site}, y qué módulos del AI Growth Operator encajan con su negocio — y cuáles no.`,
+      `1. Elena realiza su diagnóstico: cómo ven ${whatEs}, y qué módulos del AI Growth Operator encajan con su negocio — y cuáles no.`,
       `2. Recibe los resultados por escrito por correo, junto con un enlace para reservar una videollamada de ${CALL_MINUTES} minutos con Elena para revisarlos.`,
       '3. En la llamada: qué implicaría la instalación y si le conviene ahora.',
       '',
@@ -246,6 +270,7 @@ export function buildPrepNote(
     '',
     '<strong>THEIR ANSWERS</strong>',
     `Website: ${esc(intake.website || '—')}`,
+    intake.presence ? `Online presence (no own site — check by hand, not scanned): ${esc(intake.presence)}` : '',
     `Customers reach them via: ${esc(intake.channels || '—')}`,
     `Typical sale value: ${esc(intake.saleValue || '—')}`,
     intake.freeText ? `Notes: ${esc(intake.freeText.slice(0, 800))}` : '',
@@ -337,7 +362,7 @@ export async function deliverDiagnosticAfterPayment(order: PaidOrder): Promise<v
   const msg = [
     `💳 PAID — ${title} ($${order.amount_usd})`,
     `${order.company_name || order.client_name || 'Client'} · ${order.client_email || 'no email'} · ${lang.toUpperCase()}`,
-    `Web: ${intake.website || '—'}`,
+    `Web: ${intake.website || '—'}${intake.presence ? ` · presence: ${intake.presence}` : ''}`,
     scan.result ? `AI-search scan: ${scan.result.score}/100 (${scan.result.grade})` : `Scan: ${scan.error}`,
     `Reach: ${intake.channels || '—'} · Sale: ${intake.saleValue || '—'}`,
     `Client email: ${emailSent ? 'sent' : 'NOT SENT'}`,
