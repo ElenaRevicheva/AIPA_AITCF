@@ -28,6 +28,9 @@ const MIN_JD = 200;
 const OUTLOOK_ONLY = new Set(['s-ai-native-daily-tools']);
 // The shape a cached CV must have to be reused: a CV built before a composer change is built again.
 const SHAPE = 'one-role-2026-10-11';
+// Floor for a shaped CV (13 Oct 2026): below this the kit falls back to the generic lane CV. The prompt aims higher.
+const MIN_SECTIONS = 2;
+const MIN_LINES = 5;
 // A heading is a claim that she did that work, so a requirement she may lack can never be one.
 // Language words count only as a LEVEL ("English C1", "native speaker"): "AI-native operations" is a duty.
 const REQUIREMENT_RE = /\b\d+\s*\+?\s*years?\b|\byears? of\b|\bexperience (in|with)\b|\bdegree\b|\bbachelor|\bmaster'?s\b|\bcertif|\bproficien|\bbackground in\b|\bfamiliar(ity)? with\b|\bnative (speaker|english|spanish|portuguese|level)\b|\b(english|spanish|portuguese)\s+(fluen|proficien|level|native|[abc][12])/i;
@@ -180,7 +183,10 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       if (ids.length) sections.push({ heading: headingOf(heading), ids });
     }
     const total = sections.reduce((n, s) => n + s.ids.length, 0);
-    if (sections.length < 3 || total < 7) problems.push(`only ${sections.length} usable sections / ${total} bullets — need 3-5 sections and 7-14 bullets`);
+    // 13 Oct 2026 (Elena): a posting far from her evidence used to fall all the way back to the generic lane CV. The
+    // floor is now 2 sections / 5 lines — a short CV of lines that survived the review, with the reviewer's note on
+    // the 🛡️ line, beats a generic one. The prompt still asks for 3-5 and 7-14; this is the floor, not the aim.
+    if (sections.length < MIN_SECTIONS || total < MIN_LINES) problems.push(`only ${sections.length} usable sections / ${total} bullets — need at least ${MIN_SECTIONS} sections and ${MIN_LINES} bullets (aim for 3-5 and 7-14)`);
     if (problems.length) { lastReason = problems.slice(0, 4).join('; '); log(`  ↺ compose attempt ${attempt + 1}: ${lastReason}`); continue; }
 
     // ── independent review (the 6 Oct recruiter + skeptic lenses; fact-trace is guaranteed by the bank) ──
@@ -226,7 +232,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       // veto here refusing every role she is not a perfect fit for. What gates is honesty: the lines that survive.
       if (rj.reads_as === false) log(`  ⓘ reviewer fit note: ${String(rj.reads_as_why || '').slice(0, 160)}`);
       fitNote = rj.reads_as === false ? String(rj.reads_as_why || '').slice(0, 300) : '';
-      if (kept.length < 3 || left < 7) {
+      if (kept.length < MIN_SECTIONS || left < MIN_LINES) {
         lastReason = `too few lines survived the review: ${dropped.slice(0, 3).join('; ')}. Choose lines that show each duty`;
         log(`  ↺ compose attempt ${attempt + 1}: ${lastReason.slice(0, 200)}`);
         continue;

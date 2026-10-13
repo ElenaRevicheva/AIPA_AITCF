@@ -287,6 +287,49 @@ export function ensureOperatingModel(letter: string): string {
 /**
  * Draft a letter for one job. Never throws — failure is `letter: ''`.
  */
+/**
+ * The letter's sentences, judged one by one by the strict reviewer the 🎯 answers already pass through; a sentence
+ * whose claim the evidence does not state is removed. The sign-off is never reviewed. If the review cannot run at
+ * all, the draft ships as it was gated mechanically (logged, never silent) — the note must not be blocked by a
+ * reviewer outage, and a retry every ten minutes would pay for a new draft each time.
+ */
+async function reviewLetterSentences(draft: string): Promise<{ letter: string; reviewer: string; dropped: string[] }> {
+  const paras = draft.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const signAt = paras.findIndex((p) => /^best regards/i.test(p));
+  const body = signAt >= 0 ? paras.slice(0, signAt) : paras;
+  const sign = signAt >= 0 ? paras.slice(signAt) : [];
+  const sentences: { p: number; s: string }[] = [];
+  body.forEach((p, pi) => {
+    for (const piece of p.split(/(?<=[.!?])\s+(?=["“A-Z])/)) { const t = piece.trim(); if (t) sentences.push({ p: pi, s: t }); }
+  });
+  if (!sentences.length) return { letter: draft, reviewer: '', dropped: [] };
+  const evidence = `${VERIFIED_FACTS}\n${ROLE_PROFILE}`;
+  const revSys = [
+    'You are a strict reviewer protecting a job candidate from writing anything untrue in a cover letter.',
+    'For EACH sentence: supported=true only if every claim about her (actions, results, years, titles, tools, availability, dates) is stated in the EVIDENCE. A posting duty rewritten as her experience ("I understand how client organizations operate") is unsupported. A number of years attached to a field she never held it in is unsupported.',
+    'Her operating-model sentence (quoted in the evidence) is supported. A sentence that only names the role she is applying for, or only closes the letter politely without a claim about her, is supported.',
+    'Return JSON only: {"sentences":[{"i":0,"supported":true,"unsupported_claim":""}]}',
+  ].join('\n');
+  const revUser = `EVIDENCE:\n${evidence}\n\nSENTENCES:\n${sentences.map((x, i) => `${i}. ${x.s}`).join('\n')}`;
+  let rv: { text: string; provider: string };
+  try { rv = await openaiJson(revSys, revUser, (process.env.ROLE_REVIEW_MODEL || 'gpt-5').trim()); }
+  catch (e) {
+    console.warn(`[cover-letter] review: ${String((e as Error)?.message || e).slice(0, 120)} — reviewing via the quality chain`);
+    try { rv = await completeWithProfileDetailed('quality', revSys, revUser, 4000, 'letter-review'); }
+    catch { return { letter: draft, reviewer: '', dropped: [] }; }
+  }
+  let rj: { sentences?: { i: number; supported: boolean; unsupported_claim?: string }[] };
+  try { rj = JSON.parse(rv.text.slice(rv.text.indexOf('{'), rv.text.lastIndexOf('}') + 1)); }
+  catch { return { letter: draft, reviewer: '', dropped: [] }; }
+  const bad = new Set((rj.sentences || []).filter((x) => x && x.supported === false).map((x) => Number(x.i)));
+  const dropped = sentences.filter((_, i) => bad.has(i)).map((x) => x.s);
+  const keptParas = body
+    .map((_, pi) => sentences.filter((x, i) => x.p === pi && !bad.has(i)).map((x) => x.s).join(' '))
+    .filter(Boolean);
+  if (dropped.length) console.warn(`[cover-letter] review dropped ${dropped.length} sentence(s): ${dropped.map((d) => d.slice(0, 70)).join(' | ')}`);
+  return { letter: [...keptParas, ...sign].join('\n\n'), reviewer: rv.provider, dropped };
+}
+
 export async function generateCoverLetter(input: {
   jobTitle: string;
   company: string;
@@ -362,7 +405,14 @@ export async function generateCoverLetter(input: {
     if (describesHerAlone(draft)) {
       return { letter: '', tailored: false, jdChars, reason: 'draft described her as working alone' };
     }
-    return { letter: ensureOperatingModel(draft), tailored: true, provider, jdChars };
+    // 13 Oct 2026 (Elena: "the letter and the pitch are grounded but unguarded — we need to fix that"): the letter's
+    // sentences pass through the same strict reviewer the 🎯 answers already get. A sentence whose claim the evidence
+    // does not state is removed ("I understand how client organizations operate…", "available to start within two
+    // weeks" on the SPACE44 deal); the sign-off and the operating-model sentence are kept. If the review itself cannot
+    // run, the mechanically gated draft ships — logged, never silent.
+    const reviewed = await reviewLetterSentences(draft);
+    return { letter: ensureOperatingModel(reviewed.letter), tailored: true,
+      provider: reviewed.reviewer ? `${provider} + review ${reviewed.reviewer}` : provider, jdChars };
   } catch (e) {
     return {
       letter: '',
@@ -388,6 +438,7 @@ export async function generateCoverLetter(input: {
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 const ROLE_PROFILE = `
 - I am based in Panama (UTC-5) and work fully remote; US Eastern, Central and Mountain business hours overlap my working day.
+- I am available immediately (no notice period) for full-time or contract work.
 - My English is fluent at a professional level; I write and present in English every day.
 - I work with APIs, webhooks and JSON daily: every system I run calls HubSpot, Resend, Telegram and other APIs and exchanges JSON.
 - I am comfortable working with explicit adult (NSFW) content for creative projects (Elena, 29 Sep 2026).
@@ -553,16 +604,22 @@ export async function generateRoleDefense(input: {
       const NICE = /\b(advantage|a plus|nice to have|nice-to-have|preferred|bonus|desirable|ideally)\b/i;
       const allReqs = reqs.map((r) => String(r.posting_line)).filter((l) => quotedIn(l, jd) && !NICE.test(l));
       let kept = questions, finalGaps = gaps.filter((g) => !NICE.test(g.posting_line)), reviewer = '';
+      let finalPitch = String(j.pitch || '');
       try {
         const revSys = [
           'You are a strict reviewer protecting a job candidate from saying anything untrue in an interview.',
+          'The LAST answer is her PITCH (one sentence). It is supported only if every claim in it is stated in the EVIDENCE: a role title, a field or a number of years she never held in that field ("7 years in solutions architecture" when the evidence says 7 years as Deputy CEO and Chief Legal Officer) is unsupported; a posting duty rewritten as her experience is unsupported.',
           'ANSWERS: an answer is supported only if EVERY claim in it (actions, habits, methods, results) is stated in the EVIDENCE. General reasoning she never evidenced ("I weigh the cost", "I track metrics") is NOT supported.',
           'REQUIREMENTS, two kinds. HARD (years of experience, named software, credentials, seniority level, on-set/agency/client/brand work, a domain, a language level): met only if the EVIDENCE states it explicitly; a related skill is not the requirement. SOFT (a capability, mindset or way of working, e.g. consistency, autonomy, experimentation, owning production end to end, prompting, a portfolio): met when the EVIDENCE shows her actually doing it — including through the ANSWERS you marked supported.',
           'Willingness, availability, time-zone, language and comfort requirements are answered by the EVIDENCE profile lines — mark them met when a profile line covers them. A portfolio or track-record line is met when the EVIDENCE lists published work. Never produce a gap line that runs down her own work ("not high-quality by your standard").',
           'For every requirement NOT met, write "say": what she would SAY out loud, in natural first-person speech: "I haven\'t done X yet. What I have done is Y." — X is the requirement in plain words, Y the nearest real thing from the EVIDENCE. Never "I haven\'t claimed/stated". No number that is not in the EVIDENCE.',
           'Return JSON only.',
         ].join('\n');
-        const revUser = `EVIDENCE:\n${evidence}\n\nANSWERS:\n${questions.map((x, i) => `${i}. Q: ${x.q}\n   A: ${x.a}`).join('\n')}\n\nREQUIREMENTS:\n${allReqs.map((l, i) => `${i}. ${l}`).join('\n')}\n\nReturn {"answers":[{"i":0,"supported":true,"unsupported_claim":""}],"requirements":[{"i":0,"met":false,"say":""}]}`;
+        // 13 Oct 2026: the PITCH joins the answers the reviewer judges. It opens the 🎯 note AND the machine CV's
+        // summary, and it was the one sentence nothing checked: "7+ years of experience in solutions architecture"
+        // passed the number gate (7 is in the evidence) on the SPACE44 deal. Appended LAST so answer indexes stay.
+        const pitchIdx = questions.length;
+        const revUser = `EVIDENCE:\n${evidence}\n\nANSWERS:\n${questions.map((x, i) => `${i}. Q: ${x.q}\n   A: ${x.a}`).join('\n')}\n${pitchIdx}. Q: PITCH — one sentence, why she fits THIS role\n   A: ${String(j.pitch || '')}\n\nREQUIREMENTS:\n${allReqs.map((l, i) => `${i}. ${l}`).join('\n')}\n\nReturn {"answers":[{"i":0,"supported":true,"unsupported_claim":""}],"requirements":[{"i":0,"met":false,"say":""}]}`;
         let rv: { text: string; provider: string };
         try { rv = await openaiJson(revSys, revUser, (process.env.ROLE_REVIEW_MODEL || 'gpt-5').trim()); }
         catch (re) {
@@ -576,6 +633,13 @@ export async function generateRoleDefense(input: {
           requirements?: { i: number; met: boolean; say?: string }[];
         };
         const dropped = (rj.answers || []).filter((a) => a.supported === false);
+        const pitchBad = dropped.find((d) => Number(d.i) === pitchIdx);
+        if (pitchBad) {
+          // An unsupported pitch is redrafted like any answer; on the last attempt it is dropped rather than shipped —
+          // a 🎯 note with no pitch is honest, a 🎯 note with a bent one is not.
+          if (attempt < 2) { lastReason = `the pitch made a claim the evidence does not support: ${pitchBad.unsupported_claim || ''}. Rewrite the pitch from the evidence only`; continue; }
+          finalPitch = '';
+        }
         kept = questions.filter((_, i) => !dropped.some((d) => d.i === i));
         if (kept.length < 3) {
           lastReason = `answers made claims the evidence does not support: ${dropped.map((d) => d.unsupported_claim).filter(Boolean).slice(0, 3).join('; ')}. Answer only with what the evidence states`;
@@ -589,7 +653,7 @@ export async function generateRoleDefense(input: {
             return { posting_line: allReqs[r.i] as string, say: ungroundedNumbers(say, `${evidence}\n${jd}`).length ? HONEST : say };
           });
       } catch { /* reviewer unavailable: keep the mechanically checked draft rather than drop the note */ }
-      return { defense: { pitch: String(j.pitch || ''), questions: kept.slice(0, 5), gaps: finalGaps },
+      return { defense: { pitch: finalPitch, questions: kept.slice(0, 5), gaps: finalGaps },
         provider: reviewer ? `${out.provider} + review ${reviewer}` : out.provider };
     } catch (e) {
       lastReason = (e instanceof Error ? e.message : String(e)).slice(0, 160);
