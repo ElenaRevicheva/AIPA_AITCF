@@ -82,6 +82,8 @@ function escHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
 }
 
+const { extractSiteEmails } = require('./lib/site-contacts.cjs');
+
 /** Panama mobiles are 8 digits starting with 6; landlines are 7 and have no WhatsApp. */
 const PA_MOBILE = /^5076\d{7}$/;
 
@@ -116,53 +118,10 @@ function parseContacts(html) {
       return d;
     })
     .filter(p => p.length >= 10 && p.startsWith('507'));
-  // Emails: mailto links AND plain text (many Panama sites print info@… as text).
-  // Placeholder addresses printed inside form previews and demo screenshots are the one
-  // class of scrape that is worse than finding nothing: it looks like a real contact, so
-  // it silently outranks the hand-researched preferredEmail and ships a one-click button
-  // aimed at a fictional person. PUMAS.digital (Aug 11 2026) published `jane@company.com`
-  // in its demo-request mock and the staged deal took it as the prospect's address.
-  const placeholder = /^(jane|john|joe|name|you|your(name|email|company)?|firstname|email|test|demo|sample)@|@(company|yourcompany|yourdomain|domain|example|acme|email|mail|test|sample)\.(com|org|net|io|co)$/i;
-  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js|html)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@|@.*-seccion\.|user@domain|john@doe|ttycirugia/i;
-  // mailto: is authoritative — the site itself declares the address there.
-  const mailtoEmails = [...html.matchAll(/mailto:([^"'\s?<>]+)/gi)].map(m => m[1].toLowerCase());
-  // Cloudflare "Email Address Obfuscation" replaces every address with a
-  // data-cfemail hex blob (first byte = XOR key). The site is still declaring the
-  // address, so it is as authoritative as mailto:. alquilerdeyatespanama.com
-  // (2 Oct 2026) printed info@ in its footer and the scrape saw no email at all.
-  for (const m of html.matchAll(/data-cfemail="([0-9a-f]{4,})"/gi)) {
-    const hex = m[1];
-    const key = parseInt(hex.slice(0, 2), 16);
-    let s = '';
-    for (let i = 2; i < hex.length; i += 2) s += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16) ^ key);
-    mailtoEmails.push(s.toLowerCase());
-  }
-  // Plain text needs a LEFT boundary, or a label glued to the address is swallowed
-  // into the local part: "Email" + "contactus@<clinic domain>" became
-  // emailcontactus@… and the send was suppressed (caught July 26 2026).
-  const textEmails = [
-    ...html.matchAll(/(?<![A-Za-z0-9._%+-])[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g),
-  ].map(m => m[0].toLowerCase());
-
-  /**
-   * Last-resort repair for addresses that still arrive glued to a label
-   * ("emailcontactus@…", "correoinfo@…"). Only accepts the stripped variant when
-   * the site itself also shows it — never guesses a new address.
-   */
-  const unglue = (addr) => {
-    const m = addr.match(/^(e-?mail|correo(?:electronico)?|mail|escr[ií]benos|cont[áa]ctenos)([a-z][a-z0-9._%+-]{2,})@(.+)$/i);
-    if (!m) return addr;
-    const candidate = `${m[2]}@${m[3]}`.toLowerCase();
-    const shown = new RegExp(`(?<![A-Za-z0-9._%+-])${candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
-    return shown.test(html) || mailtoEmails.includes(candidate) ? candidate : addr;
-  };
-
-  const emails = [...mailtoEmails, ...textEmails]
-    .map(e => e.toLowerCase())
-    .map(unglue)
-    .filter(e => !junk.test(e))
-    .filter(e => !placeholder.test(e))
-    .filter(e => /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e));
+  // Emails: mailto links AND plain text (many Panama sites print info@… as text), Cloudflare-
+  // hidden addresses, placeholder filter — the rules live in lib/site-contacts.cjs (13 Oct 2026)
+  // so the Atlas lead machine reads sites the same way. Behaviour unchanged.
+  const emails = extractSiteEmails(html);
   // Only a declared WhatsApp link or a Panama mobile can receive a WhatsApp message.
   // Handing a landline to wa.me produces a button that opens a chat with nobody.
   const wa = waExplicit[0] || phones.find(p => PA_MOBILE.test(p)) || null;

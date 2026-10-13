@@ -50,6 +50,7 @@ const {
   ELENA_COPY_CC,
   aigoVideoLinesFor,
 } = require('../docs/selling/aigo-kit.cjs');
+const { extractSiteEmails, isTemplateAddress, isNotABuyerInbox } = require('./lib/site-contacts.cjs');
 const videoLines = (lead) => aigoVideoLinesFor(`${lead.query || ''} ${lead.company || ''}`);
 // Elena's switch (13 Oct 2026: "I prefer to switch it on when I say so"). OFF by default, so
 // syncing this file changes nothing: letters, registry rows and notes stay byte-identical to the
@@ -64,6 +65,16 @@ const g = (k) => (env.match(new RegExp('^' + k + '=(.+)$', 'm')) || [])[1]?.trim
 // The kit switch is read from BOTH places: this script parses .env itself (it is never
 // loaded into process.env), so a process.env-only check would ignore ATLAS_AIGO_KIT=1 in .env.
 const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1' || g('ATLAS_AIGO_KIT') === '1';
+// Elena's second switch (13 Oct 2026): read sites with the hand stager's contact rules
+// (lib/site-contacts.cjs — Cloudflare-hidden emails, placeholder / pattern / complaints-desk
+// filter) and stop quoting a score measured on a 403 block page. OFF = byte-identical to before.
+const TRUE_CONTACTS_ON = process.env.ATLAS_TRUE_CONTACTS === '1' || g('ATLAS_TRUE_CONTACTS') === '1';
+/** The audit read a block page (HTTP 403 etc.), so its score measures the firewall, not the business. */
+const blockedAudit = (a) => TRUE_CONTACTS_ON && !!(a && a.blocked);
+const BLOCKED_LINE = (lead) =>
+  `Intenté analizar ${lead.website} con mi motor de visibilidad en IA y su servidor bloqueó la lectura (acceso denegado) antes de mostrar la página. ` +
+  `Esa misma protección contra bots puede estar frenando también a los rastreadores de IA (GPTBot, ClaudeBot, PerplexityBot): si no los deja pasar, ChatGPT no puede leer su sitio para recomendarlos.`;
+const auditLabel = (a) => (blockedAudit(a) ? '403 bloqueado' : `${a.score}/${a.grade}`);
 
 // This script reads .env itself via g() and never touched process.env — which is
 // fine until it borrows a module that DOES read process.env. dist/brightdata-enrich
@@ -480,7 +491,9 @@ const JUNK_EMAIL =
   /(sentry|wixpress|example|yourdomain|domain\.com|\.png|\.jpg|\.jpeg|\.gif|\.webp|\.svg|godaddy|squarespace|wordpress|cloudflare)/i;
 
 function pickBestEmail(emails, domain) {
-  const clean = [...new Set(emails)].filter((e) => !JUNK_EMAIL.test(e) && e.length < 70);
+  const clean = [...new Set(emails)].filter(
+    (e) => !JUNK_EMAIL.test(e) && e.length < 70 && !(TRUE_CONTACTS_ON && (isTemplateAddress(e) || isNotABuyerInbox(e))),
+  );
   const onDomain = clean.filter((e) => e.toLowerCase().endsWith(`@${domain}`));
   // Off-domain fallback is only safe for personal/ISP inboxes, which small LATAM
   // businesses genuinely use. An arbitrary OTHER COMPANY's address on the page is
@@ -631,6 +644,13 @@ async function findEmail(website) {
         const ph = pickPhone(html);
         if (ph) phoneByDomain.set(domain, ph);
       }
+      if (TRUE_CONTACTS_ON) {
+        // mailto, Cloudflare-hidden, bounded plain text; placeholders already removed.
+        found.push(...extractSiteEmails(html));
+        // Junk alone used to end the search on page one; keep going until one is usable.
+        if (pickBestEmail(found, domain)) break;
+        continue;
+      }
       const hits = html.match(EMAIL_RE) || [];
       found.push(...hits);
       // mailto: links are the most reliable signal a human put there on purpose
@@ -720,6 +740,8 @@ async function auditSite(url) {
       geo: d.geo ?? cat('geo'),
       /** Low = they are blocking GPTBot/ClaudeBot. The best prospects score worst here. */
       aiAccess: cat('aiAccess'),
+      /** HTTP 403/401/429 from their server: the checks scored the block page. */
+      blocked: (d.checks || []).some((c) => c.id === 'http-response' && c.status === 'fail'),
     };
   } catch {
     return null;
@@ -913,8 +935,11 @@ function buildDraft(lead, audit, angle) {
   //
   // Above the threshold the audit becomes the CREDENTIAL that earns the read,
   // and the letter pivots to the Operator — which is what is being sold anyway.
-  const credential = audit.score >= CREDENTIAL_SCORE;
-  const subject = credential
+  const blocked = blockedAudit(audit);
+  const credential = !blocked && audit.score >= CREDENTIAL_SCORE;
+  const subject = blocked
+    ? `${lead.company}: su sitio bloquea la lectura automática — ¿también a ChatGPT?`
+    : credential
     ? `${lead.company} — ${audit.score}/100 en visibilidad IA, y aun así les escribo`
     : v.subject(lead.company, audit.score);
   const body = [
@@ -933,10 +958,14 @@ function buildDraft(lead, audit, angle) {
       : [
           v.opening(lead.city),
           ``,
-          `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
-          ...(audit.aeo != null
-            ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
-            : []),
+          ...(blocked
+            ? [BLOCKED_LINE(lead)]
+            : [
+                `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
+                ...(audit.aeo != null
+                  ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
+                  : []),
+              ]),
         ]),
     ``,
     (LANE_OFFER[lead.lane] || LANE_OFFER.geo_aeo_tech_seo_makers).pitch(lead.city),
@@ -968,7 +997,9 @@ function buildDraft(lead, audit, angle) {
  * whose first outreach really went by email.
  */
 function buildFuDraft(lead, audit, angle) {
-  const subject = `Seguimiento — auditoría de visibilidad en IA: ${lead.company} (${audit.score}/100)`;
+  const subject = blockedAudit(audit)
+    ? `Seguimiento — ${lead.company}: la IA no puede leer su sitio`
+    : `Seguimiento — auditoría de visibilidad en IA: ${lead.company} (${audit.score}/100)`;
   const body = [
     `Estimado equipo de ${lead.company}:`,
     ``,
@@ -976,7 +1007,9 @@ function buildFuDraft(lead, audit, angle) {
     ``,
     // Same credential branch as buildDraft: a follow-up that contradicts the first
     // letter is worse than no follow-up, and on 85+ the gap line is untrue anyway.
-    audit.score >= CREDENTIAL_SCORE
+    blockedAudit(audit)
+      ? `Les escribí hace unos días por correo sobre ${lead.company}. ${BLOCKED_LINE(lead)}`
+      : audit.score >= CREDENTIAL_SCORE
       ? `Les escribí hace unos días sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}) — de los mejores que he medido en ${lead.city}, así que no les escribo por ahí.`
       : `Les escribí hace unos días por correo sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}). Cuando un cliente pregunta a ChatGPT o Perplexity por opciones como la suya en ${lead.city}, su empresa todavía no aparece como una respuesta citable${audit.aeo != null ? ` (AEO ${audit.aeo}/100)` : ''}.`,
     ``,
@@ -1001,12 +1034,16 @@ function buildWaDraft(lead, audit) {
   return [
     `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
     ``,
+    ...(blockedAudit(audit)
+      ? [BLOCKED_LINE(lead)]
+      : [
     `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
     // WhatsApp gets the same treatment — it is the channel Elena actually closes
     // on, so a false "no aparece" line here costs the most.
     audit.score >= CREDENTIAL_SCORE
       ? `De los mejores puntajes que he medido en ${lead.city}. No les voy a inventar un problema que no tienen — les escribo por lo que pasa DESPUÉS de que la IA los recomiende.`
       : `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
+        ]),
     ``,
     OPERATOR_ES,
     ``,
@@ -1021,7 +1058,9 @@ function buildFuWaDraft(lead, audit) {
   return [
     `Hola de nuevo 👋 Soy Elena Revicheva (AIdeazz): https://aideazz.xyz/portfolio`,
     ``,
-    `Les escribí sobre la auditoría de ${lead.website}: ${audit.score}/100 (${audit.grade}).`,
+    blockedAudit(audit)
+      ? `Les escribí sobre ${lead.website}: su servidor bloqueó la lectura de mi motor de visibilidad en IA, y puede estar frenando también a ChatGPT.`
+      : `Les escribí sobre la auditoría de ${lead.website}: ${audit.score}/100 (${audit.grade}).`,
     `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
     ``,
     `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
@@ -1054,7 +1093,7 @@ async function stageLead(lead, audit, angle) {
     geo_aeo_tech_seo_makers: 'GEO/AEO fix',
   };
   const laneTag = LANE_TAG[lead.lane] || LANE_TAG.geo_aeo_tech_seo_makers;
-  const dealName = `[CLIENT-ATLAS] ${lead.company} — ${laneTag} (audit: ${audit.score}/${audit.grade}) · ${angleKey}`;
+  const dealName = `[CLIENT-ATLAS] ${lead.company} — ${laneTag} (audit: ${auditLabel(audit)}) · ${angleKey}`;
   if (DRY) return { slug, dealName, dealId: null };
 
   fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
@@ -1099,12 +1138,12 @@ async function stageLead(lead, audit, angle) {
     try {
       const task = await hs('POST', '/crm/v3/objects/tasks', {
         properties: {
-          hs_task_subject: `Enviar 1er contacto — ${lead.company} (auditoría ${audit.score}/${audit.grade})`,
+          hs_task_subject: `Enviar 1er contacto — ${lead.company} (auditoría ${auditLabel(audit)})`,
           hs_task_body:
             `Lead de Atlas listo para enviar.\n\n` +
             `Sitio: ${lead.website}\nEmail: ${lead.email}\n` +
             `${lead.phone ? `WhatsApp: ${formatPhone507(lead.phone)}\n` : 'WhatsApp: no publicado en su sitio\n'}` +
-            `Auditoría: ${audit.score}/100 (${audit.grade})\n\n` +
+            `Auditoría: ${blockedAudit(audit) ? 'su servidor bloqueó la lectura (HTTP 403) — sin puntaje' : `${audit.score}/100 (${audit.grade})`}\n\n` +
             `Los botones de envío están en la nota del deal.`,
           hs_task_status: 'NOT_STARTED',
           hs_task_priority: 'HIGH',
@@ -1181,7 +1220,9 @@ async function stageLead(lead, audit, angle) {
     `${fuLink}<br>`,
     fuWaLink ? `${fuWaLink}<br><br>` : `<br>`,
     `<b>🔥 NUEVO LEAD — Atlas lead machine</b><br>`,
-    `<b>Auditoría:</b> ${audit.score}/100 ${audit.grade}`,
+    blockedAudit(audit)
+      ? `<b>Auditoría:</b> bloqueada (HTTP 403) — el puntaje ${audit.score} midió la página de bloqueo, no el negocio`
+      : `<b>Auditoría:</b> ${audit.score}/100 ${audit.grade}`,
     audit.aeo != null ? ` · AEO ${audit.aeo}` : '',
     `<br><b>Sitio:</b> ${lead.website}<br>`,
     `<b>Email:</b> ${lead.email}<br>`,
@@ -1450,4 +1491,4 @@ async function publishOutreachArtifacts(count) {
  * the drift only surfaces when a prospect gets a letter nobody reviewed.
  * Guarded by require.main so exporting never triggers the run above.
  */
-module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
+module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, pickBestEmail, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
