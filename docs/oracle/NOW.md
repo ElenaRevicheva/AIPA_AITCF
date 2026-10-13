@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
-| Claude Code (Atlas true contacts) | 2026-10-13 02:30 | Elena: make the hand-stager's contact scraper (parseContacts, Cloudflare decoder) work in Atlas; shared lib, behind ATLAS_TRUE_CONTACTS (off) | scripts/lib/site-contacts.cjs (new), scripts/stage-manual-prospect.cjs (parseContacts only, proven identical), scripts/atlas-lead-machine.cjs; Oracle named-file scp, no PM2 | 20dc04ba |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct — Atlas "true contacts" = the hand stager's scraper, now shared + behind `ATLAS_TRUE_CONTACTS` (OFF) · deployed · claim released
+- **Found:** the feature Elena remembered = `parseContacts` in `stage-manual-prospect.cjs` (Cloudflare `data-cfemail` decoder, placeholder filter,
+  2–3 Oct). Atlas had its own weaker finder + a Google-index fallback that staged a placeholder, a guessed pattern and a complaints desk on 12 Oct.
+  Also found: Atlas's original source (SerpAPI google_maps, dead 11 Aug) and its working replacement Google Places — `docs/selling/ATLAS_TRUE_CONTACTS_FINDINGS_2026-10-13.md` (Places NOT built; her call).
+- **DONE:** `scripts/lib/site-contacts.cjs` (one implementation); hand stager uses it unchanged; Atlas uses it when `ATLAS_TRUE_CONTACTS=1`
+  (+ rejects `nombre.apellido@`-type formats and complaints/legal/press/careers/no-reply inboxes; 403-blocked audits quote no score). Commit 2169b4cc.
+- **VERIFIED BY:** parseContacts identical on 45/45 real sites; switch OFF = 240/240 letters identical to Oracle's machine; ON changes only
+  blocked-site letters; on 45 real sites ON drops 0, finds 1 Cloudflare-hidden address OFF missed. md5 git = laptop = Oracle for the 3 files;
+  on Oracle switch reads OFF (old behaviour) and ON rejects the placeholder. Backup `~/_session-backups/atlas-true-contacts-20261013/`.
+- **NEXT (Elena's):** Monday: `ATLAS_TRUE_CONTACTS=1` and/or `ATLAS_AIGO_KIT=1` in Oracle `.env` (memory `reference_atlas_aigo_kit_switch`). Later: Places as source.
+- **RISK:** the switches fix what Atlas READS from a site, not WHICH sites organic search returns (blog posts, chains) — that is the Places step.
 
 ### ✅ 13 Oct ~14:30 UTC — kit enhancement level in all three copies (laptop = origin/main = Oracle) · first new deal exposed two fetcher bugs, both fixed and verified
 - **DONE:** md5 of every file touched 12–13 Oct equal in all three places (11 files + gitignored `dist/cover-letter.js` laptop = Oracle); aideazz
