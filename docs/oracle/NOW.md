@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
-| Claude Code (audit-lead noise) | 2026-10-13 17:15 | Elena go: Telegram 'Visibility audit lead' — mute repeats of the same site from the same outside visitor within 30 days (mohave.edu bot every ~2 days); own-key pings unchanged | src/visibility-api.ts + dist; data/visibility-lead-seen.json (new); pm2 restart cto-aipa | f14b992c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct — Telegram "🔍 Visibility audit lead" noise: repeat outside audits muted · own-key pings unchanged (Elena) · live · claim released
+- **Found:** every audit pinged Telegram. mohave.edu = one Las Vegas IP (Cogent) via the aideazz.xyz demo every ~2 days (6/8/10/13 Oct) — a bot, not a buyer.
+- **DONE:** `src/visibility-api.ts` `logAuditLead`: outside key (demo/other) + same site + same IP within 30 days → log only (`data/visibility-lead-seen.json`);
+  `aidz_owner_` key (Atlas, stagers) pings exactly as before — Elena wants those. Commit c33abb0e; mohave seeded as seen 13 Oct.
+- **VERIFIED BY:** tsc: only `visibility-api.js` differs from the pre-change build (= Oracle's old file, md5 814d0e87); filter tests (first ping, repeat muted,
+  new visitor pings, 31 days later pings again); `pm2 restart cto-aipa --update-env` 17:15:25 > file 17:15:20; `/v1/visibility` → 100, own-property not pinged.
+  Backup `~/_session-backups/atlas-true-contacts-20261013/visibility-api.js.before-dedupe`.
+- **RISK:** two real people behind one office IP auditing the same site → second one is log-only (grep `[visibility-lead]` to see every audit).
 
 ### ✅ 13 Oct — Atlas FULLY switched on for Monday (Elena's go): Places source + `ATLAS_TRUE_CONTACTS=1` + `ATLAS_AIGO_KIT=1`
 - **DONE:** both lines added to Oracle `~/cto-aipa/.env` (137 → 139 lines, nothing else changed; backup `~/_session-backups/atlas-true-contacts-20261013/env.before-switches`).
