@@ -69,6 +69,28 @@ const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1' || g('ATLAS_AIGO_KIT') ==
 // (lib/site-contacts.cjs — Cloudflare-hidden emails, placeholder / pattern / complaints-desk
 // filter) and stop quoting a score measured on a 403 block page. OFF = byte-identical to before.
 const TRUE_CONTACTS_ON = process.env.ATLAS_TRUE_CONTACTS === '1' || g('ATLAS_TRUE_CONTACTS') === '1';
+// Google Places = the maps data this machine was built on (name, own website, phone, rating), through
+// Elena's own key (Elena, 13 Oct 2026: "fix that, but only within the free monthly allowance").
+// Text Search with phone/website is Google's "Text Search Enterprise" SKU: 1,000 free requests a month
+// (developers.google.com/maps/billing-and-pricing/pricing, read 13 Oct). Atlas stops itself at
+// PLACES_MONTHLY_CAP (300 = 30% of the free cap, room for anything else on the account) and then
+// falls back to Bright Data, the 17 Aug supply. ATLAS_PLACES=0 turns it off.
+const PLACES_KEY = g('GOOGLE_PLACES_API_KEY');
+const PLACES_OFF = (process.env.ATLAS_PLACES || g('ATLAS_PLACES')) === '0';
+const PLACES_MONTHLY_CAP = Number(process.env.ATLAS_PLACES_MONTHLY_CAP || g('ATLAS_PLACES_MONTHLY_CAP') || 300);
+const PLACES_LEDGER = path.join(ROOT, 'data', 'places-usage.json');
+const placesMonth = () => new Date().toISOString().slice(0, 7);
+function placesUsed() {
+  try { return Number(JSON.parse(fs.readFileSync(PLACES_LEDGER, 'utf8'))[placesMonth()] || 0); } catch { return 0; }
+}
+function placesCount() {
+  let led = {};
+  try { led = JSON.parse(fs.readFileSync(PLACES_LEDGER, 'utf8')); } catch { /* first call this month */ }
+  led[placesMonth()] = Number(led[placesMonth()] || 0) + 1;
+  fs.mkdirSync(path.dirname(PLACES_LEDGER), { recursive: true });
+  fs.writeFileSync(PLACES_LEDGER, JSON.stringify(led, null, 2) + '\n');
+}
+const placesReady = () => !!PLACES_KEY && !PLACES_OFF && placesUsed() < PLACES_MONTHLY_CAP;
 /** The audit read a block page (HTTP 403 etc.), so its score measures the firewall, not the business. */
 const blockedAudit = (a) => TRUE_CONTACTS_ON && !!(a && a.blocked);
 const BLOCKED_LINE = (lead) =>
@@ -466,6 +488,41 @@ async function bdSerpBusinesses(target) {
 
 /** Businesses with a website, from the maps engine — same data shape Places returns. */
 async function mapsSearch(target) {
+  if (placesReady()) {
+    // One request = one billed event, up to 20 businesses. Counted BEFORE the call, so a
+    // timeout still counts against the cap (Google may have billed it).
+    placesCount();
+    const m = String(target.ll || '').match(/@(-?[\d.]+),(-?[\d.]+)/);
+    const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': PLACES_KEY,
+        'X-Goog-FieldMask':
+          'places.displayName,places.websiteUri,places.internationalPhoneNumber,places.rating,places.userRatingCount,places.businessStatus',
+      },
+      body: JSON.stringify({
+        textQuery: `${target.q} ${target.city}`,
+        maxResultCount: 20,
+        languageCode: target.hl || 'es',
+        ...(m ? { locationBias: { circle: { center: { latitude: Number(m[1]), longitude: Number(m[2]) }, radius: 30000 } } } : {}),
+      }),
+      signal: AbortSignal.timeout(60000),
+    });
+    if (!r.ok) throw new Error(`Places ${r.status}`);
+    const d = await r.json();
+    console.log(`[lead-machine] supply: Google Places (${placesUsed()}/${PLACES_MONTHLY_CAP} this month, free cap 1,000)`);
+    return (d.places || [])
+      .filter((x) => x.websiteUri && x.displayName?.text && (x.businessStatus || 'OPERATIONAL') === 'OPERATIONAL')
+      .map((x) => ({
+        company: String(x.displayName.text).trim(),
+        website: String(x.websiteUri).trim(),
+        phone: x.internationalPhoneNumber ? String(x.internationalPhoneNumber).trim() : null,
+        rating: x.rating ?? null,
+        reviews: x.userRatingCount ?? null,
+        city: target.city,
+      }));
+  }
   const u =
     `https://serpapi.com/search.json?engine=google_maps&type=search` +
     `&q=${encodeURIComponent(target.q)}&ll=${encodeURIComponent(target.ll)}&hl=es&api_key=${SERP}`;
@@ -1301,7 +1358,7 @@ if (require.main === module) (async () => {
       // organic search cannot. When it has no quota (cancelled Aug 11 2026) we go
       // straight to Bright Data rather than throwing the lane away — that `continue`
       // is what would have made this Monday, and every Monday after, produce zero.
-      businesses = (await serpHasQuota()) ? await mapsSearch(target) : await bdSerpBusinesses(target);
+      businesses = placesReady() || (await serpHasQuota()) ? await mapsSearch(target) : await bdSerpBusinesses(target);
     } catch (e) {
       console.warn(`[lead-machine] "${target.q}" primary supply failed: ${String(e.message).slice(0, 90)}`);
       // A provider hiccup must not silently cost a lane. Try the other supply once.
@@ -1491,4 +1548,4 @@ async function publishOutreachArtifacts(count) {
  * the drift only surfaces when a prospect gets a letter nobody reviewed.
  * Guarded by require.main so exporting never triggers the run above.
  */
-module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, pickBestEmail, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
+module.exports = { buildDraft, buildFuDraft, buildWaDraft, buildFuWaDraft, pickBestEmail, mapsSearch, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };
