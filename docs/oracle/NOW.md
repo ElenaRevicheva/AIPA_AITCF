@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (AIGO kit sync) | 2026-10-13 01:30 | Elena: sync laptop = git = Oracle for the AIGO kit; Atlas kit behind ATLAS_AIGO_KIT (off) so Monday stays her switch | scripts/atlas-lead-machine.cjs, docs/selling/prospect-meta.cjs, docs/selling/aigo-kit.cjs on Oracle (named-file scp, no PM2) | 797a493e |
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
 
 **Rules**
@@ -131,6 +130,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 13 Oct — AIGO kit SYNCED laptop = git = Oracle · Atlas kit behind `ATLAS_AIGO_KIT` (OFF) · Elena's switch · claim released
+- **DONE:** `scripts/atlas-lead-machine.cjs` carries the kit only when `ATLAS_AIGO_KIT=1` (read from Oracle `.env` OR the cron line — the script parses
+  `.env` itself, so a process.env-only switch would have ignored it). Deployed by named-file scp with `prospect-meta.cjs`, `aigo-kit.cjs`, the backfill
+  script; backups `~/_session-backups/aigo-kit-sync-20261013/`. No PM2 restart (cron + CLI scripts only).
+- **VERIFIED BY:** md5 git = laptop = Oracle for all 4 files (atlas-lead-machine `ad806200…`); switch OFF → 180/180 letters identical to Oracle's pre-kit
+  machine + WA text identical to a real 12 Oct draft; `.env` test: =1 → kit, =0 → none; on Oracle as configured → no kit; prospect-meta JSON md5
+  `1c418aee` unchanged. Switch is in neither Oracle `.env` nor crontab.
+- **NEXT (Elena's):** to switch Mondays on: add `ATLAS_AIGO_KIT=1` to Oracle `~/cto-aipa/.env` (one line, reversible). Recommended first: make Atlas reject
+  placeholder/guessed/complaints addresses + 403-blocked audits (4 of 8 bad on 12 Oct). Google Calendar 20 Nov 09:00 Panama event carries this (items 4–7).
+- **RISK:** none open from this change. Prospect addresses are kept OUT of git (pii-guard; contacts in gitignored `data/`).
 
 ### ✅ 13 Oct — AIGO kit SWITCHED ON for the 8 Atlas deals of 12 Oct (Elena's go) · Monday machine NOT switched on (her call) · claim released
 - **DONE:** `scripts/backfill-atlas-aigo-kit-20261012.cjs --apply` on Oracle (contacts in gitignored `data/atlas-backfill-20261013.json`, never in git).
