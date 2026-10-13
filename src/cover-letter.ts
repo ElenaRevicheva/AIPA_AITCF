@@ -294,7 +294,8 @@ export function ensureOperatingModel(letter: string): string {
  * reviewer outage, and a retry every ten minutes would pay for a new draft each time.
  */
 async function reviewLetterSentences(draft: string): Promise<{ letter: string; reviewer: string; dropped: string[] }> {
-  const paras = draft.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  // The sign-off gets its own paragraph even when the model glued it to the closing line.
+  const paras = draft.replace(/[ \t]*(Best regards,)/i, '\n\n$1').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
   const signAt = paras.findIndex((p) => /^best regards/i.test(p));
   const body = signAt >= 0 ? paras.slice(0, signAt) : paras;
   const sign = signAt >= 0 ? paras.slice(signAt) : [];
