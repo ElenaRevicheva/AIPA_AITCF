@@ -21,6 +21,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
+| Claude Code (audit-lead noise) | 2026-10-13 17:15 | Elena go: Telegram 'Visibility audit lead' — mute repeats of the same site from the same outside visitor within 30 days (mohave.edu bot every ~2 days); own-key pings unchanged | src/visibility-api.ts + dist; data/visibility-lead-seen.json (new); pm2 restart cto-aipa | f14b992c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
