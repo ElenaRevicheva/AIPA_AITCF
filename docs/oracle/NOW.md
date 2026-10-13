@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
+| Claude Code (no-website ICP) | 2026-10-13 20:40 | 9 pilot clinics staged in HubSpot (done). NOW: 2 guard clauses written LOCALLY for Elena to review (no-website intake; social/Maps link → honest 422). NOT deployed | src/diagnostic-delivery.ts, src/visibility-audit.ts, src/visibility-api.ts, scripts/test-diagnostic-delivery.cjs; no Oracle, no PM2 until Elena approves | 604e8931 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
