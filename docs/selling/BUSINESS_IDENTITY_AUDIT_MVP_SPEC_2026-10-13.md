@@ -191,3 +191,25 @@ channel, not the software, and nothing more gets built.
 - **Platform fields change:** the capability table is checked on business #1 and re-checked before each kit.
 - **Hub hosted on aideazz.xyz:** it is a page *about* the business on our domain; tell the owner plainly, offer the file for their domain.
 - **Small clinics:** most of the 9 have 0–27 reviews; budgets may be small. The pilot measures this.
+
+## 11. Revision 13 Oct (Elena): maximum reuse, near-zero build
+
+**New fact:** since 13 Oct the Atlas Monday job reads Google Places with Elena's key (self-cap 300/month, ledger
+`data/places-usage.json` on Oracle; commits `65e74faa`, `f14b992c`). Its `mapsSearch()` (`scripts/atlas-lead-machine.cjs:490`)
+**already receives the no-website businesses and drops them** (`.filter((x) => x.websiteUri …)`, ~`:514`).
+The 5 laptop Places requests of 12 Oct (the pilot list) used the same key and are **not** in that ledger.
+
+**So the pilot needs almost nothing new:**
+| Spec piece | Max-reuse replacement | Build |
+|---|---|---|
+| Finding businesses (B2) | Atlas Monday already fetches them: **keep** the no-website results in a side file + 1 line in its Telegram digest instead of dropping them. Add `places.googleMapsUri` to its field mask. Same request, no extra Places calls; nothing else in Atlas changes. | ~10 additive lines, Elena's go |
+| Record + validator (B1) | **HubSpot is the record**: Company (name, phone, address, city), Deal, and one Note holding the evidence matrix + canonical facts + consent lines. Screenshots via `scripts/hs-files.cjs` (PRIVATE). | 0 |
+| Matrix + mobile report (B3) | For 9 businesses: written per business by Claude; the "mobile report" is the WhatsApp message itself (3 findings). | 0 |
+| Kit generator (B4) | Written per paying client by Claude from the confirmed facts, checked with the existing `ungroundedNumbers` / `quotedIn` (`src/cover-letter.ts`). | 0 |
+| Identity hub (B5) | Hand-written flat file per paying client + `_redirects` line, then `runVisibilityAudit` on it. | 0 |
+| HubSpot glue (B6) | MCP / existing staging; deals in 🔥 I Act TODAY surface in the morning brief. | 0 |
+| Sales samples | `docs/selling/aigo-kit.cjs`: deck PDF + the industry promo film (already in Atlas letters). | 0 |
+| Payment | `/pay/analisis-tecnico` ($100), existing delivery to HubSpot. | 0 |
+
+**Total build for the pilot: B0 (two guard clauses) + the Atlas keep-no-website change ≈ 0.5–1 agent day.**
+B1–B6 are built only after ≥2 of 9 pay, and only the piece that took the most minutes.

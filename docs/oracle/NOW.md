@@ -144,6 +144,9 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ℹ️ 13 Oct — Places key: 5 laptop requests on 12 Oct NOT in the Atlas ledger
+- Claude Code ran 5 Places Text Search requests from the laptop (no-website pilot list, `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md`). Same key as Atlas; `data/places-usage.json` on Oracle does not count them. Tiny vs the free cap, but the ledger is not the whole account. Plan to reuse Atlas instead of laptop searches: `docs/selling/BUSINESS_IDENTITY_AUDIT_MVP_SPEC_2026-10-13.md` §11 (not built, Elena's go).
+
 ### ✅ 13 Oct ~17:40 UTC — SYNC CHECK laptop = GitHub = Oracle after 12–13 Oct work (Elena asked)
 - **cto-aipa:** laptop = GitHub (`aa16ca10`); Oracle dist 93/93 = build of GitHub (+ `hashnode-daily.js`, a stale Aug build no cron uses — left);
   369 tracked scripts/src: 3 stale OLDER Oracle copies refreshed (aigo-promo-gen, check_oracle_health, test-job-tailor; backup `~/_session-backups/sync-20261013/`;
