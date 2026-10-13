@@ -131,6 +131,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 13 Oct ~14:30 UTC — kit enhancement level in all three copies (laptop = origin/main = Oracle) · first new deal exposed two fetcher bugs, both fixed and verified
+- **DONE:** md5 of every file touched 12–13 Oct equal in all three places (11 files + gitignored `dist/cover-letter.js` laptop = Oracle); aideazz
+  level with origin. SPACE44 (the first new deal under the new code) got its full kit at 07:40 but every OpenAI structured call was 400
+  `Invalid body` → Gemini fallback. Bisect probe proved it: the posting cut at 6,000 chars inside an emoji (lone `\ud83d`); second bug:
+  `&#x27;` left raw by the fetcher. Both fixed inside `src/cover-letter.ts` (+ composer's request builder): b7edaf04, e9189da0, b89f5d98.
+- **VERIFIED BY:** probe A (as fetched) 400 / B (surrogate stripped) 200 / C bank 200 / D defense bank 200; after deploy, composeCv on the
+  SPACE44 posting via the kit's own fetch → `openai:gpt-4.1 + review openai:gpt-5`, 3 verbatim headings / 8 bullets; `tsc` 0 errors; 15/15.
+  Record: `docs/oracle/2026-10-12_apply_kit_profound_plan.md` (13 Oct section).
+- **NEXT (Elena's):** apply to CodeRoad. SPACE44's CV/🎯 were Gemini-reviewed — say the word and I run `--recompose --only=65894501929`
+  (model spend) so it gets the gpt-5-reviewed version added on top.
+- **RISK:** never judge Oracle's checkout by `git diff` — its HEAD is deliberately old; use `test -f` + md5. A posting that trips the
+  OpenAI 400 again would show `[cv-compose] openai 400` in `~/logs/apply-kit.log`; the fallback is loud, not silent.
+
+
 ### ✅ 13 Oct — AIGO kit SYNCED laptop = git = Oracle · Atlas kit behind `ATLAS_AIGO_KIT` (OFF) · Elena's switch · claim released
 - **DONE:** `scripts/atlas-lead-machine.cjs` carries the kit only when `ATLAS_AIGO_KIT=1` (read from Oracle `.env` OR the cron line — the script parses
   `.env` itself, so a process.env-only switch would have ignored it). Deployed by named-file scp with `prospect-meta.cjs`, `aigo-kit.cjs`, the backfill

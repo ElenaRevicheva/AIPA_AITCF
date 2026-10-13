@@ -77,3 +77,24 @@ Hand-built CVs stay protected by the hand-built guard. VJH's own letter generato
 
 Not done, by design: the composer still cannot put a posting heading over a past role; a reviewer that drops every job-search line
 for a "backlog" heading leaves the kit on the generic job-tailor CV for that deal (the `(not shaped: …)` log line + ✖CV in the audit).
+
+## 13 Oct 2026 — the first new deal under the new code, and two fetcher bugs it exposed
+
+SPACE44 (AI Solutions Architect) arrived 07:34 UTC and the 07:40 run built its whole kit (🔎 🎯 🛡️ + shaped CV, ✅ letter, 📋) — but all
+four OpenAI structured calls answered `400 Invalid body: failed to parse JSON value` and fell back to Gemini, so that deal's CV was
+composed AND reviewed by Gemini. The error appears nowhere else in the log; a bisect probe on Oracle proved the cause: the posting
+is cut at exactly 6,000 characters inside an emoji, leaving a lone high surrogate (`\ud83d` at index 5,999) that JSON.stringify
+writes as a bare escape and OpenAI's parser refuses. Probe: posting as fetched → 400; the same posting with the lone surrogate
+removed → 200; the CV bank → 200; the defense bank → 200. Second bug found on the re-probe: the fetcher left `&#x27;` raw and turned
+`&#39;` into a space, so the posting read "organisation&#x27;s" and the composer rejected a heading the model had copied faithfully.
+
+Fixed inside the existing functions (`src/cover-letter.ts`: `stripLoneSurrogates` applied to fetched postings and to every OpenAI JSON
+request, `htmlToText` decodes hex/decimal entities, quotes and apostrophes; `scripts/lib/cv-compose.cjs` sanitises its own request
+builder). Commits b7edaf04, e9189da0, b89f5d98. Deployed by named-file scp, md5 equal laptop = Oracle; `tsc` 0 errors; letter test 15/15.
+Re-probe on the SPACE44 posting through the kit's own fetch: 0 lone surrogates; composeCv → `openai:gpt-4.1 + review openai:gpt-5`,
+3 verbatim headings / 8 bullets, fit_note captured. The SPACE44 deal keeps its Gemini-built kit (additive rule); `--recompose
+--only=65894501929` by hand would rebuild its CV on the OpenAI pair (model spend — her call).
+
+Consistency check (Elena, 13 Oct): every file touched this session is byte-equal on the laptop, origin/main and Oracle's checkout
+(11 files + the gitignored compiled module); the aideazz repo is level with its origin. Oracle's git HEAD stays deliberately old
+(named-file deploys) — a `git diff origin/main` there shows files it does not track as "deleted"; `test -f` + md5 is the real check.
