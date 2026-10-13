@@ -145,6 +145,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 13 Oct ~19:10 UTC — SPACE44 (AI Solutions Architect, deal 65894501929) re-stuffed with the gated kit · Elena's move: apply
+- **DONE (additive, 9 → 13 notes, nothing removed; backups `~/_session-backups/regen-65894501929-20261013/`):** new 🎯 (pitch passed
+  gpt-5 review, 5 grounded answers, 1 honest gap on "7+ years in solutions architecture"); new CV `…_SPACE44_v2.pdf` (3 verbatim duty
+  headings / 7 lines, gpt-4.1 + gpt-5 review, reviewer's note printed on the 🛡️ line); two machine ✅ letters came out true but thin
+  (the reviewer removed 5, then 2 sentences — paraphrase casualties; two prompt rounds, then stopped under the golden rule); so the
+  letter to use is the **✉️ COVER LETTER (hand-written 13 Oct)** note (bank lines matched to the posting; v2 CV attached) + its 📋 prompt.
+  File: `docs/applications/cv-by-job/space44-ai-solutions-architect/COVER_LETTER.txt`.
+- **VERIFIED BY:** HubSpot read-back: 🛡️ attachments `224238640052;224272324402`, first 📎 line names v2 with the reviewer's note, old line kept;
+  ✉️ note carries the letter + CV 224272324402; 📋 note carries the hand letter.
+- **NEXT (Elena's):** open the deal → ✉️ letter → 📋 prompt → v2 CV on the 🛡️ note → apply. Which to use is written on each note.
+- **RISK:** the kit's machine letter is TRUE but SHORT on postings far from her evidence (reviewer cuts paraphrases) — read the ✅ note before
+  pasting on future deals; a hand-written ✉️ letter stops the kit from drafting another one.
+
+
 ### ✅ 13 Oct ~17:40 UTC — claim gates live: 🎯 pitch and ✅ letter now reviewed by gpt-5; CV floor 2/5 · verified by dry run on the SPACE44 posting · claim released
 - **DONE:** Elena's go ("the letter and the pitch are grounded but unguarded … yes, we need to fix that"). Inside existing functions only:
   pitch appended to the reviewer's answer list (unsupported → redraft; last attempt → dropped, never shipped bent); letter sentences through
