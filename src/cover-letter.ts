@@ -309,6 +309,7 @@ async function reviewLetterSentences(draft: string): Promise<{ letter: string; r
     'You are a strict reviewer protecting a job candidate from writing anything untrue in a cover letter.',
     'For EACH sentence: supported=true only if every claim about her (actions, results, years, titles, tools, availability, dates) is stated in the EVIDENCE. A posting duty rewritten as her experience ("I understand how client organizations operate") is unsupported. A number of years attached to a field she never held it in is unsupported.',
     'Her operating-model sentence (quoted in the evidence) is supported. A sentence that only names the role she is applying for, or only closes the letter politely without a claim about her, is supported.',
+    'A sentence that restates an evidence line in slightly different words, with the same actor, the same action and the same numbers, is supported. Unsupported means a NEW claim: a stronger verb than the evidence ("built" where it says "designed"), a result or number the evidence does not state, or a duty of the posting presented as her experience.',
     'Return JSON only: {"sentences":[{"i":0,"supported":true,"unsupported_claim":""}]}',
   ].join('\n');
   const revUser = `EVIDENCE:\n${evidence}\n\nSENTENCES:\n${sentences.map((x, i) => `${i}. ${x.s}`).join('\n')}`;
@@ -371,6 +372,7 @@ export async function generateCoverLetter(input: {
     'STYLE: 150-220 words. Plain, direct, specific. Four short paragraphs at most.',
     'Open with the role. Then the two or three things from the verified facts that most directly match THIS posting, said concretely. Close with a short availability line.',
     '- After the opening sentence, every sentence carries one concrete verified fact chosen for the duties THIS posting names: a number, a named system, a named incident or a dated result, in the words of the facts. Never write filler such as "this experience has helped me understand", "positions me to" or "I am confident that".',
+    '- State each fact in the wording the facts use: "designed the rubric" stays "designed", "led strategic planning" stays "led", "15 production services and 20 scheduled jobs carry out operations" stays as written. A paraphrase that changes the verb ("built", "developed", "managed") or adds a result the facts do not state is removed by the reviewer and shortens the letter.',
     'Sign off exactly as: Best regards,\\nElena Revicheva\\nhttps://aideazz.xyz',
   ].join('\n');
 
