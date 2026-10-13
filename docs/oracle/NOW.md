@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (no-website ICP) | 2026-10-12 23:00 | Elena go: 1 Google Places search (yacht/dental Panama) → best 10 no-website leads staged in HubSpot + WhatsApp drafts. Later (NOT yet): guard clauses in diagnostic-delivery.ts + visibility-audit.ts, Atlas country switch | HubSpot (new [CLIENT-MANUAL] deals only), docs/selling/NO_WEBSITE_*; no Oracle, no PM2 | — |
-| Claude Code (blog own-site-first) | 2026-10-13 20:30 | Elena go: daily blog publishes to aideazz.xyz first, Dev.to best-effort; DEVTO_PAUSED=1 during the suspension; re-run today's post | src/daily-blog-publisher.ts, src/blog-es-bundle.ts + dist, scripts/incident-to-blog.cjs, Oracle .env (+DEVTO_PAUSED); pm2 restart cto-aipa | a56a3264 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅/⚠️ 13 Oct ~20:25 UTC — Daily blog publishes to aideazz.xyz FIRST, Dev.to optional · `DEVTO_PAUSED=1` on Oracle · live · claim released
+- **DONE (Elena's go):** `src/daily-blog-publisher.ts` — cache + static page ship first, Dev.to after, best-effort (401 / no key / `DEVTO_PAUSED=1` → skipped, Telegram says so);
+  `scripts/incident-to-blog.cjs` respects `DEVTO_PAUSED`; `blog-es-bundle` falls back to the aideazz URL. Commit e109bd9c. tsc: only the 2 intended dist files changed.
+  `pm2 restart cto-aipa --update-env` 20:20:47 > files 20:20:40. Backup `~/_session-backups/blog-own-site-first-20261013/` (incl. .env).
+- **VERIFIED BY:** log `Dev.to cross-post paused … aideazz.xyz only today`; both new pages 200 on aideazz.xyz; GitHub blog-static commits 20:21.
+- **⚠️ MY MISTAKE — TWO posts today, same incident:** the restart fired the publisher's own catch-up AND I fired `/blog/daily-run` 10 s later; both ran concurrently, so
+  the near-duplicate guard saw neither: `ai-agent-time-zone-fix-when-us-pacific-hours-vetoed-a-job` (849 words) and
+  `ai-agent-judge-veto-overrides-when-code-corrects-live-decisions` (1208 words), both the Epoch AI time-zone veto, 57% shared vocabulary. Elena decides: keep one + canonical the other (CLAUDE.md rule).
+- **LESSON / NEXT:** after a cto-aipa restart, check for `catch-up … firing` before any manual `/blog/daily-run`. Re-enable Dev.to = remove `DEVTO_PAUSED` from .env after Dev.to reinstates the account.
 
 ### ⏳ 13 Oct — DAILY BLOG STOPPED since 10 Oct: Dev.to SUSPENDED the account (not a key or billing problem) · appeal sent · Elena's move: wait for Dev.to
 - **Proof:** key active + byte-identical to Oracle `.env`; every authenticated call 401 (laptop + Oracle); dev.to/new = "Your account has been suspended".
