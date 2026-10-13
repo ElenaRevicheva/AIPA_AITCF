@@ -193,10 +193,31 @@ async function fetchStructured(jobUrl: string): Promise<string> {
  * apply link are useful even when the letter is boilerplate.
  */
 /** Exported 28 Sep 2026: the apply kit tailors the CV and defense note to the same posting text. */
+/**
+ * A posting cut at MAX_JD_CHARS can end in the first half of an emoji. JSON.stringify writes that lone surrogate as a
+ * bare "\ud83d" escape and OpenAI refuses the whole request: 400 "Invalid body: failed to parse JSON value" — every
+ * structured call for the SPACE44 deal (13 Oct 2026, posting cut at 5,999 inside "🔥") fell back to Gemini. Scraped
+ * text can also carry lone surrogates mid-string, so this drops every unpaired one, and nothing else.
+ */
+export function stripLoneSurrogates(s: string): string {
+  let out = '';
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c >= 0xd800 && c <= 0xdbff) {
+      const n = s.charCodeAt(i + 1);
+      if (n >= 0xdc00 && n <= 0xdfff) { out += s[i] + s[i + 1]; i++; }
+      continue;
+    }
+    if (c >= 0xdc00 && c <= 0xdfff) continue;
+    out += s[i];
+  }
+  return out;
+}
+
 export async function fetchJobDescription(jobUrl?: string): Promise<string> {
   if (!jobUrl || !/^https?:\/\//i.test(jobUrl)) return '';
 
-  const structured = await fetchStructured(jobUrl);
+  const structured = stripLoneSurrogates(await fetchStructured(jobUrl));
   if (structured.length >= MIN_JD_CHARS) return structured;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
@@ -214,7 +235,7 @@ export async function fetchJobDescription(jobUrl?: string): Promise<string> {
     if (!res.ok) return '';
     const ct = res.headers.get('content-type') || '';
     if (!/text\/html|application\/xhtml|text\/plain/i.test(ct)) return '';
-    return htmlToText(await res.text()).slice(0, MAX_JD_CHARS);
+    return stripLoneSurrogates(htmlToText(await res.text()).slice(0, MAX_JD_CHARS));
   } catch {
     return '';
   } finally {
@@ -404,7 +425,7 @@ async function openaiJson(system: string, user: string, modelOverride?: string):
     method: 'POST',
     headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
     body: JSON.stringify({ model, ...(reasoning ? {} : { temperature: 0.2 }), response_format: { type: 'json_object' },
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+      messages: [{ role: 'system', content: stripLoneSurrogates(system) }, { role: 'user', content: stripLoneSurrogates(user) }] }),
     signal: AbortSignal.timeout(reasoning ? 240_000 : 90_000),
   });
   const j = (await r.json()) as { choices?: { message?: { content?: string } }[]; error?: { message?: string } };

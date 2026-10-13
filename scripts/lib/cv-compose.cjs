@@ -21,7 +21,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const BANK = path.join(ROOT, 'docs', 'applications', 'cv-bank.json');
-const { norm, describesHerAlone } = require(path.join(ROOT, 'dist', 'cover-letter.js'));
+const { norm, describesHerAlone, stripLoneSurrogates } = require(path.join(ROOT, 'dist', 'cover-letter.js'));
 
 const MIN_JD = 200;
 // Professional Outlook text — it lives in the Outlook, never in a role's CV (Elena, 11 Oct 2026).
@@ -87,8 +87,10 @@ async function openaiJson(system, user, model) {
   const r = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+    // 13 Oct 2026: a posting cut inside an emoji leaves a lone surrogate; JSON.stringify writes it as a bare escape and
+    // OpenAI answers 400 "Invalid body" (SPACE44 — every structured call fell back to Gemini). Strip unpaired halves.
     body: JSON.stringify({ model, ...(reasoning ? {} : { temperature: 0.2 }), response_format: { type: 'json_object' },
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+      messages: [{ role: 'system', content: stripLoneSurrogates(system) }, { role: 'user', content: stripLoneSurrogates(user) }] }),
     signal: AbortSignal.timeout(reasoning ? 240_000 : 90_000),
   });
   const j = await r.json();
