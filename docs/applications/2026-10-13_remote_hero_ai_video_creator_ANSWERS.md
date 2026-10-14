@@ -40,7 +40,7 @@ All of my experience below is from my own AI studio, AIdeazz AI Lab (ATUONA AI F
 
 *1. Portfolio*
 
-How I make these: I don't hand-make every frame, and I don't just type prompts into a chatbot. I designed my own production pipeline and I run it. I own the concept, script, shot plan, engine choice, review and final cut; AI coding agents (Claude Code, Cursor) write the pipeline code under my direction. Built-in controls:
+How I make these: I designed my own production pipeline and I run it. I own the concept, script, shot plan, engine choice, review and final cut; AI coding agents (Claude Code, Cursor) write the pipeline code under my direction. Built-in controls:
 • Engine tests: the same keyframe goes through several engines side by side (10 tries on one AREAREA shot); I pick on face consistency and realism.
 • Consistent characters: one reference portrait per character feeds every keyframe.
 • Budget in code: every generation is priced before it's sent, refused if it would pass the film's budget, and logged. The costs below come from that log.
