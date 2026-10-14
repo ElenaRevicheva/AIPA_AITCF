@@ -121,6 +121,8 @@ async function digest(outPath) {
     '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly.',
     '# Only if the command FAILED or printed no READ-PROOF line: "⚠️ Deal NOT fully loaded" — never guess it, never skip running it.',
     '# Ask ONE mock question per message (🎙️ Q<n>/<total>) — never list the whole series.',
+    '# SPANISH (Elena, 14 Oct 2026): "en español" or she writes in Spanish → the WHOLE interview in Spanish (questions, polished',
+    '# answer, explanations) and EVERY message ends with a Spanish [[tts:text]]…[[/tts:text]] voice block; use the §0b template.',
     '# LIVE RULE (Elena, 11 Oct 2026): if she pastes an INTERVIEWER\'S question (not her answer to your mock question), reply',
     '# "🔴 LIVE — say this:" + ONE first-person answer, 3–5 sentences, true facts from the deal only — no other sections, no next',
     '# question, no voice note. FACTS always: titles exactly "Deputy CEO for Corporate Governance & Chief Legal Officer" (never',
@@ -155,6 +157,13 @@ function printVerifiedExamples() {
     if (ex.length) {
       console.log('\n===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):');
       ex.forEach((t, i) => console.log(`${i + 1}. ${t}`));
+    }
+    // 14 Oct 2026 (Pitz, Spanish interview): a model TRANSLATING a story bent "1–10 October" into "una semana" — so the
+    // Spanish versions are written once, numbers checked against the English, and copied like the English ones.
+    const es = (bank.bullets || []).map((b) => String(b.text_es || '').trim()).filter(Boolean);
+    if (es.length) {
+      console.log('\n===== ✅ EJEMPLOS VERIFICADOS (ES) — para "Por ejemplo, en mi trabajo:" copia UNO PALABRA POR PALABRA (cifras verificadas):');
+      es.forEach((t, i) => console.log(`${i + 1}. ${t}`));
     }
   } catch (e) { console.log(`\n(verified examples unavailable: ${e.message.slice(0, 80)})`); }
 }

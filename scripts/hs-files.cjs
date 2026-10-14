@@ -34,6 +34,7 @@ const ATTACH_SEP = ';';
 const MIME = {
   '.pdf': 'application/pdf',
   '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
 function authHeaders() {
@@ -104,15 +105,18 @@ async function findExistingFile(name) {
 }
 
 /**
- * Upload one attachment. Returns { id, name, reused }.
+ * Upload one attachment. Returns { id, name, reused, url }.
  * `access: PRIVATE` — a signed contract must not become a public URL.
+ * `access: PUBLIC_NOT_INDEXABLE` (14 Oct 2026, opt-in only) — an UNLISTED address search engines do not index, for a
+ * job posting a recruiter sent only as a PDF: the apply kit reads postings from a link, and the recruiter's private
+ * job description must not go on the public site or the public repo.
  */
-async function uploadOutreachFile(absPath, displayName) {
+async function uploadOutreachFile(absPath, displayName, access = 'PRIVATE') {
   if (!fs.existsSync(absPath)) throw new Error(`no such file: ${absPath}`);
   const name = displayName || path.basename(absPath);
 
   const existing = await findExistingFile(name);
-  if (existing?.id) return { id: String(existing.id), name, reused: true };
+  if (existing?.id) return { id: String(existing.id), name, reused: true, url: existing.url };
 
   const ext = path.extname(name).toLowerCase();
   const form = new FormData();
@@ -122,7 +126,7 @@ async function uploadOutreachFile(absPath, displayName) {
   form.append(
     'options',
     JSON.stringify({
-      access: 'PRIVATE',
+      access,
       overwrite: false,
       duplicateValidationStrategy: 'RETURN_EXISTING',
       duplicateValidationScope: 'EXACT_FOLDER',
@@ -148,7 +152,7 @@ async function uploadOutreachFile(absPath, displayName) {
   if (!r.ok) throw new Error(`upload failed ${r.status}: ${r.text.slice(0, 200)}`);
   const id = r.json?.id;
   if (!id) throw new Error(`upload returned no id: ${r.text.slice(0, 160)}`);
-  return { id: String(id), name, reused: false };
+  return { id: String(id), name, reused: false, url: r.json?.url };
 }
 
 /** Union file ids onto a note. Returns { before, after, added }. */

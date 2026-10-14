@@ -181,7 +181,8 @@
         "measurement",
         "research",
         "geo"
-      ]
+      ],
+      "text_es": "AI Visibility Audit API: un producto público, lanzado en julio de 2026: cualquier persona pega la dirección de un sitio web y, sin iniciar sesión, obtiene una calificación de qué tan bien ChatGPT, Perplexity y Claude pueden encontrarlo y citarlo. Diseñé la rúbrica —34 verificaciones en 4 categorías ponderadas— y un resultado que un comprador no técnico puede usar: una calificación, y la corrección y la razón de cada verificación fallida. Solo en los registros del servidor del 1 al 10 de octubre: 39 auditorías de 18 sitios web — 18 hechas por personas en la página pública y 21 por mis propios agentes de prospección antes de contactar a un nuevo prospecto."
     },
     {
       "id": "b-acceptance-criteria-are-tests",
@@ -192,7 +193,8 @@
         "quality",
         "evaluation",
         "launch"
-      ]
+      ],
+      "text_es": "Mis criterios de aceptación son pruebas: un cambio se acepta solo cuando las pruebas y los registros de producción demuestran que funciona. Más de 600 pruebas automatizadas en capas unitarias, de integración y de evaluación."
     },
     {
       "id": "b-model-vs-code-spec",
@@ -204,7 +206,8 @@
         "governance",
         "screening",
         "iteration"
-      ]
+      ],
+      "text_es": "La especificación define qué decide el modelo y qué decide el código: los datos duros de una oferta, como una restricción de país o una cifra salarial, se verifican en código; los juicios van al modelo. Cuando una de mis reglas de excepción dejó pasar por error tres ofertas porque vio \"LATAM\" e ignoró \"U.S. only\", la cambié para que consulte el mismo verificador de ubicación que usan los filtros."
     },
     {
       "id": "b-prioritized-from-outcome-data",
@@ -217,7 +220,8 @@
         "iteration",
         "recommendation",
         "sourcing"
-      ]
+      ],
+      "text_es": "Prioricé con datos de resultados. En mi pipeline de búsqueda de empleo, las etiquetas de resultado mostraron que una categoría de puesto sumaba 7 de las 12 ofertas que rechacé, pero solo 2 de las 12 que califiqué como positivas. La saqué de la segmentación en menos de un día y reorienté las búsquedas hacia las categorías que encajan."
     },
     {
       "id": "b-said-no-on-evidence",
@@ -230,7 +234,8 @@
         "recommendation",
         "sourcing",
         "documentation"
-      ]
+      ],
+      "text_es": "Dije que no con evidencia. Dos bolsas de empleo parecían igual de buenas en sus sitios, pero una no tenía ninguna oferta con menos de 33 días y el 91% estaba vencida según su propia fecha de expiración. La rechacé, conecté la otra y dejé por escrito el porqué."
     },
     {
       "id": "b-vendor-retired-models",
@@ -241,7 +246,8 @@
         "prioritization",
         "monitoring",
         "ai-agents"
-      ]
+      ],
+      "text_es": "Decidí bajo incertidumbre. Cuando un proveedor retiró los modelos de IA que usaban mis servicios, migré los seis productos a una cadena de respaldo de cinco proveedores esa misma semana, sin interrupción del servicio."
     },
     {
       "id": "b-espaluz-lost-signups",
@@ -253,7 +259,8 @@
         "monitoring",
         "crm",
         "quality"
-      ]
+      ],
+      "text_es": "Los registros de prueba de EspaLuz, mi bot tutor de idiomas, nunca habían llegado al CRM desde el lanzamiento, mientras el registro del emisor se veía sano. Lo encontré auditando desde el extremo receptor, lo corregí y recuperé a los 28 usuarios perdidos."
     },
     {
       "id": "b-reply-detector",
@@ -266,7 +273,8 @@
         "monitoring",
         "sales-ops",
         "user-problems"
-      ]
+      ],
+      "text_es": "Construí un detector de respuestas para que la respuesta de un prospecto no se pierda en la bandeja de entrada: lee dos bandejas y cruza cada remitente con el CRM. Reproducido sobre 60 días de correo real, redujo 2,432 correos a los 73 de personas vinculadas a un deal, incluida la respuesta de un prospecto que llevaba casi ocho semanas sin verse. En vivo, revisa cada 10 minutos y me alerta con el deal enlazado."
     },
     {
       "id": "b-rag-upgrade-stayed-off",
@@ -278,7 +286,8 @@
         "iteration",
         "quality",
         "screening"
-      ]
+      ],
+      "text_es": "Una mejora de mi paso de evaluación con IA (recuperación, RAG) obtuvo un puntaje menor en un conjunto de prueba construido con mis propias decisiones pasadas, así que quedó desactivada: un cambio que mide peor no se publica, por sofisticado que sea."
     },
     {
       "id": "b-new-source-72-percent",
@@ -289,7 +298,8 @@
         "sourcing",
         "evaluation",
         "research"
-      ]
+      ],
+      "text_es": "Una nueva fuente de empleos pasó mi filtro en vivo el 72% de las veces, sobre sus 345 ofertas, así que se quedó."
     },
     {
       "id": "b-fixed-the-measurement",
@@ -300,7 +310,8 @@
         "evaluation",
         "quality",
         "iteration"
-      ]
+      ],
+      "text_es": "Corrijo la medición misma: la reproducción de mis evaluaciones estaba calificando contra ofertas en blanco, así que su puntaje medía el vacío. Ahora cada decisión se guarda con su oferta real y se reproduce antes de publicar un cambio."
     },
     {
       "id": "b-ran-is-not-worked",
@@ -311,7 +322,8 @@
         "quality",
         "reliability",
         "measurement"
-      ]
+      ],
+      "text_es": "\"Se ejecutó\" no es \"funcionó\": una ruta de búsqueda corría a tiempo con sus filtros apagados en silencio. La primera ejecución corregida rechazó cinco resultados basura que antes se convertían en deals del CRM."
     },
     {
       "id": "b-spending-cap",
@@ -322,7 +334,8 @@
         "reliability",
         "governance",
         "quality"
-      ]
+      ],
+      "text_es": "Encontré un tope de gasto que nunca podía activarse: el control de presupuesto leía un campo de precio que el proveedor nunca envía. Lo corregí con la respuesta real del proveedor y publiqué el postmortem."
     },
     {
       "id": "b-agent-coordination-protocol",
@@ -333,7 +346,8 @@
         "documentation",
         "governance",
         "ai-agents"
-      ]
+      ],
+      "text_es": "Definí el protocolo de coordinación que siguen tres agentes de IA de programación aunque no pueden ver los chats de los otros: reclamar antes de tocar sistemas compartidos, un bloque de traspaso en cada pausa (hecho / siguiente / verificado por / riesgo) y cada entregable en un archivo o en el CRM, nunca solo en un chat."
     },
     {
       "id": "b-crm-stages-and-audit",
@@ -345,7 +359,8 @@
         "sales-ops",
         "monitoring",
         "quality"
-      ]
+      ],
+      "text_es": "Cada etapa del CRM se nombra según de quién es el siguiente paso; un envío aprobado mueve el deal, registra la entrega y agenda el seguimiento. Una auditoría diaria de lectura revisa cada deal prioritario contra un estándar de completitud de seis partes y alerta ante cualquier hueco."
     },
     {
       "id": "b-morning-briefing",
@@ -356,7 +371,8 @@
         "research",
         "crm",
         "process"
-      ]
+      ],
+      "text_es": "Un briefing matutino reemplazó abrir registros uno por uno: la cola de prioridades del día, cada elemento con un resumen de la empresa con fuentes cuando existen."
     },
     {
       "id": "b-public-postmortems",
@@ -366,7 +382,8 @@
         "documentation",
         "process",
         "quality"
-      ]
+      ],
+      "text_es": "Publico los fallos abiertamente: más de 20 postmortems con nombre en una AI Operations Wiki pública, más un SOP de operaciones de IA."
     },
     {
       "id": "b-hallucination-guardrail",
@@ -381,7 +398,8 @@
         "governance",
         "publishing",
         "reliability"
-      ]
+      ],
+      "text_es": "Barrera contra alucinaciones. Cuando se agotó el saldo de un proveedor, mi publicador diario pasó a un modelo de respaldo más barato y durante diez semanas describió una base de datos que el sistema nunca ha usado, mientras cada ejecución se reportaba limpia. Lo detuve en el origen y lo reconstruí para escribir solo a partir de hechos medidos en el sistema en marcha: un artículo con una cifra ausente de ese paquete, o que nombre infraestructura no instalada, se rechaza y se regenera; si el modelo aun así no se mantiene dentro del paquete, se compone un artículo solo con evidencia a partir de las cifras autorizadas, y un día con muy pocos hechos verificados no tiene artículo."
     },
     {
       "id": "b-inquiry-concierge",
@@ -395,7 +413,8 @@
         "human-in-the-loop",
         "ai-agents",
         "launch"
-      ]
+      ],
+      "text_es": "Concierge de consultas (Make + Claude, con respaldo). Las consultas del formulario y del chat del sitio llegan a HubSpot de inmediato; un escenario de Make.com hace que Claude redacte la respuesta, y el correo sale solo después de una aprobación humana con un toque. Cuando se agotaron los créditos de IA de Make y los borradores se detuvieron en silencio, agregué un respaldo: mi servidor ahora redacta con una cadena de cinco proveedores si Make no respondió a tiempo, así ninguna consulta queda sin respuesta. Publicado como caso de estudio."
     },
     {
       "id": "b-approved-send-fail-closed",
@@ -408,7 +427,8 @@
         "sales-ops",
         "quality",
         "guardrail"
-      ]
+      ],
+      "text_es": "El outreach se envía tras una aprobación humana, que además mueve el deal, registra la entrega y agenda el seguimiento (más de 2,800 deals). El envío es fail-closed: si un adjunto no carga, el correo se rechaza. A veces eso cuesta un envío; un adjunto equivocado frente a un cliente cuesta confianza."
     },
     {
       "id": "b-golden-set-tests-minute",
@@ -419,7 +439,8 @@
         "quality",
         "measurement",
         "screening"
-      ]
+      ],
+      "text_es": "Más de 600 pruebas automatizadas en el pipeline de descubrimiento de empleos (unitarias, de integración y golden set), que corren en aproximadamente un minuto; más de 11,000 ofertas de empleo calificadas por el pipeline agéntico."
     },
     {
       "id": "b-hard-gates-before-model",
@@ -431,7 +452,8 @@
         "guardrail",
         "screening",
         "quality"
-      ]
+      ],
+      "text_es": "Una mejora propuesta con RAG no superó la línea base en una reproducción de 38 decisiones, así que quedó desactivada. Ubicación y salario son filtros duros en código que corren antes del modelo, así que el modelo no puede dejar pasar un empleo que no los cumple."
     },
     {
       "id": "b-services-degrade-not-stop",
@@ -442,7 +464,8 @@
         "monitoring",
         "infrastructure",
         "ai-agents"
-      ]
+      ],
+      "text_es": "15 servicios de producción de larga duración y 20 tareas programadas en una sola VM en la nube, todos con reinicio automático, con una cadena de respaldo de 5 proveedores de LLM para que la falla de un proveedor degrade el servicio en lugar de detenerlo."
     }
   ],
   "roles": {
