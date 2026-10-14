@@ -965,7 +965,11 @@ const HEARD_AS: [RegExp, string][] = [
   [/(^|\s)СТО\s+(?:AIPA|АИПА|АЙПА)(?=\s|$|[.,!?])/gi, "$1CTO AIPA"],
   [/\bC\.?T\.?O\.?\s+A\.?I\.?P\.?A\.?\b/gi, "CTO AIPA"],
   [/\bC[MN]O\s+AP+A\b/gi, "CMO AIPA"],
-  [/\b(?:ideas|idears|aideas)\b/gi, "AIdeazz"],
+  // Not plain "ideas" (14 Oct 2026, when this table went live on every voice note): "save these ideas" /
+  // "tengo ideas" are real words, and the idea-saving intent would have heard "AIdeazz" instead.
+  [/\b(?:idears|aideas)\b/gi, "AIdeazz"],
+  // "датировано CETA" (12 Oct 2026) — her Cita column, heard as an acronym and filed as the card title.
+  [/\bCETA\b/g, "Cita"],
   [/\bespa\s*luz\b/gi, "EspaLuz"],
   [/\bvibe\s*job\b/gi, "VibeJob"],
   [/\ba\s*tuona\b/gi, "Atuona"],
@@ -973,7 +977,7 @@ const HEARD_AS: [RegExp, string][] = [
   [/\bAlic[ea]\b/g, "Alisa"],
 ];
 
-function repairNames(text: string): string {
+export function repairNames(text: string): string {
   let out = text;
   for (const [re, to] of HEARD_AS) out = out.replace(re, to);
   return out;

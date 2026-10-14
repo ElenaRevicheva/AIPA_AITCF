@@ -94,7 +94,9 @@ import {
   pointsOnlyAtRecentCard,
   appendToCardDescription,
   panamaToday,
+  repairNames,
 } from './trello-voice';
+import { synthesizeBriefingMp3 } from './sprint-briefing/tts-openai';
 import {
   loadRadarLedger,
   radarKeyboard,
@@ -7527,7 +7529,12 @@ Ready to commit? Use:
     
     // Register for alerts
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
-    
+
+    // 14 Oct 2026: everything this voice note makes the bot reply is also SAID back (speakBack, in finally — every
+    // path below returns early, and each one must still be spoken).
+    let heard: string | null = null;
+    const replies: string[] = [];
+
     try {
       // Get voice file from Telegram
       const voice = ctx.message?.voice;
@@ -7556,6 +7563,12 @@ Ready to commit? Use:
       
       // Show what was heard
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
+      heard = transcription;
+      const sendText = ctx.reply.bind(ctx);
+      ctx.reply = ((text: string, other?: Parameters<typeof sendText>[1], signal?: Parameters<typeof sendText>[2]) => {
+        replies.push(text);
+        return sendText(text, other, signal);
+      }) as typeof ctx.reply;
 
       // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
       // Must run BEFORE Trello NLP so these specific commands reach their handler.
@@ -7606,6 +7619,9 @@ Ready to commit? Use:
     } catch (error) {
       console.error('Voice message error:', error);
       await ctx.reply('❌ Error processing voice message. Please try typing instead.');
+    } finally {
+      // Not awaited: updates are handled one at a time, so a slow voice would hold up her next message.
+      if (heard) void speakBack(ctx, heard, replies);
     }
   });
   
@@ -8725,6 +8741,18 @@ const WHISPER_PROMPT = [
   'Columns: Cita. Датировано. Надо сделать. Поток. В приоритете.',
 ].join(' ');
 
+/**
+ * Every voice note leaves through here (14 Oct 2026). The name-repair table in trello-voice.ts was written on 2 Sep
+ * and never called — 0 references in the live build — so "STO AIPA" could still become a card title. The log line
+ * proves voice volume and repairs from the journal without ever writing what she said.
+ */
+function heardText(raw: string, provider: string): string {
+  const text = repairNames(String(raw || '').trim());
+  const script = /[Ѐ-ӿ]/.test(text) ? (/[a-z]/i.test(text) ? 'mixed' : 'cyrillic') : 'latin';
+  console.log(`[Voice] transcribed by ${provider}: ${text.length} chars, ${script}, names repaired: ${text !== String(raw || '').trim() ? 'yes' : 'no'}`);
+  return text;
+}
+
 async function transcribeAudio(filePath: string): Promise<string | null> {
   // No language lock — Elena speaks EN, ES and RU in the same message.
   // 1) Groq Whisper with retries (transient ECONNRESET / 5xx / 429 must not
@@ -8737,7 +8765,7 @@ async function transcribeAudio(filePath: string): Promise<string | null> {
         response_format: 'text',
         prompt: WHISPER_PROMPT,
       });
-      return transcription as unknown as string;
+      return heardText(transcription as unknown as string, 'groq');
     } catch (error: any) {
       const msg = String(error?.message || error);
       const status = error?.status ?? error?.statusCode ?? null;
@@ -8761,12 +8789,74 @@ async function transcribeAudio(filePath: string): Promise<string | null> {
         response_format: 'text',
         prompt: WHISPER_PROMPT,
       });
-      return transcription as unknown as string;
+      return heardText(transcription as unknown as string, 'openai');
     }
   } catch (error) {
     console.error('Transcription error (openai fallback):', error instanceof Error ? error.message.slice(0, 160) : error);
   }
   return null;
+}
+
+// =============================================================================
+// HELPER: Speak the reply back (voice note in → voice note out)
+// =============================================================================
+
+/** 'es' / 'en' for the two languages she asked the bot to speak; null = leave the reply in its own language. */
+function speechLang(s: string): 'es' | 'en' | null {
+  if (/[Ѐ-ӿ]/.test(s)) return null;
+  const words = s.toLowerCase().match(/[a-záéíóúñü]+/g) || [];
+  const es = words.filter((w) => /^(el|la|los|las|de|del|que|para|con|una|por|tarea|crea|cita|mañana|hoy|octubre|noviembre|es|está|mi|en)$/.test(w)).length
+    + (/[ñ¿¡áéíóú]/.test(s) ? 2 : 0);
+  const en = words.filter((w) => /^(the|and|to|for|of|with|task|card|create|my|is|this|on|in|tomorrow|today)$/.test(w)).length;
+  return es > en ? 'es' : 'en';
+}
+
+/** What a voice can say: no links (a card URL read aloud is noise), no Markdown, no emoji. */
+function forSpeech(text: string): string {
+  return text
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[*_`[\]#>]/g, '')
+    .replace(/\p{Extended_Pictographic}|️/gu, '')
+    .split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim()).filter(Boolean).join('\n')
+    .slice(0, 4000);
+}
+
+const digitsOf = (s: string) => (s.match(/\d+/g) || []).sort().join(',');
+
+/**
+ * CTO AIPA answers a voice note with a voice note (Elena, 14 Oct 2026: "fully speaking in English and Spanish").
+ * Reuses the Sprinter's OpenAI voice (synthesizeBriefingMp3, nova) — the voice OpenClaw already speaks with — so
+ * nothing new is built. It says what the text replies said, in the language she spoke: a Spanish note gets a Spanish
+ * voice even when the confirmation text is English. That translation goes through the same model waterfall, and is
+ * spoken only if every number survived it (a date that changes in translation would confirm a card that does not
+ * exist — acknowledgement is not completion); otherwise the original text is spoken. Russian is spoken as written.
+ * Off switch: CTO_SPEAK_REPLIES=0. Never throws: the text reply has already gone out.
+ */
+async function speakBack(ctx: Context, heard: string, replies: string[]): Promise<void> {
+  if (process.env.CTO_SPEAK_REPLIES === '0' || !process.env.OPENAI_API_KEY?.trim()) return;
+  try {
+    // Progress lines ("🤔 Thinking...") are not answers.
+    let text = forSpeech(replies.filter((t) => !(t.length < 80 && /(\.\.\.|…)\s*$/.test(t))).join('\n\n'));
+    if (!text) return;
+    const want = speechLang(heard);
+    let lang = speechLang(text) ?? 'as written';
+    if (want && lang !== want) {
+      const r = await completeWithProfileDetailed('classify',
+        `Translate the user's text into natural spoken ${want === 'es' ? 'Spanish' : 'English'}. Keep every number, date, time and name exactly. Output only the translation.`,
+        text, 1200, 'telegram/voice-reply');
+      const t = forSpeech(r.text || '');
+      if (t && digitsOf(t) === digitsOf(text)) { text = t; lang = want; }
+      else console.warn(`[Voice] ${r.provider} translation changed a number — speaking the original`);
+    }
+    const { default: OpenAI } = await import('openai');
+    // The SDK's default timeout is 10 minutes; a voice that arrives after that is worse than none.
+    const audio = await synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
+      { model: process.env.CTO_VOICE_TTS_MODEL || 'gpt-4o-mini-tts', format: 'opus' });
+    await ctx.replyWithVoice(new InputFile(audio, 'cto-aipa.ogg'));
+    console.log(`[Voice] spoke the reply: ${lang}, ${text.length} chars`);
+  } catch (e) {
+    console.warn(`[Voice] could not speak the reply (${String((e as Error)?.message || e).slice(0, 120)}) — text only`);
+  }
 }
 
 // =============================================================================
