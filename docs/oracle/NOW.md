@@ -144,6 +144,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅/⏳ 14 Oct ~19:50 UTC — CTO AIPA SPEAKS (voice note in → voice note out, EN/ES) + name repair LIVE · OpenClaw glossary queued
+- **DONE (Elena's go on moves 5+6 of `docs/oracle/2026-10-14_voice_agents_compare.md`; f001beaf; pm2 `cto-aipa` restarted
+  19:45:41 > file 19:45:37; backups `~/_session-backups/voice-speak-20261014/`):** `repairNames` (written 2 Sep, never called) runs on
+  every voice note — log `[Voice] transcribed by <provider>: N chars, <script>, names repaired: yes|no`, never the words. Plain "ideas"
+  removed from the table (real word — would break the idea intent), `CETA → Cita` added. Every reply to a voice note is also sent as a
+  voice note (`speakBack`, Sprinter's `synthesizeBriefingMp3`, gpt-4o-mini-tts/nova, Opus): Spanish note → Spanish voice (English
+  confirmations translated by the waterfall, spoken only if every number survived), Russian as written. Not awaited (an ES call took
+  120 s), 90 s timeout. **Off switch: `CTO_SPEAK_REPLIES=0`** in Oracle `.env` + restart.
+- **VERIFIED BY:** tsc; test-trello-voice-dates 72/72; 14 helper checks; Oracle probe — gemini kept every digit, both Opus notes read
+  back word for word by Whisper. Laptop = origin/main = Oracle (md5, 3 files). **Not yet seen from a real voice turn** → first note from
+  Elena must log `[Voice] spoke the reply`. Until then the Pitz 🎤 story note keeps "do not say the repair table is live".
+- **NEXT (agent):** move 1 — `tools.media.audio.prompt` glossary in `~/.openclaw/openclaw.json` (today OpenClaw sends Whisper only
+  "Transcribe the audio.") — applied ONLY after her 20:00 UTC screen, once OpenClaw sessions are idle 15 min.
+
 ### ✅ 14 Oct ~17:00 UTC — Pitz (Developer Mid — Fullstack & AI Agents) staged + full kit · OpenClaw Spanish mode · interview TODAY 20:00 UTC
 - **DONE:** inbound (Montserrat Téllez, PITZ, found Elena on LinkedIn). Deal `[HIRING-MANUAL] … @ Pitz` in I Act TODAY, audit ✓ in every column
   (posting = unlisted HubSpot text file, JD PDF attached privately, posting-shaped CV, brief, role + technical defense, letter, Comet,
