@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (Pitz) | 2026-10-14 16:50 | Pitz interview TODAY 20:00 UTC: deal staged + kit ✓; OpenClaw Spanish mode (voice OpenAI nova), Spanish verified examples | docs/applications/cv-bank.json (+text_es only), scripts/hs-deal-prep.cjs, scripts/hs-files.cjs, OpenClaw workspace + config (tts), HubSpot Pitz deal | bdffaa4a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,20 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 14 Oct ~17:00 UTC — Pitz (Developer Mid — Fullstack & AI Agents) staged + full kit · OpenClaw Spanish mode · interview TODAY 20:00 UTC
+- **DONE:** inbound (Montserrat Téllez, PITZ, found Elena on LinkedIn). Deal `[HIRING-MANUAL] … @ Pitz` in I Act TODAY, audit ✓ in every column
+  (posting = unlisted HubSpot text file, JD PDF attached privately, posting-shaped CV, brief, role + technical defense, letter, Comet,
+  recruiter link) + `🔎 PITZ — INVESTIGACIÓN PROFUNDA` note (166 sourced facts → 15 sources, 8 likely questions, 5 for Montse).
+  OpenClaw: `prep me for <company> en español` (skill §0b templates, Spanish voice block, `/cards` reads Spanish headings);
+  cv-bank.json `text_es` on all 23 stories (numbers checked EN=ES) → "✅ EJEMPLOS VERIFICADOS (ES)"; voice = OpenAI `nova`
+  (`openclaw config` messages.tts.provider openai; gateway restarted 16:14 UTC; billing patch intact).
+- **VERIFIED BY:** live tests spar-test-20261014-es3/es4/es5: Spanish questions, Spanish verified example word for word ("del 1 al 10 de
+  octubre"), exact career line, voice block in every reply; Whisper transcribed nova's Spanish/English samples word for word.
+- **OPEN:** gpt-4.1 still picks role-generic core questions instead of the deep-dive's "Preguntas probables" (rule in §0b, not obeyed).
+  **Microsoft Edge voices answer 403 from Oracle** (node-edge-tts AND EspaLuz's python edge_tts 7.2.7) — EspaLuz's Spanish voice is
+  probably degraded to gTTS; not touched (Elena's call).
+- **RISK:** OpenAI credit runs out → OpenClaw voice falls back to Edge (403) → text only. Salary she gave Pitz: USD 3,500–4,000 net.
 
 ### 🦷 13 Oct — No-website businesses: 9 pilot clinics in HubSpot · guards LIVE (Doors 2+3) · Atlas Monday stages best 2 no-website (Elena's go)
 - **DONE + LIVE (cto-aipa restarted 21:08:47 UTC > files 21:08:39–44; backups `~/_session-backups/no-website-20261013/`):**
