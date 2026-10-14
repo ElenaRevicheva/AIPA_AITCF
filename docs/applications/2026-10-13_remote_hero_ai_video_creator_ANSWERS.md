@@ -47,7 +47,6 @@ How I make these: I designed my own production pipeline and I run it. I own the 
 • Review gates: I approve frames before anything is animated (39 on AREAREA), and I give edits by marking screenshots; the pipeline maps each one to the exact shot.
 • Checked narration: on the client films, every voice take is transcribed back by AI and re-recorded if a word is missed.
 • Scripted finish: assembly, EN/ES subtitles, music ducked under the voice, mastered to streaming loudness.
-How I work is laid out in my Professional Outlook: https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026.pdf
 I can walk you through it live, and document and teach it step by step.
 
 Videos (≈ cost from my pipeline's log):
@@ -81,6 +80,8 @@ More films, including Crimson Escape: https://atuona.xyz/aifilmstudio/
 *2.* Yes, I'm proficient in written and spoken English; I also speak Russian.
 
 *3.* Yes. The post lists ~$2,500 (up to $3,500) at the top and ~$3,000 (up to $4,000) further down. I'm comfortable within that and would aim for the upper part, since I already run the full pipeline and track cost per video. 9–5 EST is my local time in Panama.
+
+My Professional Outlook, with how I work: https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026.pdf
 
 Thank you!
 Elena
