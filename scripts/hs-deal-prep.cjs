@@ -238,6 +238,24 @@ function printVerifiedExamples() {
     if (text.length > MAX_NOTE) cut++;
     console.log(text.length > MAX_NOTE ? `${text.slice(0, MAX_NOTE)} …[cut]` : text);
   }
+  // THIS COMPANY'S QUESTIONS (14 Oct 2026, Pitz): the 🔎 deep-dive lists what this company is likely to ask, but gpt-4.1
+  // kept asking role-generic questions while that list sat inside a long note. The verified examples, printed as their
+  // own block near the end, ARE followed — so the company's questions get the same treatment.
+  const companyQs = [];
+  for (const n of notes) {
+    const lines = stripHtml(n.html).split('\n').map((l) => l.trim()); // a note pasted from Windows keeps "\r" per line
+    const at = lines.findIndex((l) => /^\s*\d+\.\s*(Preguntas probables|Likely (interview )?questions)/i.test(l));
+    if (at < 0) continue;
+    for (const l of lines.slice(at + 1)) {
+      if (/^\s*\d+\.\s/.test(l)) break; // the next numbered section ends the list
+      const m = l.match(/^\s*[•*-]\s*(.+)$/);
+      if (m) companyQs.push(m[1].trim());
+    }
+  }
+  if (companyQs.length) {
+    console.log("\n===== 🎤 THIS COMPANY'S LIKELY QUESTIONS (from the 🔎 deep-dive) — the CORE mock questions: ask THESE, in this order:");
+    companyQs.forEach((q, i) => console.log(`${i + 1}. ${q}`));
+  }
   printVerifiedExamples();
   // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
   // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
