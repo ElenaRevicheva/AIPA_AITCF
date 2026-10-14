@@ -152,9 +152,11 @@ git log keeps the record.
   (`openclaw config` messages.tts.provider openai; gateway restarted 16:14 UTC; billing patch intact).
 - **VERIFIED BY:** live tests spar-test-20261014-es3/es4/es5: Spanish questions, Spanish verified example word for word ("del 1 al 10 de
   octubre"), exact career line, voice block in every reply; Whisper transcribed nova's Spanish/English samples word for word.
-- **OPEN:** gpt-4.1 still picks role-generic core questions instead of the deep-dive's "Preguntas probables" (rule in §0b, not obeyed).
-  **Microsoft Edge voices answer 403 from Oracle** (node-edge-tts AND EspaLuz's python edge_tts 7.2.7) — EspaLuz's Spanish voice is
-  probably degraded to gTTS; not touched (Elena's call).
+- **FIXED 17:10 UTC:** hs-deal-prep prints the deep-dive's questions as "🎤 THIS COMPANY'S LIKELY QUESTIONS" → live test es6: Q1 trial-
+  inactivity agent, Q2 agent in production (cto-aipa 95d92d21, job-list-filter 87f7b3d). **Microsoft Edge voices answer 403 everywhere**
+  (Oracle AND laptop) — Microsoft-side. EspaLuz unaffected in practice: gTTS direct + gTTS fallback, 0 TTS errors in its journal since 1 Sep.
+- **PITZ CEO:** Boardy intro with Natalia Salcedo (CEO/founder) Fri 16 Oct 10:00 Panama — note + HIGH task on the Pitz deal, Trello card
+  updated. Two doors: recruiter (Montse, Mid fullstack/agents) today + CEO (applied AI, voice-first, diagnostics agents) Friday.
 - **RISK:** OpenAI credit runs out → OpenClaw voice falls back to Edge (403) → text only. Salary she gave Pitz: USD 3,500–4,000 net.
 
 ### 🦷 13 Oct — No-website businesses: 9 pilot clinics in HubSpot · guards LIVE (Doors 2+3) · Atlas Monday stages best 2 no-website (Elena's go)
