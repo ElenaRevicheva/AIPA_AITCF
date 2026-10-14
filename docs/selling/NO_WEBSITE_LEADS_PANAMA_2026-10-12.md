@@ -28,17 +28,35 @@ Plan: `NO_WEBSITE_BUSINESSES_AUDIT_2026-10-08.md` §7–8. Elena's go: 12 Oct.
 | 8 | Dental Implants of Panama | 5.0 | 1 | same address as Panama Express Dental Center, possibly one business |
 | 9 | Orthox Clínica Dental | — | 0 | brand-new listing |
 
-## WhatsApp draft (Spanish, sent by Elena from the laptop)
-Only verified facts. No AI-answer claim yet: the Perplexity probe was not run (no key on the laptop).
+## WhatsApp message (Elena's format, 14 Oct 2026) — LIVE on all 9 deal notes
+Replaces the 12–13 Oct drafts (old note bodies backed up on the laptop, `D:/aideazz/_session-backups/nowebsite-wa-20261014/`).
+Only verified facts. Per clinic only the greeting and the Google line change; links stay in this order.
 
-> Hola, equipo de {clínica}. Vi su perfil en Google Maps{, {rating}★ con {reseñas} reseñas: muy buena reputación}.
-> Un detalle: su perfil no tiene sitio web enlazado, y al buscar su clínica en internet solo aparecen directorios como WhatClinic,
-> que muestran a sus pacientes otras clínicas al lado de la suya. Así, ChatGPT y Google no tienen una fuente propia suya que citar
-> cuando alguien pregunta por implantes u ortodoncia en Panamá.
-> Lo resolvemos sin hacer una web completa: textos listos para su WhatsApp Business y su perfil de Google, y una página corta que la IA
-> pueda citar. Empieza con un diagnóstico rápido de $100.
-> ¿Le muestro lo que encontré? — Elena, AIdeazz AI Lab · aideazz.xyz/portfolio
+> Hola, {Dr. Apellido | equipo de {clínica}}. ¡Mucho gusto! 😊
 >
-> PD: también instalamos un asistente de WhatsApp bilingüe que responde a pacientes internacionales 24/7 y agenda las consultas.
+> Soy Elena Revicheva, fundadora de AIdeazz AI Lab.
+>
+> {GOOGLE LINE}
+>
+> Al revisar su presencia digital, noté una oportunidad interesante: su perfil de Google no incluye un sitio web y no encontré una página oficial de la clínica.
+>
+> Esto puede limitar la información que Google y asistentes de IA como ChatGPT encuentran sobre sus tratamientos y servicios cuando los pacientes buscan opciones dentales en Panamá.
+>
+> ¿Le gustaría que le compartiera un diagnóstico gratuito de una página, con lo que encontré y algunas recomendaciones prácticas para mejorar la visibilidad de su clínica, incluso sin tener un sitio web?
+>
+> Sin compromiso, por supuesto.
+>
+> Un cordial saludo,
+> Elena Revicheva
+> AIdeazz AI Lab
+>
+> 🔎 https://aideazz.xyz/api
+> 🔗 https://aideazz.xyz/portfolio
+> PD: también creamos asistentes de WhatsApp bilingües que responden y agendan a sus pacientes 24/7 👉 https://aideazz.xyz/AIdeazz_AI_Growth_Operator_2026_ES.pdf
 
-The rating clause is used only when the clinic has 10+ reviews (TLDC, Dr. Cano, Beautiful Smile, Mundo Dental).
+GOOGLE LINE, honest to the numbers:
+- 4.5★+ with 10+ reviews (TLDC 4,9/401 · Dr. Cano 4,7/27 · Mundo Dental 4,7/10): "Vi que su clínica tiene una excelente reputación en Google: {r} ⭐ con {n} reseñas. ¡Felicitaciones!"
+- Beautiful Smile 4,1/27: "una **buena** reputación" (not "excelente").
+- 5★ with 2–4 reviews (Vive Feliz, Dr. González, OrthoBraces): "Vi que su clínica tiene 5 ⭐ en Google: todas sus reseñas son de cinco estrellas. ¡Felicitaciones!"
+- Dental Implants of Panama (1 review): "Vi el perfil de su clínica en Google Maps, con una calificación de 5 ⭐. ¡Felicitaciones!"
+- Orthox (0 reviews): "Vi el perfil de su clínica en Google Maps, en Costa del Este."
