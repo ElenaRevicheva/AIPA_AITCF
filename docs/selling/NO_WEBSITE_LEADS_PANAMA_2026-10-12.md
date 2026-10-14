@@ -60,3 +60,29 @@ GOOGLE LINE, honest to the numbers:
 - 5★ with 2–4 reviews (Vive Feliz, Dr. González, OrthoBraces): "Vi que su clínica tiene 5 ⭐ en Google: todas sus reseñas son de cinco estrellas. ¡Felicitaciones!"
 - Dental Implants of Panama (1 review): "Vi el perfil de su clínica en Google Maps, con una calificación de 5 ⭐. ¡Felicitaciones!"
 - Orthox (0 reviews): "Vi el perfil de su clínica en Google Maps, en Costa del Este."
+
+## 14 Oct 2026: outreach status + how to reach a clinic whose Google number is not on WhatsApp
+Phones and handles' numbers live in HubSpot only. Every claim below was checked 14 Oct (Google search in Elena's Chrome, curl, Places 12 Oct).
+
+**Sent on WhatsApp (4):** Dr. Cano, Vive Feliz, Dr. González, Orthox. Each number = the one the clinic publishes on its own Instagram/Facebook.
+Replies so far = **WhatsApp Business automatic greetings** (e.g. "Gracias por comunicarte con CCMED…"): delivered to a monitored inbox, NOT a reply.
+FU #1 tasks due **Fri 16 Oct 09:00 Panama**, each with one NEW verified hook + the gatekeeper question ("¿a quién le hago llegar el diagnóstico?"):
+- Dr. Cano: his practice's brand "CCMED" (from the greeting) has no page online.
+- Dr. González: Instagram/Facebook brand "Visual Smile Dental" ≠ Google name; searching "Visual Smile Dental" on Google shows another clinic on the map.
+- Vive Feliz: 1.7K Instagram followers vs 4 Google reviews and no site.
+- Orthox: in Town Center since 2021 (its own Instagram), still 0 Google reviews and no site.
+
+**Not on WhatsApp (all 5 were Google landlines) → the cross-channel method (Business Identity Audit, spec §2 step 2):**
+search the clinic's name + "instagram OR facebook" on Google; the snippet shows the bio, which often carries the WhatsApp number the
+clinic really uses. Compare it with the Google phone. **The mismatch is both the way in and the first finding of the audit.**
+
+| Clinic | Channel found | Finding used in the message |
+|---|---|---|
+| Mundo Dental | WhatsApp mobile in its Instagram bio (11.6K followers) | Instagram says "reserve by WhatsApp"; Google shows a landline with no WhatsApp; no site |
+| OrthoBraces | "Escríbenos" mobile on Facebook/Instagram (ORTHOBRACES S.A. since 2014) | same mismatch; no site |
+| TLDC | Instagram DM @clinicatldc (3.3K) | old domain tldcpanama.com (still listed by ZoomInfo) is now a Namecheap parking page; Google number not on WhatsApp |
+| Beautiful Smile | Instagram DM @beautifulsmilepty (verify it is them first) | Google number not on WhatsApp; no site |
+| Dental Implants of Panama | nothing (directories only; same address as Panama Express Dental Center) | recommend park, or a 30-second call asking for a WhatsApp/email |
+
+Instagram DM version = the same format without the PD, kept under Instagram's 1,000-character DM limit. Instagram is read by a human
+(Elena) only; nothing reads Instagram automatically.
