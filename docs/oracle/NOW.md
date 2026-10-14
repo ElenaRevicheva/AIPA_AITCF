@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 14 Oct 19:45 | Elena's go on voice moves 5+6+1: CTO AIPA name-repair live + spoken replies (EN/ES); OpenClaw Whisper glossary AFTER her 20:00 UTC screen | `src/telegram-bot.ts`, `src/trello-voice.ts`, `src/sprint-briefing/tts-openai.ts`; pm2 `cto-aipa`; `~/.openclaw/openclaw.json` (after the screen) | 60a0fe34 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
