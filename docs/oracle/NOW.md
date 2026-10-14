@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (Pitz) | 2026-10-14 16:50 | Pitz interview TODAY 20:00 UTC: deal staged + kit ✓; OpenClaw Spanish mode (voice OpenAI nova), Spanish verified examples | docs/applications/cv-bank.json (+text_es only), scripts/hs-deal-prep.cjs, scripts/hs-files.cjs, OpenClaw workspace + config (tts), HubSpot Pitz deal | bdffaa4a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
