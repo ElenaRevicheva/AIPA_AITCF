@@ -181,6 +181,13 @@ git log keeps the record.
   (6) VJH: interview invites WITH a booking link reach HubSpot + Telegram; skip the auto-reply phrase filter; ignore Elena's own scheduler links + quoted-thread links; alert escaped (`006c1ed`). vibejobhunter restarted 16:12:49 > file 16:12:38; response step ran, 0 tracebacks.
 - **HELD:** (3) `resend-reconcile` admin key — its duplicate check uses an HTML comment HubSpot strips → hourly duplicate notes + HIGH tasks per problem send; needs a ~10-line dedup fix first (Elena's call). (4) UTM on Atlas links — would put a long tracking tail in the visible first line of every letter (her outreach rule); Elena decides.
 - **Known, not changed:** VJH client replies without a quote can still become [HIRING-VJH-LEAD] (only VJH_BD_DOMAINS separates); VJH re-classifies the same mail hourly (processed ids saved only on one branch).
+- **OPEN — crucial, ranked (told Elena 15 Oct; nothing started):** (1) security: unauthenticated internal cto routes + EspaLuz PayPal webhook
+  without signature check + public EspaLuz admin/analytics (task card in her sidebar; never write details into this public repo) · (2) #3 resend
+  dedup fix (visible marker) before Mon 19 Oct Atlas sends · (3) WA follow-ups: `hs-watch-manual-emails` gives a deal entering ⏳ Sent with no
+  open task its FU (needs her go) · (4) **auto-sender:** `src/outreach.ts runDailyOutreachCycle` (cron `OUTREACH_CRON` 15:00 Panama) drafts with
+  Claude and SENDS cold emails with no review; last runs sent 0 (3 errors) but it is armed — Elena decides off/keep · (5) VJH: client replies →
+  fake [HIRING-VJH-LEAD] + paid letter; hourly re-classification of the same mail · (6) EspaLuz payments never reach HubSpot.
+  Money decisions: Algom X credits (dead since 21 Aug), Claude credits at zero.
 - **Wiki:** `aideazz` `37ec1cd` incident "Another agent wrote her top lesson" + concept `label-provenance` (blog: yes → wiki-ship 21:30 UTC).
 
 ### ⛔ 15 Oct ~13:00 UTC — OpenClaw upgrade TESTED on copies, NOT applied (fails Elena's conditions) · live untouched · claim released
