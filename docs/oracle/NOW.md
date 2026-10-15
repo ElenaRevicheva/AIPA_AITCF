@@ -168,8 +168,14 @@ git log keeps the record.
   cto-aipa restarted 21:11:17 UTC. **First post (her go, 21:15 UTC):** today's article as a link card via the publisher's own
   `postToBluesky()` — read back from the public API (author, card link, picture). From the next daily article on it is automatic;
   expect `🦋 [Bluesky] posted https://bsky.app/...` in the cto-aipa log after 19:30 UTC.
-- **Bing check:** a plain "aideazz" search lists aideazz.xyz + /portfolio; Bing's `site:` operator returns 0 for the domain —
-  do not read that as "not indexed". New articles appear in Bing hours to days after IndexNow.
+- **⚠️ BING HAS NOTHING NEWER THAN 7 SEP (measured 15 Oct ~23:45 UTC, read-only).** Bing-family `site:aideazz.xyz` (Yahoo, DuckDuckGo)
+  lists ~27 URLs = ~23 of 185 articles; newest 7 Sep; 0 of every post after it (Bing `url:` + title checks, controls passing). Today's
+  page is NOT the cause: bingbot gets byte-identical HTML, 200, index/follow, self-canonical, in both sitemaps, 14 inbound links;
+  IndexNow request matches the spec. Cause unknown from outside — only **Bing Webmaster Tools** (URL Inspection, crawl stats) can say
+  "discovered not crawled" vs "crawled not indexed". No BWT verification artifact on the site (`BingSiteAuth.xml` = SPA fallback).
+  **NEXT (Elena, sign-in):** BWT → Import from Google Search Console → URL Inspection → Request indexing. Do NOT re-ping IndexNow or
+  backfill again: the 201-URL backfill above went against the IndexNow FAQ ("only URLs changing since you start"); not the cause (the
+  gap predates it). Bing's `site:` returns 0 and Bing search from one IP degrades after ~200 scripted queries — use Yahoo/DDG `site:`.
 - Not wired (deliberate, ask first): incident-to-blog.cjs / wiki-ship posts do not call IndexNow/Bluesky yet.
 
 ### ✅ 15 Oct ~20:30 UTC — Daily blog skip FIXED and today's post LIVE · claim released
