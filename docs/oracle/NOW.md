@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct ~20:40 | Daily blog skipped 15 Oct (grounding/duplicate gates) — fix dupTokens date regex (mangled 25 Aug), derived-angle dup check, distinctive fallback title, cto-aipa git evidence from origin/main | `src/daily-blog-publisher.ts`, `src/blog-evidence.ts`; pm2 `cto-aipa` (restart = catch-up run) | 38489e2f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,22 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 15 Oct ~20:30 UTC — Daily blog skip FIXED and today's post LIVE · claim released
+- **Telegram said** "⏸ Daily blog SKIPPED — Grounding gate / unsourced number(s): 24" (19:30 UTC run). **Real cause = duplicate gate:**
+  (1) `dupTokens()` date regex lost its backslashes on 25 Aug (`77d7170b`: `\d`→`d`, ``→ a backspace char), so dates were never
+  stripped; (2) the measured-notes fallback was titled "Commit: <repo> — <date>" → 100% duplicate of `commit-aideazz-2026-10-04`;
+  (3) the derived angle "GA4 sync zero rows" was published 6 Sep, older than the 30 titles the model is shown, and all retries
+  rewrote it; (4) cto-aipa git evidence read Oracle's frozen HEAD (0 commits). Telegram only showed the LAST reason.
+- **DONE (`783a60a0`):** regex restored + bare years ignored; derived angle checked against the whole corpus, re-derived once;
+  fallback titled by the real commit subject (routine auto-commits and `now:` board commits skipped); git evidence from
+  `origin/main` (fetch only — Oracle-only Atlas commits with prospect names stay out of public posts); commit subjects scrubbed.
+- **VERIFIED BY:** replay on Oracle against the real 183-post cache (GA4 angle caught 100%; old fallback title reproduced the skip;
+  new fallback not a duplicate, grounding ok; cto-aipa evidence 0 → 12 commits); tests 19/19 laptop + Oracle; restart catch-up
+  published `fixing-the-ai-agent-learning-loop-staging-notes-as-rejection-reasons` (cache 20:26:26 UTC, aideazz `92bdd11`,
+  HTTP 200), Buffer `posted=1/1`. md5 laptop = GitHub = Oracle.
+- **Cross-posting facts (checked 15 Oct):** Hashnode GraphQL API moved to PAID (their changelog, 13 May 2026; gql.hashnode.com →
+  301) — not an option. IndexNow endpoints answer (api.indexnow.org, bing.com/indexnow) — not wired yet (Elena's call).
 
 ### ✅ 15 Oct ~18:30 UTC — ORACLE_ALL_PRODUCTS_RESILIENCE.md brought to 15 Oct (laptop = GitHub = Oracle) · CTO AIPA voice default tts-1 in code · claim released
 - **Doc (`b6d06497`):** new top section "🟢 12–15 Oct 2026" (fleet state, CTO AIPA, OpenClaw, VJH, apply kit, Atlas, blog/site,
