@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 15 Oct 12:20 | OpenClaw 2026.2.14 → 2026.10.3 — test side-by-side on a COPY first; switch only if all tests pass and nothing we built changes (Elena's conditional go) | `/usr/lib/node_modules/openclaw` (only at switch), `openclaw-gateway`; scratch `~/_scratch/openclaw-next` | f11472bd |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
