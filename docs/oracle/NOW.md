@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct 12:20 | OpenClaw 2026.2.14 → 2026.10.3 — test side-by-side on a COPY first; switch only if all tests pass and nothing we built changes (Elena's conditional go) | `/usr/lib/node_modules/openclaw` (only at switch), `openclaw-gateway`; scratch `~/_scratch/openclaw-next` | f11472bd |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⛔ 15 Oct ~13:00 UTC — OpenClaw upgrade TESTED on copies, NOT applied (fails Elena's conditions) · live untouched · claim released
+- Newest 2026.10.3 needs Node ≥24.16 (≥2026.7.1 needs ≥22.22.3); Oracle's Node 22.22.0 serves 13 processes → not touched.
+  2026.6.35 (newest on Node 22.22.0) on two copies: `Unknown model: openai/gpt-4.1` → every turn silently on Gemini; config invalid
+  until TTS/Telegram keys are relabelled; one-way state migrations on first start (cron store → SQLite). Details + how to retest:
+  job-list-filter `docs` 0afe2ad, `ORACLE_LIVE_SETUP.md` § Upgrade. `--local` does NOT inject deals/cards/proof — test via a gateway.
+- Live: 2026.2.14, gateway start 11:11:35 UTC unchanged, config/.env/crontab md5 = before, 0 migrated files. Test copies deleted.
+  Kept: `~/_session-backups/openclaw-upgrade-20261015/` (state backup, manifests, batteries). `~/_scratch/openclaw-next` (346 MB)
+  stays only until the changelog-review workflow finishes, then remove it.
+- WhatsApp: configured in Feb, never linked. OpenClaw docs recommend a dedicated number; her business number = Elena's call.
 
 ### ✅ 15 Oct ~12:00 UTC — SYNC CHECK laptop = GitHub = Oracle = running process (Elena asked) · OpenClaw menu latest
 - **Equal everywhere:** cto-aipa (371 runtime files + all 94 dist files = a build of origin/main; `package.json` synced — it lacked one
