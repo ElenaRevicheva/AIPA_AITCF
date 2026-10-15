@@ -145,7 +145,7 @@ git log keeps the record.
 
 ### ✅ 15 Oct ~20:30 UTC — Daily blog skip FIXED and today's post LIVE · claim released
 - **Telegram said** "⏸ Daily blog SKIPPED — Grounding gate / unsourced number(s): 24" (19:30 UTC run). **Real cause = duplicate gate:**
-  (1) `dupTokens()` date regex lost its backslashes on 25 Aug (`77d7170b`: `\d`→`d`, ``→ a backspace char), so dates were never
+  (1) `dupTokens()` date regex lost its backslashes on 25 Aug (`77d7170b`: `\d`→`d`, `\b`→ a backspace char), so dates were never
   stripped; (2) the measured-notes fallback was titled "Commit: <repo> — <date>" → 100% duplicate of `commit-aideazz-2026-10-04`;
   (3) the derived angle "GA4 sync zero rows" was published 6 Sep, older than the 30 titles the model is shown, and all retries
   rewrote it; (4) cto-aipa git evidence read Oracle's frozen HEAD (0 commits). Telegram only showed the LAST reason.
