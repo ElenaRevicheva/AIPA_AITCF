@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (OpenClaw company facts) | 2026-10-15 21:00 | Elena's go: deep-dive company facts into OpenClaw proof sheet (Chalán question failed) | cto-aipa scripts/hs-deal-prep.cjs; ~/.openclaw/workspace/proof/TOOLS.md (regenerated) | — |
-| Claude Code (laptop) | 15 Oct ~21:00 | Elena's go: IndexNow (Bing) + Bluesky cross-post for the daily blog | `src/daily-blog-publisher.ts`, `src/telegram-bot.ts` (key command), aideazz `public/` key file; pm2 `cto-aipa` | 6025a538 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅/⏳ 15 Oct ~20:50 UTC — Daily blog → Bing (IndexNow) LIVE · Bluesky READY, waits for Elena's /blueskykey · claim released
+- **DONE (`2958f904`, her go):** after each daily article answers 200, `announceNewArticle` (daily-blog-publisher.ts) sends it to
+  api.indexnow.org (→ Bing, Yandex, Naver, Seznam) with the key file that has been live since 19 Jul (aideazz `57bfd42`) and was never
+  used, then posts a Bluesky link card (title + the article's own first paragraph + OG picture; no model). Background only.
+  `/blueskykey <handle> <app-password>` + `~/set-bluesky-stdin.sh` (700): message deleted, Bluesky login probed before `.env` write.
+- **VERIFIED BY:** IndexNow HTTP 200 for today's article + /blog/, and 200 for a one-time backfill of all 201 sitemap URLs (186
+  articles). Helper: bad input refused; fake credentials → Bluesky 401 → nothing written (0 `BLUESKY_` lines). Bot restarted
+  20:49:38 UTC, 73 commands. Tests: blog-evidence all, trello 72/72, speak 21/21. md5 laptop = GitHub = Oracle (3 files).
+- **NEXT (Elena):** create a Bluesky APP password (Settings → Privacy and security → App passwords) and send
+  `/blueskykey <handle> <app-password>` to @aitcf_aideazz_bot. Expected log on the next article: `🦋 [Bluesky] posted https://bsky.app/...`.
+- Not wired (deliberate, ask first): incident-to-blog.cjs / wiki-ship posts do not call IndexNow/Bluesky yet.
 
 ### ✅ 15 Oct ~20:30 UTC — Daily blog skip FIXED and today's post LIVE · claim released
 - **Telegram said** "⏸ Daily blog SKIPPED — Grounding gate / unsourced number(s): 24" (19:30 UTC run). **Real cause = duplicate gate:**
