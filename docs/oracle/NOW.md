@@ -143,6 +143,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 15 Oct ~16:40 UTC — WhatsApp voice notes now play on her PHONE (Opus) · OpenClaw local patch #2 (her go)
+- **Why:** "voice works on TG cell and laptop and WA laptop but WA cell does not work". OpenClaw 2026.2.14 makes Opus only for
+  Telegram and MP3 for every other channel, and its WhatsApp sender marks all audio as a voice note (`ptt: true`) — the phone app
+  cannot play an MP3 voice note (WhatsApp Web can). Fix: `resolveOutputFormat()` returns the Telegram (Opus) format for WhatsApp too —
+  one line in 4 dist files, backups `~/_session-backups/openclaw-wa-20261015/dist-before-opus/`, `node --check` ok, gateway restart
+  16:38:10 UTC. Verified: WA voice `.mp3` before (16:12, 16:21) → `.opus` after (16:38:29), sent 16:38:31.
+- **RISK:** an OpenClaw upgrade overwrites BOTH local patches (billing + this) — see job-list-filter `docs` b272588 § Local patches.
+  **NEXT (Elena):** play the test voice note on her phone.
+
 ### ✅ 15 Oct ~16:20 UTC — VOICE fixed (OpenClaw Telegram + WhatsApp, CTO AIPA): OpenAI `tts-1` instead of `gpt-4o-mini-tts`
 - **Why (Elena: "something is bad with voice both in WA and TG"):** 7 of 15 OpenClaw voice replies failed on 15 Oct, each EXACTLY 30 s
   (`messages.tts.timeoutMs` default) → Edge fallback → 403 (Microsoft-side since 14 Oct) → "voice errors". gpt-4o-mini-tts stalls:
