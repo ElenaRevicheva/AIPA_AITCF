@@ -143,6 +143,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🧩 15 Oct — AIdeazz-as-a-team wiring plan · read-only audit done · **6 micro-wirings await Elena's yes**
+- **Plan:** `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` (25-agent read-only workflow, each wiring double-checked on Oracle + golden rule).
+  Order: (1) Atlas no-website note → bit.ly/Linktree line, **before Mon 19 Oct 16:00 UTC** · (2) `hs-watch-manual-emails` off the shared */10 minute
+  (579 HubSpot 429s) · (3) `resend-reconcile` admin-key fallback (451 × 401) · (4) UTM on 4 Atlas portfolio links → existing GA4 sync · (5) VJH judge
+  `_KIT_NOTE` + staging note · (6) VJH interview invitations with a booking link stop being dropped.
+- **Rejected as bicycles** (do not rebuild): Atlas screenshot reader, known-inquirer skip, wiki titles in OpenClaw, auto lessons into the kit, letter cap.
+- **NEXT:** Elena says which numbers → claim the board → named-file deploy from LF copies → prove each by its output line.
+
 ### ⛔ 15 Oct ~13:00 UTC — OpenClaw upgrade TESTED on copies, NOT applied (fails Elena's conditions) · live untouched · claim released
 - Newest 2026.10.3 needs Node ≥24.16 (≥2026.7.1 needs ≥22.22.3); Oracle's Node 22.22.0 serves 13 processes → not touched.
   2026.6.35 (newest on Node 22.22.0) on two copies: `Unknown model: openai/gpt-4.1` → every turn silently on Gemini; config invalid
