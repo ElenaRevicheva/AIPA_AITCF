@@ -1,0 +1,32 @@
+SUBJECT: Four briefs opened — listing stays; NL2Repo is Harbor authoring, still not unpaid QC
+TO: Megan (reply on the same 31 Aug Cal.com / HUD thread)
+FROM: Elena Revicheva <aipa@aideazz.xyz>
+
+Send after reading the four Must have lists. Do not Apply.
+Do not attach Nine Systems. Do not volunteer were-public, 22 fails,
+§9.2, $350k, Cursor commit counts, or hardship. Do not email the lab.
+
+---
+
+Hi Megan,
+
+I opened four HUD briefs.
+
+Enterprise Codebase Data Opportunity ($100,000 total) — I will not apply. The must-haves are 10+ contributors, 100 merged PRs, 100k–10M LOC, >25% coverage, and primarily pre-AI human-written code. Mine is a solo 2025 production lab, not that enterprise-monorepo profile.
+
+Long-Horizon Coding Tasks — I will not apply with this listing. That brief wants Harbor-format coding tasksets, not live production systems.
+
+Long-Horizon Agentic Tasks Outside Software Engineering — this is the brief whose workflows I actually run (tool-use, MCP, CRM as the system of record, human on the last irreversible click). I still will not apply with the current listing: the must-haves are sealed Harbor environments, 100+ tool-call traces, and offline stubs — no live services. If you commission that as paid Harbor authoring, that is my lane. I will not start it unpaid.
+
+NL2 Repo Tasks ($600/task) — I will not apply tonight. That is Harbor exam authoring (spec + golden repo + tests + environment), not the listing. Required QC still needs environment build, Harbor bundle, FN/FP, and 4–8 rollouts of Qwen3.8 Max and Opus 5 / Fable 5, with a measured gap. I cannot run those baselines on a zero Anthropic balance. If you fund one paid sample including those runs, that is the commission I meant. I will not start it unpaid.
+
+The listing stays private to opportunity buyers for labs that want the live production SKU:
+
+https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443
+
+Please keep matching those. Do not slot this listing into the four briefs above.
+
+Elena Revicheva
+AIdeazz AI Lab
+aipa@aideazz.xyz
+https://aideazz.xyz/portfolio
