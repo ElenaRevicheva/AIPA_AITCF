@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (/research_employer interview mode) | 2026-10-15 21:40 | Elena's go: /research_employer = interview-grade deep-dive → note on the HIRING deal; Perplexity fallback instead of Groq-from-nothing | cto-aipa src/research-agent.ts, src/telegram-bot.ts (+ dist, pm2 restart cto-aipa) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 15 Oct ~23:50 UTC — Interview prep flow LIVE: Elena books → `/research_employer <company>` (CTO bot) → deep-dive on the deal → OpenClaw preps · claim released
+- **Elena's rule:** 🔥 I act today kit stays as is; deep research ONLY when SHE knows an interview is booked (LinkedIn/WhatsApp — no agent sees them).
+- **DONE (`b7ba3f73` + `36561154`, 3 review rounds, each round's blockers fixed):** employer mode writes the 1–6 sections hs-deal-prep parses; Claude down →
+  Perplexity sonar-pro, search depth high, aimed at the company's own sites from the deal; deal looked up FIRST (fail-closed), a deal with a deep-dive
+  from the last 30 days keeps it (Pitz protected — verified), one research per deal, shape check (≥3 real facts, ≥3 questions, cautions, ≥2 sources),
+  re-check before write, read-back by deal id, "OpenClaw has it" only when its sheet shows the deal; research detached (bot no longer freezes).
+  hs-deal-prep: deep-dive notes of 30 days found by NOTE search (any deal age), facts ≤5,000/deal, cap read from OpenClaw config; OpenClaw
+  bootstrapMaxChars 25k→40k, total 70k→90k (gateway restarted 23:44). Menus: CTO /menu job-flow block + /research_employer text; OpenClaw HELP.md =
+  IDENTITY.md job-flow block (Oracle-only files; backups `~/_session-backups/research-employer-20261015/`).
+- **VERIFIED BY:** live Pitz test (dry, not saved): first run found nothing (job boards, low depth) → fixed → 10,452-char report, 10 sources, $0.0099, 12 s;
+  Pitz lookup → protected; lookup without key → "could not search HubSpot — nothing saved"; OpenClaw /menu test shows the job flow; cto-aipa 23:49:46 >
+  files 23:49:34, md5 Oracle = git. **Not yet exercised:** a real save on a non-Pitz deal — first real use = Elena's next booked interview; watch it.
 
 ### ✅ 15 Oct ~21:00 UTC — OpenClaw now KNOWS the employer: deep-dive company facts + the note's own cautions in its proof sheet · claim released
 - **Why:** Elena asked by voice "Tell me more about Chalán Pitz, Ajende" (Chalán = Pitz's voice agent; "Ajende" = Whisper's "agent") → gpt-4.1:
