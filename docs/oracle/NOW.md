@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct 11:45 | OpenClaw learns from Elena's corrections (her go) — lessons ledger built by the existing cards cron | job-list-filter `build-cards.py`, OpenClaw workspace `IDENTITY.md`/`HELP.md`/`cards/TOOLS.md` | dca5e84d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 15 Oct ~11:40 UTC — OpenClaw LEARNS FROM HER CORRECTIONS (like VJH) · OpenAI topped up (both keys 200) · claim released
+- **DONE (her go; job-list-filter `docs` d602035; backup `~/_session-backups/openclaw-facts-20261015/build-cards.before-lessons.py`):**
+  the existing `*/10` cards cron (`build-cards.py`) now keeps a permanent ledger `workspace/interview-cards/lessons.json` of HER words
+  with a clear correction signal (`no soy…`, `I'm not…`, `never say…`, `that's wrong…`, `remember:`/`recuerda:`) and puts them on top
+  of `cards/TOOLS.md` ("ELENA'S CORRECTIONS", every reply). `my lessons` shows them, `forget: <words>` drops one. Menu: 🧠 I LEARN FROM YOU.
+- **VERIFIED BY:** local copy test 10/10; real history → exactly 1 lesson (14 Oct "No soy developer full stack manual"; the 11 Oct "CEO"
+  answer NOT learned); live gpt-4.1: `my lessons` exact, Spanish self-intro applied it unasked; 0 truncation warnings.
+- **TRAP:** never test with a UUID-named session id — build-cards treats it as hers and the test lesson becomes permanent (use
+  `OPENCLAW_SESSIONS`/`OPENCLAW_CARDS_OUT` on a copy). OpenAI balance: topped up by Elena ~11:35 UTC, 1-token probes 200 on both keys.
+
 ### ✅ 15 Oct ~11:30 UTC — OpenClaw coach grounded in her VERIFIED FACTS · was half-blind since 7 Oct · VJH reads her No-fit screenshots in full
 - **Why (Elena: "generic replies far from my real products"):** her real Pitz session 14 Oct 21:07 → 15 Oct 10:58 UTC never ran the
   deal reader — gpt-4.1 made up "✅ Loaded … 7 notes", then a client demo, "half the test cycle", a Slack bot, React dashboards.
@@ -160,7 +169,7 @@ git log keeps the record.
   was EMPTY (gpt-4o-mini said NONE for "New York City", cached forever; 2nd shot never read — the kit's CV PDFs took both slots).
   Now her notes' images only, up to 4 joined, NONE needs a 2nd model, failures retried. Live: why = "Location: New York City … |
   hybrid in Long Island City (Tue–Thu)"; reasons 53 → 54.
-- **⚠️ RISK — Elena's money call:** **OpenAI balance EMPTY since ~11:00 UTC 15 Oct** ("You have no credits remaining"). OpenClaw answers on
+- **✅ RESOLVED ~11:35 UTC (Elena topped up; both keys 200):** OpenAI balance was EMPTY ~11:00 UTC 15 Oct ("You have no credits remaining"). OpenClaw answers on
   Gemini (failover works) but its nova VOICE falls back to Edge (403) → text only; CTO AIPA spoken replies → text only; OpenAI
   Whisper fallbacks gone (Groq primaries fine); VJH vision reads on Gemini. Anthropic also empty.
 
