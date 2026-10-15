@@ -285,6 +285,53 @@ check("a field note the same day does not count as the daily post", () => {
   assert.equal(shouldCatchUpMissedDailyPost(new Date("2026-08-26T20:00:00.000Z")), true);
 });
 
+// 15 Oct 2026: "⏸ Daily blog SKIPPED — Grounding gate / unsourced number(s): 24". The real blocker was the duplicate
+// gate: the measured-notes fallback was titled "Commit: aideazz — <date>" every day and dupTokens never stripped the
+// date (its regex was mangled on 25 Aug), so it matched the 4 Oct fallback at 100%.
+const routine = {
+  key: "git.aideazz.0", label: "Commit in aideazz", source: "git log in aideazz", numbers: [],
+  value: "3dabeca (2026-10-14) ai-ops-wiki: refresh journal + AEO surfaces (2026-10-14)",
+};
+const real = (subject) => ({ key: "git.cto-aipa.1", label: "Commit in cto-aipa", source: "git log in cto-aipa", numbers: [], value: "de06ac7 (2026-10-15) " + subject });
+
+check("fallback title names what changed, not just the repo", () => {
+  const b = bundle(); b.facts.splice(1, 1, real("CTO AIPA voice: default tts-1 in code"));
+  const { title } = composeEvidenceFallbackArticle(b, {});
+  assert.ok(/CTO AIPA voice: default tts-1 in code/.test(title), title);
+  assert.ok(!/^Commit: /.test(title), title);
+});
+
+check("two days of fallbacks in one repo get different titles", () => {
+  const a = bundle(); a.facts.splice(1, 1, real("blog: refuse near-duplicates"));
+  const c = bundle(); c.facts.splice(1, 1, real("openclaw: learns from her corrections"));
+  assert.notEqual(composeEvidenceFallbackArticle(a, {}).title.slice(0, 40), composeEvidenceFallbackArticle(c, {}).title.slice(0, 40));
+});
+
+check("a routine auto-commit never names the article when a real one exists", () => {
+  const board = { ...real("now: claim - daily blog skipped 15 Oct"), key: "git.cto-aipa.0" };
+  const b = bundle(); b.facts.splice(1, 1, routine, board, real("VJH: interview invites reach HubSpot"));
+  const { title } = composeEvidenceFallbackArticle(b, {});
+  assert.ok(/interview invites reach HubSpot/.test(title) && !/refresh journal|now: claim/.test(title), title);
+});
+
+check("dupTokens strips dates (regex not mangled again) and ignores bare years", () => {
+  const src = fs.readFileSync(path.join(root, "src/daily-blog-publisher.ts"), "utf8");
+  assert.ok(src.includes(".replace(/-20\\d{2}-\\d{2}-\\d{2}\\b/g, \"\")"), "date regex lost its backslashes");
+  assert.ok(!src.includes(String.fromCharCode(8)), "a backspace character is back in the publisher source");
+  assert.ok(src.includes("!/^20\\d{2}$/.test(w)"), "bare years must not count as shared topic words");
+});
+
+check("a derived angle that is already published is derived again", () => {
+  const src = fs.readFileSync(path.join(root, "src/daily-blog-publisher.ts"), "utf8");
+  assert.ok(/findNearDuplicate\(derived\.keyword/.test(src) && /deriving again/.test(src));
+});
+
+check("git evidence reads origin/main (what shipped), and commit subjects are scrubbed", () => {
+  const src = fs.readFileSync(path.join(root, "src/blog-evidence.ts"), "utf8");
+  assert.ok(/git fetch -q origin main/.test(src) && /origin\/main/.test(src));
+  assert.ok(/scrubPublic\(rest\.join\('\|'\)\)/.test(src));
+});
+
 if (failed) {
   console.error(`\n${failed} check(s) failed`);
   process.exit(1);

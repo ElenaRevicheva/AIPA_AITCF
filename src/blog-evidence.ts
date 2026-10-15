@@ -164,8 +164,15 @@ async function collectGit(facts: EvidenceFact[]): Promise<void> {
   for (const repo of repos) {
     const dir = gitRepoDir(repo);
     if (!dir) continue;
+    // 15 Oct 2026: Oracle's cto-aipa checkout is deployed by scp and its HEAD is held at an Atlas-only commit on
+    // purpose, so `git log HEAD` never showed a day's real work (the 15 Oct article had only aideazz auto-commits to
+    // stand on). origin/main is what shipped; fetching it never touches the working tree, and it keeps the
+    // Oracle-only Atlas commits — which name prospects — out of a public article.
+    const ref = await run(
+      `cd ${JSON.stringify(dir)} && (timeout 20 git fetch -q origin main 2>/dev/null || true) && (git rev-parse -q --verify origin/main >/dev/null && echo origin/main || echo HEAD)`,
+    );
     const log = await run(
-      `cd ${JSON.stringify(dir)} && git log --since="48 hours ago" --no-merges --pretty=format:"%h|%ad|%s" --date=short | head -12`,
+      `cd ${JSON.stringify(dir)} && git log ${ref === 'origin/main' ? 'origin/main' : 'HEAD'} --since="48 hours ago" --no-merges --pretty=format:"%h|%ad|%s" --date=short | head -12`,
     );
     if (!log) continue;
     const lines = log.split('\n').filter(Boolean);
@@ -178,7 +185,7 @@ async function collectGit(facts: EvidenceFact[]): Promise<void> {
         fact(
           `git.${repo}.${i}`,
           `Commit in ${repo}`,
-          `${hash} (${date}) ${rest.join('|')}`,
+          `${hash} (${date}) ${scrubPublic(rest.join('|'))}`,
           `git log in ${repo}`,
         ),
       );
@@ -542,8 +549,13 @@ export function salvageArticleAgainstEvidence(
   return { ok: false, reason: v.reason, markdown: next };
 }
 
+/** Commits a cron writes every day: they say nothing new, so they must not name the day's article. */
+// "now:" = the NOW.md session board (claims, handoffs) — coordination, not a story.
+const ROUTINE_COMMIT = /refresh journal|chore\(blog-static\)|regenerate|^\S+ \([\d-]+\) (merge|bump|now:)/i;
+
 function pickDistinctiveFact(bundle: EvidenceBundle): EvidenceFact | null {
-  const git = bundle.facts.find((f) => f.key.startsWith('git.') && !f.key.endsWith('.count'));
+  const git = bundle.facts.find((f) => f.key.startsWith('git.') && !f.key.endsWith('.count') && !ROUTINE_COMMIT.test(f.value))
+    || bundle.facts.find((f) => f.key.startsWith('git.') && !f.key.endsWith('.count'));
   if (git) return git;
   const wiki = bundle.facts.find((f) => f.key.startsWith('wiki.'));
   if (wiki) return wiki;
@@ -562,8 +574,16 @@ export function composeEvidenceFallbackArticle(
 ): { title: string; markdown: string } {
   const distinctive = pickDistinctiveFact(bundle);
   const date = bundle.collectedAt.slice(0, 10);
+  // 15 Oct 2026: the title was "Commit: <repo> — <date>", identical every day for a repo, so the duplicate gate
+  // refused the safety net itself ("near-duplicate of commit-aideazz-2026-10-04"). Name what actually changed.
+  const subject = distinctive && distinctive.key.startsWith('git.')
+    ? distinctive.value.replace(/^\S+ \([\d-]+\)\s*/, '').trim()
+    : '';
   const titleCore = distinctive
-    ? distinctive.label.replace(/^Commit in /, 'Commit: ').slice(0, 80)
+    ? (subject
+        ? `${distinctive.key.split('.')[1]}: ${subject}`
+        : distinctive.label.replace(/^Wiki incident: /, '').replace(/^Commit in /, 'Commit: ')
+      ).slice(0, 90)
     : 'Production measurements';
   const title = `${titleCore} — ${date}`;
 

@@ -622,9 +622,11 @@ function dupTokens(s: string): Set<string> {
   return new Set(
     s
       .toLowerCase()
-      .replace(/-20d{2}-d{2}-d{2}/g, "")
+      .replace(/-20\d{2}-\d{2}-\d{2}\b/g, "")
       .split(/[^a-z0-9]+/)
-      .filter((w) => w.length > 2 && !DUP_STOPWORDS.has(w)),
+      // A bare year is a date, not a topic: "Commit: aideazz — 2026-10-15" and "commit-aideazz-2026-10-04" shared
+      // {commit, aideazz, 2026} = 3 tokens = 100%, and the 15 Oct measured-notes fallback was refused as a duplicate.
+      .filter((w) => w.length > 2 && !DUP_STOPWORDS.has(w) && !/^20\d{2}$/.test(w)),
   );
 }
 
@@ -1159,7 +1161,15 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
     // work is not finite. Prefer an angle from today's evidence so the post
     // is about what actually happened; keep the rotation keyword only as SEO
     // fallback, with every digit stripped so the model cannot copy it.
-    const derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
+    let derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
+    // 15 Oct 2026: the model only sees the last 30 titles, so it proposed "GA4 sync zero rows" — published 6 Sep —
+    // and every retry rewrote that same article. Check the angle against the WHOLE corpus and re-derive once.
+    const angleDup = derived ? findNearDuplicate(derived.keyword, titleToSlug(derived.keyword)) : null;
+    if (derived && angleDup) {
+      console.log(`[daily-blog] Derived angle "${derived.keyword}" is already published as "${angleDup.slug}" — deriving again`);
+      derived = await deriveAngleFromEvidence(deps.anthropic, evidence, [angleDup.slug, ...recentTitles]);
+      if (derived && findNearDuplicate(derived.keyword, titleToSlug(derived.keyword))) derived = null;
+    }
     if (derived) {
       keyword = derived.keyword;
       brief = derived.brief;
