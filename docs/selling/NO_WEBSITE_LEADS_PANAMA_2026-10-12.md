@@ -86,3 +86,13 @@ clinic really uses. Compare it with the Google phone. **The mismatch is both the
 
 Instagram DM version = the same format without the PD, kept under Instagram's 1,000-character DM limit. Instagram is read by a human
 (Elena) only; nothing reads Instagram automatically.
+
+## 15 Oct 2026: the WhatsApp hides behind the Instagram bio's short link (Elena's finding)
+- **All 8 reachable clinics are now SENT** (TLDC, Mundo Dental, OrthoBraces on WhatsApp; Beautiful Smile by Instagram DM; plus the 4 of 14 Oct).
+  FU #1 tasks for all 8 due **Fri 16 Oct 09:00 Panama**. Dental Implants of Panama: landline only, nothing else found → park.
+- **TLDC:** Elena opened its Instagram bio → a bit.ly link → a WhatsApp number different from Google's landline, and messaged it.
+  Re-checked: TLDC's own Linktree (linktr.ee/clinicatldc) links the same wa.me number, **and still links the dead tldcpanama.com**.
+- **Method (search correctly):** Google `"<instagram handle>" linktree OR bit.ly OR wa.link`, then open the short link (public redirect, not
+  Instagram) to read the wa.me number. **Only trust links on the clinic's own page:** a wa.link in the same results led to a Mexican number
+  from another account.
+- Lesson for Atlas: a Google LANDLINE with no WhatsApp is not a dead end; the bio link usually carries the real WhatsApp.

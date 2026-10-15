@@ -219,11 +219,13 @@ git log keeps the record.
     **14 Oct: all 9 WA messages rewritten to Elena's polite format** (🔎 api → 🔗 portfolio → PD 👉 ES deck PDF); button text = shown text, read back
     from HubSpot for all 9; template + honest per-clinic Google lines in `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md`. **Elena's move: send.**
     Atlas Monday's `buildNoWebsiteWa()` still writes the OLD short text (not changed — needs her go).
-    **14 Oct status:** ⏳ Sent (WA) = Dr. Cano, Vive Feliz, Dr. González, Orthox → **4 FU tasks due Fri 16 Oct 14:00 UTC** (HIGH, reminder,
-    verified hook + gatekeeper question + button). Replies so far = WhatsApp Business auto-greetings (NOT replies). The 5 landlines were not on WA →
-    🧭 REACH PLAN note + task (Thu 15 Oct) on each: Mundo Dental + OrthoBraces = WA mobile from their own Instagram/Facebook (button ready),
-    TLDC + Beautiful Smile = Instagram DM (text ready, <1,000 chars), Dental Implants of Panama = nothing found → park (Elena's call). The 4 with a
-    channel moved 🤖 → 🔥. Method + findings: `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md` (14 Oct section). **Elena's move: send the 4.**
+    **15 Oct status: 8 of 9 SENT** (WhatsApp: Dr. Cano, Vive Feliz, Dr. González, Orthox, Mundo Dental, OrthoBraces, TLDC; Instagram DM: Beautiful
+    Smile) → **8 FU tasks due Fri 16 Oct 14:00 UTC** (HIGH, reminder, verified hook + gatekeeper question + button), the 4 done "send" tasks closed.
+    Replies so far = WhatsApp Business auto-greetings only. Dental Implants of Panama = landline only → park (Elena's call).
+    **Elena's finding 15 Oct:** TLDC's real WhatsApp sits behind its Instagram bio's bit.ly / Linktree link (≠ Google landline). Method + the
+    "only trust the clinic's own page" trap: `docs/selling/NO_WEBSITE_LEADS_PANAMA_2026-10-12.md` (15 Oct section). Atlas today learns ONLY stage
+    counts per lane (`hs-outcomes-to-atlas.cjs` → whitespace `data/outcomes.json`): no notes, no screenshots. Screenshot-reading plan proposed to
+    Elena 15 Oct, awaiting her yes.
     ⚠️ **Nothing automatic watches WhatsApp** (`hs-watch-manual-emails` FU +4d and `followup_radar.py` = EMAIL only) → when Elena marks ⏳ Sent +
     "sent" note, the agent creates the FU task. Proposed (needs her go): that watcher also gives any deal entering ⏳ Sent with no open task its FU.
 - **VERIFIED BY:** live curl: instagram 422, share.google 422, aideazz.xyz 200 100/A+; pm2 log `no-owned-website url=… platform=Instagram`; Oracle `test-no-website-leads.cjs` 32/32; laptop `test-diagnostic-delivery.cjs` 69/69; 1 live Places request through `mapsSearch` → 200 with googleMapsUri/primaryType (2 laptop Places requests, outside the Oracle ledger).
