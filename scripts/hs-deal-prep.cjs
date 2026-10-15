@@ -85,7 +85,7 @@ async function digest(outPath) {
     sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
     limit: 60,
   });
-  const entries = [];
+  const entries = [], interviewDeals = [];
   for (const d of res.results || []) {
     const name = String(d.properties.dealname || '');
     if (!/^\s*\[HIRING-/i.test(name)) continue;
@@ -105,6 +105,8 @@ async function digest(outPath) {
     // Compact on purpose: every live deal must fit the smallest context in the chain. Role + stage + the
     // posting's own requirements is what the interview needs; links and full notes are one tool call away.
     const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trim()}…` : s);
+    const qs = likelyQuestions(notes);
+    if (qs.length) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs });
     reqs = [...new Set(reqs)].slice(0, 3).map((r) => cut(r, 90));
     entries.push([
       `### ${cut(company || role, 40)} — ${cut(role, 70)} (${d.properties.dealstage})`,
@@ -118,8 +120,9 @@ async function digest(outPath) {
     '# take the role and requirements from HERE. Never invent a role. For full notes run hs-deal-prep.cjs --company="<company>".',
     '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, RUN that command in that same turn, before writing',
     '# anything (add --role="<role she named>" — one company can have several deals). Your first line must be the',
-    '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly.',
-    '# Only if the command FAILED or printed no READ-PROOF line: "⚠️ Deal NOT fully loaded" — never guess it, never skip running it.',
+    '# "✅ Loaded: …" text from the READ-PROOF line at the very END of its output (note count + newest note), copied exactly —',
+    '# or, for a deal under 🎤 INTERVIEW DEALS in her VERIFIED FACTS sheet, that ✅ Loaded line. NEVER compose it yourself',
+    '# (15 Oct 2026: a made-up "7 notes, newest: …" line hid that the deal was never read). No such line: "⚠️ Deal NOT fully loaded".',
     '# Ask ONE mock question per message (🎙️ Q<n>/<total>) — never list the whole series.',
     '# SPANISH (Elena, 14 Oct 2026): "en español" or she writes in Spanish → the WHOLE interview in Spanish (questions, polished',
     '# answer, explanations) and EVERY message ends with a Spanish [[tts:text]]…[[/tts:text]] voice block; use the §0b template.',
@@ -128,7 +131,7 @@ async function digest(outPath) {
     '# question, no voice note. FACTS always: titles exactly "Deputy CEO for Corporate Governance & Chief Legal Officer" (never',
     '# "CEO"); AI agents implement, she decides requirements and tests; no metric she does not have (conversions, revenue, hours).',
     '# EXAMPLE RULE (Elena, 11 Oct 2026): EVERY answer — polished or LIVE — has a line "For example, from my work:" with ONE true example from HER OWN products,',
-    '# COPIED WORD FOR WORD from the "✅ VERIFIED EXAMPLES" list at the end of the deal output (pick the best fit; never reword',
+    '# COPIED WORD FOR WORD from the "✅ VERIFIED EXAMPLES" list (always in her VERIFIED FACTS sheet) (pick the best fit; never reword',
     '# or round a number — "18 websites" is not "18 users"). A generic answer with no example from her products is a miss.',
     '# HER CAREER, exactly: 2011–2018 Deputy CEO for Corporate Governance & Chief Legal Officer of a ~60-person regional e-government',
     '# operator — she ran the BOARD PROCESS and the LEGAL side of moving public services online (not product delivery, not IT). 2024–2025',
@@ -142,30 +145,129 @@ async function digest(outPath) {
   fs.writeFileSync(`${outPath}.tmp`, body);
   fs.renameSync(`${outPath}.tmp`, outPath);      // atomic: OpenClaw never reads a half-written sheet
   console.log(`digest: ${entries.length} live job deals → ${outPath} (${body.length} chars)`);
+  const proofOut = arg('proof-out');
+  if (proofOut) {
+    const sheet = proofSheet(interviewDeals);
+    fs.mkdirSync(path.dirname(proofOut), { recursive: true });
+    fs.writeFileSync(`${proofOut}.tmp`, sheet);
+    fs.renameSync(`${proofOut}.tmp`, proofOut);
+    console.log(`proof sheet: ${interviewDeals.length} interview deal(s) → ${proofOut} (${sheet.length} chars)`);
+  }
 }
 
 // VERIFIED EXAMPLES (11 Oct 2026, Elena: answers must carry "examples of my true verified situations with my products").
 // gpt-4.1 paraphrased a CV fact into a false one ("39 audits from 18 real users in one week"), while the 🛡️ line it
 // copies verbatim never bent — so the example is copied too, from the reviewed CV bank, never re-told.
 // --examples (12 Oct 2026): the same list for `spar` (no deal loaded) — without it Gemini invented "2,500+ analyses".
-function printVerifiedExamples() {
+const loadBank = () => require(require('path').join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'));
+const plain = (t) => String(t || '').replace(/\*\*/g, '').trim();
+
+function verifiedExampleLines() {
   try {
-    const bank = require(require('path').join(__dirname, '..', 'docs', 'applications', 'cv-bank.json'));
+    const bank = loadBank();
     const told = (t) => t.replace(/^\*\*([^*]+?)\*\*\s*/, (m, lead) => (lead.includes(' — ') ? `${lead.split(' — ')[0]}: ` : ''));
     // Every reviewed bullet is a true story; "six products", "five junk results" carry numbers in words, so no digit filter.
     const ex = (bank.bullets || []).map((b) => told(String(b.text || ''))).filter(Boolean);
-    if (ex.length) {
-      console.log('\n===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):');
-      ex.forEach((t, i) => console.log(`${i + 1}. ${t}`));
-    }
     // 14 Oct 2026 (Pitz, Spanish interview): a model TRANSLATING a story bent "1–10 October" into "una semana" — so the
     // Spanish versions are written once, numbers checked against the English, and copied like the English ones.
     const es = (bank.bullets || []).map((b) => String(b.text_es || '').trim()).filter(Boolean);
-    if (es.length) {
-      console.log('\n===== ✅ EJEMPLOS VERIFICADOS (ES) — para "Por ejemplo, en mi trabajo:" copia UNO PALABRA POR PALABRA (cifras verificadas):');
-      es.forEach((t, i) => console.log(`${i + 1}. ${t}`));
+    const out = [];
+    if (ex.length) out.push('', '===== ✅ VERIFIED EXAMPLES — for "For example, from my work:" copy ONE of these WORD FOR WORD (numbers are checked):', ...ex.map((t, i) => `${i + 1}. ${t}`));
+    if (es.length) out.push('', '===== ✅ EJEMPLOS VERIFICADOS (ES) — para "Por ejemplo, en mi trabajo:" copia UNO PALABRA POR PALABRA (cifras verificadas):', ...es.map((t, i) => `${i + 1}. ${t}`));
+    return out;
+  } catch (e) { return ['', `(verified examples unavailable: ${e.message.slice(0, 80)})`]; }
+}
+const printVerifiedExamples = () => verifiedExampleLines().forEach((l) => console.log(l));
+
+// 🎤 THIS COMPANY'S QUESTIONS — the "Preguntas probables / Likely questions" list of a 🔎 deep-dive note.
+function likelyQuestions(notes) {
+  const qs = [];
+  for (const n of notes) {
+    const lines = stripHtml(n.html).split('\n').map((l) => l.trim()); // a note pasted from Windows keeps "\r" per line
+    const at = lines.findIndex((l) => /^\s*\d+\.\s*(Preguntas probables|Likely (interview )?questions)/i.test(l));
+    if (at < 0) continue;
+    for (const l of lines.slice(at + 1)) {
+      if (/^\s*\d+\.\s/.test(l)) break; // the next numbered section ends the list
+      const m = l.match(/^\s*[•*-]\s*(.+)$/);
+      if (m) qs.push(m[1].trim());
     }
-  } catch (e) { console.log(`\n(verified examples unavailable: ${e.message.slice(0, 80)})`); }
+  }
+  return qs;
+}
+
+// What she can check in HubSpot herself: the deal's note count and the first words of its newest note.
+function readProof(dealname, notes, cut = 0) {
+  const newest = [...notes].sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0];
+  const newestTitle = newest ? stripHtml(newest.html).split('\n')[0].trim().slice(0, 60) : '';
+  return `✅ Loaded: ${String(dealname).replace(/^\s*\[[^\]]*\]\s*/, '')} — ${notes.length} notes, newest: "${newestTitle}"${cut ? ` · ⚠️ ${cut} note(s) cut` : ''}`;
+}
+
+/*
+ * PROOF SHEET (15 Oct 2026) — `--digest --proof-out=<file>`, injected into EVERY OpenClaw reply next to the deals sheet.
+ * Elena's real Pitz session (14 Oct 21:07 → 15 Oct 10:58 UTC) never ran this script: gpt-4.1 wrote a "✅ Loaded … 7 notes"
+ * line it had made up, then invented a client demo, "half the test cycle", a Slack bot and React dashboards, and on a free
+ * question had no true fact about her at all. The reviewed facts only reached a model that ran a tool — so they now sit in
+ * the context, like the deals did on 7 Oct. STACK lines: not in the CV bank (its rule: no new sentence), verified from each
+ * repo's code on 15 Oct 2026 — cto-aipa src/*.ts (llm-resilience.ts chain, concierge.ts Resend webhook); EspaLuzWhatsApp
+ * espaluz_rag.py + config/migrations/001_espaluz_embeddings.sql (pgvector), espaluz_bridge.py (Twilio), espaluz_memory.py
+ * (LangChain); VibeJobHunterAIPA_AIMCF src/api/app.py (FastAPI), src/autonomous/orchestrator.py (HubSpot); aideazz/
+ * package.json (React 18 + TypeScript + Vite + Tailwind, 86 .tsx), atuona/ and aideazz-ops-dashboard/ package.json (React).
+ * Career ES: the 2011–2018 line is skill §0b's; the other two translate CV-bank summary s-cofounder-and-board and
+ * s-products-end-to-end, numbers checked.
+ */
+const STACK_BY_PRODUCT = [
+  ['CTO AIPA (my AI technical agent): TypeScript on Node.js; a Telegram bot; Trello and HubSpot REST APIs; Resend email webhooks; a five-provider model chain (Claude, OpenAI, Gemini, Groq, Grok) that fails over automatically.',
+    'CTO AIPA (mi agente técnico de IA): TypeScript sobre Node.js; un bot de Telegram; APIs REST de Trello y HubSpot; webhooks de correo de Resend; una cadena de cinco proveedores de modelos (Claude, OpenAI, Gemini, Groq, Grok) que cambia de proveedor automáticamente.'],
+  ['EspaLuz (bilingual AI Spanish tutor): Python; PostgreSQL with pgvector for each family\'s conversation memory (RAG); LangChain memory; WhatsApp through Twilio webhooks, plus a Telegram twin; Whisper for voice notes.',
+    'EspaLuz (tutora bilingüe de español con IA): Python; PostgreSQL con pgvector para la memoria de conversación de cada familia (RAG); memoria con LangChain; WhatsApp mediante webhooks de Twilio, más un gemelo en Telegram; Whisper para las notas de voz.'],
+  ['VibeJob Hunter (job-search sourcing and screening pipeline): Python with FastAPI; writes to HubSpot through its REST API.',
+    'VibeJob Hunter (pipeline de búsqueda y filtrado de empleos): Python con FastAPI; escribe en HubSpot mediante su API REST.'],
+  ['Front ends: aideazz.xyz is React + TypeScript (Vite, Tailwind); the Atuona gallery and my ops dashboard are React too.',
+    'Front ends: aideazz.xyz está hecho en React + TypeScript (Vite, Tailwind); la galería de Atuona y mi panel de operaciones también son React.'],
+  ['How I build: AI agents (Cursor, Claude Code) do much of the implementation; I own the requirements, the architecture, the tests a change must pass, deployment and production decisions.',
+    'Cómo construyo: agentes de IA (Cursor, Claude Code) hacen gran parte de la implementación; yo decido los requisitos, la arquitectura, las pruebas que debe pasar un cambio, el despliegue y las decisiones en producción.'],
+];
+const CAREER_ES = [
+  'De 2011 a 2018 fui Deputy CEO de Gobierno Corporativo y Directora Jurídica (CLO) de un operador regional de gobierno electrónico de ~60 personas: dirigí el proceso del consejo y el área jurídica del paso de los servicios públicos a formato electrónico.',
+  'En 2024–2025 fui Operational Co-Founder de OmniBazaar, un marketplace de comercio electrónico descentralizado, donde lideré la planificación estratégica y su estructura operativa.',
+  'Desde 2025 soy responsable de punta a punta de los productos de IA de AIdeazz AI Lab, que fundé: decido qué se construye y en qué orden, escribo los requisitos, decido las pruebas que debe pasar un cambio, lo lanzo y mido el resultado en producción. Agentes de IA especializados hacen gran parte de la implementación; las decisiones de producto, la aceptación y el resultado son míos.',
+];
+const NEVER_INVENT = '# NEVER invent: clients, users, demos, dashboards, Slack bots, onboarding agents, "twice as fast", "half the time", or any number not printed here.'
+  + ' If nothing here fits (a tool, a stack, a result she does not have), SAY SO and give the closest true fact: "I don\'t have a verified example of X — the closest is …" / "No tengo un ejemplo verificado de X; lo más cercano es …".';
+
+function proofSheet(interviewDeals) {
+  let bank = {};
+  try { bank = loadBank(); } catch { /* the examples block reports it */ }
+  const out = [
+    '# ✅ ELENA\'S VERIFIED FACTS — the ONLY source for anything you say about her experience, products, stack or background:',
+    '# mock answers, LIVE answers and free questions, in English or Spanish. Refreshed every 30 min (cto-aipa hs-deal-prep.cjs --digest).',
+    '# Copy these WORD FOR WORD (Spanish: copy the Spanish line — never translate a fact yourself).',
+    NEVER_INVENT,
+    '',
+    '===== HER CAREER AND WORK (EN — reviewed CV lines):',
+    ...(bank.summary || []).map((s) => `• ${plain(s.text)}`),
+    '',
+    '===== SU TRAYECTORIA (ES — copia exacta):',
+    ...CAREER_ES.map((s) => `• ${s}`),
+    '',
+    '===== HER PRODUCTS (live):',
+    ...(bank.live || []).map((l) => `• ${plain(l.text)}`),
+    '',
+    '===== HER STACK (reviewed CV line, word for word):',
+    plain(bank.tools || ''),
+    '',
+    '===== WHICH PRODUCT RUNS ON WHAT (verified from the code, 15 Oct 2026) / QUÉ USA CADA PRODUCTO:',
+    ...STACK_BY_PRODUCT.flatMap(([en, es]) => [`• ${en}`, `  ES: ${es}`]),
+    ...verifiedExampleLines(),
+  ];
+  if (interviewDeals.length) {
+    out.push('', '===== 🎤 INTERVIEW DEALS (a 🔎 deep-dive exists) — for "prep me for <company>": your FIRST line is this deal\'s ✅ Loaded line copied exactly; the mock questions are THESE, in this order:');
+    for (const d of interviewDeals) {
+      out.push(`### ${d.title}`, d.proof, ...d.qs.map((q, i) => `${i + 1}. ${q}`));
+    }
+  }
+  out.push('', NEVER_INVENT);
+  return `${out.join('\n')}\n`;
 }
 
 (async () => {
@@ -241,17 +343,7 @@ function printVerifiedExamples() {
   // THIS COMPANY'S QUESTIONS (14 Oct 2026, Pitz): the 🔎 deep-dive lists what this company is likely to ask, but gpt-4.1
   // kept asking role-generic questions while that list sat inside a long note. The verified examples, printed as their
   // own block near the end, ARE followed — so the company's questions get the same treatment.
-  const companyQs = [];
-  for (const n of notes) {
-    const lines = stripHtml(n.html).split('\n').map((l) => l.trim()); // a note pasted from Windows keeps "\r" per line
-    const at = lines.findIndex((l) => /^\s*\d+\.\s*(Preguntas probables|Likely (interview )?questions)/i.test(l));
-    if (at < 0) continue;
-    for (const l of lines.slice(at + 1)) {
-      if (/^\s*\d+\.\s/.test(l)) break; // the next numbered section ends the list
-      const m = l.match(/^\s*[•*-]\s*(.+)$/);
-      if (m) companyQs.push(m[1].trim());
-    }
-  }
+  const companyQs = likelyQuestions(notes);
   if (companyQs.length) {
     console.log("\n===== 🎤 THIS COMPANY'S LIKELY QUESTIONS (from the 🔎 deep-dive) — the CORE mock questions: ask THESE, in this order:");
     companyQs.forEach((q, i) => console.log(`${i + 1}. ${q}`));
@@ -260,10 +352,7 @@ function printVerifiedExamples() {
   // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
   // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
   // the deal's note count and the first words of its newest note (the top of the Notes tab).
-  const newest = [...notes].sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0];
-  const newestTitle = newest ? stripHtml(newest.html).split('\n')[0].trim().slice(0, 60) : '';
-  console.log(`\n===== READ-PROOF — copy into your FIRST line: ✅ Loaded: ${deal.properties.dealname.replace(/^\s*\[[^\]]*\]\s*/, '')}`
-    + ` — ${notes.length} notes, newest: "${newestTitle}"${cut ? ` · ⚠️ ${cut} note(s) cut` : ''}`);
+  console.log(`\n===== READ-PROOF — copy into your FIRST line: ${readProof(deal.properties.dealname, notes, cut)}`);
 })().catch((e) => {
   console.error(`hs-deal-prep failed: ${e.message}`);
   process.exit(1);

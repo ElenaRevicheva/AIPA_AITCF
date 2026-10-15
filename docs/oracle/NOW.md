@@ -143,6 +143,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 15 Oct ~11:30 UTC — OpenClaw coach grounded in her VERIFIED FACTS · was half-blind since 7 Oct · VJH reads her No-fit screenshots in full
+- **Why (Elena: "generic replies far from my real products"):** her real Pitz session 14 Oct 21:07 → 15 Oct 10:58 UTC never ran the
+  deal reader — gpt-4.1 made up "✅ Loaded … 7 notes", then a client demo, "half the test cycle", a Slack bot, React dashboards.
+  AND OpenClaw caps injected context at **24,000 chars TOTAL**: since 7 Oct the deals sheet was cut 10,984 → 7,676 and the cards
+  sheet 4,247 → 661 on every reply (189 journal warnings, silent).
+- **DONE (backups `~/_session-backups/openclaw-facts-20261015/`):** `hs-deal-prep.cjs --digest --proof-out=` (same `*/30` cron line,
+  one flag added) writes `~/.openclaw/workspace/proof/TOOLS.md` — CV-bank summary/products/stack, each product's stack verified from
+  code, career in Spanish, 23 examples EN+ES, and per 🔎-deep-dive deal its TRUE ✅ Loaded line + likely questions (~21,400 chars).
+  OpenClaw: path added to `bootstrap-extra-files`, `bootstrapMaxChars 25000`, `bootstrapTotalMaxChars 70000`, Whisper words + Claude
+  Code, Cursor (she was heard as "cloud code"); restarted 11:11:35 UTC. Menu: 💬 ASK ABOUT YOU, Spanish answers, what updates itself.
+- **VERIFIED BY:** 8 test sessions (her exact questions ×2): 0 invented items in 7, 0 truncation warnings, true proof line + Pitz Q1,
+  career ES word for word, stack per product correct; `/menu` returns the new menu. cto-aipa (this commit), job-list-filter `docs` 1e91c9b.
+- **VJH (6b9ebd4, scp'd; Oracle checkout HEAD still 6a0a94e with the same 2 files):** Pursuit No-fit "Look why" + 2 screenshots → `why`
+  was EMPTY (gpt-4o-mini said NONE for "New York City", cached forever; 2nd shot never read — the kit's CV PDFs took both slots).
+  Now her notes' images only, up to 4 joined, NONE needs a 2nd model, failures retried. Live: why = "Location: New York City … |
+  hybrid in Long Island City (Tue–Thu)"; reasons 53 → 54.
+- **⚠️ RISK — Elena's money call:** **OpenAI balance EMPTY since ~11:00 UTC 15 Oct** ("You have no credits remaining"). OpenClaw answers on
+  Gemini (failover works) but its nova VOICE falls back to Edge (403) → text only; CTO AIPA spoken replies → text only; OpenAI
+  Whisper fallbacks gone (Groq primaries fine); VJH vision reads on Gemini. Anthropic also empty.
+
 ### ✅ 14–15 Oct — voice moves 1+5+6 LIVE (Elena's go): CTO AIPA speaks (EN/ES) + name repair · OpenClaw hears her vocabulary · claim released
 - **CTO AIPA (f001beaf + review fixes 1b1fde29; pm2 restarted 00:30:07 UTC > files 00:30:04; backups `~/_session-backups/voice-speak-20261014/`):**
   `repairNames` (written 2 Sep, never called) runs on every voice note, log `[Voice] transcribed by <provider>: N chars, <script>,
