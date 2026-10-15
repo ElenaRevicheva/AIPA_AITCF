@@ -85,8 +85,9 @@ async function digest(outPath) {
     sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
     limit: 60,
   });
-  const entries = [], interviewDeals = [];
+  const entries = [], interviewDeals = [], seen = new Set();
   for (const d of res.results || []) {
+    seen.add(String(d.id));
     const name = String(d.properties.dealname || '');
     if (!/^\s*\[HIRING-/i.test(name)) continue;
     let notes;
@@ -106,7 +107,8 @@ async function digest(outPath) {
     // posting's own requirements is what the interview needs; links and full notes are one tool call away.
     const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trim()}…` : s);
     const qs = likelyQuestions(notes);
-    if (qs.length) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs, ...deepDiveFacts(notes) });
+    const dd = deepDiveFacts(notes);
+    if (qs.length && freshDive(dd)) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs, ...dd });
     reqs = [...new Set(reqs)].slice(0, 3).map((r) => cut(r, 90));
     entries.push([
       `### ${cut(company || role, 40)} — ${cut(role, 70)} (${d.properties.dealstage})`,
@@ -140,10 +142,42 @@ async function digest(outPath) {
   ].join('\n');
   let body = head;
   for (const e of entries) { if ((body + e).length + 2 > DIGEST_MAX) break; body += `${e}\n\n`; }
+  // 15 Oct 2026: /research_employer saves the deep-dive on the deal of a BOOKED interview, usually older than the 60
+  // newest deals above (they span only a few days). So the deep-dive NOTES of the last 30 days are searched directly,
+  // and their open [HIRING-…] deals are read too — for their deep-dive only.
+  try {
+    const since = String(Date.now() - 30 * 864e5);
+    const found = await hs('POST', '/crm/v3/objects/notes/search', {
+      filterGroups: ['PROFUNDA', 'DIVE'].map((tok) => ({ filters: [
+        { propertyName: 'hs_note_body', operator: 'CONTAINS_TOKEN', value: tok },
+        { propertyName: 'hs_timestamp', operator: 'GTE', value: since },
+      ] })),
+      properties: ['hs_timestamp'],
+      limit: 50,
+    });
+    const extra = new Set();
+    for (const n of found.results || []) {
+      const a = await hs('GET', `/crm/v4/objects/notes/${n.id}/associations/deals`);
+      for (const r of a.results || []) if (!seen.has(String(r.toObjectId))) extra.add(String(r.toObjectId));
+    }
+    for (const id of extra) {
+      const d = await hs('GET', `/crm/v3/objects/deals/${id}?properties=dealname,dealstage`);
+      const name = String((d.properties && d.properties.dealname) || '');
+      if (!/^\s*\[HIRING-/i.test(name) || ['closedwon', 'closedlost'].includes(d.properties.dealstage)) continue;
+      seen.add(id);
+      let notes;
+      try { notes = await notesOf(d.id); } catch { continue; }
+      const qs = likelyQuestions(notes), dd = deepDiveFacts(notes);
+      if (!qs.length || !dd.facts.length || !freshDive(dd)) continue;
+      const m = name.replace(/^\s*\[[^\]]*\]\s*/, '').match(/^(.*?)\s+@\s+(.*)$/);
+      const role = m ? m[1].trim() : name, company = m ? m[2].trim() : '';
+      interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs, ...dd });
+    }
+  } catch (e) { console.warn(`deep-dive notes pass skipped: ${String(e.message).slice(0, 80)}`); }
   const fs = require('fs'), path = require('path');
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(`${outPath}.tmp`, body);
-  fs.renameSync(`${outPath}.tmp`, outPath);      // atomic: OpenClaw never reads a half-written sheet
+  fs.writeFileSync(`${outPath}.${process.pid}.tmp`, body);   // per-process: the bot's refresh and the cron never share a tmp
+  fs.renameSync(`${outPath}.${process.pid}.tmp`, outPath);      // atomic: OpenClaw never reads a half-written sheet
   console.log(`digest: ${entries.length} live job deals → ${outPath} (${body.length} chars)`);
   const proofOut = arg('proof-out');
   if (proofOut) {
@@ -155,8 +189,8 @@ async function digest(outPath) {
       sheet = proofSheet(interviewDeals);
     }
     fs.mkdirSync(path.dirname(proofOut), { recursive: true });
-    fs.writeFileSync(`${proofOut}.tmp`, sheet);
-    fs.renameSync(`${proofOut}.tmp`, proofOut);
+    fs.writeFileSync(`${proofOut}.${process.pid}.tmp`, sheet);
+    fs.renameSync(`${proofOut}.${process.pid}.tmp`, proofOut);
     console.log(`proof sheet: ${interviewDeals.length} interview deal(s) → ${proofOut} (${sheet.length} chars)`);
   }
 }
@@ -207,7 +241,16 @@ function likelyQuestions(notes) {
 // The note's own "Cuidado — lo que NO sabemos / no afirmar" section travels too, printed FIRST and never trimmed: without it
 // the coach would state as settled what the note itself flags as disputed (rounds that may overlap, two named tech leads).
 const FACTS_MAX = 2200;          // per deal; the whole proof sheet stays under PROOF_MAX below
-const PROOF_MAX = 24500;         // OpenClaw agents.defaults.bootstrapMaxChars = 25,000 per file (over it, the MIDDLE is cut)
+// The cap is OpenClaw's own setting (agents.defaults.bootstrapMaxChars; over it, the MIDDLE of the file is cut), read live
+// so raising it there is the only change needed; 24,500 when no OpenClaw config is on this machine.
+const PROOF_MAX = (() => {
+  try {
+    const c = JSON.parse(require('fs').readFileSync(require('path').join(require('os').homedir(), '.openclaw', 'openclaw.json'), 'utf8'));
+    const n = c && c.agents && c.agents.defaults && c.agents.defaults.bootstrapMaxChars;
+    if (typeof n === 'number' && n > 5000) return n - 500;   // a quoted value makes OpenClaw use its defaults, so ignore it too
+  } catch { /* no OpenClaw here */ }
+  return 24500;
+})();
 const FACTS_END = /^\s*\d+\.\s*(Por qué existe|Why (this|the) role|Dónde encaja|Where (Elena|she) fits|Preguntas probables|Likely (interview )?questions)/i;
 const CAUTION_START = /^\s*\d+\.\s*(Cuidado|Careful|What we (do )?not know|.*no afirmar|.*do not claim)/i;
 const tidyFact = (l) => l.replace(/\s*\[\d+\](\[\d+\])*/g, '').replace(/^\d+\.\s+(?=\S)/, '— ').trim(); // no "[3]" read aloud; headings ≠ the numbered questions
@@ -233,10 +276,12 @@ function deepDiveFacts(notes) {
         cautions.push(tidyFact(l));
       }
     }
-    if (facts.length) return { facts, cautions };
+    if (facts.length) return { facts, cautions, ddTs: n.ts };
   }
-  return { facts: [], cautions: [] };
+  return { facts: [], cautions: [], ddTs: '' };
 }
+// An interview is time-bound: a deep-dive older than 30 days no longer earns space in the sheet.
+const freshDive = (x) => !x.ddTs || !(Date.now() - Date.parse(x.ddTs) > 30 * 864e5);
 
 // What she can check in HubSpot herself: the deal's note count and the first words of its newest note.
 function readProof(dealname, notes, cut = 0) {

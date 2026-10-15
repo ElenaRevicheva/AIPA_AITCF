@@ -858,6 +858,53 @@ export async function addNoteToDeal(dealId: string, body: string): Promise<void>
   }
 }
 
+/**
+ * Interview deep-dive (15 Oct 2026): the open [HIRING-…] deal for a company ("… @ <Company>"), and whether it already
+ * carries a 🔎 deep-dive note. /research_employer writes its report there; hs-deal-prep.cjs then feeds OpenClaw.
+ * Exact company match after "@" first; a "Re: …" thread deal only when no other deal matches.
+ */
+export async function findHiringDealForCompany(company: string): Promise<{ id: string; name: string; hasDeepDive: boolean } | null> {
+  const want = company.trim().toLowerCase();
+  if (!want) return null;
+  const data = await hsPost<{ results?: Array<{ id: string; properties: { dealname?: string } }> }>('/crm/v3/objects/deals/search', {
+    query: company.trim(),
+    filterGroups: [{ filters: [{ propertyName: 'dealstage', operator: 'NOT_IN', values: ['closedwon', 'closedlost'] }] }],
+    properties: ['dealname'],
+    sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+    limit: 50,
+  });
+  // Fail CLOSED: hsGet/hsPost return null on any HTTP error (429, 502…). "Could not read" must never pass as "no deep-dive".
+  if (!data) throw new Error('could not search HubSpot deals — nothing saved');
+  const hiring = (data.results || []).filter((d) => /^\s*\[HIRING-/i.test(String(d.properties.dealname || '')));
+  const companyOf = (n: string) => n.split('@').slice(1).join('@').trim().toLowerCase();
+  const isThread = (n: string) => /^\s*\[[^\]]+\]\s*re:/i.test(n);
+  const exact = hiring.filter((d) => companyOf(String(d.properties.dealname || '')) === want);
+  const pool = exact.length ? exact : hiring.filter((d) => companyOf(String(d.properties.dealname || '')).includes(want));
+  const hit = pool.find((d) => !isThread(String(d.properties.dealname || ''))) || pool[0];
+  if (!hit) return null;
+  return { id: hit.id, name: String(hit.properties.dealname || ''), hasDeepDive: await dealHasDeepDive(hit.id) };
+}
+
+/**
+ * Does this deal carry a 🔎 deep-dive note from the last 30 days (older ones no longer reach OpenClaw's sheet)?
+ * Fails CLOSED: any HubSpot read error throws — "could not read" never passes as "none".
+ */
+export async function dealHasDeepDive(dealId: string): Promise<boolean> {
+  const assoc = await hsGet<{ results?: Array<{ toObjectId: string | number }> }>(`/crm/v4/objects/deals/${dealId}/associations/notes`);
+  if (!assoc) throw new Error('could not read the deal\'s notes from HubSpot');
+  const ids = (assoc.results || []).map((r) => ({ id: String(r.toObjectId) }));
+  if (!ids.length) return false;
+  const notes = await hsPost<{ results?: Array<{ properties: { hs_note_body?: string; hs_timestamp?: string } }> }>(
+    '/crm/v3/objects/notes/batch/read', { inputs: ids.slice(0, 100), properties: ['hs_note_body', 'hs_timestamp'] });
+  if (!notes) throw new Error('could not read the deal\'s notes from HubSpot');
+  return (notes.results || []).some((n) => {
+    const first = String(n.properties.hs_note_body || '').replace(/<br\s*\/?>|<\/(p|div|li|h\d)>/gi, '\n')
+      .replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').split('\n').map((l) => l.trim()).find(Boolean) || '';
+    const ts = Date.parse(String(n.properties.hs_timestamp || ''));
+    return /INVESTIGACI[ÓO]N PROFUNDA|DEEP[- ]DIVE/i.test(first) && !(Date.now() - ts > 30 * 864e5);
+  });
+}
+
 /** Escape plain text for HubSpot HTML notes. */
 function escHs(s: string): string {
   return s

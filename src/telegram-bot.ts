@@ -118,7 +118,8 @@ import {
 } from './radar-cleanup';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
-import { getHubSpotStats, pushLeadToHubSpot } from './hubspot-client';
+import { getHubSpotStats, pushLeadToHubSpot, findHiringDealForCompany, dealHasDeepDive, addNoteToDeal } from './hubspot-client';
+import { execFile } from 'child_process';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -839,7 +840,7 @@ Type /menu for all commands! 🚀
       title: '🔬 RESEARCH AGENTS',
       commands: [
         { cmd: '/research_company',    desc: '🔥 Autonomous Claude + Bright Data research on a prospect. Founder, pain signals, pitch angle, HOT/WARM/COLD. ~90s.', usage: '/research_company decircle.io' },
-        { cmd: '/research_employer',   desc: '🎯 Employer mode — funding, hiring, tech stack, comp signals, application angle.', usage: '/research_employer Anthropic' },
+        { cmd: '/research_employer',   desc: '🎯 INTERVIEW BOOKED? Deep research on the company + its products (every fact sourced, plus what NOT to claim), saved on the job deal → then OpenClaw: /new + "prep me for <company>". Only for booked interviews; the 🔥 I act today kit stays automatic.', usage: '/research_employer Pitz' },
         { cmd: '/research_competitor', desc: '📚 SEO/AEO competitor gap — top content + blog topic gaps.', usage: '/research_competitor brain.fm' },
       ],
     },
@@ -912,6 +913,11 @@ Type /menu for all commands! 🚀
 
   async function showMenu(ctx: Context) {
     const menuMessage = `🤖 *CTO AIPA v6.0 - PERSONAL AI CO-FOUNDER*
+
+💼 *YOUR JOB FLOW — nothing to remember*
+1️⃣ New job → the kit fills the HubSpot deal by itself (company note, CV, letter, Comet prompt) → open 🔥 I act today, apply
+2️⃣ Interview booked (LinkedIn, WhatsApp, anywhere) → send here: \`/research_employer <company>\` → deep research on the company + products lands on the job deal
+3️⃣ In OpenClaw: \`/new\` → \`prep me for <company>\` → it prepares you from that research
 
 _Tap a section below to see commands and usage examples!_
 
@@ -2340,17 +2346,126 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     }
   }
 
+  /**
+   * Interview deep-dive → the HIRING deal (15 Oct 2026). Saved as a "🔎 <Company> — DEEP DIVE" note, the header
+   * hs-deal-prep.cjs looks for, then OpenClaw's sheets are refreshed with the same command as its every-30-minutes cron.
+   * A deal that already has a deep-dive keeps it (Pitz's hand-written one is never overridden). Every claim the bot makes
+   * is read back first: the note on the deal, then the deal's block in OpenClaw's proof sheet.
+   */
+  // A section heading = its OWN number + its OWN keyword, and only moving forward: "4. What would you ship first?" inside
+  // the questions, or "1. What the ARR is" inside the cautions, is an item, not a heading.
+  const DD_HEADS: Record<number, RegExp> = {
+    1: /^\s*1\.\s+What\b/i, 2: /^\s*2\.\s+Products?\b/i, 3: /^\s*3\.\s+Customers?\b/i,
+    4: /^\s*4\.\s+Founders?\b/i, 5: /^\s*5\.\s+Likely\b/i, 6: /^\s*6\.\s+Careful\b/i,
+  };
+  /** Plain text the parser reads: no markdown, and numbered items in sections 5–6 turned into "• " bullets. */
+  function normalizeDeepDive(report: string): string {
+    let sec = 0;
+    return report.replace(/\*\*/g, '').replace(/^#{1,6}\s*/gm, '').split('\n').map((l) => {
+      const n = Number((l.match(/^\s*([1-6])\.\s/) || [])[1] || 0);
+      if (n > sec && DD_HEADS[n]?.test(l)) { sec = n; return l.trim(); }
+      if (/^\s*(Sources|Fuentes)\s*:/i.test(l)) { sec = 7; return l.trim(); }
+      if ((sec === 5 || sec === 6) && /^\s*\d+[.)]\s+\S/.test(l)) return `• ${l.replace(/^\s*\d+[.)]\s+/, '').trim()}`;
+      return l.trimEnd();
+    }).join('\n').trim();
+  }
+  /** Why a report must NOT take the deal's one deep-dive slot (a refusal, an empty answer, an unstructured summary). */
+  function deepDiveProblem(t: string): string | null {
+    const lines = t.split('\n').map((l) => l.trim());
+    const q = lines.findIndex((l) => /^\d+\.\s*(Likely (interview )?questions|Preguntas probables)/i.test(l));
+    if (q < 0) return 'it has no "Likely interview questions" section';
+    if (lines.slice(0, q).filter((l) => l && !/^\d+\.\s/.test(l)).length < 3) return 'it has almost no company facts';
+    let qs = 0;
+    for (const l of lines.slice(q + 1)) {
+      if (/^\d+\.\s/.test(l) || /^(Sources|Fuentes)\s*:/i.test(l)) break;
+      if (/^[•*-]\s*\S/.test(l)) qs++;
+    }
+    if (qs < 3) return 'it has fewer than 3 likely questions';
+    const c = lines.findIndex((l) => /^\d+\.\s*(Careful|Cuidado)/i.test(l));
+    if (c < 0) return 'it has no "Careful — what we do NOT know" section';
+    let cautions = 0;
+    for (const l of lines.slice(c + 1)) {
+      if (/^\d+\.\s/.test(l) || /^(Sources|Fuentes)\s*:/i.test(l)) break;
+      if (/^[•*-]\s*\S/.test(l)) cautions++;
+    }
+    if (!cautions) return 'its "Careful" section is empty';
+    if (!lines.some((l) => /^\[\d+\]\s*https?:\/\//i.test(l))) return 'it lists no sources';
+    return null;
+  }
+  const deepDiveInProgress = new Set<string>(); // deal ids being researched right now (one research per deal at a time)
+  async function saveInterviewDeepDive(
+    ctx: any, company: string, deal: { id: string; name: string } | null, report: string, engine: string,
+  ): Promise<string> {
+    if (!deal) return `ℹ️ No open job deal found for "${company}" in HubSpot, so the research is only in this chat. Stage the job first, or send /research_employer with the company name exactly as in the deal (the part after "@").`;
+    const text = normalizeDeepDive(report);
+    const problem = deepDiveProblem(text);
+    if (problem) return `⚠️ The research is above but NOT saved: ${problem} (often the engine found little on this company). Nothing was added to the deal — send /research_employer again with the full company name or its website.`;
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const date = new Date().toISOString().slice(0, 10);
+    const html = `<strong>🔎 ${esc(company)} — DEEP DIVE (interview research, ${esc(engine)}, ${date})</strong><br>`
+      + esc(text).split('\n').join('<br>');
+    // Re-checked by deal id right before the write: a deep-dive that appeared during the research is kept, never doubled.
+    if (await dealHasDeepDive(deal.id)) return `ℹ️ "${deal.name}" got a deep-dive while this research ran — kept as it is, nothing added.`;
+    await addNoteToDeal(deal.id, html);
+    let landed = false;
+    try { landed = await dealHasDeepDive(deal.id); } catch { /* reported below */ }
+    if (!landed) {
+      return `⚠️ Could not confirm the note on "${deal.name}" (HubSpot did not show it on read-back). Check the deal in HubSpot before sending the command again.`;
+    }
+    const ws = '/home/ubuntu/.openclaw/workspace';
+    if (fs.existsSync(ws)) {
+      const co = deal.name.split('@').slice(1).join('@').trim();
+      execFile('/usr/bin/node', ['scripts/hs-deal-prep.cjs', '--digest', `--out=${ws}/deals/TOOLS.md`, `--proof-out=${ws}/proof/TOOLS.md`],
+        { cwd: process.cwd(), timeout: 180_000 }, (e) => {
+          let has = false;
+          try { has = fs.readFileSync(`${ws}/proof/TOOLS.md`, 'utf8').split('\n').some((l) => l.startsWith(`### ${co} — `)); } catch { /* not readable */ }
+          console.log(`[research] OpenClaw sheet refresh ${e ? 'failed: ' + e.message.slice(0, 120) : 'done'} · ${co} in sheet: ${has}`);
+          void ctx.reply(has
+            ? `✅ OpenClaw has it now. In OpenClaw: /new → "prep me for ${company}".`
+            : `⚠️ Saved on HubSpot, but OpenClaw's sheet does not show "${co}" yet${e ? ' (refresh failed)' : ''}. It refreshes every 30 minutes — if it is still missing in an hour, tell Claude.`).catch(() => { /* chat gone */ });
+        });
+    }
+    return `✅ Saved on the HubSpot deal "${deal.name}" (read back: the note is there). Refreshing OpenClaw now — I'll confirm here in a minute or two.`;
+  }
+
   async function runResearchTelegram(ctx: any, mode: ResearchMode, cmdName: string): Promise<void> {
     const raw = ctx.message?.text?.replace('/' + cmdName, '').trim() || '';
     if (!raw) {
-      await ctx.reply(`Usage: /${cmdName} <company-or-domain>\n\nExample: /${cmdName} Cresta`);
+      await ctx.reply(mode === 'employer'
+        ? `Usage: /${cmdName} <company>\n\nSend it when an interview is booked: deep research on the company + its products is saved on the job deal, and OpenClaw prepares you from it.\nExample: /${cmdName} Pitz`
+        : `Usage: /${cmdName} <company-or-domain>\n\nExample: /${cmdName} Cresta`);
       return;
     }
     const startedAt = Date.now();
-    await ctx.reply(`🔍 Researching ${raw} (${mode} mode) via Bright Data + Claude tool-use loop. This typically takes 30-90 seconds.`);
+    // Employer mode: the deal is looked up FIRST (fail closed). A deal that already has a deep-dive keeps it — nothing
+    // is spent — and the job title narrows the research so a short name cannot pull in a different company.
+    let deal: { id: string; name: string; hasDeepDive: boolean } | null = null;
+    let query = raw;
+    if (mode === 'employer') {
+      try { deal = await findHiringDealForCompany(raw); } catch (e) {
+        await ctx.reply(`❌ ${(e as Error).message?.slice(0, 200)}. Nothing was researched or saved — try again in a minute.`);
+        return;
+      }
+      if (deal?.hasDeepDive) {
+        await ctx.reply(`ℹ️ "${deal.name}" already has a deep-dive note from the last 30 days — kept as it is, nothing new researched. In OpenClaw: /new → "prep me for ${raw}".`);
+        return;
+      }
+      if (deal && deepDiveInProgress.has(deal.id)) {
+        await ctx.reply(`⏳ A deep-dive on "${deal.name}" is already running — its result will arrive here.`);
+        return;
+      }
+      const role = deal ? (deal.name.replace(/^\s*\[[^\]]*\]\s*/, '').split('@')[0] || '').trim() : '';
+      if (role) query = `${raw} — the company hiring for the role "${role}"`;
+    }
+    await ctx.reply(mode === 'employer'
+      ? `🔎 Interview deep-dive on ${raw}${deal ? '' : ' (no open job deal found — the result stays in this chat)'}: company + products, every fact with a source, plus what NOT to claim. Takes 1–4 minutes. You can keep using the bot meanwhile.`
+      : `🔍 Researching ${raw} (${mode} mode) via Bright Data + Claude tool-use loop. This typically takes 30-90 seconds.`);
 
+    // Detached: grammY handles one update at a time, so awaiting a multi-minute research here froze the whole bot.
+    if (deal) deepDiveInProgress.add(deal.id);
+    void (async () => {
     try {
-      const result = await runResearchAgent(anthropic, raw, mode, { maxToolCalls: 8, timeoutMs: 150_000 });
+      const result = await runResearchAgent(anthropic, query, mode, { maxToolCalls: mode === 'employer' ? 10 : 8, timeoutMs: 150_000 });
       if (!result.ok) {
         await ctx.reply(`❌ Research failed for ${raw}: ${result.error || 'unknown'}\n\n${result.report.slice(0, 1000)}`);
         return;
@@ -2358,7 +2473,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
       const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
       const header = `📊 **Research: ${raw}** (${mode})\n` +
-        `${result.toolCalls} BrightData tool calls · ${elapsed}s · model claude-sonnet-4-5` +
+        `${result.toolCalls} BrightData tool calls · ${elapsed}s · ${result.engine || 'unknown engine'}` +
         (result.truncatedAt ? `\n⚠️ Truncated at ${result.truncatedAt}` : '') +
         `\n\n`;
 
@@ -2387,9 +2502,19 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
           await new Promise(r => setTimeout(r, 400));
         }
       }
+      if (mode === 'employer') {
+        try {
+          await ctx.reply(await saveInterviewDeepDive(ctx, raw, deal, result.report, result.engine || 'unknown engine'));
+        } catch (e) {
+          await ctx.reply(`⚠️ The research is above, but saving it to HubSpot failed: ${(e as Error).message?.slice(0, 200)}`);
+        }
+      }
     } catch (err) {
-      await ctx.reply(`❌ Research agent error: ${(err as Error).message?.slice(0, 300)}`);
+      try { await ctx.reply(`❌ Research agent error: ${(err as Error).message?.slice(0, 300)}`); } catch { /* chat gone */ }
+    } finally {
+      if (deal) deepDiveInProgress.delete(deal.id);
     }
+    })();
   }
 
   bot.command('research_company',    async (ctx) => { await runResearchTelegram(ctx, 'client',     'research_company'); });

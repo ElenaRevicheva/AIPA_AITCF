@@ -43,6 +43,8 @@ export interface ResearchResult {
   durationMs: number;
   truncatedAt?: 'tool_cap' | 'time_cap';
   error?: string;
+  /** Which engine actually wrote the report (the header used to say "claude-sonnet-4-5" even on a fallback). */
+  engine?: string;
 }
 
 const TOOL_DEFS: Anthropic.Tool[] = [
@@ -106,23 +108,25 @@ Output a structured markdown report with these sections (omit empty ones, do not
 
 Be concise. Cite URLs inline as [text](url). Do not hallucinate. If a tool returns nothing useful, say so and move on. Stop after 6-8 tool calls maximum.`,
 
+  // 15 Oct 2026 (Elena): employer mode = the INTERVIEW deep-dive. She runs it only when an interview is booked (LinkedIn,
+  // WhatsApp — channels no agent sees); the report is saved on the HIRING deal and hs-deal-prep.cjs puts its facts, its
+  // "Careful" lines and its questions into OpenClaw's proof sheet. The numbered headings below are what that parser reads.
   employer:
-    `You are a job-search research analyst for Elena Revicheva, an AI builder / executive-turned-AI-engineer pursuing fractional CTO and senior AI engineering roles.
-Your job: research a company that is hiring (or might hire her) to inform her application and outreach.
-Use bd_serp_search to find recent news, funding, leadership, the role posting, and any Glassdoor/Levels.fyi signals.
-Use bd_unlock_url for static pages. Use bd_scrape_browser for JS-heavy pages.
-
-Output a structured markdown report with these sections (omit empty ones):
-- **Company:** name + 1-line summary
-- **Why they're hiring AI talent:** signals (funding, product launch, tech stack)
-- **Hiring manager (if findable):** name + LinkedIn URL
-- **Compensation signal:** range, public posts, Glassdoor data
-- **Tech stack:** languages, frameworks, AI providers
-- **Recent news (3-6 months):** dates + 1-line summaries
-- **Application angle:** ONE concrete differentiator Elena should lead with (her exec background + 10 production agents + multi-agent CRM)
-- **Verdict:** APPLY-NOW / APPLY-IF-FIT / SKIP with rationale
-
-Be concise. Cite URLs inline. Stop after 6-8 tool calls maximum.`,
+    `You are researching an EMPLOYER because Elena Revicheva has a job INTERVIEW scheduled with them. Your report becomes the ONLY company knowledge her interview coach may use, so depth and truth matter more than speed.
+Research the COMPANY and its PRODUCTS only. Never write anything about Elena, her fit, or advice to her.
+Use bd_serp_search to find the official site, product and pricing pages, docs, recent news (last 12 months), funding, founders and leadership, customers, and the job posting.
+Use bd_unlock_url (or bd_scrape_browser for JS-heavy pages) to READ the official product, pricing, about and careers pages — do not rely on search snippets alone.
+Rules: every fact ends with a source marker like [1] that matches the Sources list. If sources disagree, a figure is only the company's claim, or something is unknown, put it in section 6 — never state it as settled in sections 1–4.
+Output EXACTLY this structure, plain text (no markdown, no bold, no # headers), bullets start with "• ":
+1. What <Company> is
+2. Products (each product: what it does, for whom, how it works, AI or agents inside, plans/pricing if public)
+3. Customers, markets and figures (according to the company)
+4. Founders, team, funding and milestones
+5. Likely interview questions (6-8, specific to this company's products and stage)
+6. Careful — what we do NOT know / do not claim
+Sources:
+[1] https://...
+Stop after 8-10 tool calls maximum.`,
 
   competitor:
     `You are an SEO/AEO competitor-research analyst for the AIdeazz daily blog (Claude-generated articles published to aideazz.xyz + dev.to).
@@ -185,6 +189,40 @@ async function dispatchTool(name: string, input: Record<string, any>): Promise<s
   }
 }
 
+/**
+ * Perplexity as the research engine when Claude cannot run (15 Oct 2026: Anthropic credit at zero). The old fallback asked
+ * Groq to "write the best report you can" from what was gathered — after a credit error on the FIRST call that was nothing,
+ * so it wrote a report from no research at all. Perplexity searches the web itself and returns its sources.
+ */
+async function perplexityReport(system: string, query: string): Promise<{ text: string; engine: string } | null> {
+  const key = process.env.PERPLEXITY_API_KEY?.trim();
+  if (!key) return null;
+  const model = (process.env.RESEARCH_PERPLEXITY_MODEL || 'sonar-pro').trim();
+  const sys = system.split('\n').filter((l) => !/bd_|tool calls/i.test(l)).join('\n')
+    + '\nSearch the web yourself and read the official pages before writing.';
+  try {
+    const r = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, temperature: 0.2, max_tokens: 3000,
+        messages: [{ role: 'system', content: sys }, { role: 'user', content: `Research target: ${query.trim()}` }] }),
+      signal: AbortSignal.timeout(240_000),
+    });
+    if (!r.ok) { console.warn(`[research-agent] Perplexity ${r.status}: ${(await r.text()).slice(0, 160)}`); return null; }
+    const j: any = await r.json();
+    let text = String(j?.choices?.[0]?.message?.content || '').replace(/\*\*/g, '').replace(/^#{1,6}\s*/gm, '').trim();
+    if (!text) return null;
+    // Perplexity's [n] markers index its citations; list them when the model did not.
+    const cites: string[] = (Array.isArray(j?.citations) ? j.citations : (j?.search_results || []).map((s: any) => s?.url)).filter(Boolean);
+    if (cites.length && !/^\s*(Sources|Fuentes)\s*:/im.test(text)) text += `\n\nSources:\n${cites.map((u, i) => `[${i + 1}] ${u}`).join('\n')}`;
+    if (j?.usage) console.log(`[research-agent] Perplexity ${model} usage ${JSON.stringify(j.usage).slice(0, 200)}`);
+    return { text, engine: `perplexity ${model}` };
+  } catch (e) {
+    console.warn('[research-agent] Perplexity failed:', (e as Error).message?.slice(0, 160));
+    return null;
+  }
+}
+
 export async function runResearchAgent(
   anthropic: Anthropic,
   query: string,
@@ -238,7 +276,8 @@ export async function runResearchAgent(
     } catch (err) {
       if (isAnthropicCreditExhaustion(err)) {
         const groqKey = process.env.GROQ_API_KEY?.trim();
-        if (groqKey) {
+        // Groq can only summarise what the tools already returned — never let it write from nothing.
+        if (groqKey && toolCalls > 0) {
           try {
             console.warn('[research-agent] Anthropic credit exhausted mid-loop — Groq single-shot fallback');
             const groq = new Groq({ apiKey: groqKey });
@@ -249,19 +288,25 @@ export async function runResearchAgent(
               .slice(0, 12000);
             const groqResp = await groq.chat.completions.create({
               model: groqModel(),
-              messages: [{ role: 'user', content: `Based on this research gathered so far for "${query}" (mode: ${mode}), write the best possible structured report you can:\n\n${gathered}\n\nReturn the final report now.` }],
+              messages: [{ role: 'user', content: `${system.split('\n').filter((l) => !/bd_|tool calls/i.test(l)).join('\n')}\n\nBased ONLY on this research gathered so far for "${query}" (mode: ${mode}), write the report in exactly the format above:\n\n${gathered}\n\nReturn the final report now.` }],
               max_tokens: 2048,
               temperature: 0.3,
             });
             const fallbackReport = groqResp.choices[0]?.message?.content?.trim() || '';
             if (fallbackReport) {
               console.warn(`[research-agent] Groq fallback returned ${fallbackReport.length} chars`);
-              return { query, mode, ok: true, report: fallbackReport, toolCalls, durationMs: Date.now() - started, truncatedAt: 'tool_cap', error: 'groq_fallback' };
+              return { query, mode, ok: true, report: fallbackReport, toolCalls, durationMs: Date.now() - started, truncatedAt: 'tool_cap', error: 'groq_fallback', engine: `groq ${groqModel()} (from ${toolCalls} Bright Data results)` };
             }
           } catch (groqErr) {
             console.error('[research-agent] Groq fallback also failed:', (groqErr as Error).message);
           }
         }
+      }
+      // Claude unavailable and nothing summarisable gathered → Perplexity researches it whole (searches + sources).
+      const px = await perplexityReport(system, query);
+      if (px) {
+        console.warn(`[research-agent] Claude unavailable — report by ${px.engine} (${px.text.length} chars)`);
+        return { query, mode, ok: true, report: px.text, toolCalls, durationMs: Date.now() - started, engine: px.engine };
       }
       return {
         query, mode, ok: false, report: `Claude API error: ${(err as Error).message?.slice(0, 300)}`,
@@ -302,6 +347,7 @@ export async function runResearchAgent(
       report: finalText || '(empty report — Claude returned no text)',
       toolCalls,
       durationMs: Date.now() - started,
+      engine: `${model} + Bright Data`,
     };
     if (truncatedAt) out.truncatedAt = truncatedAt;
     return out;
