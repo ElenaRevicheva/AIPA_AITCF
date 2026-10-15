@@ -106,7 +106,7 @@ async function digest(outPath) {
     // posting's own requirements is what the interview needs; links and full notes are one tool call away.
     const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trim()}…` : s);
     const qs = likelyQuestions(notes);
-    if (qs.length) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs });
+    if (qs.length) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs, ...deepDiveFacts(notes) });
     reqs = [...new Set(reqs)].slice(0, 3).map((r) => cut(r, 90));
     entries.push([
       `### ${cut(company || role, 40)} — ${cut(role, 70)} (${d.properties.dealstage})`,
@@ -147,7 +147,13 @@ async function digest(outPath) {
   console.log(`digest: ${entries.length} live job deals → ${outPath} (${body.length} chars)`);
   const proofOut = arg('proof-out');
   if (proofOut) {
-    const sheet = proofSheet(interviewDeals);
+    let sheet = proofSheet(interviewDeals);
+    // Over the per-file cap OpenClaw keeps the first 70% + last 20% and cuts the middle: drop company-fact lines (never the
+    // "Do NOT claim" cautions) until it fits, longest list first.
+    while (sheet.length > PROOF_MAX && interviewDeals.some((x) => x.facts && x.facts.length)) {
+      interviewDeals.reduce((a, b) => ((b.facts || []).length > (a.facts || []).length ? b : a)).facts.pop();
+      sheet = proofSheet(interviewDeals);
+    }
     fs.mkdirSync(path.dirname(proofOut), { recursive: true });
     fs.writeFileSync(`${proofOut}.tmp`, sheet);
     fs.renameSync(`${proofOut}.tmp`, proofOut);
@@ -193,6 +199,43 @@ function likelyQuestions(notes) {
     }
   }
   return qs;
+}
+
+// 🔎 THIS COMPANY'S FACTS (15 Oct 2026, Pitz): Elena asked the coach "tell me more about Chalán" — Pitz's own voice agent,
+// sections 1–4 of the deep-dive — and it had only the questions, so it truthfully answered it knew nothing. The sourced
+// facts (what the company is, product, customers, founders/funding) now travel with the questions, word for word.
+// The note's own "Cuidado — lo que NO sabemos / no afirmar" section travels too, printed FIRST and never trimmed: without it
+// the coach would state as settled what the note itself flags as disputed (rounds that may overlap, two named tech leads).
+const FACTS_MAX = 2200;          // per deal; the whole proof sheet stays under PROOF_MAX below
+const PROOF_MAX = 24500;         // OpenClaw agents.defaults.bootstrapMaxChars = 25,000 per file (over it, the MIDDLE is cut)
+const FACTS_END = /^\s*\d+\.\s*(Por qué existe|Why (this|the) role|Dónde encaja|Where (Elena|she) fits|Preguntas probables|Likely (interview )?questions)/i;
+const CAUTION_START = /^\s*\d+\.\s*(Cuidado|Careful|What we (do )?not know|.*no afirmar|.*do not claim)/i;
+const tidyFact = (l) => l.replace(/\s*\[\d+\](\[\d+\])*/g, '').replace(/^\d+\.\s+(?=\S)/, '— ').trim(); // no "[3]" read aloud; headings ≠ the numbered questions
+function deepDiveFacts(notes) {
+  const dives = [...notes].sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
+  for (const n of dives) {
+    const lines = stripHtml(n.html).split('\n').map((l) => l.trim());
+    if (!/INVESTIGACI[ÓO]N PROFUNDA|DEEP[- ]DIVE/i.test(lines[0] || '')) continue;
+    const end = lines.findIndex((l) => FACTS_END.test(l));
+    const facts = [];
+    let len = 0;
+    for (const l of lines.slice(1, end < 0 ? undefined : end).filter(Boolean).map(tidyFact)) {
+      if (len + l.length + 1 > FACTS_MAX) break;
+      facts.push(l);
+      len += l.length + 1;
+    }
+    const cs = lines.findIndex((l) => CAUTION_START.test(l));
+    const cautions = [];
+    if (cs >= 0) {
+      for (const l of lines.slice(cs + 1)) {
+        if (!l) continue;
+        if (/^(Fuentes|Sources)\b/i.test(l) || /^\s*\d+\.\s/.test(l)) break;
+        cautions.push(tidyFact(l));
+      }
+    }
+    if (facts.length) return { facts, cautions };
+  }
+  return { facts: [], cautions: [] };
 }
 
 // What she can check in HubSpot herself: the deal's note count and the first words of its newest note.
@@ -261,9 +304,11 @@ function proofSheet(interviewDeals) {
     ...verifiedExampleLines(),
   ];
   if (interviewDeals.length) {
-    out.push('', '===== 🎤 INTERVIEW DEALS (a 🔎 deep-dive exists) — for "prep me for <company>": your FIRST line is this deal\'s ✅ Loaded line copied exactly; the mock questions are THESE, in this order:');
+    out.push('', '===== 🎤 INTERVIEW DEALS (a 🔎 deep-dive exists) — for "prep me for <company>": your FIRST line is this deal\'s ✅ Loaded line copied exactly; the mock questions are THESE, in this order. For any question ABOUT the company (its product, its agents, customers, founders, funding) answer ONLY from its "Company facts" lines (in English, translate a company fact faithfully — never add to it), and obey its "Do NOT claim" lines:');
     for (const d of interviewDeals) {
       out.push(`### ${d.title}`, d.proof, ...d.qs.map((q, i) => `${i + 1}. ${q}`));
+      if (d.cautions && d.cautions.length) out.push('Do NOT claim (same 🔎 note — read before the facts):', ...d.cautions.map((c) => `⚠️ ${c.replace(/^[•*-]\s*/, '')}`));
+      if (d.facts && d.facts.length) out.push('Company facts (🔎 deep-dive, sourced in HubSpot — copy, never add):', ...d.facts);
     }
   }
   out.push('', NEVER_INVENT);
