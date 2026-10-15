@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct (WA link) | OpenClaw → her WhatsApp Business number (Elena's go; version unchanged 2026.2.14; allowlist = her number only, selfChatMode, no read receipts) | `~/.openclaw/openclaw.json` (channels.whatsapp), `~/.openclaw/credentials/whatsapp`, `openclaw-gateway` restart | 08e3b8ec |
 | Claude Code (team wiring) | 2026-10-15 16:30 | Elena's go: the 6 micro-wirings of `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` | cto-aipa: scripts/lib/no-website-leads.cjs, scripts/resend-reconcile.cjs, scripts/atlas-lead-machine.cjs, crontab line hs-watch-manual-emails; VJH: scripts/judge_feedback_sync.py, src/autonomous/orchestrator.py (+ vibejobhunter restart) | — |
 
 **Rules**
@@ -144,6 +143,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 15 Oct ~16:10 UTC — OpenClaw now ALSO answers on Elena's WhatsApp Business ("Message yourself") · version unchanged · claim released
+- **DONE (her explicit go; risk explained first — OpenClaw docs recommend a dedicated number):** linked with the documented
+  `openclaw channels login --channel whatsapp`; settings: allowlist = her own number ONLY (Feb value was a placeholder),
+  `selfChatMode: true`, `sendReadReceipts: false`, groups allowlist. Clients are never answered and never get blue ticks.
+  Credentials chmod 700/600. Backup `~/_session-backups/openclaw-wa-20261015/`. Gateway restarted 16:07:23 UTC.
+- **VERIFIED BY:** her screenshot + log `[whatsapp] Inbound … (direct)` → `Auto-replied` 16:08 UTC, gpt-4.1, true ✅ Loaded line +
+  Pitz Q1; Telegram provider started too; 0 truncation. WhatsApp + Telegram share ONE session (OpenClaw default).
+- **RISK:** everything she types in "Message yourself" now reaches the coach (she used it as a notepad for client drafts).
+  Unlink = WhatsApp Business → Linked devices → log out, or `openclaw channels logout --channel whatsapp`.
+  Upgrade still NOT applied (see entry below); `~/_scratch/openclaw-next` removed.
 
 ### 🧩 15 Oct — AIdeazz-as-a-team wiring plan · read-only audit done · **6 micro-wirings await Elena's yes**
 - **Plan:** `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` (25-agent read-only workflow, each wiring double-checked on Oracle + golden rule).
