@@ -8903,8 +8903,10 @@ async function speakBack(ctx: Context, heard: string, replies: string[]): Promis
     // The SDK timeout stops at the response headers, not the audio body — so the whole call gets its own limit.
     let timer: NodeJS.Timeout | undefined;
     const audio = await Promise.race([
+      // tts-1, not gpt-4o-mini-tts (15 Oct 2026): the latter stalled 1 call in 4 for 60 s+ on Oracle and failed 7 of 15
+      // OpenClaw voice replies that day; tts-1 answered 12 of 12 in 1.7–3.5 s with the same nova voice.
       synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
-        { model: process.env.CTO_VOICE_TTS_MODEL || 'gpt-4o-mini-tts', format: 'opus' }),
+        { model: process.env.CTO_VOICE_TTS_MODEL || 'tts-1', format: 'opus' }),
       new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('the voice took over 2 minutes')), 120_000); }),
     ]).finally(() => clearTimeout(timer));
     const noteId = ctx.message?.message_id;
