@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct ~16:50 | Final sync laptop = GitHub = Oracle; CTO AIPA voice default tts-1 in CODE (was only Oracle .env) | `src/telegram-bot.ts`, `src/sprint-briefing/tts-openai.ts`; pm2 `cto-aipa` | 11cc96e9 |
+| Claude Code (laptop) | 15 Oct ~16:50 | Final sync laptop = GitHub = Oracle (tts-1 default done de06ac75) + updating `ORACLE_ALL_PRODUCTS_RESILIENCE.md` with 12–15 Oct features | `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md` (laptop/GitHub/Oracle copy) | 11cc96e9 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
