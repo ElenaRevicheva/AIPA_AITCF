@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (OpenClaw company facts) | 2026-10-15 21:00 | Elena's go: deep-dive company facts into OpenClaw proof sheet (Chalán question failed) | cto-aipa scripts/hs-deal-prep.cjs; ~/.openclaw/workspace/proof/TOOLS.md (regenerated) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 15 Oct ~21:00 UTC — OpenClaw now KNOWS the employer: deep-dive company facts + the note's own cautions in its proof sheet · claim released
+- **Why:** Elena asked by voice "Tell me more about Chalán Pitz, Ajende" (Chalán = Pitz's voice agent; "Ajende" = Whisper's "agent") → gpt-4.1:
+  "no tengo información verificada". The proof sheet had only the Loaded line + 8 questions; the 🔎 deep-dive facts were one tool call away.
+- **DONE (`e6cd9cac`, hs-deal-prep.cjs only, +48 lines; reviewed 2 lenses — both first BLOCKED for dropping the note's "9. Cuidado / no afirmar"):**
+  per deep-dive deal: ⚠️ "Do NOT claim" lines first (never trimmed) + "Company facts" (sections 1–4, word for word, [n] stripped). Oracle md5 = git
+  `dd6af98e`; sheet refreshed 20:54:36 UTC, 24,028 chars (< 25k cap). Backup `~/_session-backups/openclaw-company-facts-20261015/`.
+- **VERIFIED BY:** 3 test sessions (not delivered): Chalán ×2 answered from the facts with a TTS block; "¿cuánto levantó Pitz / quién lidera tech?"
+  → "US$5M y US$3.1M pueden solaparse, no sumes" + both tech names. Minor filler ("funciona en la nube") not in the note.
+- **RULE (Elena: every prep must know the employer deeply):** every interview → a 🔎 "INVESTIGACIÓN PROFUNDA" note (sections + "Cuidado" +
+  "Preguntas probables") on the deal, written by the session that hears about it; hs-deal-prep picks it up within 30 min. Only Pitz has one today.
+- **PROPOSED, awaiting Elena:** company brief "What they do" + sources for action-stage deals without a deep-dive (needs bootstrapMaxChars 25k → ~30k).
 
 ### ✅/⏳ 15 Oct ~20:50 UTC — Daily blog → Bing (IndexNow) LIVE · Bluesky READY, waits for Elena's /blueskykey · claim released
 - **DONE (`2958f904`, her go):** after each daily article answers 200, `announceNewArticle` (daily-blog-publisher.ts) sends it to
