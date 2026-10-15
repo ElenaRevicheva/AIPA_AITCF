@@ -1,0 +1,12 @@
+{
+  "provider": "template",
+  "model": "deterministic",
+  "guard_ok": true,
+  "used_fallback_template": true,
+  "failover_notice": "NOTICE: No LLM provider keys were available. Briefing rendered from the deterministic template. Figures are identical; prose is not model-written.",
+  "attempts": [
+    "no LLM keys in environment \u2192 template"
+  ],
+  "reorder_count": 5,
+  "top_reorder": "Manuka Honey MGO 514+ 500g"
+}
