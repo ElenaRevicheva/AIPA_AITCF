@@ -143,6 +143,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 15 Oct ~12:00 UTC — SYNC CHECK laptop = GitHub = Oracle = running process (Elena asked) · OpenClaw menu latest
+- **Equal everywhere:** cto-aipa (371 runtime files + all 94 dist files = a build of origin/main; `package.json` synced — it lacked one
+  npm script), VJH `6b9ebd4` (Oracle fast-forwarded, 0 local edits, stashes kept), job-list-filter `dd795a3` (OpenClaw workspace +
+  skill files = git; Oracle `~/job-list-filter` code = main, only README differs), aideazz `3dabeca` (laptop fast-forwarded), whitespace,
+  Influencer, Atuona, AILA, atlas-captures, hive, ops dashboard. Every process started after its newest code file (PM2 + systemd).
+- **Unchanged deliberate holds:** EspaLuz ×2 + DragonTrade (no GitHub commits since the 12 Oct audit); Oracle cto-aipa HEAD `782abc2`
+  (Atlas commits) — never pull. 40 laptop-only tools (film/promo renders, CV builders) are not on Oracle on purpose.
+- **Menu:** live `/menu` = 34 lines with 💬 ASK ABOUT YOU + 🧠 I LEARN FROM YOU, 0 leaked rule lines; `my lessons` 2/2 exact (a quoted
+  fallback in IDENTITY made gpt-4.1 answer "No lessons yet" — removed).
+- **Elena's call, untouched:** laptop `aideazz-private-docs` has 53 binaries deleted (pptx/jpg/tar.gz; safe on GitHub `45583e0`);
+  `handy_manny-s` laptop edits to docs she deleted on GitHub in May; cto-aipa laptop edits by other agents (`dist-lambda/sprint/
+  lambda-pkg/handler.js`, `.claude/launch.json`, 3 docs/selling files); aw-portal service template differs (Oracle's own).
+
 ### ✅ 15 Oct ~11:40 UTC — OpenClaw LEARNS FROM HER CORRECTIONS (like VJH) · OpenAI topped up (both keys 200) · claim released
 - **DONE (her go; job-list-filter `docs` d602035; backup `~/_session-backups/openclaw-facts-20261015/build-cards.before-lessons.py`):**
   the existing `*/10` cards cron (`build-cards.py`) now keeps a permanent ledger `workspace/interview-cards/lessons.json` of HER words
