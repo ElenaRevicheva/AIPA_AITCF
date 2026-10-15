@@ -20,6 +20,44 @@ AIPA_DIR=/home/ubuntu/cto-aipa
 cd "$AIPA_DIR" || { echo "FATAL: no cto-aipa checkout on this box"; exit 1; }
 echo "--- staging $SPEC in $AIPA_DIR as $(whoami) ---"
 
+# Read-only: pull EspaLuz WhatsApp audio/decoder lines from the live box.
+# Used to write hiring copy from production evidence, not from a stack list.
+if [ "$SPEC" = "espaluz-audio-logs" ]; then
+  echo "--- espaluz-whatsapp service ---"
+  systemctl is-active espaluz-whatsapp || true
+  systemctl show espaluz-whatsapp -p ActiveEnterTimestamp -p NRestarts --no-pager || true
+  echo "--- EspaLuzWhatsApp git ---"
+  if [ -d /home/ubuntu/EspaLuzWhatsApp/.git ]; then
+    git -C /home/ubuntu/EspaLuzWhatsApp log -10 --oneline
+    git -C /home/ubuntu/EspaLuzWhatsApp rev-parse --short HEAD
+  else
+    echo "no /home/ubuntu/EspaLuzWhatsApp checkout"
+  fi
+  echo "--- journalctl decoder/carrier (since 2026-08-01) ---"
+  journalctl -u espaluz-whatsapp --since "2026-08-01" --no-pager 2>/dev/null \
+    | grep -E 'Header missing|Non-monotonic|backward in time|164040|error_code|ffmpeg|OpusHead|tutor mode|sample rate|44100|24000' \
+    | tail -120 || true
+  echo "--- saved audio / repro files ---"
+  ls -lt /tmp/*.{ogg,mp3,wav,opus,log} 2>/dev/null | head -20 || true
+  ls -lt /home/ubuntu/EspaLuzWhatsApp/logs 2>/dev/null | head -20 || true
+  echo "--- ffprobe Sep 4 repro artifacts (sample rate + decoder warnings) ---"
+  for f in /tmp/sp.mp3 /tmp/pa.mp3 /tmp/mixed.mp3 /tmp/a_sp.mp3 /tmp/a_pa.mp3 /tmp/a_joined.mp3 /tmp/a_final.ogg /tmp/bytecat.mp3 /tmp/proper.mp3; do
+    [ -f "$f" ] || continue
+    echo "FILE $f"
+    ffprobe -hide_banner -v warning -show_entries stream=codec_name,sample_rate,channels,bit_rate -of default=noprint_wrappers=1 "$f" 2>&1 | head -20
+    echo "--- ffmpeg -v warning decode $f ---"
+    ffmpeg -v warning -i "$f" -f null - 2>&1 | tail -25
+    echo
+  done
+  echo "--- pause/tts sample-rate in live code ---"
+  grep -n "create_pause_audio\|generate_tts_audio\|24000\|44100\|concat" \
+    /home/ubuntu/EspaLuzWhatsApp/*.py \
+    /home/ubuntu/EspaLuzWhatsApp/**/*.py 2>/dev/null | head -60 || true
+  echo "--- espaluz-audio-logs done ---"
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit 0
+fi
+
 if [ ! -f .env ]; then
   echo "FATAL: .env missing on Oracle — HUBSPOT_API_KEY unavailable"
   exit 1
