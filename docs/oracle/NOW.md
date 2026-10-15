@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 15 Oct ~16:50 | Final sync laptop = GitHub = Oracle (tts-1 default done de06ac75) + updating `ORACLE_ALL_PRODUCTS_RESILIENCE.md` with 12–15 Oct features | `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md` (laptop/GitHub/Oracle copy) | 11cc96e9 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 15 Oct ~18:30 UTC — ORACLE_ALL_PRODUCTS_RESILIENCE.md brought to 15 Oct (laptop = GitHub = Oracle) · CTO AIPA voice default tts-1 in code · claim released
+- **Doc (`b6d06497`):** new top section "🟢 12–15 Oct 2026" (fleet state, CTO AIPA, OpenClaw, VJH, apply kit, Atlas, blog/site,
+  Atuona, sales, held items, standing-traps table, named failure modes) + 105 stale CURRENT claims corrected in place and marked
+  "(updated 15 Oct 2026)"; 3 personal inbox handles removed (public repo). Method: 6 line-range readers + a change collector (47 live
+  changes from NOW.md + git logs, incl. the parallel session's team wiring #1–#6) + a planner; every edit unique, no history section
+  removed, tables intact, no phone/email/key added. 2,931 → 3,092 lines. Oracle copy (was 2,842 lines, pre-12 Oct) replaced, backup
+  `~/_session-backups/resilience-doc-20261015/`. md5 laptop = GitHub = Oracle.
+- **Code (`de06ac75`):** CTO AIPA `speakBack` defaults to `tts-1` (was only Oracle `.env`); pm2 restart 16:55:32 UTC.
+- **Synced this pass:** Oracle `~/aideazz` fast-forwarded to `37ec1cd` (the parallel session's wiki entry) so tonight's 21:30 wiki-ship
+  push is not rejected; every laptop repo 0/0 vs GitHub.
+- **Left for Elena:** the private export `aideazz-private-docs/docs/plans/oracle-infrastructure` is from March (re-export or archive);
+  9 stale `.claude/worktrees/*` snapshots and `AIPA_AITCF-pr/` hold old copies of the doc (not live).
 
 ### ✅ 15 Oct ~16:40 UTC — WhatsApp voice notes now play on her PHONE (Opus) · OpenClaw local patch #2 (her go)
 - **Why:** "voice works on TG cell and laptop and WA laptop but WA cell does not work". OpenClaw 2026.2.14 makes Opus only for
