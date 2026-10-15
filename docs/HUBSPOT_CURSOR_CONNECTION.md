@@ -134,7 +134,7 @@ Resend from **aipa@aideazz.xyz** (same From). Ensure/refresh links:
 `node scripts/hs-ensure-aipa-email-links.cjs`.
 
 State (idempotent): `docs/selling/.hs-manual-email-watcher-state.json` (gitignored).
-**Oracle cron (installed July 20 2026):** `*/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh`
+**Oracle cron (installed July 20 2026; minute moved 15 Oct 2026 — at `*/10` it collided with hs-fill-apply-kit + reply-radar on the same HubSpot key → 429s):** `3-59/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh`
 → log `/home/ubuntu/logs/hs-watch-manual-emails.log`. Agents may also run the script at session start.
 
 ---

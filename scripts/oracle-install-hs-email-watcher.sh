@@ -11,7 +11,8 @@ cd /home/ubuntu/cto-aipa
 exec /usr/bin/node scripts/hs-watch-manual-emails.cjs --hours=24 >> /home/ubuntu/logs/hs-watch-manual-emails.log 2>&1
 EOF
 chmod +x /home/ubuntu/bin/hs-watch-manual-emails.sh
-CRON_LINE="*/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh"
+# 15 Oct 2026: minute 3 — at */10 it collided with hs-fill-apply-kit + reply-radar on the same HubSpot key (429s).
+CRON_LINE="3-59/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh"
 ( crontab -l 2>/dev/null | grep -v hs-watch-manual-emails || true; echo "$CRON_LINE" ) | crontab -
 echo "=== crontab ==="
 crontab -l | grep hs-watch

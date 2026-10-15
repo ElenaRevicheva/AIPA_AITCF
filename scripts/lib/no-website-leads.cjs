@@ -97,7 +97,7 @@ function buildNoWebsiteNote(c, { isMobile, date }) {
     btn,
     isMobile
       ? `<i>Mobile number from Google — WhatsApp likely, not confirmed.</i>`
-      : `<i>⚠️ Google lists a LANDLINE. If the chat fails: look for a WhatsApp link on their Instagram, or call.</i>`,
+      : `<i>⚠️ Google lists a LANDLINE. Find their Instagram (search the name) and open the bio: the real WhatsApp is often behind a Linktree / bit.ly / wa.link link (TLDC, 15 Oct). Trust only a link on the business's own page, never one from another account. If none: call, or park.</i>`,
     `<b>Message (ES):</b><br>${esc(msg)}`,
     `<b>3️⃣ EVIDENCE (Google Places, ${date})</b>`,
     `• ${c.mapsUri ? `<a href="${c.mapsUri}">Google Maps listing</a>` : 'Google Maps listing'} · ${c.rating ?? '—'}★ · ${c.reviews || 0} reviews · phone ${esc(c.phone)} · ${esc(c.city || '')}`,
