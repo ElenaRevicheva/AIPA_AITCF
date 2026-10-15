@@ -155,7 +155,7 @@ git log keeps the record.
   "Preguntas probables") on the deal, written by the session that hears about it; hs-deal-prep picks it up within 30 min. Only Pitz has one today.
 - **PROPOSED, awaiting Elena:** company brief "What they do" + sources for action-stage deals without a deep-dive (needs bootstrapMaxChars 25k → ~30k).
 
-### ✅/⏳ 15 Oct ~20:50 UTC — Daily blog → Bing (IndexNow) LIVE · Bluesky READY, waits for Elena's /blueskykey · claim released
+### ✅ 15 Oct ~21:15 UTC — Daily blog → Bing (IndexNow) + Bluesky LIVE (aideazz.bsky.social, first post up) · claim released
 - **DONE (`2958f904`, her go):** after each daily article answers 200, `announceNewArticle` (daily-blog-publisher.ts) sends it to
   api.indexnow.org (→ Bing, Yandex, Naver, Seznam) with the key file that has been live since 19 Jul (aideazz `57bfd42`) and was never
   used, then posts a Bluesky link card (title + the article's own first paragraph + OG picture; no model). Background only.
@@ -163,8 +163,12 @@ git log keeps the record.
 - **VERIFIED BY:** IndexNow HTTP 200 for today's article + /blog/, and 200 for a one-time backfill of all 201 sitemap URLs (186
   articles). Helper: bad input refused; fake credentials → Bluesky 401 → nothing written (0 `BLUESKY_` lines). Bot restarted
   20:49:38 UTC, 73 commands. Tests: blog-evidence all, trello 72/72, speak 21/21. md5 laptop = GitHub = Oracle (3 files).
-- **NEXT (Elena):** create a Bluesky APP password (Settings → Privacy and security → App passwords) and send
-  `/blueskykey <handle> <app-password>` to @aitcf_aideazz_bot. Expected log on the next article: `🦋 [Bluesky] posted https://bsky.app/...`.
+- **Bluesky WIRED 21:11 UTC** by Elena's /blueskykey: login probed 200, 2 `BLUESKY_` lines (backup `.env.bak-bluesky-20261015-211113`),
+  cto-aipa restarted 21:11:17 UTC. **First post (her go, 21:15 UTC):** today's article as a link card via the publisher's own
+  `postToBluesky()` — read back from the public API (author, card link, picture). From the next daily article on it is automatic;
+  expect `🦋 [Bluesky] posted https://bsky.app/...` in the cto-aipa log after 19:30 UTC.
+- **Bing check:** a plain "aideazz" search lists aideazz.xyz + /portfolio; Bing's `site:` operator returns 0 for the domain —
+  do not read that as "not indexed". New articles appear in Bing hours to days after IndexNow.
 - Not wired (deliberate, ask first): incident-to-blog.cjs / wiki-ship posts do not call IndexNow/Bluesky yet.
 
 ### ✅ 15 Oct ~20:30 UTC — Daily blog skip FIXED and today's post LIVE · claim released
