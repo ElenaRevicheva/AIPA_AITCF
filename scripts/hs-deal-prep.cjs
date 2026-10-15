@@ -240,7 +240,7 @@ function likelyQuestions(notes) {
 // facts (what the company is, product, customers, founders/funding) now travel with the questions, word for word.
 // The note's own "Cuidado — lo que NO sabemos / no afirmar" section travels too, printed FIRST and never trimmed: without it
 // the coach would state as settled what the note itself flags as disputed (rounds that may overlap, two named tech leads).
-const FACTS_MAX = 2200;          // per deal; the whole proof sheet stays under PROOF_MAX below
+const FACTS_MAX = 5000;          // per deal (15 Oct: 2,200 cut products/customers/founders of a full report); the sheet stays under PROOF_MAX
 // The cap is OpenClaw's own setting (agents.defaults.bootstrapMaxChars; over it, the MIDDLE of the file is cut), read live
 // so raising it there is the only change needed; 24,500 when no OpenClaw config is on this machine.
 const PROOF_MAX = (() => {

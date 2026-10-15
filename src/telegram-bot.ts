@@ -2374,7 +2374,9 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     const lines = t.split('\n').map((l) => l.trim());
     const q = lines.findIndex((l) => /^\d+\.\s*(Likely (interview )?questions|Preguntas probables)/i.test(l));
     if (q < 0) return 'it has no "Likely interview questions" section';
-    if (lines.slice(0, q).filter((l) => l && !/^\d+\.\s/.test(l)).length < 3) return 'it has almost no company facts';
+    // "No product has been verified…" is an honest empty answer, not a fact (Pitz test, 15 Oct: a whole report of these).
+    const NOTHING = /^[•*-]?\s*(No\b|None\b|Not\b|Nothing\b|The (available )?(search )?(evidence|results?)\b|Unable\b|Could not\b|I could not\b)/i;
+    if (lines.slice(0, q).filter((l) => l && !/^\d+\.\s/.test(l) && !NOTHING.test(l)).length < 3) return 'it found almost no real facts about the company';
     let qs = 0;
     for (const l of lines.slice(q + 1)) {
       if (/^\d+\.\s/.test(l) || /^(Sources|Fuentes)\s*:/i.test(l)) break;
@@ -2389,7 +2391,8 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       if (/^[•*-]\s*\S/.test(l)) cautions++;
     }
     if (!cautions) return 'its "Careful" section is empty';
-    if (!lines.some((l) => /^\[\d+\]\s*https?:\/\//i.test(l))) return 'it lists no sources';
+    const srcs = new Set(lines.filter((l) => /^\[\d+\]\s*https?:\/\//i.test(l)).map((l) => l.replace(/^\[\d+\]\s*/, '').trim()));
+    if (srcs.size < 2) return 'it lists fewer than 2 sources';
     return null;
   }
   const deepDiveInProgress = new Set<string>(); // deal ids being researched right now (one research per deal at a time)
@@ -2439,7 +2442,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     const startedAt = Date.now();
     // Employer mode: the deal is looked up FIRST (fail closed). A deal that already has a deep-dive keeps it — nothing
     // is spent — and the job title narrows the research so a short name cannot pull in a different company.
-    let deal: { id: string; name: string; hasDeepDive: boolean } | null = null;
+    let deal: { id: string; name: string; hasDeepDive: boolean; sites: string[] } | null = null;
     let query = raw;
     if (mode === 'employer') {
       try { deal = await findHiringDealForCompany(raw); } catch (e) {
@@ -2455,7 +2458,10 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         return;
       }
       const role = deal ? (deal.name.replace(/^\s*\[[^\]]*\]\s*/, '').split('@')[0] || '').trim() : '';
-      if (role) query = `${raw} — the company hiring for the role "${role}"`;
+      const sites = deal?.sites?.length ? ` (official website: ${deal.sites.join(', ')})` : '';
+      // "the company hiring for <role>" sent the search to job boards; the company's own sites point it at the company.
+      query = `Company: ${raw}${sites}. Research this company and its products.`
+        + (role ? ` (Context only — do not search job boards: she interviews for "${role}".)` : '');
     }
     await ctx.reply(mode === 'employer'
       ? `🔎 Interview deep-dive on ${raw}${deal ? '' : ' (no open job deal found — the result stays in this chat)'}: company + products, every fact with a source, plus what NOT to claim. Takes 1–4 minutes. You can keep using the bot meanwhile.`

@@ -205,6 +205,7 @@ async function perplexityReport(system: string, query: string): Promise<{ text: 
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model, temperature: 0.2, max_tokens: 3000,
+        web_search_options: { search_context_size: 'high' }, // default 'low' found nothing on Pitz (15 Oct test)
         messages: [{ role: 'system', content: sys }, { role: 'user', content: `Research target: ${query.trim()}` }] }),
       signal: AbortSignal.timeout(240_000),
     });

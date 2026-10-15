@@ -863,7 +863,7 @@ export async function addNoteToDeal(dealId: string, body: string): Promise<void>
  * carries a 🔎 deep-dive note. /research_employer writes its report there; hs-deal-prep.cjs then feeds OpenClaw.
  * Exact company match after "@" first; a "Re: …" thread deal only when no other deal matches.
  */
-export async function findHiringDealForCompany(company: string): Promise<{ id: string; name: string; hasDeepDive: boolean } | null> {
+export async function findHiringDealForCompany(company: string): Promise<{ id: string; name: string; hasDeepDive: boolean; sites: string[] } | null> {
   const want = company.trim().toLowerCase();
   if (!want) return null;
   const data = await hsPost<{ results?: Array<{ id: string; properties: { dealname?: string } }> }>('/crm/v3/objects/deals/search', {
@@ -882,22 +882,37 @@ export async function findHiringDealForCompany(company: string): Promise<{ id: s
   const pool = exact.length ? exact : hiring.filter((d) => companyOf(String(d.properties.dealname || '')).includes(want));
   const hit = pool.find((d) => !isThread(String(d.properties.dealname || ''))) || pool[0];
   if (!hit) return null;
-  return { id: hit.id, name: String(hit.properties.dealname || ''), hasDeepDive: await dealHasDeepDive(hit.id) };
+  const notes = await readDealNotes(hit.id);
+  // The company's own sites, from what the kit already wrote on the deal (🔎 COMPANY BRIEF "cited from", 📌 posting):
+  // research on a bare name like "Pitz" found job boards, not the company (15 Oct test).
+  const token = want.replace(/[^a-z0-9]/g, '').slice(0, 12);
+  const sites = [...new Set(notes.flatMap((n) => String(n.properties.hs_note_body || '')
+    .match(/\b(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)+)/gi) || [])
+    .map((u) => u.replace(/^https?:\/\//i, '').replace(/^www\./i, '').toLowerCase())
+    .filter((h) => token.length >= 3 && h.replace(/[^a-z0-9]/g, '').includes(token) && /\.[a-z]{2,6}$/.test(h)
+      && !/\.(g?html?|php|aspx?)$/.test(h) && !/hubspot|linkedin|whatclinic|indeed|glassdoor/.test(h)))].slice(0, 4);
+  return { id: hit.id, name: String(hit.properties.dealname || ''), hasDeepDive: hasFreshDeepDive(notes), sites };
 }
 
-/**
- * Does this deal carry a 🔎 deep-dive note from the last 30 days (older ones no longer reach OpenClaw's sheet)?
- * Fails CLOSED: any HubSpot read error throws — "could not read" never passes as "none".
- */
-export async function dealHasDeepDive(dealId: string): Promise<boolean> {
+type DealNote = { properties: { hs_note_body?: string; hs_timestamp?: string } };
+/** All notes on a deal. Fails CLOSED: any HubSpot read error throws — "could not read" never passes as "none". */
+async function readDealNotes(dealId: string): Promise<DealNote[]> {
   const assoc = await hsGet<{ results?: Array<{ toObjectId: string | number }> }>(`/crm/v4/objects/deals/${dealId}/associations/notes`);
   if (!assoc) throw new Error('could not read the deal\'s notes from HubSpot');
   const ids = (assoc.results || []).map((r) => ({ id: String(r.toObjectId) }));
-  if (!ids.length) return false;
-  const notes = await hsPost<{ results?: Array<{ properties: { hs_note_body?: string; hs_timestamp?: string } }> }>(
+  if (!ids.length) return [];
+  const notes = await hsPost<{ results?: DealNote[] }>(
     '/crm/v3/objects/notes/batch/read', { inputs: ids.slice(0, 100), properties: ['hs_note_body', 'hs_timestamp'] });
   if (!notes) throw new Error('could not read the deal\'s notes from HubSpot');
-  return (notes.results || []).some((n) => {
+  return notes.results || [];
+}
+
+/** Does this deal carry a 🔎 deep-dive note from the last 30 days (older ones no longer reach OpenClaw's sheet)? */
+export async function dealHasDeepDive(dealId: string): Promise<boolean> {
+  return hasFreshDeepDive(await readDealNotes(dealId));
+}
+function hasFreshDeepDive(notes: DealNote[]): boolean {
+  return notes.some((n) => {
     const first = String(n.properties.hs_note_body || '').replace(/<br\s*\/?>|<\/(p|div|li|h\d)>/gi, '\n')
       .replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').split('\n').map((l) => l.trim()).find(Boolean) || '';
     const ts = Date.parse(String(n.properties.hs_timestamp || ''));
