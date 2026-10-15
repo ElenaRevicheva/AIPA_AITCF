@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (/research_employer interview mode) | 2026-10-15 21:40 | Elena's go: /research_employer = interview-grade deep-dive → note on the HIRING deal; Perplexity fallback instead of Groq-from-nothing | cto-aipa src/research-agent.ts, src/telegram-bot.ts (+ dist, pm2 restart cto-aipa) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
