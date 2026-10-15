@@ -144,6 +144,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 15 Oct ~16:20 UTC — VOICE fixed (OpenClaw Telegram + WhatsApp, CTO AIPA): OpenAI `tts-1` instead of `gpt-4o-mini-tts`
+- **Why (Elena: "something is bad with voice both in WA and TG"):** 7 of 15 OpenClaw voice replies failed on 15 Oct, each EXACTLY 30 s
+  (`messages.tts.timeoutMs` default) → Edge fallback → 403 (Microsoft-side since 14 Oct) → "voice errors". gpt-4o-mini-tts stalls:
+  bench 5.0/5.0/4.7 s + one 60 s stall; tts-1 12/12 in 1.7–3.5 s, Spanish clear (Whisper read-back). Same nova voice.
+- **DONE:** OpenClaw `messages.tts.openai.model = tts-1` (restart 16:17:51 UTC, WA + TG up); CTO AIPA `CTO_VOICE_TTS_MODEL=tts-1`
+  in Oracle `.env` (pm2 restart 16:20:07). Backups `~/_session-backups/openclaw-wa-20261015/`. Doc: job-list-filter `docs` 6a40767.
+- **VERIFIED BY:** 3/3 test voice replies through OpenClaw in 2–3 s (Opus). WhatsApp voice = MP3 by design in 2026.2.14 (flat-line
+  bubble, plays). **NEXT (Elena):** one real voice reply on Telegram + WhatsApp.
+
 ### ✅ 15 Oct ~16:10 UTC — OpenClaw now ALSO answers on Elena's WhatsApp Business ("Message yourself") · version unchanged · claim released
 - **DONE (her explicit go; risk explained first — OpenClaw docs recommend a dedicated number):** linked with the documented
   `openclaw channels login --channel whatsapp`; settings: allowlist = her own number ONLY (Feb value was a placeholder),
