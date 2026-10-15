@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 15 Oct ~20:40 | Daily blog skipped 15 Oct (grounding/duplicate gates) — fix dupTokens date regex (mangled 25 Aug), derived-angle dup check, distinctive fallback title, cto-aipa git evidence from origin/main | `src/daily-blog-publisher.ts`, `src/blog-evidence.ts`; pm2 `cto-aipa` (restart = catch-up run) | 38489e2f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
