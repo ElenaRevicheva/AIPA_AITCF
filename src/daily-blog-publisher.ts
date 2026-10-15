@@ -677,6 +677,109 @@ function findNearDuplicate(
   }
 }
 
+// ── Bing (IndexNow) + Bluesky — 15 Oct 2026, Elena: "wire bing and bluesky" ─────────────────────────────────────────
+// IndexNow tells Bing — whose index ChatGPT search and Copilot answer from — plus Yandex, Naver and Seznam about a new
+// URL at once. The key file public/45140d69dde7068abddcad3d4ea73f0f.txt has been live on aideazz.xyz since 19 Jul
+// (aideazz 57bfd42) and nothing ever submitted a URL with it. Bluesky gets a link card built from the title and the
+// article's own first lines: no model writes it, so it cannot claim anything the article does not. Both run after the
+// page actually answers 200, in the background, so neither can delay or break a publish.
+const INDEXNOW_KEY = process.env.INDEXNOW_KEY?.trim() || "45140d69dde7068abddcad3d4ea73f0f";
+const BLUESKY_PDS = "https://bsky.social/xrpc";
+
+async function waitUntilLive(url: string, maxMinutes = 20): Promise<boolean> {
+  for (let i = 0; i < maxMinutes; i++) {
+    try {
+      const r = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(20_000) });
+      if (r.ok) return true;
+    } catch { /* not built yet */ }
+    await new Promise((res) => setTimeout(res, 60_000));
+  }
+  return false;
+}
+
+export async function submitToIndexNow(urls: string[]): Promise<string> {
+  if (process.env.INDEXNOW_ENABLED?.trim() === "0") return "off (INDEXNOW_ENABLED=0)";
+  const r = await fetch("https://api.indexnow.org/indexnow", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify({
+      host: new URL(AIDEAZZ_SITE).host,
+      key: INDEXNOW_KEY,
+      keyLocation: `${AIDEAZZ_SITE}/${INDEXNOW_KEY}.txt`,
+      urlList: urls,
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  return `HTTP ${r.status}`; // 200/202 = accepted
+}
+
+/** The article's own first real paragraph, plain text, cut at a word — never a model's summary. */
+function blueskyTeaser(markdown: string): string {
+  const para = markdown.replace(/```[\s\S]*?```/g, "").split(/\n\s*\n/).map((p) => p.trim())
+    .find((p) => p.length > 40 && !/^[#>|*-]/.test(p)) || "";
+  const plain = para.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*_`#>]/g, "").replace(/\s+/g, " ").trim();
+  return plain.length <= 220 ? plain : plain.slice(0, plain.lastIndexOf(" ", 217)) + "…";
+}
+
+export async function postToBluesky(a: { title: string; url: string; markdown: string }): Promise<string> {
+  const handle = process.env.BLUESKY_HANDLE?.trim();
+  const appPassword = process.env.BLUESKY_APP_PASSWORD?.trim();
+  if (!handle || !appPassword) return "not configured (send /blueskykey <handle> <app-password> to the bot)";
+  const s = await fetch(`${BLUESKY_PDS}/com.atproto.server.createSession`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier: handle, password: appPassword }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!s.ok) return `login failed HTTP ${s.status}`;
+  const { accessJwt, did } = (await s.json()) as { accessJwt: string; did: string };
+  const auth = { Authorization: `Bearer ${accessJwt}` };
+  const teaser = blueskyTeaser(a.markdown);
+  let thumb: unknown;
+  try { // the page's own OG picture; a card without one still links
+    const img = await fetch(`${AIDEAZZ_SITE}/elena-og.jpg`, { signal: AbortSignal.timeout(20_000) });
+    if (img.ok) {
+      const up = await fetch(`${BLUESKY_PDS}/com.atproto.repo.uploadBlob`, {
+        method: "POST",
+        headers: { ...auth, "Content-Type": "image/jpeg" },
+        body: Buffer.from(await img.arrayBuffer()),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (up.ok) thumb = ((await up.json()) as { blob: unknown }).blob;
+    }
+  } catch { /* text card */ }
+  const record = {
+    $type: "app.bsky.feed.post",
+    text: (a.title + (teaser ? "\n\n" + teaser : "")).slice(0, 290),
+    createdAt: new Date().toISOString(),
+    langs: ["en"],
+    embed: {
+      $type: "app.bsky.embed.external",
+      external: { uri: a.url, title: a.title.slice(0, 300), description: teaser.slice(0, 300), ...(thumb ? { thumb } : {}) },
+    },
+  };
+  const p = await fetch(`${BLUESKY_PDS}/com.atproto.repo.createRecord`, {
+    method: "POST",
+    headers: { ...auth, "Content-Type": "application/json" },
+    body: JSON.stringify({ repo: did, collection: "app.bsky.feed.post", record }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!p.ok) return `post failed HTTP ${p.status}`;
+  const uri = ((await p.json()) as { uri?: string }).uri || "";
+  return `posted https://bsky.app/profile/${handle}/post/${uri.split("/").pop()}`;
+}
+
+async function announceNewArticle(a: { title: string; url: string; markdown: string }): Promise<void> {
+  if (!(await waitUntilLive(a.url))) {
+    console.warn(`📡 [announce] ${a.url} not live after 20 min — IndexNow and Bluesky skipped`);
+    return;
+  }
+  try { console.log(`📡 [IndexNow] ${await submitToIndexNow([a.url, `${AIDEAZZ_SITE}/blog/`])} — ${a.url}`); }
+  catch (e) { console.warn("📡 [IndexNow] failed:", (e as Error).message); }
+  try { console.log(`🦋 [Bluesky] ${await postToBluesky(a)}`); }
+  catch (e) { console.warn("🦋 [Bluesky] failed:", (e as Error).message); }
+}
+
 /** Titles of the most recently published posts, newest first: the "do not repeat" list. */
 function recentPublishedTitles(limit = 40): string[] {
   try {
@@ -1398,6 +1501,8 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     return m.distributeArticleToBuffer(deps.anthropic, { slug, title: finalTitle, markdown: parsed!.markdown, aideazzBlogUrl })
       .then(r => console.log(`📣 [Buffer] article=${r.article} posted=${r.posted.filter(p => p.ok).length}/${r.posted.length} skipped=${r.skipped.length}`));
   }).catch(e => console.warn("[Buffer]", e instanceof Error ? e.message : String(e)));
+  // ADDITIVE (15 Oct 2026): Bing (IndexNow) + Bluesky once the page is live. Background only — see announceNewArticle.
+  if (htmlOk) void announceNewArticle({ title: finalTitle, url: aideazzBlogUrl.replace(/\/?$/, "/"), markdown: parsed.markdown });
   await saveContentLog({
     channel: "devto_direct",
     keyword,
@@ -1420,6 +1525,8 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     "",
     "2) Dev.to (cross-post):",
     devtoUrl || (devtoPaused ? "   skipped — DEVTO_PAUSED (account suspended 11 Oct)" : "   ⚠️ failed — article is live on aideazz.xyz anyway"),
+    "",
+    "3) Bing (IndexNow) + Bluesky: sent once the page answers 200 (log lines 📡 / 🦋).",
   ];
   await notifyTelegramBlogPublished(finalTitle, lines.join("\n"));
 

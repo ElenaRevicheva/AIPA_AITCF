@@ -832,6 +832,7 @@ Type /menu for all commands! 🚀
         { cmd: '/dated', desc: 'YOUR OWN dated item as an ORANGE (business) card, same dated column. Understands "next Tuesday 3pm". It states the date back to you and refuses rather than guessing.', usage: '/dated 20 October — send the Fermatix invoice' },
         { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
         { cmd: '/deepseekkey', desc: 'Wire DeepSeek V4.1 Flash for Atuona. Message is deleted; key is probed before write.', usage: '/deepseekkey sk-…' },
+        { cmd: '/blueskykey', desc: 'Let the daily blog post to Bluesky. Message is deleted; the app password is tested before write.', usage: '/blueskykey yourname.bsky.social xxxx-xxxx-xxxx-xxxx' },
       ],
     },
     'wiring_research': {
@@ -1506,6 +1507,71 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
       }, 2000);
     } else {
       await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
+    }
+  });
+
+  /**
+   * /blueskykey <handle> <app-password> — let the daily blog post a link card to Bluesky (15 Oct 2026).
+   *
+   * Identical contract to /deepseekkey: the message is deleted first, the values go to the helper on STDIN (never
+   * argv), and the helper LOGS IN to Bluesky before it writes anything. An APP password, never her real one —
+   * Bluesky → Settings → Privacy and security → App passwords; revocable on its own.
+   */
+  bot.command('blueskykey', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/blueskykey(@\S+)?\s*/i, '')
+      .trim();
+
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights */
+    }
+
+    const [handle, appPassword] = raw.replace(/^@/, '').split(/\s+/);
+    if (!handle || !appPassword) {
+      await ctx.reply(
+        'Usage: /blueskykey <handle> <app-password>\n' +
+          'Example handle: yourname.bsky.social\n\n' +
+          'Use an APP password (Bluesky → Settings → Privacy and security → App passwords), never your real one. ' +
+          'I delete your message immediately, never log the value, and log in to Bluesky with it before writing anything.',
+      );
+      return;
+    }
+    if (!/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/i.test(handle) || !/^[a-z0-9]{4}(-[a-z0-9]{4}){3}$/i.test(appPassword)) {
+      await ctx.reply(
+        'That does not look like "<handle> <app-password>" (an app password looks like xxxx-xxxx-xxxx-xxxx). ' +
+          'Nothing was written. Your message is deleted — send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Logging in to Bluesky with the app password before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-bluesky-stdin.sh', [], { stdio: ['pipe', 'pipe', 'pipe'] });
+      child.stdin.write(`${handle} ${appPassword}\n`);
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 60_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ Bluesky is wired in.\n\n' + result + '\n\n' +
+          'Restarting cto-aipa with --update-env; from the next daily article on, each one is also posted to Bluesky ' +
+          'as a link card (after Bing gets it via IndexNow).',
+      );
+      setTimeout(() => {
+        spawn('pm2', ['restart', 'cto-aipa', '--update-env'], { detached: true, stdio: 'ignore' }).unref();
+      }, 2000);
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the handle and app password and send again.');
     }
   });
 
@@ -8667,6 +8733,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'cita', description: '🏥 IENDI appointments → Trello cards (paste, forward or voice)' },
           { command: 'redditapp', description: '🔑 Wire Reddit OAuth so the community listener can actually search' },
           { command: 'deepseekkey', description: '🔑 Wire DeepSeek Flash for Atuona (message is deleted)' },
+          { command: 'blueskykey', description: '🦋 Let the daily blog post to Bluesky (message is deleted)' },
           { command: 'dated', description: '🟠 Your own dated business card (orange) on the right month board' },
           { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
           { command: 'radar', description: '🧹 Put Clean / Keep buttons back on the Follow-up radar' },
