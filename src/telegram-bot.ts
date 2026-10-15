@@ -7525,6 +7525,10 @@ Ready to commit? Use:
   // ==========================================================================
   
   bot.on('message:voice', async (ctx) => {
+    // handleQuestion's shortcuts re-feed "/fixerror …", "/readfile …" as a fake update that still carries this voice,
+    // so the same note was downloaded and transcribed again at every level (review, 14 Oct 2026). A real note has no text.
+    if (ctx.message?.text) return;
+    if (ctx.chat?.id && ctx.message) latestVoiceNote.set(ctx.chat.id, ctx.message.message_id);
     await ctx.reply('🎤 Processing your voice message...');
     
     // Register for alerts
@@ -7565,10 +7569,9 @@ Ready to commit? Use:
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
       heard = transcription;
       const sendText = ctx.reply.bind(ctx);
-      ctx.reply = ((text: string, other?: Parameters<typeof sendText>[1], signal?: Parameters<typeof sendText>[2]) => {
-        replies.push(text);
-        return sendText(text, other, signal);
-      }) as typeof ctx.reply;
+      // Recorded only once Telegram took it: replyMarkdownSafe's plain-text retry was otherwise spoken twice.
+      ctx.reply = ((text: string, other?: Parameters<typeof sendText>[1], signal?: Parameters<typeof sendText>[2]) =>
+        sendText(text, other, signal).then((m) => { replies.push(text); return m; })) as typeof ctx.reply;
 
       // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
       // Must run BEFORE Trello NLP so these specific commands reach their handler.
@@ -7576,6 +7579,7 @@ Ready to commit? Use:
       if (
         lower.includes('vibejobhunter') ||
         lower.includes('vibe job hunter') ||
+        lower.includes('vibejob hunter') || // what repairNames makes of "vibe job hunter" (14 Oct 2026)
         lower.includes('job matcher') ||
         lower.includes('job matching') ||
         lower.includes('job search') ||
@@ -8732,7 +8736,7 @@ const WHISPER_PROMPT = [
   // Month names (common source of errors when mixed EN/ES/RU)
   'January, February, March, April, May, June, July, August, September, October, November, December.',
   // Project / brand vocabulary
-  'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
+  'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena, Alisa.',
   // Trello action vocabulary
   'Move card, create card, add card, archive card, move this card, add task, new task.',
   // Avoid common substitutions
@@ -8811,49 +8815,106 @@ function speechLang(s: string): 'es' | 'en' | null {
   return es > en ? 'es' : 'en';
 }
 
-/** What a voice can say: no links (a card URL read aloud is noise), no Markdown, no emoji. */
+/**
+ * What a voice can say: no links (a card URL read aloud is noise), no code or /commands (they are for the screen),
+ * no Markdown, no emoji — and about a minute at most, cut at a sentence end, never mid-word.
+ */
 function forSpeech(text: string): string {
-  return text
+  const clean = text
+    .replace(/```[\s\S]*?```/g, ' ')
     .replace(/https?:\/\/\S+/g, '')
-    .replace(/[*_`[\]#>]/g, '')
+    .replace(/^\s*\/\w+.*$/gm, '')
+    .replace(/_/g, ' ')
+    .replace(/[*`[\]#>]/g, '')
     .replace(/\p{Extended_Pictographic}|️/gu, '')
-    .split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim()).filter(Boolean).join('\n')
-    .slice(0, 4000);
+    .split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim()).filter(Boolean).join('\n');
+  if (clean.length <= 1500) return clean;
+  const cut = clean.slice(0, 1500);
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n'), cut.lastIndexOf('! '), cut.lastIndexOf('? '), cut.lastIndexOf('\n'));
+  return (end > 500 ? cut.slice(0, end + 1) : cut.slice(0, cut.lastIndexOf(' '))).trim();
 }
 
 const digitsOf = (s: string) => (s.match(/\d+/g) || []).sort().join(',');
+
+/**
+ * Why a translation must NOT be spoken, or '' when it may. Digits alone were blind to a month written as a word
+ * ("October 16" → "16 de noviembre" keeps 16), AM/PM, a dropped "not", and a translation cut off at the token limit
+ * (review of f001beaf, 14 Oct 2026). Each check is language-neutral: either spelling counts on either side.
+ */
+const MONTHS: [string, string][] = [['january', 'enero'], ['february', 'febrero'], ['march', 'marzo'], ['april', 'abril'],
+  ['may', 'mayo'], ['june', 'junio'], ['july', 'julio'], ['august', 'agosto'], ['september', 'septiembre'],
+  ['october', 'octubre'], ['november', 'noviembre'], ['december', 'diciembre']];
+function translationBreaks(src: string, t: string): string {
+  if (digitsOf(t) !== digitsOf(src)) return 'changed a number';
+  if (t.length < src.length * 0.6) return 'came back short';
+  const a = src.toLowerCase(), b = t.toLowerCase();
+  // "may" is also a verb, so May counts only next to a day number.
+  const has = (s: string, w: string) => w === 'may'
+    ? /(^|[^a-z])may\s+\d|\d\s+may([^a-z]|$)/.test(s)
+    : new RegExp(`(^|[^a-záéíóúñ])${w}([^a-záéíóúñ]|$)`).test(s);
+  for (const [en, es] of MONTHS) {
+    if ((has(a, en) || has(a, es)) && !(has(b, en) || has(b, es) || (en === 'may' && /\bmayo\b/.test(b)))) return `lost the month ${en}`;
+  }
+  // Only after a time ("10:00 AM"): "I am" is not a time of day.
+  const AM = /\d\s?a\.?\s?m\b|de la mañana/i, PM = /\d\s?p\.?\s?m\b|de la tarde|de la noche/i;
+  if (AM.test(src) && !AM.test(t)) return 'lost AM';
+  if (PM.test(src) && !PM.test(t)) return 'lost PM';
+  const NEG = /\bnot\b|n't\b|\bnever\b|\bno\b|\bnunca\b/i;
+  if (NEG.test(src) && !NEG.test(t)) return 'lost a "not"';
+  return '';
+}
+
+/** Chat id → message id of her newest voice note. A voice that answers an older note after a newer one is wrong. */
+const latestVoiceNote = new Map<number, number>();
 
 /**
  * CTO AIPA answers a voice note with a voice note (Elena, 14 Oct 2026: "fully speaking in English and Spanish").
  * Reuses the Sprinter's OpenAI voice (synthesizeBriefingMp3, nova) — the voice OpenClaw already speaks with — so
  * nothing new is built. It says what the text replies said, in the language she spoke: a Spanish note gets a Spanish
  * voice even when the confirmation text is English. That translation goes through the same model waterfall, and is
- * spoken only if every number survived it (a date that changes in translation would confirm a card that does not
- * exist — acknowledgement is not completion); otherwise the original text is spoken. Russian is spoken as written.
+ * spoken only if translationBreaks() finds nothing (a date that changes in translation would confirm a card that does
+ * not exist — acknowledgement is not completion); otherwise the original text is spoken. Russian is spoken as written.
+ * The voice is threaded to the note it answers, and dropped when a newer note arrived first or it took over 3 minutes.
  * Off switch: CTO_SPEAK_REPLIES=0. Never throws: the text reply has already gone out.
  */
 async function speakBack(ctx: Context, heard: string, replies: string[]): Promise<void> {
   if (process.env.CTO_SPEAK_REPLIES === '0' || !process.env.OPENAI_API_KEY?.trim()) return;
+  const t0 = Date.now();
   try {
     // Progress lines ("🤔 Thinking...") are not answers.
     let text = forSpeech(replies.filter((t) => !(t.length < 80 && /(\.\.\.|…)\s*$/.test(t))).join('\n\n'));
     if (!text) return;
     const want = speechLang(heard);
-    let lang = speechLang(text) ?? 'as written';
-    if (want && lang !== want) {
+    // The reply's own language, judged on the bot's words only: replies quote her transcript and card names, and her
+    // board's columns are Russian — either one made an English confirmation look Spanish or "unknown" (review, 14 Oct).
+    const own = speechLang(text.replace(/"[^"\n]*"|«[^»\n]*»/g, ' ').replace(/[Ѐ-ӿ]+/g, ' '));
+    let lang: string = own ?? 'as written';
+    // The bot's templates are English, so a Spanish note is always translated (a Spanish reply comes back unchanged).
+    if (want === 'es' || (want === 'en' && own === 'es')) {
       const r = await completeWithProfileDetailed('classify',
-        `Translate the user's text into natural spoken ${want === 'es' ? 'Spanish' : 'English'}. Keep every number, date, time and name exactly. Output only the translation.`,
-        text, 1200, 'telegram/voice-reply');
+        `Translate the user's text into natural spoken ${want === 'es' ? 'Spanish' : 'English'}. Keep every number, date, time and name exactly. Keep text inside quotes and Russian words unchanged. Output only the translation.`,
+        text, Math.max(1200, Math.ceil(text.length / 2)), 'telegram/voice-reply');
       const t = forSpeech(r.text || '');
-      if (t && digitsOf(t) === digitsOf(text)) { text = t; lang = want; }
-      else console.warn(`[Voice] ${r.provider} translation changed a number — speaking the original`);
+      const broken = t ? translationBreaks(text, t) : 'came back empty';
+      if (!broken) { text = t; lang = want; }
+      else console.warn(`[Voice] ${r.provider} translation ${broken} — speaking the original`);
     }
     const { default: OpenAI } = await import('openai');
-    // The SDK's default timeout is 10 minutes; a voice that arrives after that is worse than none.
-    const audio = await synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
-      { model: process.env.CTO_VOICE_TTS_MODEL || 'gpt-4o-mini-tts', format: 'opus' });
-    await ctx.replyWithVoice(new InputFile(audio, 'cto-aipa.ogg'));
-    console.log(`[Voice] spoke the reply: ${lang}, ${text.length} chars`);
+    // The SDK timeout stops at the response headers, not the audio body — so the whole call gets its own limit.
+    let timer: NodeJS.Timeout | undefined;
+    const audio = await Promise.race([
+      synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
+        { model: process.env.CTO_VOICE_TTS_MODEL || 'gpt-4o-mini-tts', format: 'opus' }),
+      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('the voice took over 2 minutes')), 120_000); }),
+    ]).finally(() => clearTimeout(timer));
+    const noteId = ctx.message?.message_id;
+    if (ctx.chat && noteId && latestVoiceNote.get(ctx.chat.id) !== noteId) {
+      console.warn('[Voice] a newer voice note arrived first — not speaking this older reply'); return;
+    }
+    if (Date.now() - t0 > 180_000) { console.warn('[Voice] reply ready after 3 min — too late, text only'); return; }
+    await ctx.replyWithVoice(new InputFile(audio, 'cto-aipa.ogg'),
+      noteId ? { reply_parameters: { message_id: noteId, allow_sending_without_reply: true } } : undefined);
+    console.log(`[Voice] spoke the reply: ${lang}, ${text.length} chars, ${Math.round((Date.now() - t0) / 1000)} s`);
   } catch (e) {
     console.warn(`[Voice] could not speak the reply (${String((e as Error)?.message || e).slice(0, 120)}) — text only`);
   }

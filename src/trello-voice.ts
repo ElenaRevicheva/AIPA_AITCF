@@ -974,7 +974,8 @@ const HEARD_AS: [RegExp, string][] = [
   [/\bvibe\s*job\b/gi, "VibeJob"],
   [/\ba\s*tuona\b/gi, "Atuona"],
   [/\balg[oa]m\b/gi, "Algom"],
-  [/\bAlic[ea]\b/g, "Alisa"],
+  // No "Alice → Alisa" since this table runs on every voice note (14 Oct 2026): it rewrote every real Alice into her
+  // daughter's name. Alisa is now a soft hint in WHISPER_PROMPT instead, which cannot overwrite a real Alice.
 ];
 
 export function repairNames(text: string): string {
