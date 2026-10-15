@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (team wiring) | 2026-10-15 16:30 | Elena's go: the 6 micro-wirings of `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` | cto-aipa: scripts/lib/no-website-leads.cjs, scripts/resend-reconcile.cjs, scripts/atlas-lead-machine.cjs, crontab line hs-watch-manual-emails; VJH: scripts/judge_feedback_sync.py, src/autonomous/orchestrator.py (+ vibejobhunter restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -164,13 +163,15 @@ git log keeps the record.
   Unlink = WhatsApp Business → Linked devices → log out, or `openclaw channels logout --channel whatsapp`.
   Upgrade still NOT applied (see entry below); `~/_scratch/openclaw-next` removed.
 
-### 🧩 15 Oct — AIdeazz-as-a-team wiring plan · read-only audit done · **6 micro-wirings await Elena's yes**
-- **Plan:** `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` (25-agent read-only workflow, each wiring double-checked on Oracle + golden rule).
-  Order: (1) Atlas no-website note → bit.ly/Linktree line, **before Mon 19 Oct 16:00 UTC** · (2) `hs-watch-manual-emails` off the shared */10 minute
-  (579 HubSpot 429s) · (3) `resend-reconcile` admin-key fallback (451 × 401) · (4) UTM on 4 Atlas portfolio links → existing GA4 sync · (5) VJH judge
-  `_KIT_NOTE` + staging note · (6) VJH interview invitations with a booking link stop being dropped.
-- **Rejected as bicycles** (do not rebuild): Atlas screenshot reader, known-inquirer skip, wiki titles in OpenClaw, auto lessons into the kit, letter cap.
-- **NEXT:** Elena says which numbers → claim the board → named-file deploy from LF copies → prove each by its output line.
+### ✅ 15 Oct — AIdeazz-as-a-team: 4 micro-wirings DEPLOYED + proven · 2 held for Elena · claim released
+- **DONE (each reviewed by 2 independent lenses before deploy; backups `~/_session-backups/team-wiring-20261015/`):**
+  (1) Atlas Monday no-website note → Instagram bio Linktree/bit.ly/wa.link line (`e0592904`; Oracle md5 = git `143c8849`, test 32/32; shows on Mon 19 Oct landline picks).
+  (2) `hs-watch-manual-emails` cron `*/10` → `3-59/10` (not :x5 — 4 daily HubSpot jobs start there); installer + doc match. Runs 16:03 + 16:13 `"ok": true`, no 429 (was 22/30 failing).
+  (5) VJH judge: `🚨 The form pre-fills` in `_KIT_NOTE` + cached kit reasons re-derived (`e864641`). 16:17 run: 54 → **47 with her reason · refreshed 7**; pre-fills 7/6 → 0/0; pay lesson 8x → 1x (her own words).
+  (6) VJH: interview invites WITH a booking link reach HubSpot + Telegram; skip the auto-reply phrase filter; ignore Elena's own scheduler links + quoted-thread links; alert escaped (`006c1ed`). vibejobhunter restarted 16:12:49 > file 16:12:38; response step ran, 0 tracebacks.
+- **HELD:** (3) `resend-reconcile` admin key — its duplicate check uses an HTML comment HubSpot strips → hourly duplicate notes + HIGH tasks per problem send; needs a ~10-line dedup fix first (Elena's call). (4) UTM on Atlas links — would put a long tracking tail in the visible first line of every letter (her outreach rule); Elena decides.
+- **Known, not changed:** VJH client replies without a quote can still become [HIRING-VJH-LEAD] (only VJH_BD_DOMAINS separates); VJH re-classifies the same mail hourly (processed ids saved only on one branch).
+- **Wiki:** `aideazz` `37ec1cd` incident "Another agent wrote her top lesson" + concept `label-provenance` (blog: yes → wiki-ship 21:30 UTC).
 
 ### ⛔ 15 Oct ~13:00 UTC — OpenClaw upgrade TESTED on copies, NOT applied (fails Elena's conditions) · live untouched · claim released
 - Newest 2026.10.3 needs Node ≥24.16 (≥2026.7.1 needs ≥22.22.3); Oracle's Node 22.22.0 serves 13 processes → not touched.

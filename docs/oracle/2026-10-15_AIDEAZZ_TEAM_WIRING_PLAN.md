@@ -6,7 +6,9 @@ to other agents, i want all my agents talk to each other, share precious skills,
 **How this was made:** a read-only workflow (25 agents, `wf_e111b9d3-84a`): 7 readers mapped every agent and shared channel on Oracle,
 a synthesis proposed 8 micro-wirings, each wiring was attacked by two independent checkers (does it really exist and run on Oracle? does it
 pass the golden rule?), then a completeness critic. Nothing was changed. Every cited file was md5-identical laptop = Oracle on 15 Oct.
-**Status: plan only. Each item waits for Elena's yes** (contract Teach → Plan → Confirm → Build → Document).
+**Status (15 Oct, evening): items 1, 2, 5, 6 DEPLOYED and proven by output; 3 and 4 HELD** (see NOW.md). Pre-deploy review changed three
+items: #2 minute is `3-59/10` (not :x5), #3 held (its dedup marker is stripped by HubSpot → duplicate notes/tasks), #6 also skips the
+auto-reply phrase filter and ignores Elena's own/quoted scheduler links. #4 held: a visible tracking tail in every letter.
 
 ## What already works as a team (verified)
 - **HubSpot is the shared memory, with one front door.** VJH, Atlas, Algom and the three EspaLuz bots all write through CTO AIPA's
