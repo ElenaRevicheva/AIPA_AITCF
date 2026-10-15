@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 15 Oct (WA link) | OpenClaw → WhatsApp Business +507 6166 6716 (Elena's go; version unchanged 2026.2.14; allowlist = her number only, selfChatMode, no read receipts) | `~/.openclaw/openclaw.json` (channels.whatsapp), `~/.openclaw/credentials/whatsapp`, `openclaw-gateway` restart | 08e3b8ec |
 | Claude Code (team wiring) | 2026-10-15 16:30 | Elena's go: the 6 micro-wirings of `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` | cto-aipa: scripts/lib/no-website-leads.cjs, scripts/resend-reconcile.cjs, scripts/atlas-lead-machine.cjs, crontab line hs-watch-manual-emails; VJH: scripts/judge_feedback_sync.py, src/autonomous/orchestrator.py (+ vibejobhunter restart) | — |
 
 **Rules**
