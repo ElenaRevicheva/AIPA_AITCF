@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (OpenClaw company facts) | 2026-10-15 21:00 | Elena's go: deep-dive company facts into OpenClaw proof sheet (Chalán question failed) | cto-aipa scripts/hs-deal-prep.cjs; ~/.openclaw/workspace/proof/TOOLS.md (regenerated) | — |
 | Claude Code (laptop) | 15 Oct ~21:00 | Elena's go: IndexNow (Bing) + Bluesky cross-post for the daily blog | `src/daily-blog-publisher.ts`, `src/telegram-bot.ts` (key command), aideazz `public/` key file; pm2 `cto-aipa` | 6025a538 |
 
 **Rules**
