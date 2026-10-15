@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 14 Oct 19:45 | Elena's go on voice moves 5+6+1: CTO AIPA name-repair live + spoken replies (EN/ES); OpenClaw Whisper glossary AFTER her 20:00 UTC screen | `src/telegram-bot.ts`, `src/trello-voice.ts`, `src/sprint-briefing/tts-openai.ts`; pm2 `cto-aipa`; `~/.openclaw/openclaw.json` (after the screen) | 60a0fe34 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,19 +143,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ✅/⏳ 14 Oct ~19:50 UTC — CTO AIPA SPEAKS (voice note in → voice note out, EN/ES) + name repair LIVE · OpenClaw glossary queued
-- **DONE (Elena's go on moves 5+6 of `docs/oracle/2026-10-14_voice_agents_compare.md`; f001beaf; pm2 `cto-aipa` restarted
-  19:45:41 > file 19:45:37; backups `~/_session-backups/voice-speak-20261014/`):** `repairNames` (written 2 Sep, never called) runs on
-  every voice note — log `[Voice] transcribed by <provider>: N chars, <script>, names repaired: yes|no`, never the words. Plain "ideas"
-  removed from the table (real word — would break the idea intent), `CETA → Cita` added. Every reply to a voice note is also sent as a
-  voice note (`speakBack`, Sprinter's `synthesizeBriefingMp3`, gpt-4o-mini-tts/nova, Opus): Spanish note → Spanish voice (English
-  confirmations translated by the waterfall, spoken only if every number survived), Russian as written. Not awaited (an ES call took
-  120 s), 90 s timeout. **Off switch: `CTO_SPEAK_REPLIES=0`** in Oracle `.env` + restart.
-- **VERIFIED BY:** tsc; test-trello-voice-dates 72/72; 14 helper checks; Oracle probe — gemini kept every digit, both Opus notes read
-  back word for word by Whisper. Laptop = origin/main = Oracle (md5, 3 files). **Not yet seen from a real voice turn** → first note from
-  Elena must log `[Voice] spoke the reply`. Until then the Pitz 🎤 story note keeps "do not say the repair table is live".
-- **NEXT (agent):** move 1 — `tools.media.audio.prompt` glossary in `~/.openclaw/openclaw.json` (today OpenClaw sends Whisper only
-  "Transcribe the audio.") — applied ONLY after her 20:00 UTC screen, once OpenClaw sessions are idle 15 min.
+### ✅ 14–15 Oct — voice moves 1+5+6 LIVE (Elena's go): CTO AIPA speaks (EN/ES) + name repair · OpenClaw hears her vocabulary · claim released
+- **CTO AIPA (f001beaf + review fixes 1b1fde29; pm2 restarted 00:30:07 UTC > files 00:30:04; backups `~/_session-backups/voice-speak-20261014/`):**
+  `repairNames` (written 2 Sep, never called) runs on every voice note, log `[Voice] transcribed by <provider>: N chars, <script>,
+  names repaired: yes|no` (never the words). Every reply to a voice note comes back as a voice note too (`speakBack`, Sprinter's
+  `synthesizeBriefingMp3`, gpt-4o-mini-tts/nova, Opus), threaded to the note: Spanish note → Spanish voice (translated by the waterfall,
+  refused by `translationBreaks` if a number/month/AM-PM/"not" changed or it came back short), English as written, Russian as written.
+  **Off switch: `CTO_SPEAK_REPLIES=0`** in Oracle `.env` + restart.
+- **The adversarial review (3 lenses) found, all fixed:** a PRE-EXISTING loop — handleQuestion's shortcuts re-feed `/fixerror …` as a fake
+  update that still carries the voice, so the voice handler re-transcribed the same note at every level (guard: a real note has no text);
+  Spanish notes still got the English confirmation (language judged on her echoed words); Russian column names sent every English
+  confirmation through a model rewrite; a late voice could confirm an old time after a correction (now threaded, dropped if a newer note
+  came first or > 3 min); Markdown retry spoken twice; code read aloud; "vibe job hunter" intent broken by the repair; "Alice" rewritten
+  to Alisa (hard pair removed → soft hint in WHISPER_PROMPT). Note: handleQuestion's shortcuts were already no-ops for TYPED questions too
+  (fake update has no bot_command entity) — left as is (enabling them would auto-run /editfile etc.).
+- **OpenClaw (move 1, 20:31 UTC restart; backup `~/_session-backups/openclaw-glossary-20261014/`):** `tools.media.audio.prompt` = her
+  vocabulary (it sent Whisper only "Transcribe the audio."). A/B before applying: groq 9/15 → 15/15 terms, OpenAI 7/15 → 14/15; her 7 real
+  notes unchanged in meaning. Doc: job-list-filter `docs` 4166a2d.
+- **VERIFIED BY:** tsc; test-trello-voice-dates 72/72; helper checks 14/14 + 21/21; Oracle probe (translation kept digits; nova Opus
+  read back word for word); laptop = origin/main = Oracle md5 on all 3 files. **Not yet seen from a real voice turn** — her first note
+  must log `[Voice] transcribed by` and `[Voice] spoke the reply`.
 
 ### ✅ 14 Oct ~17:00 UTC — Pitz (Developer Mid — Fullstack & AI Agents) staged + full kit · OpenClaw Spanish mode · interview TODAY 20:00 UTC
 - **DONE:** inbound (Montserrat Téllez, PITZ, found Elena on LinkedIn). Deal `[HIRING-MANUAL] … @ Pitz` in I Act TODAY, audit ✓ in every column
