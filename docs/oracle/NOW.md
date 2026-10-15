@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 15 Oct 11:45 | OpenClaw learns from Elena's corrections (her go) — lessons ledger built by the existing cards cron | job-list-filter `build-cards.py`, OpenClaw workspace `IDENTITY.md`/`HELP.md`/`cards/TOOLS.md` | dca5e84d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
