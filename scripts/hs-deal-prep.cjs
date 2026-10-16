@@ -72,7 +72,7 @@ async function notesOf(dealId) {
 }
 
 // ── --digest: one compact entry per live job deal ───────────────────────────────────────────────────────────
-const DIGEST_MAX = 11000;      // fits EVERY model in the chain: Groq's per-file bootstrap limit measured 12,506 (7 Oct 2026)
+const DIGEST_MAX = 11100;      // (11000 until 16 Oct: +32 header chars must not drop a deal) fits EVERY model in the chain: Groq's per-file bootstrap limit measured 12,506 (7 Oct 2026)
 const firstSentence = (s) => (String(s || '').match(/^[^.!?]{20,240}[.!?]/) || [String(s || '').slice(0, 200)])[0].trim();
 
 async function digest(outPath) {
@@ -130,8 +130,8 @@ async function digest(outPath) {
     '# answer, explanations) and EVERY message ends with a Spanish [[tts:text]]…[[/tts:text]] voice block; use the §0b template.',
     '# LIVE RULE (Elena, 11 Oct 2026): if she pastes an INTERVIEWER\'S question (not her answer to your mock question), reply',
     '# "🔴 LIVE — say this:" + ONE first-person answer, 3–5 sentences, true facts from the deal only — no other sections, no next',
-    '# question, no voice note. FACTS always: titles exactly "Deputy CEO for Corporate Governance & Chief Legal Officer" (never',
-    '# "CEO"); AI agents implement, she decides requirements and tests; no metric she does not have (conversions, revenue, hours).',
+    '# question, no voice note (typed + asks for voice: tts tool ONCE). FACTS always: titles exactly "Deputy CEO for Corporate',
+    '# Governance & Chief Legal Officer" (never "CEO"); AI agents implement, she decides requirements and tests; no metric she lacks (conversions, revenue, hours).',
     '# EXAMPLE RULE (Elena, 11 Oct 2026): EVERY answer — polished or LIVE — has a line "For example, from my work:" with ONE true example from HER OWN products,',
     '# COPIED WORD FOR WORD from the "✅ VERIFIED EXAMPLES" list (always in her VERIFIED FACTS sheet) (pick the best fit; never reword',
     '# or round a number — "18 websites" is not "18 users"). A generic answer with no example from her products is a miss.',
