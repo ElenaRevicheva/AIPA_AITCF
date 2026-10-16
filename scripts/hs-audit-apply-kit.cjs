@@ -19,7 +19,7 @@
 'use strict';
 
 const path = require('path');
-const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
+const { hubspotKey, hubspotBase, envValue, vjhTelegram } = require(path.join(__dirname, 'hs-env.cjs'));
 const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
 const { COMET_MARK } = require(path.join(__dirname, 'lib', 'comet-prompt.cjs'));
 const { CV_MARK } = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
@@ -74,6 +74,7 @@ async function auditDeal(d) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId);
   let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false, shaped = false, handBuilt = '';
+  let tailored = false, tailoredWhy = '';
   const notes = [];
   for (const id of ids) notes.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`));
   if (!isJobDeal(d.properties.dealname, notes.map((n) => n.properties?.hs_note_body))) return null;
@@ -87,6 +88,12 @@ async function auditDeal(d) {
     if (html.includes('🎯 ROLE DEFENSE')) role = true;
     const body = stripHtml(html);
     if (body.includes(CV_MARK)) shaped = true;
+    // 16 Oct 2026: the kit's own honest choice — its CV composer could not shape this posting from her verified facts, so it
+    // attached the tailored CV and (since 16 Oct) wrote why. A complete kit, not a gap; the reason travels with the line.
+    if (body.includes('Tailored CV attached to this note')) {
+      tailored = true;
+      tailoredWhy = (body.match(/Not shaped to this posting:\s*(.+?)(?: — |$)/) || [])[1] || tailoredWhy;
+    }
     const at0 = STUB_RE.test(body);
     const at = body.search(LETTER_RE);
     if (!at0 && at >= 0 && body.length - at >= MIN_LETTER_CHARS) letter = true;
@@ -99,13 +106,22 @@ async function auditDeal(d) {
       }
     }
   }
-  if (cv && !shaped) cvName = handBuilt ? `${handBuilt} (hand-built)` : `${cvName} (not shaped to the posting)`;
-  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt), cvName, link, defense, role, comet };
+  // Deals staged before 11 Oct 2026 predate posting-shaped CVs; Elena (16 Oct): no backfill — their tailored CV is the kit.
+  const legacy = String(d.properties.createdate || '') < '2026-10-11';
+  if (cv && !shaped) {
+    cvName = handBuilt ? `${handBuilt} (hand-built)`
+      : tailored ? `${cvName} (tailored — not shaped: ${tailoredWhy || 'too few of her verified facts fit this posting'})`
+      : legacy ? `${cvName} (staged before posting-shaped CVs)` : `${cvName} (generic — not shaped to the posting)`;
+  }
+  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt || tailored || legacy), cvName, link, defense, role, comet };
 }
 
 async function telegram(text) {
-  const token = envValue('TELEGRAM_BOT_TOKEN');
-  const chat = envValue('TELEGRAM_LEADS_DIGEST_CHAT_ID') || envValue('TELEGRAM_AUTHORIZED_USERS').split(',')[0].trim();
+  // Jobs arrive in the VibeJob Hunter bot (Elena, 16 Oct 2026); this repo's bot only where VJH is not on the box.
+  const vjh = vjhTelegram();
+  const token = vjh ? vjh.token : envValue('TELEGRAM_BOT_TOKEN');
+  const chat = vjh ? vjh.chat : (envValue('TELEGRAM_LEADS_DIGEST_CHAT_ID') || envValue('TELEGRAM_AUTHORIZED_USERS').split(',')[0].trim());
+  console.log(`  telegram via ${vjh ? 'VibeJob Hunter bot' : 'CTO AIPA bot'}`);
   if (!token || !chat) { console.log('  (telegram not configured — alert printed only)'); return; }
   const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
@@ -119,7 +135,7 @@ async function telegram(text) {
   const search = await hs('POST', '/crm/v3/objects/deals/search', {
     // VJH deals AND hand-staged jobs (29 Sep 2026) — recruiter-outreach deals return null below.
     filterGroups: jobDealFilterGroups(STAGE),
-    properties: ['dealname'],
+    properties: ['dealname', 'createdate'],
     limit: 100,
   });
   const deals = search.results || [];
@@ -129,7 +145,7 @@ async function telegram(text) {
     catch (e) { rows.push({ id: d.id, name: d.properties.dealname, error: e.message }); }
   }
 
-  const missing = (r) => [!r.link && 'no apply link', !r.letter && 'no letter', !r.cv && 'no CV shaped to the posting',
+  const missing = (r) => [!r.link && 'no apply link', !r.letter && 'no letter', !r.cv && 'no CV for this posting (none attached, or only a generic lane CV)',
     !r.defense && 'no 🛡️ defense', !r.role && 'no 🎯 role defense', !r.comet && 'no 📋 Comet prompt'].filter(Boolean);
   const gaps = rows.filter((r) => r.error || missing(r).length);
   for (const r of rows) {

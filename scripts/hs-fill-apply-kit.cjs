@@ -239,7 +239,13 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
 /** The 🛡️ note's CV line: the shaped one carries CV_MARK (the audit's ✓CV and hs-attach-cv read it). */
 function cvLineHtml(cv) {
   if (!cv.cvPath) return '';
-  if (!cv.shaped) return `<p>📎 <strong>Tailored CV attached to this note — use this one:</strong> ${esc(cv.name)}</p>`;
+  // 16 Oct 2026: the reason the composer could not shape it used to live only in the cron log, so the audit could not tell
+  // an honest kit decision from a missing CV. It now travels with the line (the audit reads "Not shaped to this posting:").
+  if (!cv.shaped) {
+    return `<p>📎 <strong>Tailored CV attached to this note — use this one:</strong> ${esc(cv.name)}`
+      + (cv.why ? `<br><em>Not shaped to this posting: ${esc(String(cv.why).slice(0, 220))} — your verified facts do not cover enough of it; say the gap before they find it.</em>` : '')
+      + '</p>';
+  }
   // 12 Oct 2026: the independent reviewer's doubt (cv-compose `fit_note`) used to live only in the JSON on Oracle while
   // this line said "use this one" — the CodeRoad v1 case. It now travels with the file, so a machine CV never hides its caveat.
   return `<p>${CV_MARK}: <strong>${esc(cv.name)}</strong> — use this one. `

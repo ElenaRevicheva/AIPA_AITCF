@@ -35,7 +35,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
+const { hubspotKey, hubspotBase, envValue, vjhTelegram } = require(path.join(__dirname, 'hs-env.cjs'));
 const { BRIEF_MARK, createResearcher, decodeSafe } = require(path.join(__dirname, 'lib', 'company-research.cjs'));
 const { checkAll } = require(path.join(__dirname, 'lib', 'posting-state.cjs'));
 const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
@@ -497,9 +497,12 @@ ${cards}
     }
     // read through hs-env: these scripts run from cron with a bare environment, so .env is the
     // only reliable source — process.env was empty on the first Oracle run.
-    const token = envValue('TELEGRAM_BOT_TOKEN');
-    const chat = (envValue('CONCIERGE_TG_CHAT') || '').trim();
+    // Jobs arrive in the VibeJob Hunter bot (Elena, 16 Oct 2026); this repo's bot only where VJH is not on the box.
+    const vjh = vjhTelegram();
+    const token = vjh ? vjh.token : envValue('TELEGRAM_BOT_TOKEN');
+    const chat = vjh ? vjh.chat : (envValue('CONCIERGE_TG_CHAT') || '').trim();
     if (!token || !chat) { console.warn('  ! TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT missing — not sent'); process.exitCode = 1; return; }
+    console.log(`  telegram via ${vjh ? 'VibeJob Hunter bot' : 'CTO AIPA bot'}`);
     // The caption has to explain itself: it arrives at 8am with no conversation around it.
     const line = (r) => `🆕 ${r.title}${r.company && !r.title.toLowerCase().includes(r.company.toLowerCase()) ? ` — ${r.company}` : ''}`;
     const listed = fresh.slice(0, 6).map(line).join('\n') + (fresh.length > 6 ? `\n…and ${fresh.length - 6} more` : '');

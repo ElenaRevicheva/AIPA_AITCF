@@ -60,6 +60,20 @@ function visibilityKey() {
   );
 }
 
+/**
+ * Elena's JOB chat (16 Oct 2026: "everything about jobs in the VibeJob Hunter bot, no matter which bot works it out").
+ * Its token + chat live in VJH's own .env on the same box. null where that file is absent (the laptop) → callers fall back
+ * to this repo's bot.
+ */
+function vjhTelegram() {
+  try {
+    const t = fs.readFileSync(path.join(require('os').homedir(), 'VibeJobHunterAIPA_AIMCF', '.env'), 'utf8');
+    const v = (k) => (t.match(new RegExp(`^${k}=(.+)$`, 'm'))?.[1] || '').trim().replace(/^["']|["']$/g, '');
+    const token = v('TELEGRAM_BOT_TOKEN'), chat = v('TELEGRAM_CHAT_ID');
+    return token && chat ? { token, chat } : null;
+  } catch { return null; }
+}
+
 module.exports = {
   ENV_PATH,
   envValue,
@@ -68,4 +82,5 @@ module.exports = {
   hubspotBase,
   visibilityUrl,
   visibilityKey,
+  vjhTelegram,
 };

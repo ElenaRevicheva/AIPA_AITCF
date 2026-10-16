@@ -914,10 +914,7 @@ Type /menu for all commands! 🚀
   async function showMenu(ctx: Context) {
     const menuMessage = `🤖 *CTO AIPA v6.0 - PERSONAL AI CO-FOUNDER*
 
-💼 *YOUR JOB FLOW — nothing to remember*
-1️⃣ New job → the kit fills the HubSpot deal by itself (company note, CV, letter, Comet prompt) → open 🔥 I act today, apply
-2️⃣ Interview booked (LinkedIn, WhatsApp, anywhere) → send here: \`/research_employer <company>\` → deep research on the company + products lands on the job deal
-3️⃣ In OpenClaw: \`/new\` → \`prep me for <company>\` → it prepares you from that research
+💼 *Jobs:* the full job flow, apply queue and kit alerts are in the VibeJob Hunter bot (/menu there). Interview booked? Send here: \`/research_employer <company>\`
 
 _Tap a section below to see commands and usage examples!_
 
@@ -1047,12 +1044,8 @@ Or just ask me anything - I understand natural language!`;
       await ctx.reply(
 `🧠 PERSONAL AI (JOB + PROJECTS)
 
-💼 YOUR JOB FLOW — nothing to remember
-1️⃣ New job → the kit fills the HubSpot deal by itself (company note, CV, letter, Comet prompt) → open 🔥 I act today → apply
-2️⃣ Interview booked (LinkedIn, WhatsApp, anywhere) → send here:
-   /research_employer <company>
-   → deep research on the company + its products is saved on the job deal (1–4 min); I confirm when OpenClaw has it
-3️⃣ In OpenClaw: /new → prep me for <company> → it prepares you from that research, "don't claim" warnings first
+💼 JOBS → the full job flow, the daily apply queue and kit alerts live in the VibeJob Hunter bot (/menu there).
+   The one job command here: /research_employer <company> — send it when an interview is booked.
 
 /project  - Set active project or job search mode
   Example: /project job  (JOB_SEARCH umbrella: VibeJob Hunter + YC shortlist)
