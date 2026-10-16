@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 16 Oct 13:55 | VJH bot screens told the truth (/start /menu /workflow /manual /help + Back-to-Menu), broken buttons off the menu | VibeJobHunterAIPA_AIMCF src/notifications/telegram_bot_enhanced.py; systemd vibejobhunter restart | e9f7e677 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,22 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 16 Oct ~13:50 UTC — VJH bot screens tell the truth · bilingual plan ready for Elena's yes · claim released
+- **DONE (VJH `ee90351`, Oracle ff-merged, md5 `9b31ec05…` = git, restarted 13:48:50 > file 13:48:44, "Enhanced Bot polling started" 13:50:21, 0 tracebacks):**
+  /start /menu /workflow /manual /help + "Back to Menu" share ONE checked text each (module constants). Old screens claimed auto-apply,
+  ATS forms, Hunter emails, LinkedIn queues. Menu = only true buttons (How it works · What is mine · Priority · 📘 Post publicly NOW);
+  Today/Jobs/Stats/Outreach/Pause/Resume/Status showed April data, a fake "0 jobs" (ats_cache list-vs-dict) or did nothing — **off the
+  menu, handlers untouched** (typed commands still answer). OpenClaw menu line "warnings first" corrected (not what the skill does;
+  backup `~/_session-backups/bilingual-20261016/openclaw/`).
+- **VERIFIED BY:** sentence-by-sentence truth check on Oracle (9 corrections applied); all 5 screens sent to Telegram with Markdown →
+  parsed (4 silent test copies deleted), the new menu delivered to Elena.
+- **FOUND, NOT FIXED (needs her yes):** VJH checks Zoho/Gmail for employer replies **only in cycles that find a new job** —
+  `orchestrator.py` returns at "📭 No new jobs" before STEP 6 (48 of 70 cycles ran it). 24 h look-back, so a long dry spell can
+  miss a reply. Fix = run the same STEP 6 block before that `return` (dedup already INSERT OR IGNORE).
+- **NEXT:** `docs/oracle/2026-10-16_BILINGUAL_TEAM_PLAN.md` — 11 items checked by 2 lenses (reality + golden rule), built on the
+  15 Oct file drops (proof/deals sheets, her corrections ledger, judge ledger). Waiting for Elena's yes. The apply queue / kit alert
+  through the VJH bot have not had a real send yet (13:15 "nothing new", 13:45 "gaps 0").
 
 ### ✅ 16 Oct ~12:15 UTC — Jobs live in the VibeJob Hunter bot · kit-gap alert honest for future kits · claim released
 - **Elena's rule:** everything about jobs appears in the VJH bot, whichever agent does the work. **Done:** apply-kit alert (13:45 UTC) + daily apply
