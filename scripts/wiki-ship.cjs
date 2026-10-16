@@ -274,8 +274,13 @@ function main() {
       const blogUrl = (out.match(/https:\/\/aideazz\.xyz\/blog\/\S+/) || ['(no url)'])[0];
       // Say what actually happened. A blog page without a cross-post is a
       // partial result and must not read like a full one.
-      if (devto) say('✓', `published ${inc.slug}\n   ${blogUrl}\n   ${devto}`);
-      else say('!', `${inc.slug}: blog page went out but NO Dev.to cross-post — ${blogUrl}`);
+      // 16 Oct 2026: Dev.to is suspended (DEVTO_PAUSED=1); field notes now also go to Bing (IndexNow) + Bluesky.
+      const sky = (out.match(/https:\/\/bsky\.app\/\S+/) || [])[0] || null;
+      const bing = (out.match(/IndexNow \(Bing\): (HTTP \d+)/) || [])[1] || null;
+      const extra = `${bing ? `\n   Bing (IndexNow) ${bing}` : ''}${sky ? `\n   ${sky}` : ''}`;
+      if (devto) say('✓', `published ${inc.slug}\n   ${blogUrl}\n   ${devto}${extra}`);
+      else if (sky || bing) say('✓', `published ${inc.slug} (no Dev.to — paused)\n   ${blogUrl}${extra}`);
+      else say('!', `${inc.slug}: blog page went out but NO cross-post (Dev.to, Bluesky, Bing) — ${blogUrl}`);
 
       state[inc.slug] = { publishedAt: new Date().toISOString(), slug: inc.slug, devtoUrl: devto };
       fs.mkdirSync(path.dirname(statePath), { recursive: true });

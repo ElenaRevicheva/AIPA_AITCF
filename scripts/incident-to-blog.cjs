@@ -258,6 +258,27 @@ async function main() {
   saveBlogPostCache({ slug, title, markdown, devtoUrl: devtoUrl || '', aideazzBlogUrl: canonical, stream: 'fieldnote' });
   const ok = await pushOneArticleHtml(article);
   console.log(`blog page ${ok ? 'PUBLISHED' : 'FAILED'}: ${canonical}`);
+
+  // 16 Oct 2026 (Elena: Dev.to suspended, "let us publish there"): field notes get the same two outlets the daily
+  // article got on 15 Oct — Bing via IndexNow and the Bluesky link card — through the SAME exported helpers, once the
+  // page answers 200. Neither can undo or fail the publish; each logs what really happened.
+  let indexNow = null, bluesky = null;
+  if (ok) {
+    const { submitToIndexNow, postToBluesky } = require('../dist/daily-blog-publisher.js');
+    const live = canonical.replace(/\/?$/, '/');
+    let up = false;
+    for (let i = 0; i < 20 && !up; i++) {
+      try { up = (await fetch(live, { redirect: 'follow', signal: AbortSignal.timeout(20000) })).ok; } catch { /* not built yet */ }
+      if (!up) await new Promise((r) => setTimeout(r, 60000));
+    }
+    if (!up) console.warn(`📡 ${live} not live after 20 min — IndexNow and Bluesky skipped (re-run them by hand)`);
+    else {
+      try { indexNow = await submitToIndexNow([live, 'https://aideazz.xyz/blog/']); console.log(`📡 IndexNow (Bing): ${indexNow} — ${live}`); }
+      catch (e) { console.warn(`📡 IndexNow failed: ${e.message}`); }
+      try { bluesky = await postToBluesky({ title, url: live, markdown }); console.log(`🦋 Bluesky: ${bluesky}`); }
+      catch (e) { console.warn(`🦋 Bluesky failed: ${e.message}`); }
+    }
+  }
   // No sitemap write here: the website build regenerates it from the pages that
   // actually ship. Writing one from this side stripped 61 URLs and every
   // trailing slash each time it ran.
@@ -286,7 +307,7 @@ NOT RECORDED - neither the blog page nor Dev.to accepted it. ` +
     process.exit(1);
   }
 
-  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl, blogPage: ok };
+  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl, blogPage: ok, indexNow, bluesky };
   writeState(state);
   console.log(`\ndone — ${canonical}${devtoUrl ? ` + ${devtoUrl}` : ''}\n`);
 }
