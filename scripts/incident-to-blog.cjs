@@ -125,7 +125,12 @@ function buildArticle(inc, conceptBySlug) {
       L.push('');
       L.push(`*${c.meta.one_liner}*`);
       L.push('');
-      L.push(c.body);
+      // 16 Oct 2026: concept bodies cross-link as [[slug]] (the wiki renders an anchor); the blog printed it raw
+      // ("[[silent-failure]]" on the live 15 Oct post). Same target as the wiki: that concept's anchor, named by its title.
+      L.push(c.body.replace(/\[\[([a-z0-9-]+)\]\]/g, (m, s) => {
+        const t = conceptBySlug.get(s)?.meta.title;
+        return t ? `[${/^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t}](${WIKI_URL}#${s})` : m;
+      }));
       L.push('');
     }
   }
