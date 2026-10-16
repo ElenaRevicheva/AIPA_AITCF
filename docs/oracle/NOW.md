@@ -145,6 +145,22 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 16 Oct ~18:00 UTC — Bots see ALL 14 🔥 deals (sheet picks by stage) · VJH honest counts + conscience test · OpenClaw names fixed · inbox fix PROVEN
+- **DONE:** `hs-deal-prep.cjs` digest picks by STAGE (`6e32c38f`): every 🔥 job deal (14; newest-60 had hidden 8: Puente x4, SIPEngines, Addi,
+  Clara, David Kennedy), ⏳/💬 from the last 14 days, newest 🤖 to fill; header line 2 = "<ISO>Z · N live job deals listed below · HubSpot
+  totals …" (VJH regex intact). VJH `5204521` + `0215cb0` (restarted 17:56:48): no false "complete lists" label, counts from header totals,
+  explicit language line for clearly EN/ES typed questions; `evals/test_qa_conscience.py` 27 pass on Oracle. OpenClaw IDENTITY.md
+  screenshot rule no longer says "60 newest". Backups `~/_session-backups/bilingual-20261016/step12-1753/`.
+- **OpenClaw names:** a misheard voice note ("STO AIPA … CloudCode") had been learned into lessons.json and obeyed every reply (poisoned
+  loop). `build-cards.py` now repairs known mishearings when rendering the sheet (ledger raw) — job-list-filter `eb20bc9`; AGENTS.md "write
+  only the right name"; SKILL/AGENTS lost literal media tags (one caused "telegram tool reply failed" 16:42). Names test 1/3 → 3/3.
+- **VERIFIED BY:** live VJH answers — "¿Cuántos…🔥?" → "Tienes 14 trabajos…" with all 14 named; "How many in ⏳ Sent in total?" → "There are
+  a total of 72…". Inbox fix proof: 17:55:59 "Found 0 new jobs" → "No new jobs this cycle" → "Checking for responses" → 17:56:43 complete.
+- **Agent conversations (read-only check):** all 3 refuted (OpenClaw triggering research = new endpoint; judge reading corrections = new
+  input, already knows; kit reading judge verdict = no data source). Survivor: $0 SKILL.md nudge "no deep-dive yet → /research_employer"
+  (needs Elena's yes). Side findings: judge vetoes agent-engineer titles against its own rule (measure with replay_learning.py, ~$0.02,
+  ask first); the 4 Puente roles list Panama first (judge's "excludes Panama" was wrong, code overrule right).
+
 ### ✅ 16 Oct ~15:25 UTC — BILINGUAL TEAM LIVE: VJH + CTO AIPA read OpenClaw's shared sheets · one voice rule · VJH inbox every cycle · claim released
 - **DONE (Elena's yes to all 4 packages; plan `docs/oracle/2026-10-16_BILINGUAL_TEAM_PLAN.md`; backups FIRST: Oracle + laptop
   `_session-backups/bilingual-20261016/`, md5 manifest):**
