@@ -151,7 +151,7 @@ git log keeps the record.
   re-check before write, read-back by deal id, "OpenClaw has it" only when its sheet shows the deal; research detached (bot no longer freezes).
   hs-deal-prep: deep-dive notes of 30 days found by NOTE search (any deal age), facts ≤5,000/deal, cap read from OpenClaw config; OpenClaw
   bootstrapMaxChars 25k→40k, total 70k→90k (gateway restarted 23:44). Menus: CTO /menu job-flow block + /research_employer text; OpenClaw HELP.md =
-  IDENTITY.md job-flow block (Oracle-only files; backups `~/_session-backups/research-employer-20261015/`).
+  IDENTITY.md job-flow block (Oracle-only files; backups `~/_session-backups/research-employer-20261015/`). **16 Oct 10:38 UTC:** the same 3-step flow also at the top of CTO menu → 🧠 Personal AI (JOB + PROJECTS), where Elena looks (`b3f1a849`, cto-aipa restarted 10:38:16, md5 = git).
 - **VERIFIED BY:** live Pitz test (dry, not saved): first run found nothing (job boards, low depth) → fixed → 10,452-char report, 10 sources, $0.0099, 12 s;
   Pitz lookup → protected; lookup without key → "could not search HubSpot — nothing saved"; OpenClaw /menu test shows the job flow; cto-aipa 23:49:46 >
   files 23:49:34, md5 Oracle = git. **Not yet exercised:** a real save on a non-Pitz deal — first real use = Elena's next booked interview; watch it.
