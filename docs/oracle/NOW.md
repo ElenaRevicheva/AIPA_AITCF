@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 16 Oct 14:10 | Bilingual build (Elena's yes to all 4 + LIVE voice on request): VJH inbox fix + VJH-1..4, CTO-1..4, OpenClaw OC-1..3 — building + reviewing on laptop/copies, deploy after proof | VJH orchestrator.py, telegram_bot_enhanced.py, telegram_qa_helper.py, llm_judge.py, judge_feedback_sync.py · cto-aipa src/telegram-bot.ts, scripts/hs-deal-prep.cjs · Oracle ~/.openclaw/workspace IDENTITY/AGENTS/SKILL.md + settings/tts.json · pm2 cto-aipa, systemd vibejobhunter | 892ec1b0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
