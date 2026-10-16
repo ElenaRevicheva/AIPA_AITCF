@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 16 Oct 13:55 | VJH bot screens told the truth (/start /menu /workflow /manual /help + Back-to-Menu), broken buttons off the menu | VibeJobHunterAIPA_AIMCF src/notifications/telegram_bot_enhanced.py; systemd vibejobhunter restart | e9f7e677 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
