@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (jobs → VJH bot + kit-gap clarity) | 2026-10-16 10:50 | Elena's go: job alerts + apply queue via VJH bot, job flow in VJH /menu, honest kit-gap alert (future kits) | cto-aipa scripts/hs-env.cjs, hs-audit-apply-kit.cjs, apply-queue.cjs, hs-fill-apply-kit.cjs, src/telegram-bot.ts (+restart); VJH src/notifications/telegram_bot_enhanced.py (+restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 16 Oct ~12:15 UTC — Jobs live in the VibeJob Hunter bot · kit-gap alert honest for future kits · claim released
+- **Elena's rule:** everything about jobs appears in the VJH bot, whichever agent does the work. **Done:** apply-kit alert (13:45 UTC) + daily apply
+  queue (13:15 UTC) now sent via VJH's bot (`scripts/hs-env.cjs vjhTelegram()` reads VJH's .env; CTO bot only as fallback) · VJH /menu opens with
+  the 3-step job flow (`45e77dd`, vibejobhunter restarted 12:12:08, 0 tracebacks) · CTO menus now point to the VJH bot (`05b7b2ad`, cto-aipa 12:11:43).
+  **Skipped (Elena: only if not a bicycle):** `/research_employer` inside the VJH bot — no VJH→CTO command path exists; it stays in the CTO bot (the
+  one exception, stated in the VJH menu).
+- **Kit gap explained:** the 7 "no CV shaped" deals all had a full kit + a CV: 5 staged before 11 Oct (posting-shaped CVs began 11 Oct; Elena: no
+  backfill), 2 where the composer could not shape it. Audit now counts the kit's tailored CV + pre-11-Oct CVs as complete and labels only what is
+  known; the kit writes the composer's reason on the 🛡️ line from now on ("Not shaped to this posting: …"). Oracle audit: 15/15 complete, 0 gaps.
+- **NEXT:** today 13:15 + 13:45 UTC — confirm the apply queue / any alert arrive in the VJH chat (log line "telegram via VibeJob Hunter bot").
 
 ### ✅ 15 Oct ~23:50 UTC — Interview prep flow LIVE: Elena books → `/research_employer <company>` (CTO bot) → deep-dive on the deal → OpenClaw preps · claim released
 - **Elena's rule:** 🔥 I act today kit stays as is; deep research ONLY when SHE knows an interview is booked (LinkedIn/WhatsApp — no agent sees them).
