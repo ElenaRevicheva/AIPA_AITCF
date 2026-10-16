@@ -198,8 +198,10 @@ git log keeps the record.
   "discovered not crawled" vs "crawled not indexed". No BWT verification artifact on the site (`BingSiteAuth.xml` = SPA fallback).
   **16 Oct 13:00 UTC: Elena verified BWT (Google sign-in + GSC import). URL Inspection of today's article = "Discovered but not
   crawled", Discover ✅ 15 Oct (the ping/sitemap landed), Crawl ✗ with Bing's generic "issues preventing indexation" (no fetch error
-  named).** Next evidence: inspect a pre-ping post (10 Oct) for its Discovered date — long-known-but-uncrawled = site-level crawl
-  priority, not discovery. Then Site Explorer counts. Do NOT re-ping IndexNow or
+  named).** The 10 Oct post (dead-deals) is ALSO "Discovered on 15 Oct" → Bing did not know it existed for 5 days: it was not
+  re-reading the sitemap/hub, so the gap since 7 Sep is mostly DISCOVERY, not crawl priority. 15 Oct = the IndexNow day, so the
+  pings (incl. the 201-URL backfill) are most likely how Bing learned of the missing posts; both now "Indexing requested" ✅.
+  Next: BWT ☰ Sitemaps must list sitemap.xml (submit if absent); re-inspect ~20 Oct; no site changes needed now. Do NOT re-ping IndexNow or
   backfill again: the 201-URL backfill above went against the IndexNow FAQ ("only URLs changing since you start"); not the cause (the
   gap predates it). Bing's `site:` returns 0 and Bing search from one IP degrades after ~200 scripted queries — use Yahoo/DDG `site:`.
 - Not wired (deliberate, ask first): incident-to-blog.cjs / wiki-ship posts do not call IndexNow/Bluesky yet.
