@@ -1047,6 +1047,13 @@ Or just ask me anything - I understand natural language!`;
       await ctx.reply(
 `🧠 PERSONAL AI (JOB + PROJECTS)
 
+💼 YOUR JOB FLOW — nothing to remember
+1️⃣ New job → the kit fills the HubSpot deal by itself (company note, CV, letter, Comet prompt) → open 🔥 I act today → apply
+2️⃣ Interview booked (LinkedIn, WhatsApp, anywhere) → send here:
+   /research_employer <company>
+   → deep research on the company + its products is saved on the job deal (1–4 min); I confirm when OpenClaw has it
+3️⃣ In OpenClaw: /new → prep me for <company> → it prepares you from that research, "don't claim" warnings first
+
 /project  - Set active project or job search mode
   Example: /project job  (JOB_SEARCH umbrella: VibeJob Hunter + YC shortlist)
 
