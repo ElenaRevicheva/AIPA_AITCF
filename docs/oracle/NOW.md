@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 16 Oct 15:35 | AI Ops Wiki incident: VJH inbox fate-sharing (Elena asked) — waits for the first zero-job cycle after the fix as proof | aideazz content/ai-ops-wiki/{incidents,concepts}, public/ai-ops-wiki.html (generated) | 81882c62 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
