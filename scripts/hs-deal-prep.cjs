@@ -6,7 +6,7 @@
  *   node scripts/hs-deal-prep.cjs --company="Puente" --role="Chief of Staff"   # several deals at one company
  *   node scripts/hs-deal-prep.cjs --deal=<dealId>
  *   node scripts/hs-deal-prep.cjs --examples               # only the ✅ VERIFIED EXAMPLES list (spar, no deal)
- *   node scripts/hs-deal-prep.cjs --digest --out=<file>      # compact sheet of ALL live job deals (≤ 11,000 chars)
+ *   node scripts/hs-deal-prep.cjs --digest --out=<file>      # deals sheet by stage: every 🔥, ⏳/💬 of the last 14 days, newest 🤖 to fill (≤ 11,100 chars); HubSpot totals in header line 2
  *
  * --digest (7 Oct 2026): the mock interview must not depend on a model REMEMBERING to call this script — gpt-4.1
  * skipped it in Elena's chat and invented "AI Product Engineer @ Shortical". The digest is written to the OpenClaw
@@ -71,28 +71,60 @@ async function notesOf(dealId) {
   return out;
 }
 
-// ── --digest: one compact entry per live job deal ───────────────────────────────────────────────────────────
+// ── --digest: one compact entry per SELECTED live job deal (by stage; totals in the header) ─────────────────
 const DIGEST_MAX = 11100;      // (11000 until 16 Oct: +32 header chars must not drop a deal) fits EVERY model in the chain: Groq's per-file bootstrap limit measured 12,506 (7 Oct 2026)
 const firstSentence = (s) => (String(s || '').match(/^[^.!?]{20,240}[.!?]/) || [String(s || '').slice(0, 200)])[0].trim();
 
 async function digest(outPath) {
-  const res = await hs('POST', '/crm/v3/objects/deals/search', {
-    filterGroups: [{ filters: [
-      { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING*' },
-      { propertyName: 'dealstage', operator: 'NOT_IN', values: ['closedwon', 'closedlost'] },
-    ] }],
+  // 16 Oct 2026: the 60 NEWEST deals by creation date hid 8 of the 14 "🔥 I act today" deals (Puente ×4, SIPEngines,
+  // Addi, Clara, David Kennedy) — recency is not priority. Deals are picked BY STAGE: every 🔥 deal, then the ⏳/💬 that
+  // entered that stage in the last 14 days, then the newest 🤖 untriaged ones fill the same cap. Header line 2 carries
+  // HubSpot's own per-stage totals, so nobody counts a partial list.
+  const LBL = { qualifiedtobuy: '🔥 I act today', presentationscheduled: '🔥 I act this week', decisionmakerboughtin: '⏳ Sent', contractsent: '💬 They replied', appointmentscheduled: '🤖 AI working' };
+  const TIERS = [['qualifiedtobuy', 1], ['presentationscheduled', 1], ['contractsent', 2], ['decisionmakerboughtin', 2]];
+  const named = { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING*' };
+  const since = Date.now() - 14 * 864e5, totals = {}, picked = [];
+  for (const [stage, tier] of TIERS) {
+    const entered = `hs_v2_date_entered_${stage}`, got = [];
+    for (let after; ;) {   // every page: tier 1 is listed whole; tier 2 is filtered here, so HubSpot's sort order cannot drop one
+      const r = await hs('POST', '/crm/v3/objects/deals/search', {
+        filterGroups: [{ filters: [named, { propertyName: 'dealstage', operator: 'EQ', value: stage }] }],
+        properties: ['dealname', 'dealstage', 'createdate', entered],
+        sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+        limit: 100, ...(after ? { after } : {}),
+      });
+      totals[stage] = r.total;
+      got.push(...(r.results || []));
+      after = r.paging && r.paging.next && r.paging.next.after;
+      if (!after) break;
+    }
+    const ts = (d) => Date.parse(d.properties[entered] || '') || 0;
+    const keep = tier === 1 ? got : got.filter((d) => ts(d) >= since).sort((a, b) => ts(b) - ts(a));
+    picked.push(...keep.map((d) => ({ d, tier })));
+  }
+  const windowed = picked.filter((p) => p.tier === 2).length;
+  const fill = await hs('POST', '/crm/v3/objects/deals/search', {
+    filterGroups: [{ filters: [named, { propertyName: 'dealstage', operator: 'NOT_IN', values: ['closedwon', 'closedlost', ...TIERS.map((t) => t[0])] }] }],
     properties: ['dealname', 'dealstage', 'createdate'],
     sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
-    limit: 60,
+    limit: Math.min(100, Math.max(1, 60 - picked.length)),   // 60 deals read in all, as the newest-60 sheet did — unless 🔥 + recent ⏳/💬 alone exceed 60 (each of those is read)
   });
+  // The fill search is every OTHER open stage; the 🤖 total is counted on its own stage, so the label stays exact.
+  totals.appointmentscheduled = (await hs('POST', '/crm/v3/objects/deals/search', {
+    filterGroups: [{ filters: [named, { propertyName: 'dealstage', operator: 'EQ', value: 'appointmentscheduled' }] }], properties: ['dealstage'], limit: 1,
+  })).total;
+  picked.push(...(fill.results || []).slice(0, Math.max(0, 60 - picked.length)).map((d) => ({ d, tier: 3 })));
   const entries = [], interviewDeals = [], seen = new Set();
-  for (const d of res.results || []) {
+  const notJob = {};   // per stage: named *HIRING* but not a job deal (a "Hiring manager @ —" row, a recruiter thread) — the header says so
+  for (const { d, tier } of picked) {
+    if (seen.has(String(d.id))) continue;   // a deal that changed stage between two searches is listed once
     seen.add(String(d.id));
     const name = String(d.properties.dealname || '');
-    if (!/^\s*\[HIRING-/i.test(name)) continue;
+    const notAJob = () => { notJob[d.properties.dealstage] = (notJob[d.properties.dealstage] || 0) + 1; };
+    if (!/^\s*\[HIRING-/i.test(name)) { notAJob(); continue; }
     let notes;
     try { notes = await notesOf(d.id); } catch (e) { console.warn(`skip deal ${d.id}: ${e.message.slice(0, 80)}`); continue; }
-    if (!isJobDeal(name, notes.map((n) => n.html))) continue;
+    if (!isJobDeal(name, notes.map((n) => n.html))) { notAJob(); continue; }
     const m = name.replace(/^\s*\[[^\]]*\]\s*/, '').match(/^(.*?)\s+@\s+(.*)$/);
     const role = m ? m[1].trim() : name, company = m ? m[2].trim() : '';
     let link = '', reqs = [], what = '';
@@ -110,15 +142,32 @@ async function digest(outPath) {
     const dd = deepDiveFacts(notes);
     if (qs.length && freshDive(dd)) interviewDeals.push({ title: `${company || role} — ${role} (${d.properties.dealstage})`, proof: readProof(name, notes), qs, ...dd });
     reqs = [...new Set(reqs)].slice(0, 3).map((r) => cut(r, 90));
-    entries.push([
-      `### ${cut(company || role, 40)} — ${cut(role, 70)} (${d.properties.dealstage})`,
+    const title = `### ${cut(company || role, 40)} — ${cut(role, 70)} (${d.properties.dealstage})`;
+    entries.push({ tier, stage: d.properties.dealstage, short: title, text: [
+      title,
       what ? `does: ${cut(what, 110)}` : '',
       reqs.length ? `needs: ${reqs.join(' • ')}` : '',
-    ].filter(Boolean).join('\n'));
+    ].filter(Boolean).join('\n') });
   }
-  const head = [
+  // Header line 2 keeps "<ISO>Z · N live job deals" together (VJH telegram_qa_helper.py parses it); N = rows written.
+  const by = (w, s) => w.filter((e) => e.stage === s).length;
+  const jobs = (s) => totals[s] - (notJob[s] || 0);   // tier 1 is read whole, so this is its exact job-deal count
+  const fireN = { qualifiedtobuy: jobs('qualifiedtobuy'), presentationscheduled: jobs('presentationscheduled') };   // header prints these, not the raw HIRING count
+  const jobs2 = windowed - (notJob.contractsent || 0) - (notJob.decisionmakerboughtin || 0);
+  const skipped = TIERS.reduce((a, [s]) => a + (notJob[s] || 0), 0);   // 🔥/⏳/💬 only: 🤖 are not all read
+  const listed = (w) => {
+    const t2 = w.filter((e) => e.tier === 2).length, t3 = w.filter((e) => e.tier === 3).length;
+    const fire = ['qualifiedtobuy', 'presentationscheduled'].every((s) => by(w, s) === jobs(s))
+      ? 'every 🔥 job deal' : `🔥 I act today ${by(w, 'qualifiedtobuy')} of ${jobs('qualifiedtobuy')}, 🔥 I act this week ${by(w, 'presentationscheduled')} of ${jobs('presentationscheduled')}`;
+    return `listed: ${fire}, ${t2 === jobs2 ? `all ${t2}` : `${t2} of the ${jobs2}`} ⏳/💬 job deals that entered that stage in the last 14 days, ${t3 ? `the ${t3} newest 🤖` : 'no 🤖 rows (their count is in the totals)'}`
+      + (skipped ? `; besides these, ${skipped} 🔥 or recent ⏳/💬 deal(s) are named HIRING but are not job postings (not listed)` : '');
+  };
+  const head = (w) => [
     '# LIVE JOB DEALS (HubSpot) — read-only snapshot, refreshed every 30 min by cto-aipa/scripts/hs-deal-prep.cjs --digest',
-    `# ${new Date().toISOString()} · ${entries.length} live job deals. Use this for the mock interview: when Elena names a company,`,
+    `# ${new Date().toISOString()} · ${w.length} live job deals listed below · HubSpot totals: ${Object.keys(LBL).map((s) => `${LBL[s]} ${s in fireN ? fireN[s] : totals[s]}`
+      + (s === 'presentationscheduled' ? ' (🔥 = job deals, exact)' : s === 'appointmentscheduled' ? ' (⏳/💬/🤖 = every deal named HIRING, a few not job postings)' : '')).join(' · ')}`
+      + ` — ${listed(w)}. For a count use these totals, never the rows; a deal not listed can still be live: run the --company command below.`
+      + ' Use this for the mock interview: when Elena names a company,',
     '# take the role and requirements from HERE. Never invent a role. For full notes run hs-deal-prep.cjs --company="<company>".',
     '# PROOF RULE (Elena, 11 Oct 2026): when you prepare her for a company, RUN that command in that same turn, before writing',
     '# anything (add --role="<role she named>" — one company can have several deals). Your first line must be the',
@@ -140,10 +189,21 @@ async function digest(outPath) {
     '# Operational Co-Founder of OmniBazaar. 2025– she FOUNDED AIdeazz AI Lab (never "co-founded"); she and her AI agents are one unit.',
     '',
   ].join('\n');
-  let body = head;
-  for (const e of entries) { if ((body + e).length + 2 > DIGEST_MAX) break; body += `${e}\n\n`; }
-  // 15 Oct 2026: /research_employer saves the deep-dive on the deal of a BOOKED interview, usually older than the 60
-  // newest deals above (they span only a few days). So the deep-dive NOTES of the last 30 days are searched directly,
+  // Rows go in priority order (🔥, then ⏳/💬, then 🤖), so the cap always cuts the lowest tier first. A full row with a
+  // kit is ~450 chars (16 Oct: after 14 full 🔥 rows only 3 of the 15 recent ⏳ fitted), so every 🔥 and recent ⏳/💬
+  // deal is NAMED first (its ### line), then the does/needs lines come back in that order while they fit, then the
+  // newest 🤖 fill what is left. The --company command prints any deal in full.
+  const render = (w) => head(w) + w.map((e) => `${e.text}\n\n`).join('');
+  const detail = new Map(entries.map((e) => [e, e.text])), named2 = entries.filter((e) => e.tier < 3);
+  const written = [], fits = (e) => render([...written, e]).length <= DIGEST_MAX;
+  for (const e of named2) { e.text = e.short; if (!fits(e)) break; written.push(e); }
+  for (const e of written) { e.text = detail.get(e); if (render(written).length > DIGEST_MAX) e.text = e.short; }
+  if (written.length === named2.length) {
+    for (const e of entries.filter((x) => x.tier === 3)) { if (!fits(e)) e.text = e.short; if (!fits(e)) break; written.push(e); }
+  }
+  const body = render(written);
+  // 15 Oct 2026: /research_employer saves the deep-dive on the deal of a BOOKED interview, often not among the deals
+  // listed above. So the deep-dive NOTES of the last 30 days are searched directly,
   // and their open [HIRING-…] deals are read too — for their deep-dive only.
   try {
     const since = String(Date.now() - 30 * 864e5);
@@ -178,7 +238,8 @@ async function digest(outPath) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(`${outPath}.${process.pid}.tmp`, body);   // per-process: the bot's refresh and the cron never share a tmp
   fs.renameSync(`${outPath}.${process.pid}.tmp`, outPath);      // atomic: OpenClaw never reads a half-written sheet
-  console.log(`digest: ${entries.length} live job deals → ${outPath} (${body.length} chars)`);
+  const per = (f) => Object.keys(LBL).map((s) => `${s}=${f(s)}`).join(' ');
+  console.log(`digest: ${written.length} live job deals → ${outPath} (${body.length} chars) · rows by stage ${per((s) => by(written, s))} · HubSpot totals ${per((s) => totals[s])} · in 14-day window ${windowed} · not job deals ${JSON.stringify(notJob)}`);
   const proofOut = arg('proof-out');
   if (proofOut) {
     let sheet = proofSheet(interviewDeals);
