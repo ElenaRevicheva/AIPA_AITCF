@@ -109,9 +109,12 @@ async function auditDeal(d) {
   // Deals staged before 11 Oct 2026 predate posting-shaped CVs; Elena (16 Oct): no backfill — their tailored CV is the kit.
   const legacy = String(d.properties.createdate || '') < '2026-10-11';
   if (cv && !shaped) {
+    // Only what is known: the kit's recorded reason, else the staging date, else the bare fact — never a guessed reason.
     cvName = handBuilt ? `${handBuilt} (hand-built)`
-      : tailored ? `${cvName} (tailored — not shaped: ${tailoredWhy || 'too few of her verified facts fit this posting'})`
-      : legacy ? `${cvName} (staged before posting-shaped CVs)` : `${cvName} (generic — not shaped to the posting)`;
+      : tailoredWhy ? `${cvName} (tailored — not shaped: ${tailoredWhy})`
+      : legacy ? `${cvName} (staged before posting-shaped CVs)`
+      : tailored ? `${cvName} (tailored — the kit could not shape it to this posting)`
+      : `${cvName} (generic — not shaped to the posting)`;
   }
   return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt || tailored || legacy), cvName, link, defense, role, comet };
 }
