@@ -514,6 +514,63 @@ MEMORY: You remember conversations, ideas, projects, and preferences across sess
 KNOWLEDGE: You can access Elena's knowledge base (ideas, diary, research, tasks).
 `;
 
+// 16 Oct 2026 — ONE source for facts about Elena, shared with OpenClaw (Elena: "make work what bots already have …
+// share data and learn from each other in bilingual way"). Free chat, photos and /fixerror answered about her from
+// AIDEAZZ_CONTEXT above, a hardcoded paragraph that still says "11 AI products in 10 months" and "Railway". OpenClaw
+// already reads her verified sheet: proof/TOOLS.md (EN + "SU TRAYECTORIA (ES)", refreshed every 30 min by
+// hs-deal-prep.cjs --digest — the same file /research_employer refreshes) plus her own correction lines in
+// cards/TOOLS.md. Read on every call, so a fact fixed there reaches the next answer here. Only the facts part is used:
+// from "===== 🎤 INTERVIEW DEALS" on, the sheet is OpenClaw's mock-interview orders (kept here: the deal names only).
+// No sheet on this machine (the laptop, a missing file) → null, and every caller uses AIDEAZZ_CONTEXT as before.
+// With the sheet, only AIDEAZZ_CONTEXT's biography gives way: its persona, the 11-repo map /readfile and /tree need,
+// the three personas and the memory lines stay (review, 16 Oct 2026).
+
+/** The verified-facts part of proof/TOOLS.md; the interview-deal block under it is reduced to its deal names. */
+function proofFactsPart(sheet: string): string {
+  const lines = sheet.replace(/\r\n/g, '\n').split('\n');
+  const cut = lines.findIndex((l) => /^=====.*INTERVIEW DEALS/.test(l));
+  if (cut < 0) return lines.join('\n').trim();
+  const deals = lines.slice(cut + 1).filter((l) => l.startsWith('### '))
+    .map((l) => l.slice(4).replace(/\s*\([a-z0-9_]+\)\s*$/, '').trim()).filter(Boolean);
+  return lines.slice(0, cut).join('\n').trim()
+    + (deals.length ? `\n\n===== INTERVIEW DEALS WITH A 🔎 DEEP-DIVE (names only): ${deals.join(' · ')}` : '');
+}
+
+/** Her own correction lines ("- 2026-10-15 (voice): …") from the top of cards/TOOLS.md; its '#' lines are OpenClaw's rules. */
+function correctionLinesOf(cards: string): string[] {
+  const out: string[] = [];
+  for (const l of cards.replace(/\r\n/g, '\n').split('\n')) {
+    if (/^#{1,2} .*INTERVIEW CARDS|^## /.test(l)) break; // her mock-interview cards start here
+    if (/^- 20\d\d-\d\d-\d\d/.test(l)) out.push(l.trim());
+  }
+  return out.slice(0, 20);
+}
+
+/** Elena's verified facts, ready for a prompt — or null when the sheet is not on this machine. Never throws. */
+function elenaFacts(): string | null {
+  const ws = '/home/ubuntu/.openclaw/workspace';
+  let facts: string;
+  try { facts = proofFactsPart(fs.readFileSync(`${ws}/proof/TOOLS.md`, 'utf8')); } catch { return null; }
+  if (facts.length < 500) return null; // an empty or half-written sheet is not a source
+  if (facts.length > 32_000) facts = facts.slice(0, facts.lastIndexOf('\n', 32_000));
+  let fixes: string[] = [];
+  try { fixes = correctionLinesOf(fs.readFileSync(`${ws}/cards/TOOLS.md`, 'utf8')); } catch { /* no corrections yet */ }
+  // AIDEAZZ_CONTEXT minus its ABOUT ELENA paragraph ("11 AI products in 10 months"), the stale "Railway" hosting tag
+  // and the unverified "(Revenue-generating!)"; a later edit of AIDEAZZ_CONTEXT only makes these no-ops.
+  const base = AIDEAZZ_CONTEXT.replace(/ABOUT ELENA:[\s\S]*?(?=THE AIDEAZZ ECOSYSTEM)/, '')
+    .replace(/ - Railway$/m, '').replace(/ \(Revenue-generating!\)/, '');
+  return `${base}
+ELENA'S VERIFIED FACTS (the sheet her interview coach OpenClaw uses). Use them ONLY when the question is about Elena, her work, her products or her job search; for code and technical questions answer technically and leave them out. They override the AIdeazz ecosystem list above, "Previous DB context", the session context and any earlier answer of yours. A fact about her that is not in this sheet: say you do not know. Never invent one.
+${facts}
+${fixes.length ? `\nELENA'S OWN CORRECTIONS (her words, newest first; when you speak about Elena, her work or her job search, apply every one, a newer one wins):\n${fixes.join('\n')}\n` : ''}`;
+}
+
+/** Bilingual (16 Oct 2026): every prompt that answers her names the language to answer in. */
+const ANSWER_IN_HER_LANGUAGE = 'LANGUAGE: answer in the language of her message, Spanish, English or Russian (mixed: the language of most of it).';
+const ANSWER_PHOTO_IN_HER_LANGUAGE = 'LANGUAGE: answer in the language of her caption (Spanish, English or Russian). No caption: the language of the text in the image when it is Spanish, English or Russian; otherwise (no readable text, another language) English.';
+/** Said in the prompt only when a voice reply will really come, so the model never answers "I can't send audio" above one. */
+const VOICE_IS_AUTOMATIC = 'She asked for a voice reply: this bot reads your answer aloud automatically. Just write the answer; never say you cannot send voice or audio.';
+
 // All AIdeazz repos for monitoring
 const AIDEAZZ_REPOS = [
   'AIPA_AITCF',
@@ -7041,7 +7098,9 @@ _Like Cursor's error fixing, but remote!_ 🎯`, { parse_mode: 'Markdown' });
     await ctx.reply('🔍 Analyzing error...');
     
     try {
-      const fixPrompt = `${AIDEAZZ_CONTEXT}
+      // 16 Oct 2026: only the language line is new ("tengo un error con…" reaches here through handleQuestion's error
+      // shortcut). No career sheet, and askAI as before: a debugging answer never needs her facts.
+      const fixPrompt = `${AIDEAZZ_CONTEXT}\n${ANSWER_IN_HER_LANGUAGE}
 
 You are debugging an error. Analyze this error and provide:
 1. What caused it (1-2 sentences)
@@ -7054,7 +7113,8 @@ ${error}
 Be concise - this is Telegram chat. Use code blocks for any code.`;
 
       const fix = await askAI(fixPrompt, 2000);
-      await ctx.reply(`🔧 *Error Analysis*\n\n${fix}`, { parse_mode: 'Markdown' });
+      // Model-written text: a stray "_" or "*" makes Telegram refuse the Markdown, so retry it as plain text.
+      await ctx.reply(`🔧 *Error Analysis*\n\n${fix}`, { parse_mode: 'Markdown' }).catch(() => ctx.reply(`🔧 Error Analysis\n\n${fix}`));
       
     } catch (err) {
       await ctx.reply('❌ Error analyzing. Try pasting a cleaner error message.');
@@ -7679,42 +7739,60 @@ Ready to commit? Use:
       
       return;
     }
-    
-    // Register for alerts when user chats
-    if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
-    
-    // Typed messages reach Trello the way voice does (12 Oct 2026). The old comment here said "same as voice
-    // pipeline" — true on 2 Apr, false since 8 May, when only voice learned to create and edit cards.
-    const textUid = ctx.from?.id || 0;
-    let textIntent: Awaited<ReturnType<typeof detectPersonalAIIntent>>;
+
+    // THE SAME VOICE RULE (Elena, 16 Oct 2026): a typed message that ASKS for voice ("voz", "reply with voice", "out
+    // loud", "голосом"…) gets its replies in text AND voice; CTO_SPEAK_TEXT=1 speaks every typed reply. Placed after
+    // the "/" check and the pending /editfile·/createfile branch on purpose: commands and "Changes prepared…" are never
+    // read aloud. No request and no flag = exactly as before: no wrap, no latestVoiceNote write.
+    const speakTyped = !!message && (process.env.CTO_SPEAK_TEXT === '1' || asksForVoice(message));
+    const typedReplies: string[] = [];
+    if (speakTyped && ctx.chat?.id && ctx.message) {
+      latestVoiceNote.set(ctx.chat.id, ctx.message.message_id);
+      const sendText = ctx.reply.bind(ctx);
+      // Same capture as the voice handler: recorded only once Telegram took it.
+      ctx.reply = ((text: string, other?: Parameters<typeof sendText>[1], signal?: Parameters<typeof sendText>[2]) =>
+        sendText(text, other, signal).then((m) => { typedReplies.push(text); return m; })) as typeof ctx.reply;
+    }
     try {
-      if (await tryAttachLink(ctx, message || '')) { syncContextToDb(textUid); return; }
-      textIntent = await detectPersonalAIIntent(message || '');
-      // A task → Trello, like voice. Anything else reaches Trello only as an EDIT of a card made in the last
-      // 30 minutes (never a new card), and a question never does: "Can you describe how the apply kit works?"
-      // is answered, not filed.
-      const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '');
-      if (textIntent.type === 'task') {
-        if (await routeToTrello(ctx, message || '', 'text', { savesToTasks: true })) { syncContextToDb(textUid); return; }
-      } else if (textIntent.type !== 'question' && freshTrelloCards(textUid).length > 0 && editLike) {
-        if (await routeToTrello(ctx, message || '', 'text', { allowCreate: false })) { syncContextToDb(textUid); return; }
+      // Register for alerts when user chats
+      if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
+
+      // Typed messages reach Trello the way voice does (12 Oct 2026). The old comment here said "same as voice
+      // pipeline" — true on 2 Apr, false since 8 May, when only voice learned to create and edit cards.
+      const textUid = ctx.from?.id || 0;
+      let textIntent: Awaited<ReturnType<typeof detectPersonalAIIntent>>;
+      try {
+        if (await tryAttachLink(ctx, message || '')) { syncContextToDb(textUid); return; }
+        textIntent = await detectPersonalAIIntent(message || '');
+        // A task → Trello, like voice. Anything else reaches Trello only as an EDIT of a card made in the last
+        // 30 minutes (never a new card), and a question never does: "Can you describe how the apply kit works?"
+        // is answered, not filed.
+        const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '');
+        if (textIntent.type === 'task') {
+          if (await routeToTrello(ctx, message || '', 'text', { savesToTasks: true })) { syncContextToDb(textUid); return; }
+        } else if (textIntent.type !== 'question' && freshTrelloCards(textUid).length > 0 && editLike) {
+          if (await routeToTrello(ctx, message || '', 'text', { allowCreate: false })) { syncContextToDb(textUid); return; }
+        }
+      } catch (trelloErr) {
+        // Trello or a reply failed: say so in plain text and carry on with the normal handling below.
+        console.error('[text→trello] failed:', (trelloErr as Error)?.message?.slice(0, 200));
+        try { await ctx.reply(`⚠️ Trello step failed (${String((trelloErr as Error)?.message || trelloErr).slice(0, 100)}).`); } catch {}
+        textIntent = await detectPersonalAIIntent(message || '');
       }
-    } catch (trelloErr) {
-      // Trello or a reply failed: say so in plain text and carry on with the normal handling below.
-      console.error('[text→trello] failed:', (trelloErr as Error)?.message?.slice(0, 200));
-      try { await ctx.reply(`⚠️ Trello step failed (${String((trelloErr as Error)?.message || trelloErr).slice(0, 100)}).`); } catch {}
-      textIntent = await detectPersonalAIIntent(message || '');
-    }
-    if (textIntent.type !== 'question' && textIntent.type !== 'conversation' && textIntent.type !== 'command') {
-      const handled = await handlePersonalAIAction(ctx, message || '', textIntent, 'text');
-      if (handled) {
-        const userId = ctx.from?.id || 0;
-        syncContextToDb(userId);
-        return;
+      if (textIntent.type !== 'question' && textIntent.type !== 'conversation' && textIntent.type !== 'command') {
+        const handled = await handlePersonalAIAction(ctx, message || '', textIntent, 'text');
+        if (handled) {
+          const userId = ctx.from?.id || 0;
+          syncContextToDb(userId);
+          return;
+        }
       }
+
+      await handleQuestion(ctx, message || '');
+    } finally {
+      // Not awaited, like the voice handler: updates are handled one at a time.
+      if (speakTyped && typedReplies.length) void speakBack(ctx, voiceLangSource(message || '', typedReplies.join('\n')), typedReplies);
     }
-    
-    await handleQuestion(ctx, message || '');
   });
   
   // ==========================================================================
@@ -7830,26 +7908,21 @@ Ready to commit? Use:
   // PHOTO/SCREENSHOT ANALYSIS - Send images for AI analysis!
   // ==========================================================================
   
-  bot.on('message:photo', async (ctx) => {
+  // 16 Oct 2026: one analysis for a photo AND a screenshot sent as a file (message:document below), with the image's
+  // real type — a PNG declared as JPEG is refused by Claude. Answered in her language from her verified facts sheet,
+  // and spoken too when the caption asks for voice (THE SAME VOICE RULE as typed text).
+  async function analyzeImage(ctx: Context, image: { fileId: string; mime: string } | null): Promise<void> {
     await ctx.reply('📸 Analyzing your image...');
     
     // Register for alerts
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
     
     try {
-      // Get the largest photo (last in array)
-      const photos = ctx.message?.photo;
-      if (!photos || photos.length === 0) {
+      if (!image) {
         await ctx.reply('❌ Could not access photo.');
         return;
       }
-      
-      const largestPhoto = photos[photos.length - 1];
-      if (!largestPhoto) {
-        await ctx.reply('❌ Could not access photo.');
-        return;
-      }
-      const file = await ctx.api.getFile(largestPhoto.file_id);
+      const file = await ctx.api.getFile(image.fileId);
       const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${file.file_path}`;
       
       // Download photo to temp file
@@ -7877,10 +7950,14 @@ Ready to commit? Use:
 - Anything else: Describe what you see and how it relates to AIdeazz
 
 Keep response concise for Telegram. Use emojis.`;
+      const speakIt = asksForVoice(caption);
+      const visionPrompt = `${elenaFacts() ?? AIDEAZZ_CONTEXT}\n\n${analysisPrompt}\n\n${ANSWER_PHOTO_IN_HER_LANGUAGE}${speakIt && voiceRepliesOn() ? `\n${VOICE_IS_AUTOMATIC}` : ''}`;
 
       let analysis: string;
       
       try {
+        // Claude takes images up to 5 MB; a bigger file goes straight to the waterfall below.
+        if (base64Image.length > 5 * 1024 * 1024) throw new Error('image over Claude\'s 5 MB limit');
         // Try Claude Vision (requires credits)
         const response = await anthropic.messages.create({
           model: 'claude-opus-4-8',
@@ -7892,13 +7969,13 @@ Keep response concise for Telegram. Use emojis.`;
                 type: 'image',
                 source: {
                   type: 'base64',
-                  media_type: 'image/jpeg',
+                  media_type: image.mime as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
                   data: base64Image
                 }
               },
               {
                 type: 'text',
-                text: `${AIDEAZZ_CONTEXT}\n\n${analysisPrompt}`
+                text: visionPrompt
               }
             ]
           }]
@@ -7911,9 +7988,9 @@ Keep response concise for Telegram. Use emojis.`;
         // (OpenAI, then Gemini — both see images; text-only tiers refuse). It used to give up on a credit error
         // with "Image analysis temporarily unavailable" while OpenAI and Gemini were working, and log nothing.
         const why = String(visionError?.error?.error?.message || visionError?.message || visionError).slice(0, 100);
-        const r = await completeWithProfileDetailed('quality', null, `${AIDEAZZ_CONTEXT}\n\n${analysisPrompt}`, 1500,
-          'telegram/photo', { base64: base64Image, mime: 'image/jpeg' });
-        console.warn(`[telegram/photo] Claude vision failed (${why}) — answered by ${r.provider}`);
+        const r = await completeWithProfileDetailed('quality', null, visionPrompt, 1500,
+          'telegram/photo', { base64: base64Image, mime: image.mime });
+        console.warn(`[telegram/photo] Claude vision failed (${why}) — answered by ${r.provider} (${image.mime})`);
         analysis = r.text;
       }
       
@@ -7938,13 +8015,46 @@ Keep response concise for Telegram. Use emojis.`;
       } else {
         await ctx.reply(responseMessage);
       }
-      
+
+      // Spoken only when the caption asked for it. The map is set here, not at the start: a voice note's reply that is
+      // still being spoken while this image is analysed (10-30 s) is not cancelled by it.
+      if (speakIt && ctx.chat?.id && ctx.message) {
+        latestVoiceNote.set(ctx.chat.id, ctx.message.message_id);
+        void speakBack(ctx, voiceLangSource(caption, analysis), [analysis]);
+      }
+
     } catch (error) {
       console.error('Photo analysis error:', error);
       await ctx.reply('❌ Error analyzing image. Try again or describe what you see!');
     }
+  }
+
+  bot.on('message:photo', async (ctx) => {
+    // Get the largest photo (last in array)
+    const photos = ctx.message?.photo;
+    const largestPhoto = photos && photos.length > 0 ? photos[photos.length - 1] : undefined;
+    await analyzeImage(ctx, largestPhoto ? { fileId: largestPhoto.file_id, mime: 'image/jpeg' } : null);
   });
-  
+
+  // A screenshot sent as a FILE (16 Oct 2026) had no handler and was silently ignored. Only the image types the vision
+  // models read; the type is checked BEFORE "Analyzing…", so a PDF or a CV .docx still gets no reply from here.
+  const VISION_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+  bot.on('message:document', async (ctx, next) => {
+    const doc = ctx.message.document;
+    const raw = (doc.mime_type || '').toLowerCase();
+    const mime = raw === 'image/jpg' ? 'image/jpeg' : raw;
+    if (!mime.startsWith('image/')) return next();
+    if (!VISION_MIMES.has(mime)) {
+      await ctx.reply(`⚠️ I can read JPG, PNG, WebP and GIF images; this file is ${mime.slice(6).toUpperCase()}. Send it as a photo (not as a file) and I'll analyze it. / Leo imágenes JPG, PNG, WebP y GIF; este archivo es ${mime.slice(6).toUpperCase()}. Envíala como foto (no como archivo) y la analizo.`);
+      return;
+    }
+    if ((doc.file_size || 0) > 20 * 1024 * 1024) {
+      await ctx.reply('⚠️ This image file is over 20 MB, the most a Telegram bot can download. Send it as a photo (not as a file) and I\'ll analyze it. / El archivo pasa de 20 MB, lo máximo que un bot de Telegram puede descargar. Envíala como foto (no como archivo) y la analizo.');
+      return;
+    }
+    await analyzeImage(ctx, { fileId: doc.file_id, mime });
+  });
+
   // ==========================================================================
   // HELPER: Handle questions with AI
   // ==========================================================================
@@ -8211,7 +8321,12 @@ Use this time to clarify what you want to improve, and we’ll do the concrete c
         }
       }
       
-      const prompt = `${AIDEAZZ_CONTEXT}
+      const facts = elenaFacts(); // her verified sheet (shared with OpenClaw), or null → AIDEAZZ_CONTEXT as before
+      // "A voice reply is coming" is said only when one is: this message is the one speakBack will answer (a voice note,
+      // or a typed message that asked for voice). /ask and /suggest also land here and are never spoken.
+      const voiceLineFits = asksForVoice(question) && voiceRepliesOn()
+        && !!ctx.chat && !!ctx.message && latestVoiceNote.get(ctx.chat.id) === ctx.message.message_id;
+      const prompt = `${facts ?? AIDEAZZ_CONTEXT}
 
 You are CTO AIPA v5.2 - MAXIMUM CURSOR TWIN! When Elena runs out of Cursor credits, YOU are her primary coding assistant!
 
@@ -8262,11 +8377,16 @@ CONCISE RULES:
 
 Her message: "${question}"
 
-Previous DB context: ${JSON.stringify(context)}
+Previous DB context${facts ? ' (your older answers; where they disagree with ELENA\'S VERIFIED FACTS above, the facts win)' : ''}: ${JSON.stringify(context)}
 
-Act like Cursor - understand context, suggest the right action, remember the conversation!`;
+Act like Cursor - understand context, suggest the right action, remember the conversation!
+${ANSWER_IN_HER_LANGUAGE}${voiceLineFits ? `\n${VOICE_IS_AUTOMATIC}` : ''}`;
 
-      const answer = await askAI(prompt, 1500);
+      // 16 Oct 2026: the full waterfall (Claude, OpenAI, Gemini, Groq, Grok). askAI tried Claude, then Groq only — with
+      // Claude out of credit every answer hung on Groq, which rate-limits and refuses prompts this size.
+      const r = await completeWithProfileDetailed('quality', null, prompt, 1500, 'telegram/question');
+      console.log(`[telegram/question] answered by ${r.provider} in ${r.ms} ms · facts: ${facts ? 'verified sheet' : 'AIDEAZZ_CONTEXT (no sheet)'}`);
+      const answer = r.text;
       
       // Save to conversation context
       addQuestionToContext(ctx.from?.id || 0, question, answer);
@@ -8941,6 +9061,10 @@ const WHISPER_PROMPT = [
   'Trello card. Kira board. ' + rollingMonthNames().map(m => 'Kira ' + m.split(' ')[0]).join('. ') + '.',
   // Her column names (12 Oct 2026: "датировано Cita" was heard as "CETA" and became the card's title)
   'Columns: Cita. Датировано. Надо сделать. Поток. В приоритете.',
+  // Panama proper nouns, copied from the never-called transcribeVoice list in trello-voice.ts (16 Oct 2026). LAST on
+  // purpose: Whisper keeps only the final 224 tokens, so a prompt that grows too long loses its start, never these.
+  // Whole prompt measured at 197 GPT-2 tokens (js-tiktoken; was 160), worst rolling-month case; keep it ≤ 224.
+  'Panama, Balboa, MEDUCA, Banco General, Panapass, Poco a Poco, Neurodesarrollo, Terapia Ocupacional.',
 ].join(' ');
 
 /**
@@ -9060,6 +9184,32 @@ function translationBreaks(src: string, t: string): string {
   const NEG = /\bnot\b|n't\b|\bnever\b|\bno\b|\bnunca\b/i;
   if (NEG.test(src) && !NEG.test(t)) return 'lost a "not"';
   return '';
+}
+
+/**
+ * THE SAME VOICE RULE in all three bots (Elena, 16 Oct 2026): a voice note is answered in text AND voice; a typed
+ * message or a photo caption that ASKS for voice (voice / voz / audio / "en voz" / "out loud" / "respóndeme con voz" /
+ * "голосом") gets text AND voice; anything else gets text only. CTO_SPEAK_TEXT=1 speaks every typed reply.
+ * A word that only MENTIONS voice is not a request (review, 16 Oct 2026): part of a path, file or URL ("src/voice.ts",
+ * "/voice-api"), a voice-over, after a determiner ("the voice handler", "el audio", "mi voz"), or "голосование".
+ */
+const VOICE_REQUEST_RE = /(?<![\p{L}\p{N}_\/\\.@#-])(?<!\b(?:the|this|that|these|those|its|our|my|el|la|este|esta|ese|esa|mi)\s+)(?:voice|voz|audios?|aloud|out loud|голосом|голосов(?:ым|ое|ой)|озвучь\p{L}*)(?![\p{L}\p{N}_\/]|\.\p{L}|-(?!only\b)\p{L}|[\s-]+over\b)/iu;
+function asksForVoice(text: string): boolean {
+  return VOICE_REQUEST_RE.test(text || '');
+}
+
+/** speakBack's own off switches, readable before the answer exists: CTO_SPEAK_REPLIES=0, or no OpenAI key. */
+function voiceRepliesOn(): boolean {
+  return process.env.CTO_SPEAK_REPLIES !== '0' && !!process.env.OPENAI_API_KEY?.trim();
+}
+
+/**
+ * What speakBack judges her language from: her own words — unless they are only the request ("voz", "voice please"),
+ * which speechLang reads as English. Then the answer, which the prompt already put in her language.
+ */
+function voiceLangSource(herText: string, answer: string): string {
+  const rest = (herText || '').replace(new RegExp(VOICE_REQUEST_RE.source, 'giu'), ' ');
+  return (rest.match(/\p{L}+/gu) || []).length >= 2 ? herText : (answer || herText);
 }
 
 /** Chat id → message id of her newest voice note. A voice that answers an older note after a newer one is wrong. */
