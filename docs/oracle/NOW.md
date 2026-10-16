@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 16 Oct 14:10 | Bilingual build (Elena's yes to all 4 + LIVE voice on request): VJH inbox fix + VJH-1..4, CTO-1..4, OpenClaw OC-1..3 — building + reviewing on laptop/copies, deploy after proof | VJH orchestrator.py, telegram_bot_enhanced.py, telegram_qa_helper.py, llm_judge.py, judge_feedback_sync.py · cto-aipa src/telegram-bot.ts, scripts/hs-deal-prep.cjs · Oracle ~/.openclaw/workspace IDENTITY/AGENTS/SKILL.md + settings/tts.json · pm2 cto-aipa, systemd vibejobhunter | 892ec1b0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,31 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 16 Oct ~15:25 UTC — BILINGUAL TEAM LIVE: VJH + CTO AIPA read OpenClaw's shared sheets · one voice rule · VJH inbox every cycle · claim released
+- **DONE (Elena's yes to all 4 packages; plan `docs/oracle/2026-10-16_BILINGUAL_TEAM_PLAN.md`; backups FIRST: Oracle + laptop
+  `_session-backups/bilingual-20261016/`, md5 manifest):**
+  - **VJH** `9c804b8` + `a2ecb38` (restarted 15:24:28): Q&A grounded in deals/proof/cards sheets + judge ledger via `llm_judge._call_llm`
+    (OpenAI first), answers in her language ("No lo sé" when not in data), screenshots (judge_feedback_sync vision readers, off-loop),
+    voice reply on the team rule, chat lock (fails open), **employer-reply inbox now every cycle** (was only cycles with new jobs) +
+    IMAP `timeout=60`, screens corrected. CMO untouched (separate review SAFE).
+  - **CTO AIPA** `fb698e86` (pm2 restart 15:03:23, dist md5 `cf3a1d53`): free chat/photos from the proof sheet + her corrections, her
+    language, `completeWithProfileDetailed('quality')`; screenshots as files; typed/caption "voz/voice" → spoken; Panama Whisper words.
+  - **OpenClaw** (no restart): `~/.openclaw/settings/tts.json` `{"tts":{"auto":"inbound"}}` **OUTRANKS** `messages.tts.auto` "tagged";
+    AGENTS.md 🔊 VOICE + mishearings, SKILL.md voice rules, IDENTITY.md 📸 screenshot rule, Whisper prompt + "agente, agentes, RAG".
+    hs-deal-prep LIVE RULE + `DIGEST_MAX 11100` (`04ce9835`).
+- **VERIFIED BY:** 3-lens review + final proof per bot (before/after inventory: nothing removed). Live: VJH Spanish question →
+  Spanish answer naming the 6 real 🔥 deals + 3 sent this week; English question → English (after `a2ecb38`; first run answered in
+  Spanish). VJH 15:12 inbox check read Zoho + Gmail. OpenClaw scripted: voice note saying "reply with voice" → 0 tool calls (no double
+  audio) ✓, ES practice + "respóndeme con voz" → 1 voice ✓, mishearings ✓, menu = HELP ✓, typed LIVE w/o ask → text only ✓.
+- **KNOWN LIMIT (Elena chose "leave it", no OpenClaw code patch):** a TYPED live question + "reply with voice" gets voice only when gpt-4.1
+  calls the `tts` tool (1 of 2, then 1 of 6 with stronger wording → reverted). Voice NOTES always get voice. Fix would be a 1-line dist
+  patch in maybeApplyTtsToPayload (inbound OR tagged) — only with her yes.
+- **WATCH:** tonight 01:00–01:59 UTC the CMO post (`journalctl -u vibejobhunter --since "2026-10-17 00:55" | grep -E "LINKEDIN CMO|Post completed"`;
+  `linkedin_cmo_data/last_post_date.txt` → 2026-10-16). Her first real voice note to OpenClaw: `bash ~/_session-backups/bilingual-20261016/
+  openclaw/test_openclaw.sh live 2026-10-16T15:09` (double voice = FAIL → rollback `mv ~/.openclaw/settings/tts.json …/new/`).
+- **NOT DONE:** job-list-filter (PUBLIC repo) `docs/openclaw/` copies are older than Oracle — never copy them onto Oracle. VJH journal
+  prints the bot token in httpx getUpdates lines (raise httpx logger to WARNING — needs Elena's yes).
 
 ### ✅ 16 Oct ~13:50 UTC — VJH bot screens tell the truth · bilingual plan ready for Elena's yes · claim released
 - **DONE (VJH `ee90351`, Oracle ff-merged, md5 `9b31ec05…` = git, restarted 13:48:50 > file 13:48:44, "Enhanced Bot polling started" 13:50:21, 0 tracebacks):**
