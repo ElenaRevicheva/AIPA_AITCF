@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (jobs → VJH bot + kit-gap clarity) | 2026-10-16 10:50 | Elena's go: job alerts + apply queue via VJH bot, job flow in VJH /menu, honest kit-gap alert (future kits) | cto-aipa scripts/hs-env.cjs, hs-audit-apply-kit.cjs, apply-queue.cjs, hs-fill-apply-kit.cjs, src/telegram-bot.ts (+restart); VJH src/notifications/telegram_bot_enhanced.py (+restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
