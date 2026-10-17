@@ -500,6 +500,12 @@ function proofSheet(interviewDeals) {
     companyQs.forEach((q, i) => console.log(`${i + 1}. ${q}`));
   }
   printVerifiedExamples();
+  // NO DEEP-DIVE (17 Oct 2026, Elena): a deal without the 🔎 interview deep-dive tells her how to get one. A rule in the
+  // skill was skipped by gpt-4.1; a line it is told to COPY is not (the READ-PROOF line is copied every time).
+  if (!companyQs.length) {
+    const co = String(deal.properties.dealname || '').split('@').pop().trim() || 'this company';
+    console.log(`\n===== NO DEEP-DIVE — copy into your SECOND line (right after the ✅ Loaded line): No interview deep-dive on ${co} yet — if the interview is booked, send /research_employer ${co} in the CTO AIPA bot (1–4 min), then /new here.`);
+  }
   // READ-PROOF (11 Oct 2026, Elena: "I just need a proof" that the coach read the full true deal). The LAST line of the
   // output, so it only reaches a model that received everything above it. It names what she can check in HubSpot herself:
   // the deal's note count and the first words of its newest note (the top of the Notes tab).
