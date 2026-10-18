@@ -277,7 +277,8 @@ function main() {
       // 16 Oct 2026: Dev.to is suspended (DEVTO_PAUSED=1); field notes now also go to Bing (IndexNow) + Bluesky.
       const sky = (out.match(/https:\/\/bsky\.app\/\S+/) || [])[0] || null;
       const bing = (out.match(/IndexNow \(Bing\): (HTTP \d+)/) || [])[1] || null;
-      const extra = `${bing ? `\n   Bing (IndexNow) ${bing}` : ''}${sky ? `\n   ${sky}` : ''}`;
+      const li = (out.match(/LinkedIn (?:\(Buffer\)|failed): ([^\n]+)/) || [])[1] || null; // 18 Oct 2026: field notes → LinkedIn
+      const extra = `${bing ? `\n   Bing (IndexNow) ${bing}` : ''}${sky ? `\n   ${sky}` : ''}${li ? `\n   LinkedIn (Buffer) ${li}` : ''}`;
       if (devto) say('✓', `published ${inc.slug}\n   ${blogUrl}\n   ${devto}${extra}`);
       else if (sky || bing) say('✓', `published ${inc.slug} (no Dev.to — paused)\n   ${blogUrl}${extra}`);
       else say('!', `${inc.slug}: blog page went out but NO cross-post (Dev.to, Bluesky, Bing) — ${blogUrl}`);

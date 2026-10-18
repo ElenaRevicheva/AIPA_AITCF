@@ -144,6 +144,44 @@ function buildArticle(inc, conceptBySlug) {
   return L.join('\n');
 }
 
+/**
+ * 18 Oct 2026 (Elena: "wire LinkedIn"). Field notes reach LinkedIn through the SAME Buffer helpers the daily
+ * article uses, but the caption is assembled from the incident's own verified fields — title, subtitle, link —
+ * never written by a model: the daily article's AI caption put a false "216 restarts in 48 hours" in front of
+ * recruiters on 16 Oct. FIELDNOTE_LINKEDIN=draft → a Buffer draft she approves; =post → shares now; unset → off.
+ */
+const plain = s => (s || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*`]/g, '').replace(/\s+/g, ' ').trim();
+
+function linkedInCaption(inc, live, slug) {
+  const m = inc.meta;
+  let line = plain(m.subtitle);
+  if (!line) {
+    // no subtitle: whole sentences of the symptom, up to ~400 characters
+    for (const s of plain(m.symptom).match(/[^.!?]+[.!?]+/g) || []) {
+      if ((line + s).length > 400) break;
+      line += s;
+    }
+    line = line.trim();
+  }
+  if (line && !/[.!?]$/.test(line)) line += '.';
+  const url = `${live}?utm_source=linkedin&utm_medium=buffer_fieldnote&utm_campaign=${encodeURIComponent(slug)}`;
+  return [plain(m.title), line, url].filter(Boolean).join('\n\n');
+}
+
+async function fieldNoteToLinkedIn(caption, { draft }) {
+  const { bufferPostableChannels, bufferCreatePost } = require('../dist/buffer-publisher.js');
+  const channels = (await bufferPostableChannels()).filter(c => c.service.toLowerCase() === 'linkedin');
+  if (!channels.length) return 'no postable LinkedIn channel in Buffer';
+  const out = [];
+  for (const c of channels) {
+    const r = await bufferCreatePost({ channelId: c.id, text: caption, ...(draft ? { saveToDraft: true } : {}) });
+    out.push(r.ok ? `${draft ? 'draft' : 'posted'} ${r.id}` : `failed: ${r.error}`);
+  }
+  return out.join('; ');
+}
+
+const LEAK = /[\w.+-]+@[\w-]+\.[a-z]{2,}|Bearer\s+\S+|\b\d{9,}\b|\b\d{1,3}(\.\d{1,3}){3}\b/gi;
+
 async function main() {
   const args = process.argv.slice(2);
   const publish = args.includes('--publish');
@@ -187,6 +225,17 @@ async function main() {
   const slug = blogSlug(inc.meta.slug);
   const markdown = buildArticle(inc, conceptBySlug);
   const canonical = `https://aideazz.xyz/blog/${slug}`;
+  const caption = linkedInCaption(inc, canonical.replace(/\/?$/, '/'), slug);
+
+  // A field note already on the blog can still go to LinkedIn — always as a Buffer DRAFT, never straight to the profile.
+  if (args.includes('--linkedin-draft')) {
+    const leaks = caption.match(LEAK);
+    if (leaks) { console.error(`REFUSING — possible sensitive data in the caption: ${[...new Set(leaks)].slice(0, 5).join(', ')}`); process.exit(1); }
+    const r = await fieldNoteToLinkedIn(caption, { draft: true });
+    console.log(`💼 LinkedIn (Buffer): ${r}\n\n${caption}\n`);
+    if (state[inc.meta.slug]) { state[inc.meta.slug].linkedin = r; writeState(state); }
+    return;
+  }
 
   if (!publish) {
     console.log(`\n─── DRAFT (nothing published) ───`);
@@ -196,6 +245,7 @@ async function main() {
     console.log(`words     : ${markdown.split(/\s+/).length}`);
     console.log(`─────────────────────────────────\n`);
     console.log(markdown);
+    console.log(`\n─── LinkedIn caption (FIELDNOTE_LINKEDIN=${process.env.FIELDNOTE_LINKEDIN || 'off'}) ───\n\n${caption}`);
     console.log(`\n─── end draft — re-run with --publish to ship ───\n`);
     return;
   }
@@ -207,7 +257,7 @@ async function main() {
 
   // Leak scan before anything leaves the machine. The wiki is scrubbed by hand;
   // this is the automated backstop, and it fails closed.
-  const leaks = markdown.match(/[\w.+-]+@[\w-]+\.[a-z]{2,}|Bearer\s+\S+|\b\d{9,}\b|\b\d{1,3}(\.\d{1,3}){3}\b/gi);
+  const leaks = (markdown + '\n' + caption).match(LEAK);
   if (leaks) {
     console.error(`REFUSING TO PUBLISH — possible sensitive data: ${[...new Set(leaks)].slice(0, 5).join(', ')}`);
     process.exit(1);
@@ -262,7 +312,7 @@ async function main() {
   // 16 Oct 2026 (Elena: Dev.to suspended, "let us publish there"): field notes get the same two outlets the daily
   // article got on 15 Oct — Bing via IndexNow and the Bluesky link card — through the SAME exported helpers, once the
   // page answers 200. Neither can undo or fail the publish; each logs what really happened.
-  let indexNow = null, bluesky = null;
+  let indexNow = null, bluesky = null, linkedin = null;
   if (ok) {
     const { submitToIndexNow, postToBluesky } = require('../dist/daily-blog-publisher.js');
     const live = canonical.replace(/\/?$/, '/');
@@ -277,6 +327,11 @@ async function main() {
       catch (e) { console.warn(`📡 IndexNow failed: ${e.message}`); }
       try { bluesky = await postToBluesky({ title, url: live, markdown }); console.log(`🦋 Bluesky: ${bluesky}`); }
       catch (e) { console.warn(`🦋 Bluesky failed: ${e.message}`); }
+      const li = (process.env.FIELDNOTE_LINKEDIN || '').trim().toLowerCase();
+      if (li === 'draft' || li === 'post') {
+        try { linkedin = await fieldNoteToLinkedIn(caption, { draft: li === 'draft' }); console.log(`💼 LinkedIn (Buffer): ${linkedin}`); }
+        catch (e) { console.warn(`💼 LinkedIn failed: ${e.message}`); }
+      }
     }
   }
   // No sitemap write here: the website build regenerates it from the pages that
@@ -307,9 +362,10 @@ NOT RECORDED - neither the blog page nor Dev.to accepted it. ` +
     process.exit(1);
   }
 
-  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl, blogPage: ok, indexNow, bluesky };
+  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl, blogPage: ok, indexNow, bluesky, linkedin };
   writeState(state);
   console.log(`\ndone — ${canonical}${devtoUrl ? ` + ${devtoUrl}` : ''}\n`);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
+module.exports = { linkedInCaption, buildArticle, parseDoc, blogSlug };
