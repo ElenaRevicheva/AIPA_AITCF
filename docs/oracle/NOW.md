@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 18 Oct 12:55 | Task → document (Elena): bots create PDF/Word from her voice/text task EN/ES (quotes, proposals, evaluations, letters, prep sheets), saved to the HubSpot deal when named — building on laptop (renderer first) | cto-aipa scripts/build-lane-cv.cjs (text mode; CV path untouched), src/telegram-bot.ts · VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later pm2 cto-aipa + systemd vibejobhunter | 59d7356d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -198,6 +197,17 @@ git log keeps the record.
 - **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
+
+### ⏸️ 18 Oct ~19:05 UTC — Task → document (PDF/Word from her task) NOT built yet · kit + prep verified INTACT · claim released
+- **Not built:** the build run stopped (a builder took a relayed chat message as its task, then the session limit cut the rest).
+  Nothing changed on disk (cto-aipa src/scripts and VJH clean = HEAD). Design + honesty rules are in memory `project_task_to_document`
+  and in wf_684ea80c-5e6 (renderer = text mode in build-lane-cv.cjs + python-docx; CTO AIPA quotes/proposals/evaluations; VJH job docs).
+- **Verified intact today (Elena asked):** apply-kit audit 13:45 "11 job deals · complete 11 · gaps 0" (link, letter, posting-shaped CV,
+  🛡️, 🎯, 📋 Comet); kit fill every 10 min "11 ACT TODAY · brief already had 11 · failed 0"; OpenClaw proof sheet 24,598 chars (EN+ES
+  facts, 23 examples, Pitz deep-dive facts + cautions), deals sheet by stage (🔥 11 listed = HubSpot 11), 6 corrections; Pitz deal reader
+  prints 🛡️/🎯/✅ letter/📋 Comet/likely questions/verified examples/READ-PROOF.
+- **Also found (not acted on):** VJH weekly watchdog cron `job-board-watch.sh` lacks +x ("Permission denied", next run Tue 20 Oct);
+  Torre.ai dormant since 2 Oct (terms forbid scraping — Elena's call, see 12 Oct entry; belongs in §7 DELIBERATE).
 
 ### ✅ 18 Oct ~12:40 UTC — VJH reads postings carefully + learns her full notes · one-tap alert buttons · PDF/Word in VJH + CTO AIPA · no letters for parked jobs · claim released
 - **VJH** `d51fe5f` (11:23) PDF/.docx answered like screenshots (PyPDF2/python-docx, honest scan/AES/.doc/20 MB lines). `95efbf3`
