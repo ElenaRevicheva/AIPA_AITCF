@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (blog/reach session) | 18 Oct | Field notes → LinkedIn via existing Buffer helpers, model-free caption, first run = Buffer DRAFT (Elena's yes) | cto-aipa scripts/incident-to-blog.cjs (+ its test) · Oracle ~/cto-aipa/.env one new var · NO pm2 restart · NOT telegram-bot.ts | f0973b20 |
 | Claude Code | 17 Oct 23:55 | PDF + Word documents in all 3 bots (Elena's yes) — resumed after a usage-limit stop; unreviewed partial edits on the LAPTOP only (VJH bot+qa_helper+evals, cto-aipa telegram-bot.ts), Oracle untouched (= git HEAD); deploy only after review + proof | VJH src/notifications/telegram_bot_enhanced.py, telegram_qa_helper.py, evals/test_qa_conscience.py · cto-aipa src/telegram-bot.ts · Oracle ~/.openclaw/workspace AGENTS/IDENTITY.md · pm2 cto-aipa, systemd vibejobhunter | 191b9f22 |
 | Claude Code | 16 Oct 15:35 | AI Ops Wiki incident: VJH inbox fate-sharing (Elena asked) — waits for the first zero-job cycle after the fix as proof | aideazz content/ai-ops-wiki/{incidents,concepts}, public/ai-ops-wiki.html (generated) | 81882c62 |
 
@@ -145,6 +144,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 18 Oct — Field notes → LinkedIn via the EXISTING Buffer path, model-free caption · first one = Buffer DRAFT · claim released
+- **DONE (`6b770a36`, Elena's "wire LinkedIn"):** `scripts/incident-to-blog.cjs` → after Bluesky, `bufferCreatePost` (dist/buffer-publisher.js)
+  with caption = incident title + subtitle + link (UTM `buffer_fieldnote`), assembled, NO model. `FIELDNOTE_LINKEDIN=draft|post` in Oracle
+  `.env` (unset = off; now **draft**). `--linkedin-draft` for an already-published note. Leak scan covers the caption. wiki-ship logs
+  `LinkedIn (Buffer) …`. No pm2 restart (wiki-ship cron spawns node fresh). Backups `~/_session-backups/fieldnote-linkedin-20261018/`.
+- **VERIFIED BY:** `test-fieldnote-linkedin.cjs` 26/26 on laptop AND Oracle (all 20 publishable incidents); md5 laptop = GitHub = Oracle
+  (3 files); Buffer API lists `6ad4abac769b457934bd22f2` **draft**, sentAt null (16 Oct field note).
+- **NEXT (Elena):** approve that draft in Buffer (or say "post it") → then set `FIELDNOTE_LINKEDIN=post`. Daily → LinkedIn unchanged (her call).
+- **RISK:** Make.com still doubles the 01:00 VJH CMO post daily (18 Oct: 2 identical at 01:01) — not touched, needs her go.
 
 ### ⛔ 17 Oct ~24:00 UTC — DAILY BLOG PUBLISHES FALSE CLAIMS + leaked employer names (16 Oct) · read-only check · fix awaits Elena
 - **Full findings (no names):** `docs/oracle/BLOG_FACTCHECK_2026-10-17.md`. 16 Oct article: 8 false + 7 misleading claims, central story
