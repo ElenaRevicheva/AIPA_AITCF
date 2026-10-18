@@ -143,6 +143,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 18 Oct ~13:20 UTC — Interview loop (1 🔥 deal, Developer Mid — Fullstack & AI Agents): prompt × model × temperature drill MEASURED + 2 practice notes · no service touched
+- **Why (Elena):** the employer asked how she prompts/evaluates models in Claude Code + Cursor and sets temperature; next step = take-home test.
+- **DONE:** `docs/interview/eval-drill/` (`905314f2`, public, employer-neutral): `run-eval.cjs` + 20 cases + prompts v1/v2/v3 + results.
+  1,900 scored calls, $0.85, run from Oracle `~/_scratch/eval-drill` (keys read from `~/cto-aipa/.env`; no cto-aipa file, cron or pm2 touched).
+  HubSpot, that deal: note `118837139032` 📘 study guide (EN) + note `118837667380` 🎙️ drill (10 ES questions + verified answers + "No afirmar").
+  Memory: `reference_eval_drill_temperature_facts.md`. Facts came from a 9-agent workflow (5 researchers + 4 skeptics; corrections applied).
+- **VERIFIED BY:** `node run-eval.cjs --selftest` (oracle 100 / null 41 / garbage 0); both notes read back identical; `node scripts/hs-deal-prep.cjs
+  --deal=<that deal>` lists 18 company questions (8 deep-dive + the 10 new as 9–18), no note cut.
+- **NEXT (Elena):** OpenClaw `prep me for <company> en español, full — empieza por la pregunta 9`; then the 45-min rehearsal at the end of the 📘 note.
+- **RISK / do not "fix" without her go:** Anthropic API credit is ZERO → every Claude-first prod path falls back. Prod temperatures were never
+  measured and two go against vendor advice (Gemini 3 at 0.3 vs Google's 1.0; Groq gpt-oss at 0.1/0.3/0.9 vs Groq's 0.5–0.7) — reported, not
+  changed. The coach asks Q2–8 by default, so she must ask for 9+; newest-first ordering = one line at hs-deal-prep.cjs:286 (code change, needs her go).
+
 ### ✅/⏳ 18 Oct ~13:30 UTC — Follow-up radar: every listed thread can be cleaned, a Clean holds until new mail · claim released
 - **Bug (Elena):** the 7:00 card listed a thread she cleaned on 13 Oct, with no buttons. The digest keys a thread by subject only; the
   bot wrote `who|subject` + bare `who` → the digest never honoured her taps, the bot hid the thread sender-wide → "skip: no open threads".
