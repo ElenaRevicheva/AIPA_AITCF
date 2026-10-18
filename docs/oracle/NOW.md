@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 18 Oct 19:15 | Task → document RESTARTED (renderer first, then CTO AIPA + VJH) — laptop only until proof | cto-aipa scripts/build-lane-cv.cjs, src/telegram-bot.ts · VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later pm2 cto-aipa + systemd vibejobhunter | b563a820 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
