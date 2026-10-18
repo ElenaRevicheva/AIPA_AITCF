@@ -1,0 +1,1 @@
+{"kind":"call_failed","prompt":"v2","model_requested":"gpt-5-mini","provider":"openai","temp":"0","effort":"default","rep":0,"case_id":"c01","tags":["quote_request","plain"],"error":"400 Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.","status":400,"attempts":1}

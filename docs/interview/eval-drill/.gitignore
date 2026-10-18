@@ -1,0 +1,2 @@
+# raw per-call outputs stay local (~3 MB); summaries + errors are committed
+results/**/results*.jsonl
