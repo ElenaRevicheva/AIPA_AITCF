@@ -449,7 +449,10 @@ function proofSheet(interviewDeals) {
     }
     // Prefer a live deal (I act TODAY / interview stages) over a closed one.
     const live = found.filter((d) => !/closed/i.test(d.properties.dealstage || ''));
-    let pick = (live.length ? live : found)[0];
+    // 17 Oct 2026: then a 🔥 I act today/this week deal over a newer untriaged one ("prep me for Clara" loaded a new SDET
+    // lead instead of her act-today Growth Automation role). --role below still overrides.
+    const acting = live.filter((d) => /^(qualifiedtobuy|presentationscheduled)$/.test(d.properties.dealstage || ''));
+    let pick = (acting.length ? acting : live.length ? live : found)[0];
     // --role: one company can carry several deals (Puente: seven). Take the one whose title holds the most role words.
     const roleWords = (arg('role') || '').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2);
     if (roleWords.length) {
