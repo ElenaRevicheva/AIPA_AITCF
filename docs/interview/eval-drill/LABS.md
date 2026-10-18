@@ -149,6 +149,43 @@ is right and nothing changes.
 
 ---
 
+## Part 5 — Doing all of this inside the Claude Code app
+
+**Two layers — never mix them up.**
+1. **Claude Code's own brain** — the settings of the assistant I am talking to. Set in the app UI.
+2. **My agents' settings** — temperature, budget, model and prompt of CTO AIPA, VJH, EspaLuz. They live in code and
+   `.env`. I change them by *asking Claude Code in plain words*, and it proves the change with the test kit.
+Temperature exists only in layer 2. The app has no temperature control.
+
+### Layer 1 — where the controls are (Code tab, desktop app; checked against the docs 18 Oct)
+
+| what | where in the app | when I use it |
+|---|---|---|
+| **Model** | dropdown next to the send button (Mac shortcut Cmd+Shift+I); can change mid-session | Opus for build work; Fable for the hardest sessions |
+| **Effort** | the effort menu (Mac shortcut Cmd+Shift+E; on Windows open it from the model dropdown area) | xhigh for building and evals (my default: 35 of 37 sessions); lower for quick status questions — saves usage |
+| **Permission mode** | mode selector next to the send button (Mac Cmd+Shift+M): Manual · Accept edits · **Plan** · Auto · Bypass | **Plan** before any change to a live agent: Claude explores and proposes, edits nothing. Plan lasts for the session only |
+| **Usage** | the usage ring next to the model picker | check before a big multi-agent run |
+| **Parallel experiments** | **+ New session** (Ctrl+N on Windows); the **worktree** option next to the branch name gives a private copy | compare two models on the same task: two sessions, same prompt, different model in each dropdown |
+| **What I see** | Ctrl+O cycles Normal / Thinking / Verbose | Verbose when I want to watch every command |
+| **Slash commands** | type `/` in the prompt box | `/compact` when a long session gets slow |
+
+This session on 18 Oct read back as: model `claude-opus-5-5`, effort `xhigh`, mode `auto`, fast mode off.
+
+### Layer 2 — the conversation recipe (what I type, in order)
+1. *(mode selector → Plan)* "Plan only: I want to test ONE change to <agent>. Show me the current setting or prompt
+   line, propose one new line, the cases, the grader and the exact command. Do not edit anything."
+2. "Before any change: run the current version twice on the same cases and tell me the noise between the two runs."
+3. *(after I approve the plan → Auto)* "Make the change in a private copy (Oracle `~/_scratch` or a worktree), not in
+   the live files. Run it twice."
+4. "Show me only three things: noise between runs, before vs after, and every case that flipped — both directions."
+5. "Does it break anything I want? (my applications it would now hide, my No-fits it would now approve)"
+6. "Write the result into LABS.md and the lab log. If I say go: make the smallest change in the real file, deploy,
+   and prove from the production logs that it took."
+Words that make Claude Code do it the engineering way: *one change*, *twice*, *same cases*, *private copy*,
+*both directions*, *prove from the logs*.
+
+---
+
 ## Part 4 — The checklist (say it in this order)
 1. Write what "correct" means before any run — including what must **never** happen.
 2. Freeze the cases, with the expected answer written before the first run. Hard cases on purpose.
