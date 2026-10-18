@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (blog/reach session) | 18 Oct 12:15 | Follow-up radar: the 7:00 digest honours Clean taps (Elena: stale Boardy card, no buttons) | VJH scripts/followup_radar.py (cron, no restart) + a new scripts/test_followup_radar_ts_keys.py · cto-aipa src/radar-cleanup.ts PREPARED ONLY — no dist deploy, no pm2 restart (that is the row below) | 6b770a36 |
 | Claude Code | 18 Oct 11:35 | VJH reads postings carefully + keeps her full notes (F1-F4), one-tap job-alert buttons, finish CTO PDF/Word, cto-aipa no letters for parked deals (F6) — building on laptop; VJH PDF/Word LIVE 11:23 (d51fe5f) | VJH serpapi_jobs_ingest.py, llm_judge.py, fit_gate.py, judge_feedback_sync.py, nodes.py/telegram_bot_enhanced.py (buttons), evals · cto-aipa src/telegram-bot.ts, src/hubspot-client.ts · pm2 cto-aipa, systemd vibejobhunter | d51fe5f |
 
 **Rules**
