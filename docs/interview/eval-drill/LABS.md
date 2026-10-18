@@ -111,6 +111,42 @@ budget lesson (gpt-oss cut off 12 of 26 at 220 tokens, 0 of 17 at 600), the "usa
 the source; if real inbound volume ever appears, re-run this lab with real labelled leads first. Next lab goes where
 real decisions and real labels already exist (the VJH judge: my own applied / no-fit decisions).
 
+### Lab 3 · VJH judge: does it agree with my real decisions? (real, 18 Oct) — waiting for my step 3 ✋
+
+**Why this one makes sense:** real traffic (it screens every job before I see it), real ground truth (my own applied /
+No-fit decisions, synced from HubSpot), real stakes (a wrong "no fit" hides a job I would apply to).
+
+**Step 1 — read the real system** (`VibeJobHunterAIPA_AIMCF/src/core/llm_judge.py`): gpt-4o-mini first of 5 providers
+(Claude last on purpose — most expensive), **temperature 0**, **300-token budget** (raised from 120 after the same
+truncation trap as Lab 2), and code guardrails after the model (`latam_veto_is_wrong`, `timezone_veto_is_wrong`,
+`pay_veto_is_wrong`) — a rule the prompt cannot hold lives in code. The tool: `scripts/replay_learning.py` — writes
+nothing, judges each decision on the **posting it was made on** (never my own words: no **label leakage**), excludes the
+12 examples quoted in the prompt (no marking its own homework), and compares the old vs current instruction block — a
+built-in **ablation** (one ingredient on/off).
+
+**Step 2 — run it twice, read the noise first** (Oracle, read-only, a few cents):
+- With `--since 2026-09-20` it **refused to score**: only 6 rejections and 0 applications since then have a posting on
+  record → "JUDGE not measured". Refusing to report below a minimum sample is good design.
+- Learned rules (code, no model): catch 9 of 391 rejections, **wrongly block 0 of 40 applications** (the hard constraint).
+- Full sample, 20 rejections + 20 applications, two runs:
+
+| | run 1 | run 2 |
+|---|---|---|
+| old instructions — my No-fits it also rejects | 14/20 | 14/20 |
+| old instructions — my applications it approves | 8/20 | 8/20 |
+| current instructions — my No-fits it also rejects | 12/20 | 13/20 |
+| current instructions — my applications it approves | 8/20 | 7/20 |
+
+What it shows: the same setup moves by 1 between runs, so old vs current differs **within noise** (another null result).
+The stable signal: the judge approves only **7–8 of 20 jobs I applied to**, and 9 of its 12 misses give one reason —
+criterion **3d/3h**, "hands-on engineering/coding, not AI product management or solutions architecture".
+Trap before any prompt change: my targeting changed on 20 Sep, and many of those applications are older. If my criteria
+changed, old labels are stale — **label staleness / concept drift** — and the judge may be right by today's rules.
+
+**Step 3 ✋ — refresh the labels.** For each of the 12 applied-but-rejected jobs: *would I still apply today?* If yes for
+most of the 3d/3h ones, the fix is one line in criterion 3d, tested offline with a before/after replay. If no, the judge
+is right and nothing changes.
+
 ---
 
 ## Part 4 — The checklist (say it in this order)
