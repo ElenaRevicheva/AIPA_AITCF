@@ -153,6 +153,9 @@ git log keeps the record.
   stage ids; NOW.md from disk). Same restart misframing flagged 5 Oct, never fixed at source → 7 posts since.
 - **NEXT (Elena's go):** take 16 Oct down + its Bluesky card (she deletes LinkedIn); cut 17 Oct's false lines (deletion only); fix the
   collector before the next 19:30 UTC run. **Every agent from now on: commit subjects + NOW.md name deals by count/stage, never employer.**
+- **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
+  `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
+  hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
 
 ### ✅ 16 Oct ~18:00 UTC — Bots see ALL 14 🔥 deals (sheet picks by stage) · VJH honest counts + conscience test · OpenClaw names fixed · inbox fix PROVEN
 - **DONE:** `hs-deal-prep.cjs` digest picks by STAGE (`6e32c38f`): every 🔥 job deal (14; newest-60 had hidden 8: Puente x4, SIPEngines, Addi,
