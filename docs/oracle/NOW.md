@@ -153,9 +153,10 @@ git log keeps the record.
 - **VERIFIED BY:** independent review (17 agents, 3 lenses; found 3 real issues, all fixed) · `test_followup_radar_ts_keys.py` 20/20 on
   laptop AND on Oracle against the DEPLOYED bot dist (every button resolves to its labelled thread through `resolveRadarProposal`) ·
   read-only dry run: "No stalled conversations · 6 hidden by you" (was 5). md5 laptop = GitHub = Oracle. Backup `~/_session-backups/radar-clean-20261018/`.
-- **⏳ NEXT (claim holder of pm2 cto-aipa):** ship `dist/radar-cleanup.js` from `772fbbd7` (own-keys hiding, kept keeps its button, `last`
-  un-hides) with your next restart; `node scripts/test-radar-cleanup.cjs` 49/49. Sent by SendMessage 18 Oct. Until then the old bot can
-  re-render the keyboard after a tap without other threads of the same sender (cosmetic); the 7:00 card's own buttons are correct.
+- **✅ Button side LIVE too:** `dist/radar-cleanup.js` from `772fbbd7` shipped in the other session's 12:38 UTC cto-aipa restart (md5
+  ec08f371 = laptop build; process start 12:38:11 > file 12:37:51). `test-radar-cleanup.cjs` 49/49 on the LAPTOP only: on Oracle 4
+  discover checks fail with the OLD code too (verified side by side) — `discoverRadarProposal` reads fixed real paths by design, so the
+  test is not sealed off there. Later, with a restart: an option to skip the fixed paths in tests.
 - **Watch tomorrow 12:00 UTC:** followup-radar.log `telegram: HTTP 200 message_id=…`; cto-aipa log `[radar] skip: already posted today`.
 
 ### ✅ 18 Oct — Field notes → LinkedIn via the EXISTING Buffer path, model-free caption · first one = Buffer DRAFT · claim released
