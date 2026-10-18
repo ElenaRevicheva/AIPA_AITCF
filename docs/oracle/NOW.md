@@ -145,6 +145,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⛔ 17 Oct ~24:00 UTC — DAILY BLOG PUBLISHES FALSE CLAIMS + leaked employer names (16 Oct) · read-only check · fix awaits Elena
+- **Full findings (no names):** `docs/oracle/BLOG_FACTCHECK_2026-10-17.md`. 16 Oct article: 8 false + 7 misleading claims, central story
+  false (pm2 LIFETIME counter 216 sold as "216 restarts in 48 h"), body quotes a commit subject listing 8 employers she applies to.
+  17 Oct: core story true, 5 false lines + 2 mail hostnames. LinkedIn/Bluesky copies carry the false restart claim (no names).
+- **Root cause = `src/blog-evidence.ts`** (counter beside uptime; `head -12` read as a count; scrub misses CRM names + hostnames; raw
+  stage ids; NOW.md from disk). Same restart misframing flagged 5 Oct, never fixed at source → 7 posts since.
+- **NEXT (Elena's go):** take 16 Oct down + its Bluesky card (she deletes LinkedIn); cut 17 Oct's false lines (deletion only); fix the
+  collector before the next 19:30 UTC run. **Every agent from now on: commit subjects + NOW.md name deals by count/stage, never employer.**
+
 ### ✅ 16 Oct ~18:00 UTC — Bots see ALL 14 🔥 deals (sheet picks by stage) · VJH honest counts + conscience test · OpenClaw names fixed · inbox fix PROVEN
 - **DONE:** `hs-deal-prep.cjs` digest picks by STAGE (`6e32c38f`): every 🔥 job deal (14; newest-60 had hidden 8: Puente x4, SIPEngines, Addi,
   Clara, David Kennedy), ⏳/💬 from the last 14 days, newest 🤖 to fill; header line 2 = "<ISO>Z · N live job deals listed below · HubSpot
