@@ -20,8 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 17 Oct 23:55 | PDF + Word documents in all 3 bots (Elena's yes) — resumed after a usage-limit stop; unreviewed partial edits on the LAPTOP only (VJH bot+qa_helper+evals, cto-aipa telegram-bot.ts), Oracle untouched (= git HEAD); deploy only after review + proof | VJH src/notifications/telegram_bot_enhanced.py, telegram_qa_helper.py, evals/test_qa_conscience.py · cto-aipa src/telegram-bot.ts · Oracle ~/.openclaw/workspace AGENTS/IDENTITY.md · pm2 cto-aipa, systemd vibejobhunter | 191b9f22 |
-| Claude Code | 16 Oct 15:35 | AI Ops Wiki incident: VJH inbox fate-sharing (Elena asked) — waits for the first zero-job cycle after the fix as proof | aideazz content/ai-ops-wiki/{incidents,concepts}, public/ai-ops-wiki.html (generated) | 81882c62 |
+| Claude Code | 18 Oct 11:35 | VJH reads postings carefully + keeps her full notes (F1-F4), one-tap job-alert buttons, finish CTO PDF/Word, cto-aipa no letters for parked deals (F6) — building on laptop; VJH PDF/Word LIVE 11:23 (d51fe5f) | VJH serpapi_jobs_ingest.py, llm_judge.py, fit_gate.py, judge_feedback_sync.py, nodes.py/telegram_bot_enhanced.py (buttons), evals · cto-aipa src/telegram-bot.ts, src/hubspot-client.ts · pm2 cto-aipa, systemd vibejobhunter | d51fe5f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
