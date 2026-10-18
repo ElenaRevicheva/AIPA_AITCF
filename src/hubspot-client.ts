@@ -1835,6 +1835,11 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
           ? 'VJH found this job again, so no new letter was drafted'
           : 'employer event on an existing deal — no letter drafted',
       };
+    } else if (!draftedLetter?.trim() && (stage as string) === 'lead_parked') {
+      // 2026-10-18 (Elena: "my VJH again suggested…"): a job VJH PARKED as not a fit got a paid letter + gpt-5 review
+      // and topped her daily queue, so a rejected job read like a suggestion (Calendly Full Stack, R&P Security,
+      // 17 Oct). No letter for a parked job; the apply kit drafts one if she moves the deal to 🔥 I act today.
+      letterMeta = { tailored: false, reason: 'parked by VJH as not a fit — no letter drafted (the kit drafts one if you move it to I act today)' };
     } else if (!draftedLetter?.trim()) {
       const { generateCoverLetter } = await import('./cover-letter');
       const drafted = await generateCoverLetter({
@@ -1947,7 +1952,9 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
 
     // Always attach full action package (Apply link + letter + checklist)
     if (dealId) await addNoteToDeal(dealId, actionPkg);
-    await mirrorToQueue(dealId);
+    // 2026-10-18: a parked job stays out of her daily queue (the queue sorts letters first, so parked jobs led it).
+    if ((stage as string) !== 'lead_parked') await mirrorToQueue(dealId);
+    else console.log(`[daily-queue] parked by VJH — not queued: ${dealName.slice(0, 64)}`);
 
     // 2026-10-06 — createDeal returns null on any non-2xx (Oracle's error log
     // holds a 429 rate-limit on deal create). That used to print "✅ pushed …
