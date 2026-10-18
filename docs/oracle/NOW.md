@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (blog/reach session) | 18 Oct 12:15 | Follow-up radar: the 7:00 digest honours Clean taps (Elena: stale Boardy card, no buttons) | VJH scripts/followup_radar.py (cron, no restart) + a new scripts/test_followup_radar_ts_keys.py · cto-aipa src/radar-cleanup.ts PREPARED ONLY — no dist deploy, no pm2 restart (that is the row below) | 6b770a36 |
 | Claude Code | 18 Oct 12:38 | DEPLOYING: VJH reads postings carefully + full notes (F1-F4) + one-tap alert buttons; then CTO PDF/Word | VJH serpapi_jobs_ingest.py, llm_judge.py, fit_gate.py, judge_feedback_sync.py, crm_hub.py, nodes.py, telegram_notifier.py, telegram_bot_enhanced.py, evals (NOT followup_radar.py — blog/reach session) · systemd vibejobhunter + pm2 serpapi-jobs restart · cto-aipa src/telegram-bot.ts + pm2 cto-aipa | 72601410 |
 
 **Rules**
@@ -144,6 +143,21 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅/⏳ 18 Oct ~13:30 UTC — Follow-up radar: every listed thread can be cleaned, a Clean holds until new mail · claim released
+- **Bug (Elena):** the 7:00 card listed a thread she cleaned on 13 Oct, with no buttons. The digest keys a thread by subject only; the
+  bot wrote `who|subject` + bare `who` → the digest never honoured her taps, the bot hid the thread sender-wide → "skip: no open threads".
+- **DONE + LIVE (VJH `6f383fd`, cron, no restart):** `followup_radar.py` honours the bot's rows (`button_key`; bare-sender rows NOT —
+  would hide a real new reply), a Clean holds only until NEW MAIL in that thread, folded subjects on one line, `radar_rows_and_keyboard`
+  = one button per printed thread in card order (fixes taps clearing a DIFFERENT thread), proposal rewritten every run, card message_id
+  stamped in radar-buttons-sent.json so the 7:15 job stands down. Default `RADAR_MIN_CLEARABLE_DAYS=0` (her rule: fresh threads cleanable).
+- **VERIFIED BY:** independent review (17 agents, 3 lenses; found 3 real issues, all fixed) · `test_followup_radar_ts_keys.py` 20/20 on
+  laptop AND on Oracle against the DEPLOYED bot dist (every button resolves to its labelled thread through `resolveRadarProposal`) ·
+  read-only dry run: "No stalled conversations · 6 hidden by you" (was 5). md5 laptop = GitHub = Oracle. Backup `~/_session-backups/radar-clean-20261018/`.
+- **⏳ NEXT (claim holder of pm2 cto-aipa):** ship `dist/radar-cleanup.js` from `772fbbd7` (own-keys hiding, kept keeps its button, `last`
+  un-hides) with your next restart; `node scripts/test-radar-cleanup.cjs` 49/49. Sent by SendMessage 18 Oct. Until then the old bot can
+  re-render the keyboard after a tap without other threads of the same sender (cosmetic); the 7:00 card's own buttons are correct.
+- **Watch tomorrow 12:00 UTC:** followup-radar.log `telegram: HTTP 200 message_id=…`; cto-aipa log `[radar] skip: already posted today`.
 
 ### ✅ 18 Oct — Field notes → LinkedIn via the EXISTING Buffer path, model-free caption · first one = Buffer DRAFT · claim released
 - **DONE (`6b770a36`, Elena's "wire LinkedIn"):** `scripts/incident-to-blog.cjs` → after Bluesky, `bufferCreatePost` (dist/buffer-publisher.js)
