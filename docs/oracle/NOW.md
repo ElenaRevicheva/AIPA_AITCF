@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 18 Oct 12:38 | DEPLOYING: VJH reads postings carefully + full notes (F1-F4) + one-tap alert buttons; then CTO PDF/Word | VJH serpapi_jobs_ingest.py, llm_judge.py, fit_gate.py, judge_feedback_sync.py, crm_hub.py, nodes.py, telegram_notifier.py, telegram_bot_enhanced.py, evals (NOT followup_radar.py — blog/reach session) · systemd vibejobhunter + pm2 serpapi-jobs restart · cto-aipa src/telegram-bot.ts + pm2 cto-aipa | 72601410 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -180,6 +179,23 @@ git log keeps the record.
 - **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
+
+### ✅ 18 Oct ~12:40 UTC — VJH reads postings carefully + learns her full notes · one-tap alert buttons · PDF/Word in VJH + CTO AIPA · no letters for parked jobs · claim released
+- **VJH** `d51fe5f` (11:23) PDF/.docx answered like screenshots (PyPDF2/python-docx, honest scan/AES/.doc/20 MB lines). `95efbf3`
+  (restart 12:34 + **pm2 serpapi-jobs restart** → Google feed now runs ~12:34/00:34 UTC): F1 no BORDERLINE alert when code overruled
+  the judge · F2 only a READ posting (≥600 chars) is judged/alerted · F3 location veto stands when judge + posting cite travel/on-site/
+  hybrid/relocation · F4 "N years in software engineering" heavy at the gate · her reasons stored up to 1500 chars (were cut at 160 —
+  the evidence was lost), 12 cut reasons re-read once, outage never blanks a reason · "⏳ I applied / ❌ Not a fit" buttons on new
+  alerts (❌ asks one line → her reason on a Lost deal). Main 🔥 path unchanged; replays flipped only jobs she rejected (0 of 47 applied).
+  204 deployed tests pass on Oracle. Backups `~/_session-backups/vjh-careful-10181233/` (incl. judge_*.json, learned_rules.json).
+- **cto-aipa** `72601410` (11:30) VJH-parked jobs get no cover letter and stay out of the daily queue. `c730706d` (12:38) CTO reads PDF
+  (Gemini native) + .docx (unzip); same restart shipped the radar session's `dist/radar-cleanup.js` (772fbbd7) at its request —
+  its Oracle test shows 4 env-dependent fails (49/49 on laptop), told that session; rollback copy in `~/_session-backups/cto-docs-20261018/`.
+- **OpenClaw PDF/Word: HELD** — gpt-4.1 answered a 6-page NDA from pages 1–4 only (missed a USD 40,000 exclusivity clause) and made 0
+  exec calls; needs another approach. OpenClaw "no deep-dive yet" reminder LIVE via hs-deal-prep `faf86ddc` (line the coach copies);
+  `--company` prefers the 🔥 deal `e8b3991e`.
+- **NEXT:** verify the first Google-feed run summary + next 24 h of 🔥 deals (fresh jobs still arrive); design (running) for bots
+  CREATING PDF/Word EN/ES + Spanish CVs for Spanish postings (reuse build-lane-cv.cjs pdf-lib + python-docx + cv-bank ES lines).
 
 ### ✅ 16 Oct ~18:00 UTC — Bots see ALL 14 🔥 deals (sheet picks by stage) · VJH honest counts + conscience test · OpenClaw names fixed · inbox fix PROVEN
 - **DONE:** `hs-deal-prep.cjs` digest picks by STAGE (`6e32c38f`): every 🔥 job deal (14; newest-60 had hidden 8: Puente x4, SIPEngines, Addi,
