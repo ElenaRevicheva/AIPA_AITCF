@@ -160,22 +160,26 @@ export function itemKeyAliases(it: RadarItem): string[] {
   ])];
 }
 
+/**
+ * A thread is hidden by ITS OWN Clean only — the rule the 7:00 digest applies (followup_radar.py reads these
+ * rows through `button_key` since 18 Oct 2026). The old sender-wide match (any cleaned row with the same email)
+ * hid every later thread from that sender HERE while the digest still listed it, so Elena got a card with
+ * nothing to tap (Boardy, 18 Oct). Her rule: the radar shows what is live, and everything it shows can be cleaned.
+ */
 export function ledgerHidesItem(
   it: RadarItem,
   ledger: Record<string, RadarLedgerRow>,
   now = new Date(),
 ): boolean {
-  if (itemKeyAliases(it).some((k) => ledgerHides(ledger[k], now))) return true;
-  const who = it.who.trim().toLowerCase();
-  if (!who) return false;
-  for (const [k, row] of Object.entries(ledger)) {
-    if (!ledgerHides(row, now)) continue;
-    const rowWho = String(row.who || '').trim().toLowerCase();
-    if (rowWho && rowWho === who) return true;
-    const keyEmail = (k.split('|')[0] || '').trim().toLowerCase();
-    if (keyEmail === who) return true;
-  }
-  return false;
+  const subject = it.subject || '';
+  const own = [...new Set([it.key, radarItemKey(it.who, subject), radarItemKey(it.who, subject.slice(0, 70))])];
+  const last = (it as RadarItem & { last?: string }).last; // newest mail, written by the digest since 18 Oct
+  return own.some((k) => {
+    const row = ledger[k];
+    if (!row || row.kind === 'kept') return false; // kept = still listed, still cleanable (as in the digest)
+    if (last && row.at && Date.parse(last) > Date.parse(row.at)) return false; // new mail since the Clean
+    return ledgerHides(row, now);
+  });
 }
 
 /** Older Clean writes stored only Python's key. Promote the email so a new key cannot resurrect the thread. */

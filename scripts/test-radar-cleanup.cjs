@@ -149,10 +149,13 @@ const {
 } = require(DIST);
 const byEmail = {};
 dismissRadarItems([notStale[2]], byEmail, { at: '2026-09-06T12:00:00Z', until: null, kind: 'dismissed', who: notStale[2].who });
-check('dismiss writes the email alias so tomorrow\'s Python key still matches',
-  !!byEmail['hello@example.com'] && itemKeyAliases(notStale[2]).every((k) => byEmail[k]));
-check('hiding by email alias removes the thread',
-  openRadarItems([notStale[2]], { 'hello@example.com': byEmail['hello@example.com'] }).length === 0);
+check('dismiss writes every alias of the thread (incl. the sender|subject name the digest now reads)',
+  itemKeyAliases(notStale[2]).every((k) => byEmail[k]) && !!byEmail[radarItemKey(notStale[2].who, notStale[2].subject)]);
+check('its own Clean removes the thread', openRadarItems([notStale[2]], byEmail).length === 0);
+// 18 Oct 2026: a bare-sender row no longer hides anything — the digest never honoured it, so a thread it listed
+// got no button here (Boardy). Clean means "this thread", on both sides.
+check('a bare-sender row alone does not hide a thread the digest lists',
+  openRadarItems([notStale[2]], { 'hello@example.com': byEmail['hello@example.com'] }).length === 1);
 
 markRadarButtonsSent(tmp, new Date('2026-09-06T15:00:00Z'));
 check('buttons-sent stamp is same-day', radarButtonsSentToday(tmp, new Date('2026-09-06T18:00:00Z')) === true);
@@ -204,7 +207,8 @@ saveRadarProposal({
   id: 'old-cleared',
   items: [{ key: 'old@example.com|gone', who: 'old@example.com', subject: 'gone', age: 40, stale: true }],
 }, leftover);
-saveRadarLedger({
+saveRadarLedger({ // what dismissRadarItems actually writes for that thread
+  'old@example.com|gone': { at: '2026-08-01T00:00:00Z', until: null, kind: 'dismissed', who: 'old@example.com' },
   'old@example.com': { at: '2026-08-01T00:00:00Z', until: null, kind: 'dismissed', who: 'old@example.com' },
 }, leftover);
 check('a leftover cleared proposal alone is not a live digest',
@@ -219,14 +223,35 @@ const wedKey = 'service@example.com|month old outreach';
 const wedLedger = {
   [wedKey]: { at: '2026-09-02T12:00:00Z', until: null, kind: 'dismissed', who: 'service@example.com' },
 };
-const hsResurrect = { key: 'service@example.com|[followup-radar] they', who: 'service@example.com', subject: '[FOLLOWUP-RADAR] THEY', age: 32 };
-check('Wednesday Clean still hides a HubSpot task with a new key',
-  ledgerHidesItem(hsResurrect, wedLedger) === true);
+const otherThread = { key: 'service@example.com|a new question', who: 'service@example.com', subject: 'A new question', age: 5 };
+// 18 Oct 2026: was "Wednesday Clean still hides a HubSpot task with a new key" (sender-wide). The radar's own task
+// mails are now dropped as noise by the digest (NOISE_SUBJECT [followup-radar]); a NEW thread from a cleaned sender
+// is live mail and must show with a button.
+check('a cleaned thread does not hide a DIFFERENT thread from the same sender',
+  ledgerHidesItem(otherThread, wedLedger) === false);
+check('the cleaned thread itself stays hidden',
+  ledgerHidesItem({ key: wedKey, who: 'service@example.com', subject: 'month old outreach', age: 40 }, wedLedger) === true);
 const emptyAliases = { [wedKey]: { at: '2026-09-02T12:00:00Z', until: null, kind: 'dismissed' } };
-check('email prefix on an old Python key is enough to hide',
-  ledgerHidesItem(hsResurrect, emptyAliases) === true);
 const filled = { ...emptyAliases };
-check('backfill writes the email alias', backfillLedgerEmailAliases(filled) === 1 && !!filled['service@example.com']);
+check('backfill writes the email alias (kept for old rows; no longer used to hide)',
+  backfillLedgerEmailAliases(filled) === 1 && !!filled['service@example.com']);
+
+// The 18 Oct card: a 5-day thread whose sender had an older Clean must get a button, not an empty keyboard.
+const boardyLedger = {
+  'intro@example.com|intro: elena + someone else': { at: '2026-10-01T00:00:00Z', until: null, kind: 'dismissed', who: 'intro@example.com' },
+  'intro@example.com': { at: '2026-10-01T00:00:00Z', until: null, kind: 'dismissed', who: 'intro@example.com' },
+};
+const card = parseRadarDigest('📡 Follow-up radar\n🔴 THEY WROTE LAST — your move\n  5d  intro@example.com\n       Intro: Elena + A Contact');
+const boardyKb = radarKeyboard('rdr-test', card, boardyLedger);
+check('every thread on the card has a Clean button (Boardy, 18 Oct)',
+  boardyKb.inline_keyboard.length === 2 && /intro@/.test(boardyKb.inline_keyboard[0][0].text));
+const same = { key: 'b@example.com|thread', who: 'b@example.com', subject: 'thread', age: 3 };
+const cleanedRow = { 'b@example.com|thread': { at: '2026-10-13T13:00:00Z', until: null, kind: 'dismissed', who: 'b@example.com' } };
+check('new mail after a Clean brings the thread back (digest writes `last`)',
+  ledgerHidesItem({ ...same, last: '2026-10-15T09:00:00+00:00' }, cleanedRow) === false
+  && ledgerHidesItem({ ...same, last: '2026-10-12T09:00:00+00:00' }, cleanedRow) === true);
+const keptRow = { 'b@example.com|thread': { at: '2026-10-13T13:00:00Z', until: '2099-01-01T00:00:00Z', kind: 'kept', who: 'b@example.com' } };
+check('a Keep does not remove the thread\'s button', ledgerHidesItem(same, keptRow) === false);
 
 const loose = parseRadarDigestLoose('notify ok\n32 days waiting on ops@example.com (THEY)\n');
 check('loose log parse finds age+email without the card layout',
