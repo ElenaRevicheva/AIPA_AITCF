@@ -146,6 +146,10 @@ git log keeps the record.
 
 ### ✅ 18 Oct ~13:20 UTC — Interview loop (1 🔥 deal, Developer Mid — Fullstack & AI Agents): prompt × model × temperature drill MEASURED + 2 practice notes · no service touched
 - **Why (Elena):** the employer asked how she prompts/evaluates models in Claude Code + Cursor and sets temperature; next step = take-home test.
+- **⏳ PART 2 (stopped at usage limit, 18 Oct):** Elena wants to LEARN it hands-on on her own agents. Done: `run-eval.cjs --task <dir>` +
+  `--max-tokens` (intake summary proven byte-identical) and `eval-drill/LABS.md` Part 1 + checklist. NEXT: Part 2 (where it matters) + real
+  labs: lead triage on Groq gpt-oss-120b at max_tokens 220 (possible empty-reply risk on the leads path — UNVERIFIED), classify profile
+  gemini-3.5-flash-lite 0.3 vs 1.0, VJH judge via replay_learning.py. Investigation workflow `wf_3d4249b5-369` was stopped — resume it.
 - **DONE:** `docs/interview/eval-drill/` (`905314f2`, public, employer-neutral): `run-eval.cjs` + 20 cases + prompts v1/v2/v3 + results.
   1,900 scored calls, $0.85, run from Oracle `~/_scratch/eval-drill` (keys read from `~/cto-aipa/.env`; no cto-aipa file, cron or pm2 touched).
   HubSpot, that deal: note `118837139032` 📘 study guide (EN) + note `118837667380` 🎙️ drill (10 ES questions + verified answers + "No afirmar").

@@ -50,6 +50,12 @@ const FORCE_TEMP = argv.includes('--force-temp');
 const RESUME = argv.includes('--resume');
 const SELFTEST = argv.includes('--selftest');
 const REGRADE = argv.includes('--regrade');
+// --task <dir>: run a REAL task instead of the intake drill. The folder holds cases.jsonl, prompts/<name>.md and
+// grade.cjs (exports grade(pred, expected, case) -> {metric: number|null}, canonical(pred), metrics: [names]).
+const TASK_DIR = path.resolve(String(arg('task', HERE)));
+const TASK = TASK_DIR !== HERE ? require(path.join(TASK_DIR, 'grade.cjs')) : null;
+// --max-tokens N: the output budget is a variable too — on a reasoning model the hidden thinking spends from it.
+const MAX_TOKENS = arg('max-tokens', null) ? parseInt(arg('max-tokens'), 10) : null;
 
 // ---------------------------------------------------------------- env
 if (ENV_FILE) {
@@ -64,13 +70,13 @@ const scrub = s => String(s || '')
   .replace(/(sk|xai|gsk|AIza)[-_A-Za-z0-9]{12,}/g, '***');
 
 // ---------------------------------------------------------------- data
-const CASES_ALL = fs.readFileSync(path.join(HERE, 'cases.jsonl'), 'utf8')
+const CASES_ALL = fs.readFileSync(path.join(TASK_DIR, 'cases.jsonl'), 'utf8')
   .split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l));
 const CASES = LIMIT ? CASES_ALL.slice(0, parseInt(LIMIT, 10)) : CASES_ALL;
 
 function loadPrompt(name) {
-  const raw = fs.readFileSync(path.join(HERE, 'prompts', name + '.md'), 'utf8');
-  return raw.replace(/^@include (\S+)\s*$/m, (_, f) => fs.readFileSync(path.join(HERE, 'prompts', f), 'utf8').trim());
+  const raw = fs.readFileSync(path.join(TASK_DIR, 'prompts', name + '.md'), 'utf8');
+  return raw.replace(/^@include (\S+)\s*$/m, (_, f) => fs.readFileSync(path.join(TASK_DIR, 'prompts', f), 'utf8').trim());
 }
 
 // ---------------------------------------------------------------- providers
@@ -126,10 +132,10 @@ function openaiCompatible(url, keyVar, extraHeaders = {}) {
     const body = { model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] };
     if (url.includes('api.openai.com')) body.response_format = { type: 'json_object' };
     if (reasoning) {
-      body.max_completion_tokens = 6000; // reasoning tokens are spent from this budget
+      body.max_completion_tokens = MAX_TOKENS || 6000; // reasoning tokens are spent from this budget
       if (EFFORT) body.reasoning_effort = EFFORT;
     } else {
-      body.max_tokens = 700;
+      body.max_tokens = MAX_TOKENS || 700;
     }
     if (temp !== 'default') body.temperature = Number(temp);
     const { j, latency } = await post(url, { authorization: `Bearer ${key}`, ...extraHeaders }, body);
@@ -156,7 +162,7 @@ const PROVIDERS = {
     const key = process.env.ANTHROPIC_API_KEY;
     if (!key) throw Object.assign(new Error('no ANTHROPIC_API_KEY'), { status: 'nokey' });
     const noSampling = CLAUDE_NO_SAMPLING.test(model);
-    const body = { model, max_tokens: noSampling ? 8000 : 800, system, messages: [{ role: 'user', content: user }] };
+    const body = { model, max_tokens: MAX_TOKENS || (noSampling ? 8000 : 800), system, messages: [{ role: 'user', content: user }] };
     if (temp !== 'default') body.temperature = Number(temp);
     if (EFFORT && noSampling) body.output_config = { effort: EFFORT };
     const { j, latency } = await post('https://api.anthropic.com/v1/messages',
@@ -172,7 +178,7 @@ const PROVIDERS = {
   async gemini({ model, system, user, temp }) {
     const key = process.env.GEMINI_API_KEY;
     if (!key) throw Object.assign(new Error('no GEMINI_API_KEY'), { status: 'nokey' });
-    const generationConfig = { responseMimeType: 'application/json', maxOutputTokens: 4000 };
+    const generationConfig = { responseMimeType: 'application/json', maxOutputTokens: MAX_TOKENS || 4000 };
     if (temp !== 'default') generationConfig.temperature = Number(temp);
     const { j, latency } = await post(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {},
@@ -304,7 +310,16 @@ function grade(pred, expected) {
   };
 }
 
+const gradeRow = (pred, c) => (TASK ? TASK.grade(pred, c.expected, c) : grade(pred, c.expected));
+
 // ---------------------------------------------------------------- selftest (oracle + null baseline)
+if (SELFTEST && TASK) {
+  // A task proves its own grader: TASK.selftest(cases) returns [{name, ok}] for known-good and known-bad outputs.
+  const checks = TASK.selftest ? TASK.selftest(CASES_ALL) : [];
+  for (const r of checks) console.log(path.basename(TASK_DIR) + ' grader — ' + r.name + ': ' + (r.ok ? 'pass' : 'FAIL'));
+  if (!checks.length) console.log('this task has no selftest() — add known-good / known-bad checks before trusting it');
+  process.exit(checks.length && checks.every(r => r.ok) ? 0 : 1);
+}
 if (SELFTEST) {
   const oracle = CASES.map(c => grade({ ...c.expected, reply: 'Con gusto, ¿de qué año es su vehículo?' }, c.expected));
   const nul = CASES.map(c => grade({}, c.expected));
@@ -338,11 +353,11 @@ if (REGRADE) {
   const rows = fs.readFileSync(RESULTS, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
   const oldV = rows[0]?.grader || 1;
   fs.copyFileSync(RESULTS, path.join(OUT, `results.grader-v${oldV}.jsonl`));
-  fs.writeFileSync(RESULTS, rows.map(r => JSON.stringify({ ...r, grader: GRADER_VERSION, grade: grade(r.pred, byId[r.case_id].expected) })).join('\n') + '\n');
+  fs.writeFileSync(RESULTS, rows.map(r => JSON.stringify({ ...r, grader: GRADER_VERSION, grade: gradeRow(r.pred, byId[r.case_id]) })).join('\n') + '\n');
   console.log(`re-graded ${rows.length} rows: grader v${oldV} → v${GRADER_VERSION}`);
 }
 
-const runKey = r => [r.prompt, r.model_requested, r.temp, r.effort, r.case_id, r.rep].join('|');
+const runKey = r => [r.prompt, r.model_requested, r.temp, r.effort, r.max_tokens ?? 'default', r.case_id, r.rep].join('|');
 const done = new Set();
 if ((RESUME || REGRADE) && fs.existsSync(RESULTS)) {
   for (const l of fs.readFileSync(RESULTS, 'utf8').split('\n').filter(Boolean)) done.add(runKey(JSON.parse(l)));
@@ -364,7 +379,7 @@ for (const promptName of PROMPTS) {
       }
       for (let rep = 0; rep < REPS; rep++) {
         for (const c of CASES) {
-          const k = [promptName, spec, temp, EFFORT || 'default', c.id, rep].join('|');
+          const k = [promptName, spec, temp, EFFORT || 'default', MAX_TOKENS || 'default', c.id, rep].join('|');
           if (!REGRADE && !done.has(k)) jobs.push({ promptName, system, spec, provider, model, temp, rep, c });
         }
       }
@@ -379,7 +394,7 @@ async function worker() {
   while (next < jobs.length) {
     const job = jobs[next++];
     const { promptName, system, spec, provider, model, temp, rep, c } = job;
-    const base = { prompt: promptName, model_requested: spec, provider, temp, effort: EFFORT || 'default', rep, case_id: c.id, tags: c.tags };
+    const base = { prompt: promptName, model_requested: spec, provider, temp, effort: EFFORT || 'default', max_tokens: MAX_TOKENS || 'default', rep, case_id: c.id, tags: c.tags };
     try {
       const out = await callWithRetry(provider, { model, system, user: c.input, temp });
       const pred = parseOutput(out.text);
@@ -388,7 +403,8 @@ async function worker() {
       append(RESULTS, {
         ...base, grader: GRADER_VERSION, model_served: out.served, served_mismatch: !servedOk, status: truncated ? 'truncated' : 'ok',
         stop: out.stop, latency_s: out.latency, attempts: out.attempts, usage: out.usage,
-        grade: grade(pred, c.expected), pred, raw: String(out.text).slice(0, 2000),
+        empty: !String(out.text || '').trim(), json_valid: pred !== null,
+        grade: gradeRow(pred, c), pred, raw: String(out.text).slice(0, 2000),
       });
     } catch (e) {
       append(ERRORS, { kind: 'call_failed', ...base, error: scrub(e.message), status: e.status ?? null, attempts: e.attempts ?? 1 });
@@ -401,10 +417,10 @@ async function worker() {
 }
 
 (async () => {
-  if (REGRADE) { summarise(); return; }
+  if (REGRADE) { (TASK ? summariseTask : summarise)(); return; }
   console.log(`eval-drill: ${CASES.length} cases × prompts [${PROMPTS}] × models [${MODELS}] × temps [${TEMPS}] × ${REPS} rep(s) = ${jobs.length} calls → ${OUT}`);
   await Promise.all(Array.from({ length: Math.min(CONC, jobs.length || 1) }, worker));
-  summarise();
+  (TASK ? summariseTask : summarise)();
 })();
 
 // ---------------------------------------------------------------- summary
@@ -471,6 +487,56 @@ function summarise() {
     for (const [key, cnt] of seen) lines.push(`- ${cnt}× ${key}`);
   }
   lines.push('', `Wall clock: ${((Date.now() - t0) / 1000).toFixed(0)} s. Generated by run-eval.cjs.`);
+  fs.writeFileSync(path.join(OUT, 'summary.md'), lines.join('\n') + '\n');
+  fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
+  console.log('\n' + lines.join('\n'));
+}
+
+function summariseTask() {
+  const rows = fs.existsSync(RESULTS) ? fs.readFileSync(RESULTS, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)) : [];
+  const errs = fs.existsSync(ERRORS) ? fs.readFileSync(ERRORS, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)) : [];
+  const prices = fs.existsSync(path.join(HERE, 'prices.json')) ? JSON.parse(fs.readFileSync(path.join(HERE, 'prices.json'), 'utf8')).models || {} : {};
+  const metrics = TASK.metrics || [...new Set(rows.flatMap(r => Object.keys(r.grade || {})))];
+  const groups = new Map();
+  for (const r of rows) {
+    const k = [r.prompt, r.model_requested, r.temp, r.effort, r.max_tokens ?? 'default'].join('|');
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(r);
+  }
+  const n = CASES.length * REPS;
+  const lines = ['# ' + path.basename(TASK_DIR) + ' — ' + path.basename(OUT), '',
+    CASES.length + ' cases · reps ' + REPS + ' · rows ' + rows.length + ' · errors ' + errs.filter(e => e.kind === 'call_failed').length, '',
+    '**Noise floor:** with ' + CASES.length + ' cases × ' + REPS + ' rep(s), a rate difference under about ±' + Math.round(100 / Math.sqrt(n)) + ' points is noise.', '',
+    '| prompt | model (served) | temp | effort | max tok | finished / cut off | empty | JSON valid | ' + metrics.join(' | ') + ' | same answer every rep | p50 s | p95 s | in tok | out tok | reasoning tok | $ / 100 calls |',
+    '|' + '---|'.repeat(16 + metrics.length)];
+  const summary = [];
+  for (const [k, rs] of groups) {
+    const [prompt, model, temp, effort, maxTok] = k.split('|');
+    const ok = rs.filter(r => r.status === 'ok');
+    const mean = key => { const v = ok.map(r => r.grade && r.grade[key]).filter(x => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+    const byCase = new Map();
+    for (const r of ok) { if (!byCase.has(r.case_id)) byCase.set(r.case_id, []); byCase.get(r.case_id).push(JSON.stringify(TASK.canonical ? TASK.canonical(r.pred) : r.pred)); }
+    const multi = [...byCase.values()].filter(v => v.length > 1);
+    const consistency = multi.length ? multi.filter(v => v.every(x => x === v[0])).length / multi.length : null;
+    const lat = ok.map(r => r.latency_s);
+    const avg = f => rs.length ? Math.round(rs.reduce((a, r) => a + ((r.usage && r.usage[f]) || 0), 0) / rs.length) : null;
+    const pr = prices[model] || prices[route(model).model];
+    const cost = pr ? ((avg('input_tokens') * pr.in + avg('output_tokens') * pr.out) / 1e6) * 100 : null;
+    const served = [...new Set(rs.map(r => r.model_served))].join(', ');
+    const empty = rs.filter(r => r.empty).length, valid = rs.filter(r => r.json_valid).length;
+    const m = Object.fromEntries(metrics.map(x => [x, mean(x)]));
+    summary.push({ prompt, model, served, temp, effort, max_tokens: maxTok, rows: rs.length, ok: ok.length, cut_off: rs.length - ok.length, empty, json_valid: valid / rs.length, ...m, consistency, p50: q(lat, 0.5), p95: q(lat, 0.95), in_tok: avg('input_tokens'), out_tok: avg('output_tokens'), reasoning_tok: avg('reasoning_tokens'), usd_per_100: cost });
+    lines.push('| ' + [prompt, model + ' (' + served + ')', temp, effort, maxTok, ok.length + ' / ' + (rs.length - ok.length), empty, pct(valid / rs.length),
+      ...metrics.map(x => (m[x] === null ? '–' : pct(m[x]))), consistency === null ? '–' : pct(consistency),
+      q(lat, 0.5)?.toFixed(1) ?? '–', q(lat, 0.95)?.toFixed(1) ?? '–', avg('input_tokens'), avg('output_tokens'), avg('reasoning_tokens'),
+      cost === null ? 'price n/a' : '$' + cost.toFixed(3)].join(' | ') + ' |');
+  }
+  if (errs.length) {
+    lines.push('', '## Errors and skipped configs (never scored as wrong answers)', '');
+    const seen = new Map();
+    for (const e of errs) { const key = e.kind + ' · ' + (e.model || e.model_requested) + ' · temp ' + e.temp + ' · ' + (e.error || e.reason); seen.set(key, (seen.get(key) || 0) + 1); }
+    for (const [key, cnt] of seen) lines.push('- ' + cnt + '× ' + key);
+  }
   fs.writeFileSync(path.join(OUT, 'summary.md'), lines.join('\n') + '\n');
   fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
   console.log('\n' + lines.join('\n'));
