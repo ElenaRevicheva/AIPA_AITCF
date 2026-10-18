@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (blog/reach session) | 18 Oct | Field notes → LinkedIn via existing Buffer helpers, model-free caption, first run = Buffer DRAFT (Elena's yes) | cto-aipa scripts/incident-to-blog.cjs (+ its test) · Oracle ~/cto-aipa/.env one new var · NO pm2 restart · NOT telegram-bot.ts | f0973b20 |
 | Claude Code | 17 Oct 23:55 | PDF + Word documents in all 3 bots (Elena's yes) — resumed after a usage-limit stop; unreviewed partial edits on the LAPTOP only (VJH bot+qa_helper+evals, cto-aipa telegram-bot.ts), Oracle untouched (= git HEAD); deploy only after review + proof | VJH src/notifications/telegram_bot_enhanced.py, telegram_qa_helper.py, evals/test_qa_conscience.py · cto-aipa src/telegram-bot.ts · Oracle ~/.openclaw/workspace AGENTS/IDENTITY.md · pm2 cto-aipa, systemd vibejobhunter | 191b9f22 |
 | Claude Code | 16 Oct 15:35 | AI Ops Wiki incident: VJH inbox fate-sharing (Elena asked) — waits for the first zero-job cycle after the fix as proof | aideazz content/ai-ops-wiki/{incidents,concepts}, public/ai-ops-wiki.html (generated) | 81882c62 |
 
