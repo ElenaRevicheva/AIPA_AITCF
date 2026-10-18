@@ -52,6 +52,62 @@ The interactive explainer in the 18 Oct session: slide temperature and top_p, pr
 "balatas" vs "flores". Takeaway: temperature changes how boldly the model picks from its own list; it never adds
 knowledge.
 
+### Lab 2 · Lead triage: which model should score my leads? (real, 18 Oct) — waiting for my labels ✋
+
+**The question.** CTO AIPA scores every lead (urgency 1–5) and pushes it into HubSpot only at urgency ≥ 3
+(`src/lead-triage.ts:338-350`). Does the scorer work, and which model should do it?
+
+**Step 1 — read the real code** (`src/lead-triage.ts:145-155`). Groq `openai/gpt-oss-120b` (a thinking model), room for
+220 tokens, temperature 0.1. Trap on line 154: an empty reply becomes `{}`, which parses as "valid", so the lead is
+stored as urgency 1, "No summary" — *fail-open*, no error anywhere.
+
+**Step 2 — check production, not the config.** `TRIAGE_SKIP_GROQ=1` has been set since 12 Apr (commit `81877025`, a
+temporary workaround for a Groq crash), so every lead went to Claude Haiku — unpaid since the Anthropic credit ran out.
+Read-only count of the `lead_triage` table:
+
+| month | inbound leads | "Classification failed" | prospects | "Classification failed" |
+|---|---|---|---|---|
+| Jun | 5 | 4 | 17 | 11 |
+| Jul | 19 | 1 | 132 | 76 |
+| Aug | 14 | 6 | 214 | 94 |
+| Sep | – | – | 118 | 118 |
+| Oct | 6 | 5 | 177 | 95 |
+
+16 of 44 inbound leads and 394 of 812 prospects since June were never scored. The leads were not lost — every website
+inquiry also sends a notification email (`src/marketing-notify.ts`) — but the score, the summary and the automatic
+HubSpot push were. The daily job logged a normal run every morning: *a job that ran is not a job that produced output.*
+Named concepts: **silent failure / fail-open**, **workaround rot** (a temporary switch that outlived its reason),
+**check traffic before tuning** (today's run had 0 new leads).
+
+**Step 3 — test set from real traffic.** 20 real past leads (14 inbound, 6 prospects; 17 had failed in production),
+rebuilt into the exact production prompt — the export proves all 15 fixed lines of the template are in the deployed
+code. Private: `~/_scratch/lab2/task/cases.jsonl` on Oracle, never in git (`tasks/lead-triage/.gitignore`).
+
+**Step 4 — the no-label test** (`tasks/lead-triage/grade.cjs`, 8/8 self-checks; 2 runs per lead):
+
+| setup | answers | cut off at the budget | usable (finished) | same answer both runs | pushes to HubSpot (urgency ≥ 3) | $ / 100 leads |
+|---|---|---|---|---|---|---|
+| gpt-oss-120b · 220 tokens · temp 0.1 (production if Groq is switched back on) | 26 | **12 (2 empty)** | 14 of 14 | 100% | – | free tier |
+| gpt-oss-120b · **600** tokens · temp 0.1 | 17 | **0** | 17 of 17 | 100% | 16 of 17 | free tier |
+| gemini-3.5-flash-lite · default temp (1.0) | 40 | 0 | 40 of 40 | 75% | 24 of 40 | $0.025 |
+| gpt-4.1-mini · temp 0.1 | 40 | 0 | 40 of 40 | 100% | 34 of 40 | $0.021 |
+
+Also: 37 Groq calls were refused — free tier, 8,000 tokens per minute (logged as errors, never scored).
+
+What it shows: **the 220-token budget is the failure, not the model** — the model thinks ~159 tokens before answering.
+Both paid models are usable and cheap, but they **disagree on the push decision for 5 of 20 leads** (t03, t09, t11, t15,
+t16; e.g. t03 = 1 on Gemini, 3 on gpt-4.1-mini). Usable is not correct — only my labels can decide.
+
+**Step 5 ✋ — my labels.** Urgency 1–5 for each of the 20 leads, or T for my own test messages (removed). Then:
+`node run-eval.cjs --task ~/_scratch/lab2/task --regrade --out ~/_scratch/lab2/results` — no new calls — and the
+`push_agrees` column says which model makes my decision.
+
+**Step 6 — the decision (production change, needs my go).** Options on the table, each surgical:
+(a) unset `TRIAGE_SKIP_GROQ` and raise the Groq budget 220 → 600 (one env line, one value) — watch the free-tier limit;
+(b) route triage through the existing shared chain (`completeWithProfile`, which already treats an empty reply as a
+failure and enforces a 300-token floor) with the model my labels pick; and in either case (c) treat an empty reply as
+"Classification failed — review manually" instead of a silent urgency 1 (`src/lead-triage.ts:154`).
+
 ---
 
 ## Part 4 — The checklist (say it in this order)
@@ -70,4 +126,5 @@ knowledge.
 
 | date | lab | result (numbers) | decision | by |
 |---|---|---|---|---|
+| 18 Oct 2026 | Lab 2 lead triage (steps 1–4) | prod triage unscored for 16/44 inbound + 394/812 prospects since Jun; gpt-oss cut off 12/26 at 220 tokens, 0/17 at 600; Gemini and gpt-4.1-mini usable 40/40, disagree on 5/20 pushes | waiting for my labels, then pick the model | Elena + Claude Code |
 | 18 Oct 2026 | intake drill (README) | spec v1→v2 30–45%→80–100%; temp moved repeatability only; effort low = medium at 56% cost | prompt v2; temp 0 on gpt-4.1-mini; Gemini 3 at 1.0 | Elena + Claude Code |

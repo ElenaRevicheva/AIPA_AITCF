@@ -70,7 +70,9 @@ const scrub = s => String(s || '')
   .replace(/(sk|xai|gsk|AIza)[-_A-Za-z0-9]{12,}/g, '***');
 
 // ---------------------------------------------------------------- data
-const CASES_ALL = fs.readFileSync(path.join(TASK_DIR, 'cases.jsonl'), 'utf8')
+// A task whose real cases are private ships a synthetic cases.example.jsonl for --selftest on any machine.
+const CASES_FILE = fs.existsSync(path.join(TASK_DIR, 'cases.jsonl')) ? 'cases.jsonl' : 'cases.example.jsonl';
+const CASES_ALL = fs.readFileSync(path.join(TASK_DIR, CASES_FILE), 'utf8')
   .split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l));
 const CASES = LIMIT ? CASES_ALL.slice(0, parseInt(LIMIT, 10)) : CASES_ALL;
 
@@ -129,7 +131,8 @@ function openaiCompatible(url, keyVar, extraHeaders = {}) {
     const key = process.env[keyVar];
     if (!key) throw Object.assign(new Error(`no ${keyVar}`), { status: 'nokey' });
     const reasoning = url.includes('api.openai.com') && OPENAI_REASONING.test(model);
-    const body = { model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] };
+    // An empty prompt file = no system message, so a task can send exactly what production sends (one user message).
+    const body = { model, messages: [...(system.trim() ? [{ role: 'system', content: system }] : []), { role: 'user', content: user }] };
     if (url.includes('api.openai.com')) body.response_format = { type: 'json_object' };
     if (reasoning) {
       body.max_completion_tokens = MAX_TOKENS || 6000; // reasoning tokens are spent from this budget
@@ -162,7 +165,7 @@ const PROVIDERS = {
     const key = process.env.ANTHROPIC_API_KEY;
     if (!key) throw Object.assign(new Error('no ANTHROPIC_API_KEY'), { status: 'nokey' });
     const noSampling = CLAUDE_NO_SAMPLING.test(model);
-    const body = { model, max_tokens: MAX_TOKENS || (noSampling ? 8000 : 800), system, messages: [{ role: 'user', content: user }] };
+    const body = { model, max_tokens: MAX_TOKENS || (noSampling ? 8000 : 800), ...(system.trim() ? { system } : {}), messages: [{ role: 'user', content: user }] };
     if (temp !== 'default') body.temperature = Number(temp);
     if (EFFORT && noSampling) body.output_config = { effort: EFFORT };
     const { j, latency } = await post('https://api.anthropic.com/v1/messages',
@@ -182,7 +185,7 @@ const PROVIDERS = {
     if (temp !== 'default') generationConfig.temperature = Number(temp);
     const { j, latency } = await post(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {},
-      { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig });
+      { ...(system.trim() ? { systemInstruction: { parts: [{ text: system }] } } : {}), contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig });
     const cand = j.candidates?.[0] || {};
     return {
       text: (cand.content?.parts || []).map(p => p.text || '').join(''),
