@@ -56,3 +56,25 @@ usan" became "un CRM (el que ya usan, o uno que les configuramos)".
 3. ¿Cuántos mensajes de WhatsApp reciben al día, y cuántos fuera del horario?
 4. ¿El dominio mundodentalpty.com es suyo? (registered until Oct 2027, nameservers inactive)
 5. ¿Cuál es el horario real de cada sede? (today there are 4 versions)
+
+## 5. v4, 19 Oct evening: "don't give them the keys"
+
+Elena's rule after an external critique: the free page must not hand over the solution, or the clinic fixes it alone
+and pays $0. The free page now shows **what** is wrong, with dated proof, and the **impact on a patient**. Every **how**
+is in the $100 plan: which sources feed the AI, the domain status, the Google steps, the texts and the day-30 re-measure.
+A key-leak scan of the client page finds none of them. Private commit `75cf875`.
+
+**The $100 box now promises these 7 things. All must be deliverable:**
+
+| Promise | Deliverable today? |
+|---|---|
+| Verified fact sheet for both branches, confirmed with them | Yes, concierge. The 5 questions in §4 fill it |
+| Google steps: take control of the profile + represent El Dorado **without duplicates** | Yes, concierge. Check first for an existing El Dorado listing under another name or owner |
+| Exact sources feeding Google/AI the wrong data + the fix for each | Yes. Evidence in `SOURCES.md` + `AI_ANSWERS_2026-10-19.json` (Infoguia hours, an old directory address, an extra phone, Grok and Claude citing the dead domain) |
+| What to do with the domain and the «Servicios» button | Yes. RDAP facts in `SOURCES.md` |
+| Paste-ready texts, ES + EN | Yes, via the document desk (P1) |
+| Day-30 re-measure in the 5 AIs | **Yes, run by hand.** The day-0 scripts are saved in the private repo's `probes/`. P2 makes it one command |
+| Managed implementation, quoted separately | Yes, if they give access (Google manager, Linktree, Instagram) |
+
+**Sales order:** send the page and ask which point worries them most. **No second pitch** until they answer. Then the
+$100 plan for their point. The WhatsApp assistant is a second sale, after trust.
