@@ -21,6 +21,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 19 Oct 14:55 | OpenClaw document desk: final proof → apply (workspace + config copies, backups) | ~/.openclaw workspace IDENTITY.md/AGENTS.md/doc-desk, openclaw.json · gateway restart once | VJH 87b02f1 |
+| Claude Code (laptop) | 19 Oct 15:05 | Mundo Dental HANDOFF NEXT 2: AI-answer probe (5 queries) → "Qué responde la IA hoy" block → rebuild diagnostic B | private repo `bia/mundo-dental/*` · Oracle: read-only `competitor-probe.cjs` run, no code change, no restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
