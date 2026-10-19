@@ -247,6 +247,8 @@ const ICP_BY_LANE = {
     { q: 'plastic surgery clinic', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en' },
     { q: 'medical tourism clinic', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
     { q: 'yacht charter', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    // 19 Oct 2026 lane matrix (AIGO PDF slide 5): immigration & relocation was missing from this lane.
+    { q: 'immigration and relocation services', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
     // ── original local set (tail fallback) ──
     { q: 'restaurante', ll: PTY, city: 'Panama City' },
     { q: 'clínica veterinaria', ll: PTY, city: 'Panama City' },
@@ -267,6 +269,8 @@ const ICP_BY_LANE = {
     { q: 'relocation and visa services', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
     { q: 'medical tourism agency', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en' },
     { q: 'fertility clinic international patients', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
+    // 19 Oct 2026 lane matrix: dental implants & cosmetic dentistry was missing from this lane.
+    { q: 'dental implants center', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
     // ── original local set (tail fallback) ──
     { q: 'agencia de marketing', ll: PTY, city: 'Panama City' },
     { q: 'bienes raíces', ll: PTY, city: 'Panama City' },
@@ -286,6 +290,8 @@ const ICP_BY_LANE = {
     { q: 'private yacht charter', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
     { q: 'bariatric surgery clinic', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
     { q: 'luxury boutique resort', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
+    // 19 Oct 2026 lane matrix: immigration & relocation was missing from this lane.
+    { q: 'residency and immigration lawyer', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
     // ── original local set (tail fallback) ──
     { q: 'clínica dental', ll: PTY, city: 'Panama City' },
     { q: 'hotel boutique', ll: PTY, city: 'Panama City' },
@@ -293,6 +299,19 @@ const ICP_BY_LANE = {
     { q: 'clínica estética', ll: PTY, city: 'Panama City' },
     { q: 'tours y excursiones', ll: '@9.3400,-82.2419,12z', city: 'Bocas del Toro' },
     { q: 'hotel', ll: '@8.4333,-82.4333,12z', city: 'Boquete' },
+  ],
+  /**
+   * AI video generation (19 Oct 2026, Elena: every profitable service x industry combination in Atlas).
+   * A portfolio service whitespace already scores (ai_video_generation) that had no ICP here, so it was
+   * never worked. Same buying pattern as the other lanes, in the 4 AIGO strong-fit industries, chosen for
+   * businesses that sell an experience or a visible result. No local tail: it is a high-ticket offer only.
+   */
+  ai_video_generation: [
+    { q: 'luxury yacht charter', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
+    { q: 'boutique hotel', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
+    { q: 'cosmetic dentistry smile makeover', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    { q: 'plastic surgery clinic', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
+    { q: 'real estate developer for expats', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
   ],
 };
 
@@ -337,6 +356,11 @@ const LANE_OFFER = {
     label: 'visibilidad en IA',
     pitch: () =>
       `Son 3 arreglos concretos y de implementación rápida para que su negocio aparezca como respuesta citable cuando alguien le pregunta a ChatGPT o Perplexity por opciones en su sector.`,
+  },
+  ai_video_generation: {
+    label: 'video promocional con IA',
+    pitch: () =>
+      `Producimos con IA un video promocional para su negocio, listo en días para Instagram, WhatsApp y su web, en español e inglés: muestra el tratamiento o la experiencia que venden a su público internacional.`,
   },
 };
 
@@ -1209,6 +1233,7 @@ async function stageLead(lead, audit, angle) {
     whatsapp_ai_agents: 'WhatsApp agent',
     ai_automation: 'automation',
     geo_aeo_tech_seo_makers: 'GEO/AEO fix',
+    ai_video_generation: 'AI promo video',
   };
   const laneTag = LANE_TAG[lead.lane] || LANE_TAG.geo_aeo_tech_seo_makers;
   const dealName = `[CLIENT-ATLAS] ${lead.company} — ${laneTag} (audit: ${auditLabel(audit)}) · ${angleKey}`;

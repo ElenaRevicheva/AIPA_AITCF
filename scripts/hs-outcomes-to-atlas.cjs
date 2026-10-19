@@ -45,6 +45,10 @@ function lane(dealname) {
   const d = dealname.toLowerCase();
   if (/\bwhatsapp\b|booking agent|wa agent/.test(d)) return 'whatsapp_ai_agents';
   if (/automation|automatiza/.test(d)) return 'ai_automation';
+  // 19 Oct 2026: the Atlas AI-video lane tags its deals "AI promo video"; reliability/rescue deals used to
+  // fall through to the GEO default and be scored against the wrong lane.
+  if (/promo video|video generation/.test(d)) return 'ai_video_generation';
+  if (/reliability|rescue/.test(d)) return 'ai_reliability_and_rescue';
   if (/video|film|atuona/.test(d)) return 'ai_film_making_studios';
   if (/fractional|cto retainer/.test(d)) return 'fractional_cto';
   if (/marketing/.test(d)) return 'ai_marketing_studios';
