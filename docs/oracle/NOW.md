@@ -150,6 +150,9 @@ git log keeps the record.
   410/856 `lead_triage` rows "Classification failed" since June, BUT Elena checked the rows: almost all are her own tests or scraped job
   posts ("Pain point … hn_hiring"), not customers — real traffic ≈ 0. Kept: gpt-oss cut off 12/26 at 220 tokens vs 0/17 at 600. Optional,
   her call: switch triage off or tag tests at the source. Private cases: Oracle `~/_scratch/lab2/task/` (never git). Next lab: VJH judge.
+- **Elena's Claude Architect course (18 Oct):** PRIVATE repo `aideazz-private-docs` main `cdce03d` →
+  `docs/08-guides-howtos/claude-architect-course/COURSE.md` (safety contract, CCAR-F blueprint, M1–M7 × 4 lessons on her products,
+  verified). Taught one lesson at a time in session; she drives. Exercises are read-only or in private copies — keep it that way.
 - **⏳ PART 2 (stopped at usage limit, 18 Oct):** Elena wants to LEARN it hands-on on her own agents. Done: `run-eval.cjs --task <dir>` +
   `--max-tokens` (intake summary proven byte-identical) and `eval-drill/LABS.md` Part 1 + checklist. NEXT: Part 2 (where it matters) + real
   labs: lead triage on Groq gpt-oss-120b at max_tokens 220 (possible empty-reply risk on the leads path — UNVERIFIED), classify profile
