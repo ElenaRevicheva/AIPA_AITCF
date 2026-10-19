@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 17:10 | Mundo Dental diagnostic v3 (Elena): ChatGPT/Gemini/Perplexity/Grok answers, El Dorado + services checked, "how AI cites you" + WhatsApp AI agent sections | private repo `bia/mundo-dental/*` · Oracle: read-only one-off probes in /tmp + overwrite the 2 diagnostic files in `/var/www/aideazz-docs/` (no restart) | private 2387a0f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
