@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 19 Oct 20:20 | Atlas: dental top-up for the 2 no-website slots (Elena's go) + lane map vs AIGO PDF vs portfolio | `scripts/atlas-lead-machine.cjs` · Oracle: same file by named scp (cron script, no pm2 restart), one `--dry` run | e1cef429 |
+| Claude Code (laptop) | 19 Oct 20:45 | Atlas: dental top-up (done) + profitable lane matrix: missing industry queries, AI video lane, outcome mapping (Elena) | `scripts/atlas-lead-machine.cjs`, `scripts/hs-outcomes-to-atlas.cjs` · Oracle: same files by named scp (cron scripts, no pm2 restart), `--dry` runs only | 26e5355f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
