@@ -21,6 +21,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 19 Oct 14:55 | OpenClaw document desk: final proof → apply (workspace + config copies, backups) | ~/.openclaw workspace IDENTITY.md/AGENTS.md/doc-desk, openclaw.json · gateway restart once | VJH 87b02f1 |
+| Claude Code (laptop) | 19 Oct 15:45 | Mundo Dental diagnostic B: clickable links inside the PDF (pay ES, portfolio, their Google Maps + Instagram) | private repo `bia/mundo-dental/*` only | private 2097999 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
