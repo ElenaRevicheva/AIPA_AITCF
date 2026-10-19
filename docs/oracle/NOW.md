@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 19 Oct 14:55 | OpenClaw document desk: final proof → apply (workspace + config copies, backups) | ~/.openclaw workspace IDENTITY.md/AGENTS.md/doc-desk, openclaw.json · gateway restart once | VJH 87b02f1 |
 | Claude Code (laptop) | 19 Oct 16:05 | Mundo Dental diagnostic as a shareable web page (Elena: "clicked from anywhere") | private repo `bia/mundo-dental/*` · Oracle: ONE new file in the existing `/var/www/aideazz-docs/` (/doc/ route) — no nginx change, no restart | private 9ec8cee |
 
 **Rules**
@@ -226,6 +225,23 @@ git log keeps the record.
 - **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
+
+### ✅ 19 Oct ~15:20 UTC — DOCUMENT DESK LIVE IN ALL 3 BOTS (CTO AIPA · VJH · OpenClaw) · HANDOFF · claim released
+- **DONE (OpenClaw step 2):** `workspace/AGENTS.md` 0c365899 → 7dc742b9 (one 🖨️ MAKE A FILE section before 🔊 VOICE; nothing removed) +
+  new `workspace/doc-desk/make-doc.py` 7ee1cb28 (the bot's one command: honesty gate in code → shared renderer → file in
+  `~/.openclaw/media/outbound-docs` (700) → OpenClaw sends it by itself). No restart (workspace re-read every run). Backups
+  `*.bak-pre-docdesk-20261019` + `~/_session-backups/openclaw-docdesk-20261019/`. Mirror: job-list-filter `docs` `8a774bb` = Oracle (3 files).
+- **VERIFIED BY:** re-test on copies, 6 real gpt-4.1 turns: 6/6 files, 1 send each, 0 send lines in replies, 0 write/message tool, the
+  Pitz letter = ✅ note word for word (188/188), deal looked up first, unsourced numbers only the footer date. Live make-doc (bare env):
+  an invented "500 clientes" → [dato], PDF read back. Renderer runs with `env -i` (finds ~/cv-build-deps + fonts itself).
+- **Known limits (all 3 desks):** a reworded money amount can become [dato] (R5: one "75,000"); plain-word untruths ("15 live products",
+  "(Panamá)", "clientes felices") pass — every reply tells her to read the file first; OpenClaw may send "un momento" before the file;
+  no warning about a planted instruction in a document; outbound-docs is never cleaned; files carry the renderer's contact header.
+- **NEXT (Elena):** (1) live proof on her phone — send OpenClaw a PDF > 4 pages, a .docx, and "hazme en Word la carta de presentación para
+  Pitz"; (2) auto-sender decision (it DOES send: Sent 8/9/1, see OPEN list); (3) go/no-go on the 1-line `hs-deal-prep.cjs` send-token
+  patch; (4) restart `vibejobhunter-web` (holds 12 Oct judge code; dashboard/tech-update/count-only ATS — no judge calls).
+- **RISK:** none open from this round. All three repos laptop = GitHub = Oracle at the end (cto-aipa Oracle checkout lags by design; its 4
+  Oracle-only Atlas lead-draft commits from 12 Oct are bundled privately on the laptop, never pushed — public repo).
 
 ### ✅ 19 Oct ~15:12 UTC — OPENCLAW READS PDF IN FULL + WORD (step 1 of its document desk) · making files = step 2, gated on a re-test
 - **DONE:** `~/.openclaw/openclaw.json` only 2 keys added (diffed): `gateway.http.endpoints.responses.files` {maxBytes 20 MB, pdf.maxPages
