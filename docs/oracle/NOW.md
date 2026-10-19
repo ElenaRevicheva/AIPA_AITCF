@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 19 Oct 12:40 | VJH document desk finish (port CTO detector + honesty checks) — laptop-only; CTO desk LIVE 12:35 | VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later systemd vibejobhunter | 6582fe58 |
+| Claude Code | 19 Oct 14:55 | OpenClaw document desk: final proof → apply (workspace + config copies, backups) | ~/.openclaw workspace IDENTITY.md/AGENTS.md/doc-desk, openclaw.json · gateway restart once | VJH 87b02f1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -205,6 +205,20 @@ git log keeps the record.
 - **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
+
+### ✅ 19 Oct ~14:53 UTC — VJH DOCUMENT DESK LIVE: her voice/text task (EN/ES) → PDF / Word / HTML in the VJH chat
+- **DONE** VJH `87b02f1` (3 files: telegram_bot_enhanced.py, telegram_qa_helper.py, evals/test_qa_conscience.py; +5,433/−11, the 11
+  removed lines replaced by compatible ones — added params have defaults, the ❌ No-fit reason flow only gains "a file request is never
+  the reason"). Oracle ff-merge, md5 = git blobs, `systemctl restart vibejobhunter` 14:52:42 (files 14:52:24), journal: polling + autonomous
+  cycle started, 0 tracebacks. Backup `~/_session-backups/vjh-desk-10191452/`.
+- **What she can do:** "hazme en Word la carta para Pitz" → the deal's ✅ letter WORD FOR WORD (no model); "la evaluación en PDF para <co>"
+  → the kit's 🎯/🛡️ notes verbatim; any other doc → grounded model text, gated in code (fit verdicts dropped, unsourced numbers →
+  [cifra]/[dato], claim words blanked). VJH uploads nothing to HubSpot (no file path; the reply says so).
+- **VERIFIED BY:** request rule = CTO's + VJH additions; fresh held-out after freeze 39/39 requests, 0/54 chat; 819 desk tests pass on
+  Oracle; LIVE on Oracle (capture, nothing sent): Pitz letter .docx 38,067 bytes, 194 words = the HubSpot note; "Haz clic en el PDF" → chat.
+- **Known limits:** "Send me the Pitz letter as PDF" / "Quiero que me lo pases en PDF" stay chat (say "hazme/pásame … en PDF");
+  "Mándame la carta que te pasé ayer en PDF" makes a new letter; a claim word already in her facts ("users") passes as sourced
+  (lexical overlap ≠ entailment); efficacy phrases ("ha demostrado ser efectiva") pass — she reads every file before sending.
 
 ### ✅ 19 Oct ~12:35 UTC — CTO AIPA DOCUMENT DESK LIVE: read + create PDF / Word / HTML from her voice or text task (EN/ES)
 - **DONE** `6582fe58`, pm2 restart 12:35:16 (files 12:34:34): renderer `scripts/build-lane-cv.cjs` 14411505 (text mode pdf|docx|html; CV
