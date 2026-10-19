@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 18 Oct 19:15 | Task → document RESTARTED (renderer first, then CTO AIPA + VJH) — laptop only until proof | cto-aipa scripts/build-lane-cv.cjs, src/telegram-bot.ts · VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later pm2 cto-aipa + systemd vibejobhunter | b563a820 |
+| Claude Code | 19 Oct 01:00 | Document desk (Elena 19 Oct): CTO AIPA + VJH read and CREATE PDF/Word/HTML from her voice/text task (analysis, promo, presentation, quote from catalog, kit-verbatim fit docs) — laptop-only uncommitted edits, NOT deployed; earlier rounds failed review on honesty | cto-aipa scripts/build-lane-cv.cjs, src/telegram-bot.ts, src/hubspot-client.ts · VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later pm2 cto-aipa + systemd vibejobhunter | b563a820 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
