@@ -1503,6 +1503,11 @@ async function telegram(text) {
 // its letter templates would fire the whole machine — Google searches, audits, and
 // real HubSpot contacts and deals — as an import side effect.
 if (require.main === module) (async () => {
+  // 19 Oct 2026: publish the box's drafts + registry to main and exit (manual recovery / test).
+  if (process.argv.includes('--publish-only')) {
+    await publishOutreachArtifacts('manual');
+    return;
+  }
   const yieldLedger = loadYield();
   const forcedLane = process.env.LEAD_LANE && ICP_BY_LANE[process.env.LEAD_LANE] ? process.env.LEAD_LANE : null;
   const primary = !forcedLane && PRIMARY_LANE && ICP_BY_LANE[PRIMARY_LANE] ? PRIMARY_LANE : null;
@@ -1809,32 +1814,73 @@ if (require.main === module) (async () => {
  */
 async function publishOutreachArtifacts(count) {
   const { execFileSync } = require('child_process');
-  const git = (...args) =>
-    execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  const os = require('os');
+  const run = (cwd, ...args) =>
+    execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  // 19 Oct 2026: publish from a THROWAWAY WORKTREE of origin/main. The box's own checkout lags main on
+  // purpose (named-file deploys leave it dirty), so the old "commit here + pull --rebase + push" was
+  // refused every Monday from 21 Sep ("fetch first"): 360 drafts and 33 registry entries lived only on
+  // Oracle (rescued in ded81a1f). This never touches the running checkout, and the registry is MERGED by
+  // slug, so main never loses an entry written elsewhere (the laptop stagers write it too).
+  const REG = 'docs/selling/outreach-registry.json';
+  const DRAFTS = 'docs/selling/drafts';
+  let wt = null;
   try {
-    git('add', 'docs/selling/outreach-registry.json', 'docs/selling/drafts');
-    const staged = git('diff', '--cached', '--name-only');
-    if (!staged) {
-      console.log('[lead-machine] publish: nothing new to commit');
+    run(ROOT, 'fetch', '--quiet', 'origin', 'main');
+    wt = fs.mkdtempSync(path.join(os.tmpdir(), 'lead-publish-'));
+    run(ROOT, 'worktree', 'add', '--detach', '--quiet', wt, 'origin/main');
+    const sync = () => {
+      let changed = 0;
+      const srcDir = path.join(ROOT, DRAFTS);
+      for (const name of fs.readdirSync(srcDir)) {
+        if (name.includes('.bak-')) continue; // gitignored backups
+        const src = path.join(srcDir, name);
+        if (!fs.statSync(src).isFile()) continue;
+        const dst = path.join(wt, DRAFTS, name);
+        const body = fs.readFileSync(src);
+        if (fs.existsSync(dst) && Buffer.compare(fs.readFileSync(dst), body) === 0) continue;
+        fs.mkdirSync(path.dirname(dst), { recursive: true });
+        fs.writeFileSync(dst, body);
+        changed++;
+      }
+      // Registry: main's entries + the box's; the box wins on a shared slug (it wrote those send buttons).
+      const mainText = fs.readFileSync(path.join(wt, REG), 'utf8');
+      const merged = { ...JSON.parse(mainText), ...JSON.parse(fs.readFileSync(path.join(ROOT, REG), 'utf8')) };
+      const out = `${JSON.stringify(merged, null, 2)}\n`;
+      if (out !== mainText) {
+        fs.writeFileSync(path.join(wt, REG), out, 'utf8');
+        changed++;
+      }
+      return changed;
+    };
+    const changed = sync();
+    if (!changed) {
+      console.log('[lead-machine] publish: nothing new to commit (main already has every draft + registry entry)');
       return;
     }
-    git('commit', '-m', `selling: ${count} Atlas lead draft(s) + registry (auto)`);
-    // Rebase first: cron runs unattended and a laptop push in between would
-    // otherwise leave this commit stranded on the box, which is the same failure
-    // in a different costume.
+    run(wt, 'add', REG, DRAFTS);
+    run(wt, 'commit', '-q', '-m', `selling: ${count} Atlas lead draft(s) + registry (auto)`);
     try {
-      git('pull', '--rebase', 'origin', 'main');
+      run(wt, 'push', '-q', 'origin', 'HEAD:main');
     } catch {
-      console.warn('[lead-machine] publish: rebase failed — pushing may be rejected');
+      // Someone pushed in between: the worktree is clean, so a rebase onto the new main is safe. Once.
+      run(wt, 'pull', '--rebase', '-q', 'origin', 'main');
+      run(wt, 'push', '-q', 'origin', 'HEAD:main');
     }
-    git('push', 'origin', 'main');
-    console.log(`[lead-machine] publish: registry + drafts pushed — send buttons live`);
+    console.log(`[lead-machine] publish: ${changed} file(s) pushed to main from a clean worktree — send buttons + backup in git`);
   } catch (e) {
     console.warn(
       `[lead-machine] ⚠️ PUBLISH FAILED: ${String(e.message).slice(0, 140)}\n` +
-        `   The HubSpot send buttons will 404 until someone runs:\n` +
-        `   git add docs/selling/outreach-registry.json docs/selling/drafts && git commit && git push`,
+        `   The drafts are safe on this box. Retry with: node scripts/atlas-lead-machine.cjs --publish-only`,
     );
+  } finally {
+    if (wt) {
+      try {
+        run(ROOT, 'worktree', 'remove', '--force', wt);
+      } catch {
+        /* a leftover temp worktree is harmless; git worktree prune cleans it */
+      }
+    }
   }
 }
 
