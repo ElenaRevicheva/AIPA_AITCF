@@ -239,8 +239,8 @@ git log keeps the record.
   no warning about a planted instruction in a document; outbound-docs is never cleaned; files carry the renderer's contact header.
 - **NEXT (Elena):** (1) live proof on her phone — send OpenClaw a PDF > 4 pages, a .docx, and "hazme en Word la carta de presentación para
   Pitz"; (2) auto-sender decision (it DOES send: Sent 8/9/1, see OPEN list); (3) go/no-go on the 1-line `hs-deal-prep.cjs` send-token
-  patch; (4) restart `vibejobhunter-web` (holds 12 Oct judge code; dashboard/tech-update/count-only ATS — no judge calls).
-- **RISK:** none open from this round. All three repos laptop = GitHub = Oracle at the end (cto-aipa Oracle checkout lags by design; its 4
+  patch. *(`vibejobhunter-web` restarted 19 Oct 15:54:50 UTC, /health 200 — it had run 12 Oct code; all 3 VJH processes now run current code.)*
+- **RISK:** none open from this round. All three repos laptop = GitHub = Oracle at the end; the OpenClaw mirror (job-list-filter `docs` `b9eb6e5`) = Oracle workspace (cto-aipa Oracle checkout lags by design; its 4
   Oracle-only Atlas lead-draft commits from 12 Oct are bundled privately on the laptop, never pushed — public repo).
 
 ### ✅ 19 Oct ~15:12 UTC — OPENCLAW READS PDF IN FULL + WORD (step 1 of its document desk) · making files = step 2, gated on a re-test
