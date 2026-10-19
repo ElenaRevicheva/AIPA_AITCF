@@ -12,7 +12,7 @@ Sources:
 |---|---|
 | Mon 14:00 UTC | whitespace captures competitor ads and scores every tracked lane (`concepts.json`) |
 | Mon 15:15 / 15:30 UTC | campaign alert, then HubSpot outcomes are sent back to whitespace per lane (deal-name keywords) |
-| **Mon 16:00 UTC** | The lead machine picks **ONE lane**: the highest score among lanes that have search queries (`LEAD_LANE=` forces one). It works that lane's queries in order (fresh, then high-ticket, then the local tail) until **8** are staged. Then it stages up to **2 no-website** businesses. **Max 10.** |
+| **Mon 16:00 UTC** | **Since 19 Oct (`e71ca5a5`): GEO/AEO every week.** The lead machine works **GEO/AEO first with up to 4** of the 8 slots, then the **top-scoring other lane** fills to 8, then GEO refills if still short. With no other lane, a single GEO leg. `LEAD_LANE=` still forces one lane; `ATLAS_PRIMARY_LANE=''` (process env) restores the old top-score-only pick. Each lane's queries run fresh, then high-ticket, then the local tail. Then up to **2 no-website** businesses. **Max 10.** |
 | Since 19 Oct | If the lane leaves the 2 no-website slots short, up to 2 dental Places searches fill them (`ATLAS_NOWEB_QUERIES`). A company already in HubSpot by phone is skipped |
 
 **A score measures how hard competitors ADVERTISE, not whether Elena can reach a buyer.** That is why some hot lanes are
@@ -63,15 +63,19 @@ Offers per lane (`LANE_OFFER`, Spanish): agente de WhatsApp · automatización c
 | **Companion-grade personal AI** | B2C (EspaLuz, `expat_language` 54): sold to people, not prospected as businesses |
 | Fractional CTO | 242 signals, zero emails (2 Aug audit) |
 
-## 5. Open decision: one lane per week
+## 5. Decided: GEO/AEO is worked every week (Elena, 19 Oct)
 
-The picker always takes the top score. With today's scores (automation 39, video 35, WhatsApp 34, **GEO 13**), the
-GEO/AEO lane, Elena's flagship and her career lane, is never picked while the others outscore it.
+Before, the picker took the top score only, so GEO/AEO (score 13) was never worked. Now GEO/AEO is the primary leg every week.
 
-Options, which need Elena's go (a change inside `pickLane()`):
-- (a) the top 2 lanes, 4 leads each;
-- (b) weekly rotation through all 4 lanes;
-- (c) a weekly floor of 2 GEO leads.
+Two adversarial review rounds hardened it (32 + 19 agents, offline simulation of 6 scenarios):
+- the refill resumes by identity, not by position;
+- a search shared between lanes is paid for once;
+- a quota-cut search's tail is carried to the refill and measured once;
+- config typos fall back safely.
+
+Real-lane dry run on Oracle (max 4): GEO staged 2 (luxury real estate, Guanacaste), then ai_automation staged 2 and skipped 8 already in the CRM.
+
+**Still true:** GEO's whitespace *score* stays low, because its Meta search phrase returns no ads. Fixing the phrase is a whitespace change; see the private audit `aideazz-private-docs/docs/whitespace-atlas/`.
 
 ## 6. Verified on 19 Oct (dry runs, nothing written)
 
@@ -82,4 +86,4 @@ Options, which need Elena's go (a change inside `pickLane()`):
 | Outcome mapping | 6 deal-name shapes map to the right lane |
 | Deploy | Oracle md5 = `main` for both scripts. Backups in `~/_session-backups/atlas-noweb-topup-20261019/` and `~/_session-backups/atlas-lanes-20261019/` |
 
-Commits: `613add26` (dental top-up) · `26e5355f` (phone duplicate guard) · `0336fb2b` (lane matrix).
+Commits: `613add26` (dental top-up) · `26e5355f` (phone duplicate guard) · `0336fb2b` (lane matrix) · `e71ca5a5` (GEO/AEO every week). Backup: `~/_session-backups/atlas-geo-primary-20261019/`.
