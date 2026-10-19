@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 22:00 | Atlas publish rescue (5 weeks of drafts+registry stranded on Oracle: push rejected since 21 Sep) + publish fix; then WHITESPACE P0-P2 + UI redesign (Elena's go) | `docs/selling/drafts`, `docs/selling/outreach-registry.json`, `scripts/atlas-lead-machine.cjs` · whitespace repo + Oracle `~/whitespace` (pm2 whitespace restart) | b8fe6e28 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
