@@ -843,19 +843,80 @@ export async function addNoteToContact(contactId: string, body: string): Promise
   }
 }
 
-export async function addNoteToDeal(dealId: string, body: string): Promise<void> {
+/**
+ * attachmentIds (18 Oct 2026, task → document): HubSpot file ids the note is CREATED carrying, so its line never exists
+ * without its file. Without them the request is exactly as before. Returns the note id once it is linked to the deal,
+ * else null (existing callers ignore it).
+ */
+export async function addNoteToDeal(dealId: string, body: string, attachmentIds?: string[]): Promise<string | null> {
   const note = await hsPost<{ id: string }>('/crm/v3/objects/notes', {
     properties: {
       hs_note_body: body,
       hs_timestamp: new Date().toISOString(),
+      ...(attachmentIds?.length ? { hs_attachment_ids: attachmentIds.join(';') } : {}),
     },
   });
   if (note?.id) {
-    await hsPut(
+    const linked = await hsPut(
       `/crm/v4/objects/notes/${note.id}/associations/deals/${dealId}`,
       [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }],
     );
+    return linked ? note.id : null;
   }
+  return null;
+}
+
+/**
+ * Task → document (18 Oct 2026): every OPEN deal — a job or a client, any [PREFIX] — whose company is this name. The
+ * company of a deal is what follows "@" ("[HIRING-VJH] Role @ Pitz"), else what precedes " — " ("[CLIENT-MANUAL] Clínica
+ * Sol — …"); the name must be a whole word of it, accents and case ignored. Same search as findHiringDealForCompany;
+ * a "Re: …" thread deal only when nothing else matches. Read-only. Fails CLOSED: an unreadable search throws.
+ */
+export async function findOpenDealsByCompany(company: string): Promise<Array<{ id: string; name: string }>> {
+  const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const want = fold(company);
+  if (want.length < 2) return [];
+  // Every page of the search (19 Oct 2026, review: one page of the 50 newest hits could hide a second open deal of the
+  // same company behind a common word, and "exactly one deal" was then wrong). At most 4 pages (200 hits); fails CLOSED.
+  const results: Array<{ id: string; properties: { dealname?: string } }> = [];
+  let after: string | undefined;
+  for (let page = 0; ; page++) {
+    const data = await hsPost<{ results?: Array<{ id: string; properties: { dealname?: string } }>; paging?: { next?: { after?: string } } }>('/crm/v3/objects/deals/search', {
+      query: company.trim(),
+      filterGroups: [{ filters: [{ propertyName: 'dealstage', operator: 'NOT_IN', values: ['closedwon', 'closedlost'] }] }],
+      properties: ['dealname'],
+      sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+      limit: 50,
+      ...(after ? { after } : {}),
+    });
+    if (!data) throw new Error('could not search HubSpot deals');
+    results.push(...(data.results || []));
+    after = data.paging?.next?.after;
+    if (!after) break;
+    if (page >= 3) throw new Error('over 200 open deals match this name in HubSpot: too many to tell one apart');
+  }
+  const companyOf = (n: string) => {
+    const bare = n.replace(/^\s*(\[[^\]]*\]\s*)+/, '');
+    return bare.includes('@') ? bare.split('@').slice(1).join('@') : (bare.split(/\s[—–-]\s|\s\(|:/)[0] || '');
+  };
+  const isThread = (n: string) => /^\s*\[[^\]]+\]\s*re:/i.test(n);
+  const hits = results
+    .map((d) => ({ id: String(d.id), name: String(d.properties.dealname || '') }))
+    .filter((d) => d.name && ` ${fold(companyOf(d.name))} `.includes(` ${want} `));
+  const direct = hits.filter((d) => !isThread(d.name));
+  return direct.length ? direct : hits;
+}
+
+/** Task → document (18 Oct 2026): a deal's notes as plain text, newest first. Read-only; fails CLOSED like readDealNotes. */
+export async function dealNotesText(dealId: string): Promise<string[]> {
+  const notes = await readDealNotes(dealId);
+  return notes
+    .sort((a, b) => (Date.parse(String(b.properties.hs_timestamp || '')) || 0) - (Date.parse(String(a.properties.hs_timestamp || '')) || 0))
+    .map((n) => String(n.properties.hs_note_body || '')
+      .replace(/<br\s*\/?>|<\/(p|div|li|h\d|tr)>/gi, '\n').replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
+      .replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').trim())
+    .filter(Boolean);
 }
 
 /**
