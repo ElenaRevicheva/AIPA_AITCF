@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 18:55 | Mundo Dental: honest-wording pass on the live diagnostic + promise ledger / make-it-real plan | private repo `bia/mundo-dental/*` · Oracle: overwrite the 2 diagnostic files in `/var/www/aideazz-docs/` (no restart) · new `docs/selling/MUNDO_DENTAL_MAKE_IT_REAL_2026-10-19.md` | private cad99e6 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
