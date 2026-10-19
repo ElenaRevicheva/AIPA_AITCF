@@ -144,6 +144,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🦷 19 Oct ~15:00 UTC — FIRST HUMAN YES in the no-website pilot: Mundo Dental · free 1-page diagnostic BUILT (ES) · AEO/GEO/Tech SEO + Growth Operator plan for this client · nothing sent by the agent, no service touched (Claude cloud session, no Oracle access)
+- **DONE:**
+  - Reply found: Instagram DM, Thu 15 Oct 13:26 Panama, *"Si me interesa el diagnóstico"* — unanswered until 19 Oct. Elena also wrote on WhatsApp 19 Oct (got their fixed auto-greeting).
+  - **LATEST PDF (send this): private repo `aideazz-private-docs/bia/mundo-dental/diagnostico-mundo-dental-B.pdf`** (+ `-B.jpg` for the Instagram DM, which cannot carry a PDF) · commit `e174c81`. Rebuild: `python3 build.py` in that folder (wkhtmltopdf). Every fact dated in `SOURCES.md`; search results in `SEARCH_BASELINE_2026-10-19.md`. Variant A = obsolete (domain is dead).
+  - Content: 3 findings — (1) Google shows the Multicentro landline (no WhatsApp) while Instagram/Facebook book by WhatsApp; (2) two branches (confirmed by THEIR Linktree: Súper Centro El Dorado S-5 + Multicentro), one Google profile; (3) old domain `mundodentalpty.com` still indexed but NXDOMAIN. + "Lo que no pudimos ver" + "También vimos" (specialty **"Dolor Dento Facial"** appears only in their WhatsApp description; WhatsApp map preview pin = Estadio Nacional, a tap opens the El Dorado mall, not the clinic) + dated search block + $100 CTA (`/pay/analisis-tecnico`).
+  - Their WhatsApp is a **fixed WhatsApp Business greeting, not an AI agent** (asks name/día/hora/motivo; 9–6 Mon–Sat; names only El Dorado).
+  - Search baseline (5 queries, web search, NOT the AI probe): Mundo Dental absent in all 5. `consultoriodentofacial.com` owns "dentista dolor dento facial Panamá"; Dental One owns the ATM/TMJ page; "Clínica Dental El Dorado" is a DIFFERENT business.
+  - **Corrections made in-session (do not repeat):** "map sends patients to the stadium" was WRONG (Elena's tap test) → demoted; "no website" → domain exists but dead; Multicentro doubted, then confirmed by their Linktree.
+- **NEXT:**
+  1. **Elena:** send the JPG in the Instagram DM (thank-you + apology for the delay first). **Approve HubSpot** (proposed, NOT done): stage → 💬 They replied · **close task "🔁 FU WhatsApp — Mundo Dental"** (it would ask people who already said yes "did you see my message?") · note with the reply · task "send diagnostic".
+  2. **Agent WITH Oracle (laptop Claude Code / Cursor):** run `scripts/competitor-probe.cjs --json --prompt "<q>"` for: dentista dolor dento facial Panamá · tratamiento dolor de mandíbula Panamá · clínica dental El Dorado Panamá · dentista Multicentro Panamá · best dentist for jaw pain Panama City → save to the PRIVATE repo `bia/mundo-dental/AI_PROBE_2026-10-19.json` → add a dated "Qué responde la IA hoy" block to `build.py` (named brands only, no scores) → rebuild → Elena sends as a 2nd message. No code change, no restart.
+  3. **AEO/GEO/Tech SEO + Growth Operator for this client — only after G2 ($100 paid), concierge, no new code (golden rule; build only if ≥2 of 9 pay):**
+     - **AEO/GEO (kit, spec §4):** one canonical fact set across Google / Instagram / Facebook / WhatsApp / Linktree; add the WhatsApp to Google; a Google profile per branch; Google description + services naming "Dolor Dento Facial"; WhatsApp greeting with "Mundo Dental, Súper Centro El Dorado, planta baja, local S-5", away message, 8–10 quick replies, EN version; IG bio. Fact guard `ungroundedNumbers`/`quotedIn`.
+     - **Tech SEO (hub, spec §5):** `aideazz.xyz/c/mundo-dental` — `Dentist` JSON-LD with both branches, `sameAs` = owner-confirmed profiles, FAQ on dolor dento facial / ATM, SSR, validated with `runVisibilityAudit`; publish only after G5 written OK. It competes with consultoriodentofacial.com + Dental One's ATM page.
+     - **Measure:** same 5 queries + competitor-probe at day 0 and day 30. `citation-tracker` brand is hardcoded to AIdeazz (`:107`, `:137`) — parameterise only for a paying client.
+     - **Growth Operator (conversion):** their fixed greeting → an assistant answering from approved facts, EN/ES, after hours, handoff to staff, never confirms an appointment. Sell only if volume justifies — ask *"¿cuántos mensajes de WhatsApp reciben al día, y cuántos fuera del horario?"* — quoted individually.
+     - **Deck mismatch:** the AIGO PDF's "research/contact prospects" steps are B2B; for a clinic the operator = visibility → WhatsApp → follow-up → report. Deck still paused (`REVIEW_2026-10-11.md`).
+- **VERIFIED BY:** Elena's phone screenshots 19 Oct (NXDOMAIN, WhatsApp greeting, WhatsApp profile, Linktree, Maps tap) logged in `SOURCES.md`; PDF renders 1 page, viewed; banned-wording scan (ranking/garant/invisible//100) = 0.
+- **RISK:** this repo is PUBLIC — phones, emails, deal ids stay in the private repo / HubSpot. No AI-answer claim to the client until the probe log exists. The open FU task can still fire as a reminder to Elena — close it before she acts on it.
+
 ### ✅ 18 Oct ~13:20 UTC — Interview loop (1 🔥 deal, Developer Mid — Fullstack & AI Agents): prompt × model × temperature drill MEASURED + 2 practice notes · no service touched
 - **Why (Elena):** the employer asked how she prompts/evaluates models in Claude Code + Cursor and sets temperature; next step = take-home test.
 - **Lab 2 CLOSED (read-only, 18 Oct) — null result, do NOT tune lead triage:** `TRIAGE_SKIP_GROQ=1` (since 12 Apr) + Claude Haiku failing (404 retired model IDs, then no credit from mid-Aug) →
@@ -551,6 +571,7 @@ git log keeps the record.
 - **RISK:** OpenAI credit runs out → OpenClaw voice falls back to Edge (403) → text only. Salary she gave Pitz: USD 3,500–4,000 net.
 
 ### 🦷 13 Oct — No-website businesses: 9 pilot clinics in HubSpot · guards LIVE (Doors 2+3) · Atlas Monday stages best 2 no-website (Elena's go)
+- **19 Oct: Mundo Dental replied YES (first human yes of the 9) → see HANDOFF 19 Oct at the top of PART 2.**
 - **DONE + LIVE (cto-aipa restarted 21:08:47 UTC > files 21:08:39–44; backups `~/_session-backups/no-website-20261013/`):**
   - Free audit API: Instagram/Facebook/WhatsApp/TikTok/Linktree/Google Maps link → `422 no_owned_website` + plain message + `[visibility-lead] no-owned-website` log line (`notOwnedWebsitePlatform`, PR #60 merged `06862c94`).
   - $100 Diagnostic intake: empty `Website:` no longer swallows the next line; "none"/"no tengo" → no website; social/Maps link → `intake.presence` (never scanned); client email says "your business online" instead of "your website".
