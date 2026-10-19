@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 18:30 | Mundo Dental: add Claude as 5th AI in the diagnostic (Anthropic API has no credit → fresh Claude agents with Anthropic web search) | private repo `bia/mundo-dental/*` · Oracle: overwrite the 2 diagnostic files in `/var/www/aideazz-docs/` (no restart) | private ede577a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
