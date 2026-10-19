@@ -137,6 +137,15 @@ const MAX_NEW = Number(process.env.LEAD_MAX_NEW || 8);
 const NOWEB_MAX =
   (process.env.ATLAS_NOWEB || g('ATLAS_NOWEB')) === '0' ? 0 : Number(process.env.ATLAS_NOWEB_MAX || g('ATLAS_NOWEB_MAX') || 2);
 const noWebsiteSeen = [];
+// 19 Oct 2026 (Elena): the no-website pool fed ONLY on the week's lane queries, so an offshore/residency
+// week saw 0 (every result had a website) and dental — the measured no-website high-ticket segment, where
+// the first pilot "yes" came from — was never searched. When the lane leaves fewer than NOWEB_MAX eligible
+// candidates, top up with at most 2 Places searches (Panama City) from this list. ATLAS_NOWEB_QUERIES='' = off.
+const NOWEB_QUERIES = String(process.env.ATLAS_NOWEB_QUERIES ?? g('ATLAS_NOWEB_QUERIES') ?? 'dental implants|clínica dental')
+  .split('|')
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .slice(0, 2);
 const {
   pickNoWebsite,
   buildNoWebsiteNote,
@@ -542,7 +551,8 @@ async function mapsSearch(target) {
         primaryType: x.primaryType || null,
         city: target.city,
         query: target.q,
-        highTicket: target.hl === 'en',
+        // The dental top-up passes highTicket explicitly, so its Spanish query still counts.
+        highTicket: target.highTicket ?? target.hl === 'en',
       });
     }
     return (d.places || [])
@@ -1564,6 +1574,20 @@ if (require.main === module) (async () => {
     if (businesses.length && !(rec.seen < 4 && prev && prev.seen >= 4)) yieldLedger[k] = rec;
   }
   if (!DRY) saveYield(yieldLedger);
+
+  // ── No-website top-up (19 Oct 2026): dental, only when the lane's queries left the slots short ──
+  if (NOWEB_MAX > 0 && NOWEB_QUERIES.length && placesReady()) {
+    for (const q of NOWEB_QUERIES) {
+      if (pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX).length >= NOWEB_MAX) break;
+      try {
+        // Websited results are ignored here: this search only feeds the no-website slots.
+        await mapsSearch({ q, ll: PTY, city: 'Panama City', gl: 'pa', hl: /[áéíóúñ]/i.test(q) ? 'es' : 'en', highTicket: true });
+        console.log(`[lead-machine] no-website top-up · "${q}" · Panama City`);
+      } catch (e) {
+        console.warn(`[lead-machine] no-website top-up "${q}" failed: ${String(e.message).slice(0, 90)}`);
+      }
+    }
+  }
 
   // ── No-website businesses: the best NOWEB_MAX, on top of the regular MAX_NEW ──
   const nowebPicked = pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX);
