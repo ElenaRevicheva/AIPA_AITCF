@@ -1,18 +1,110 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 16–19 Oct 2026 — what changed, how it was proven, and the traps
+
+**Read this section first.** It gives the state on **19 Oct 2026 (~13:40–13:55 UTC)**, checked read-only against Oracle (process start times, md5s, git HEADs, crontab, logs), the laptop repos and GitHub, not against config. The 12–15 Oct section below still holds wherever this one is silent; everything after it is history. On 19 Oct about 190 stale, contradictory or public-unsafe passages further down were corrected in place and marked **(updated 19 Oct 2026)**, *corrected* or *superseded*. Whose move each item is: `docs/oracle/NOW.md` (PART 2). House rule (NOW.md §6b): **no rebuilding** — only surgical, additive fixes inside existing code that move Elena toward a paying client or a hiring manager. Employers are named here by count or stage only (NOW.md, 17 Oct).
+
+### 🔄 Fleet state — every running process vs the code it loads (re-checked 19 Oct ~13:40–13:55 UTC)
+
+Host: up 159 days, disk 53 % (21 GB free), Node 22.22.0. **16 processes:** 8 PM2 apps (+ the `pm2-logrotate` module), 7 systemd units, 1 systemd user unit.
+
+| Product | Runs on Oracle as | Code that runs (19 Oct) | Started vs newest file it loads |
+|---|---|---|---|
+| CTO AIPA + Atuona | PM2 `cto-aipa` | 94 `dist/**/*.js`: **93 = a fresh laptop build of origin/main `6bd10869`** by md5 after CR strip (last code commit `6582fe58`, the document desk), plus the orphan `dist/hashnode-daily.js` (22 Aug; no source builds it since `hashnode-daily.ts` became `daily-blog-publisher.ts`, `dist/` is gitignored, and nothing requires it). Key md5s: `telegram-bot.js` ca574988, `hubspot-client.js` b6aaf1bd. Checkout HEAD stays `782abc2` on purpose (named-file deploys) | started 19 Oct 12:35:16 UTC > newest `dist` file 12:34:35 (src copies 12:35:13) ✓ |
+| VJH + CMO | systemd `vibejobhunter` + PM2 `serpapi-jobs` | `406e83b` = GitHub, 0 tracked edits on Oracle | 18 Oct 12:34:06 / 12:34:07 > newest loaded `.py` 18 Oct 12:33:53 ✓ (`followup_radar.py` and `job-board-watch.sh` run from cron) |
+| VJH dashboard | systemd `vibejobhunter-web` | same checkout | **12 Oct 19:20:49 < `llm_judge.py` / `fit_gate.py` 18 Oct 12:33:53 ✗** — it serves the dashboard and CTO's `/api/tech-update` and runs an hourly ATS fetch that only logs a count (none calls the judge or gate today), but the restart-all-three rule was missed on 16 and 18 Oct |
+| OpenClaw (interview coach) | systemd **user** unit `openclaw-gateway` | npm `openclaw` 2026.2.14 (pinned) + 2 local dist patches (billing pattern found in 5 dist files). Caps `bootstrapMaxChars 40000` / `bootstrapTotalMaxChars 90000`. Workspace `AGENTS.md`, `HELP.md`, `IDENTITY.md` (16 Oct) and `interview-spar/SKILL.md` (17 Oct) are newer on Oracle than the public job-list-filter `docs` copies; `build-cards.py` = `docs` `eb20bc9` | gateway up since 15 Oct 23:44:23; the 16–17 Oct workspace edits were made without a restart and proven by live tests (NOW.md 16 Oct) |
+| Atlas Shifted | PM2 `whitespace` | `48ecab5` = GitHub, 0 edits | 12 Oct 19:21:32; no `.js`/`.ts` newer ✓ |
+| aideazz.xyz | 4everland builds GitHub `main`; `~/aideazz` is the wiki/blog push clone | `81cde4b` = GitHub, 0 edits (the laptop clone was `fadce9f`, 2 commits behind, at this check). Live sitemap: 206 `<loc>` | — |
+| EspaLuz WhatsApp, Familybot (+ payments webhook), Influencer | systemd ×4 | **deliberate hold**: `24e5c15` (11 behind GitHub) and `58cdb4b` (7 behind) because the newer commits untrack customer data; Influencer `62f4c82` = GitHub | all 1 Oct 06:58:40; no `.py` newer ✓ |
+| DragonTrade / Algom | PM2 `dragontrade-main`, `dragontrade-dashboard`, `algom-stream`, `algom-poll` | `17558e2` (4 behind GitHub on purpose) | main 8 Oct, dashboard and stream 16 Aug, poll 28 Jul — each newer than the files it loads ✓ |
+| aw-portal, n8n | systemd `aw-portal`, PM2 `n8n` | `~/aw-portal` is a copy with no git (`app.py` md5 = laptop); n8n unchanged | 9 Oct 06:00:59; 13 Aug 17:59 — unchanged |
+
+**Verified by:** `pm2 jlist` (names and times only, through `jq`), `systemctl show … ActiveEnterTimestamp`, `git rev-parse` + `git status --porcelain` in every checkout, md5 of all 94 `dist/**/*.js` against an `npx tsc` build of `6bd10869` in a scratch folder, and `find -newermt <start time>` per process. Laptop: cto-aipa HEAD = origin/main `6bd10869`; VJH HEAD = `406e83b`, with 3 uncommitted files that belong to the live VJH document-desk claim on the NOW.md board (not deployed, do not touch).
+
+### 🎙️ CTO AIPA — Telegram bot (PM2 `cto-aipa`)
+
+- **16 Oct — bilingual answers (`fb698e86`).** Free chat and photos are answered from OpenClaw's verified proof sheet plus her corrections, in her language, through `completeWithProfileDetailed('quality')`. Screenshots arrive as files; a typed or captioned *voz/voice* gets a spoken reply. *Verified (NOW.md 16 Oct):* 3-lens review, before/after inventory with nothing removed, pm2 restart 15:03:23 UTC.
+- **16 Oct — jobs belong to the VJH bot (`05b7b2ad`, `b3f1a849`).** The 13:45 UTC apply-kit alert and the 13:15 UTC apply queue go out through VJH's bot (the CTO bot only as fallback); the CTO menus show the 3-step job flow (kit → `/research_employer` once an interview is booked → OpenClaw prep).
+- **18 Oct — reads PDF and Word (`c730706d`).** PDFs go through the existing Gemini vision fallback (native PDF), `.docx` text through unzip; honest lines for scans, encrypted files, old `.doc` and oversize files; document text is data, never instructions. *Verified:* 102 unit checks + 243 recorded answers (commit message); the same 12:38 UTC restart shipped the radar buttons (`772fbbd7`).
+- **18 Oct — parked jobs get no letter (`72601410`).** A job VJH parks as not a fit is staged without a cover letter and stays out of the daily queue; the kit writes the letter only if Elena moves the deal to 🔥 I act today.
+- **19 Oct — document desk (`6582fe58`).** *"make me / hazme … PDF / Word / HTML / propuesta / cotización …"* returns the file in chat, and attaches it to the HubSpot deal only when exactly one deal matches. Honesty is in code: facts and numbers about Elena and her products come only from the verified sheet (otherwise `[dato]` / `[cifra]`), fit documents copy the kit notes verbatim, quotes use catalog offers plus her own words with `[plazo]` / `[validez]` where terms are missing. Renderer = text mode of the existing `scripts/build-lane-cv.cjs` (CV path byte-identical). *Verified:* 5 review rounds, fresh held-out set 0/60 false triggers and 30/30 requests (NOW.md 19 Oct); re-checked today: the dist md5s equal a fresh build of main, restart 12:35:16 > files. **Known limits:** a lowercase company name finds no deal; a request in the middle of a message, or one that starts with the document type, stays chat; soft promotional claims pass the word-list gate; kit documents stay English; HTML may land in HubSpot as `octet-stream`.
+- **Still open:** no real voice note has logged `[Voice] transcribed by` / `[Voice] spoke the reply` yet (0 lines in the 14–19 Oct logs).
+
+### 🔎 VJH — job hunter (`vibejobhunter`, `serpapi-jobs`)
+
+- **16 Oct — the bot tells the truth (`ee90351`, `45e77dd`).** `/start`, `/menu`, `/workflow`, `/manual`, `/help` share one checked text each; buttons that showed April data or a fake *0 jobs* are off the menu (handlers untouched).
+- **16 Oct — bilingual Q&A and the inbox every cycle (`9c804b8`, `a2ecb38`, `5204521`, `0215cb0`).** Answers in her language, grounded in OpenClaw's deals/proof/cards sheets and the judge ledger (*No lo sé* when the data does not say); counts come from the HubSpot totals in the sheet header, not from a partial list; `evals/test_qa_conscience.py` 27 pass on Oracle (NOW.md). Employer replies used to be checked only in cycles that found a new job (*fate-sharing*). *Re-verified 19 Oct:* 25 orchestrator cycles since the 18 Oct restart, every one logged `Checking for responses`; the latest at 13:27 UTC, which also found 5 new jobs.
+- **18 Oct — reads postings carefully (`95efbf3`, `d51fe5f`).** No BORDERLINE alert when code overruled the judge; only a posting actually read (≥ 600 chars) is judged or alerted; a location veto stands when judge and posting both cite travel / on-site / hybrid / relocation; her reasons are stored up to 1,500 chars (they were cut at 160); PDF/.docx are answered like screenshots; new alerts carry one-tap **⏳ I applied / ❌ Not a fit** buttons. *Verified:* 204 deployed tests pass on Oracle (NOW.md); restarts 12:34:06 + 12:34:07 confirmed today.
+- **18 Oct — follow-up radar (`6f383fd` + cto-aipa `772fbbd7`).** Every listed thread gets a working Clean button, and a Clean holds until new mail arrives in that thread. *Verified 19 Oct 12:00 UTC:* digest sent (Telegram HTTP 200, *6 hidden by you*, 0 waiting), and the cto-aipa button job stood down (`[radar] skip: no open threads on today's digest`).
+- **18 Oct — the job-board watchdog can run again (`406e83b`, `+x`).** Its Tuesday cron had logged `Permission denied` since 9 Sep. **Its first real run (18 Oct 19:49 UTC) REJECTED the one board it watches:** newest posting 18 days old, median age 63 days, 6.9 % still live, ~47 live postings (`~/logs/job-board-watch.log`, Telegram alert sent). Keep or drop that source is Elena's call.
+
+### 🎓 OpenClaw — interview coach
+
+- **16 Oct — one voice rule for the team.** `~/.openclaw/settings/tts.json` (`auto: inbound`) decides, not `messages.tts.auto` in `openclaw.json` (still `tagged`); both read live 19 Oct. `AGENTS.md`, `SKILL.md`, `IDENTITY.md` carry the voice, mishearing and screenshot rules. *Known limit, Elena chose to leave it:* a typed live question that asks for voice gets voice only when gpt-4.1 calls the `tts` tool; voice notes always get voice.
+- **16 Oct — the poisoned names loop fixed (job-list-filter `eb20bc9`).** A misheard voice note had been learned into `lessons.json` and obeyed in every reply; `build-cards.py` now repairs known mishearings when it renders the sheet (Oracle md5 = `docs` copy). Names test 1/3 → 3/3 (NOW.md).
+- **16–17 Oct — the coach sees every 🔥 deal (cto-aipa `6e32c38f`, `04ce9835`, `faf86ddc`, `e8b3991e`).** The deals sheet picks by stage, not the 60 newest (which had hidden 8 of 14 🔥 deals on 16 Oct); a deal with no deep-dive prints a line telling Elena to run `/research_employer`; `--company` prefers the 🔥 deal. *Verified 19 Oct (`~/logs/deal-digest.log`):* `28 live job deals … qualifiedtobuy=11` = HubSpot total 11; proof sheet 24,598 chars.
+- **18 Oct — PDF/Word reading HELD:** on a test it answered a 6-page contract from pages 1–4 only.
+
+### 🌐 Blog, wiki and distribution
+
+- **16 Oct — wiki incident *the inbox was read only on busy hours*** + new concept `fate-sharing` (aideazz `f1039b4`); its field note shipped the same day (`wiki-ship.log`: `published … (no Dev.to — paused)`, `Bing (IndexNow) HTTP 200`).
+- **Field notes now travel (`bb4aeb4f` and `786c6422` 16 Oct, `6b770a36` 18 Oct):** IndexNow + Bluesky once the page answers 200, concept links become real links, and LinkedIn through the existing Buffer helpers with a caption assembled from the incident (no model). Test 26/26 on laptop and Oracle (NOW.md). Oracle `.env` reads `FIELDNOTE_LINKEDIN=post` (file last changed 18 Oct 12:03 UTC; NOW.md 18 Oct still says `draft`, and the 16 Oct note sits in Buffer as a draft). No field note has been published since, so the first automatic LinkedIn post is still ahead.
+- **Daily article, 18 Oct (re-verified):** aideazz.xyz only (`Dev.to cross-post paused`), then `📣 [Buffer] … posted=1/1`, `📡 [IndexNow] HTTP 200`, `🦋 [Bluesky] posted`; the page answers 200.
+- **⛔ Fact-check, 17 Oct (`docs/oracle/BLOG_FACTCHECK_2026-10-17.md`):** the 16 Oct article tells pm2's *lifetime* restart counter as recent restarts. On 19 Oct that page still answers 200, `src/blog-evidence.ts` is unchanged since 15 Oct (`783a60a0`), and the 18 Oct slug repeats the framing (*218 restarts*). The fix awaits Elena.
+- **Dev.to:** the profile page returns 404 on 19 Oct (a control profile returns 200); the appeal is unanswered. Borrowed-reach plan: `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md`.
+
+### 🧪 Interview practice and labs (docs only, no service touched)
+
+- **18 Oct — eval drill** `docs/interview/eval-drill/` (`905314f2`): prompt × model × temperature, 1,900 scored calls for $0.85, run from an Oracle scratch folder. **Lab 2 closed with a null result:** the unscored `lead_triage` rows were almost all Elena's own tests and scraped job posts, so do not tune lead triage. Lab 3 (VJH judge replay) is read-only. Labs guide: `docs/interview/eval-drill/LABS.md`.
+
+### 🧭 Atlas — today
+
+- **The first production run with the 13 Oct switches is Mon 19 Oct 16:00 UTC** (not yet run at this check). Grep `supply: Google Places` and `no-website:` in `~/logs/atlas-lead-machine.log`, then read the staged deals back. On 12 Oct the run's registry commit (`782abc2`) landed only on Oracle; expect another Oracle-only commit and back it up before anyone touches that checkout.
+
+### ⏸️ Held for Elena (added 16–19 Oct)
+
+- Blog fact-check fixes (take the 16 Oct post down, cut false lines, fix the evidence collector) · Torre partner access (request drafted, `docs/applications/2026-10-18_torre_partner_access_email.md`; she sends it) · OpenClaw PDF/Word · Make.com publishing the 01:00 UTC CMO post twice · the rejected job board · restarting `vibejobhunter-web` · the Phase 4 cold-email cycle, still armed: the logs show 8 sent on 9 Oct, 9 on 13 Oct and 1 on 16 Oct, each with Telegram suppressed (keep or switch off) · the `resend-reconcile` key fix (still held; see the trap below).
+
+### ⚠️ New traps (16–19 Oct) — read with the 12–15 Oct table below
+
+| Trap | Why | Do this |
+|---|---|---|
+| **OpenClaw voice has two settings** | `~/.openclaw/settings/tts.json` outranks `messages.tts.auto` in `openclaw.json`; editing only `openclaw.json` changes nothing | Change voice behaviour in `settings/tts.json`; the 16 Oct rollback copy is in `~/_session-backups/bilingual-20261016/` |
+| **OpenClaw workspace lives on Oracle** | `AGENTS.md`, `HELP.md`, `IDENTITY.md`, `SKILL.md` on Oracle are newer than the public job-list-filter copies | Never copy the repo copies onto Oracle; back up from Oracle first |
+| **`serpapi-jobs` restart = an immediate paid run** | `main()` runs `ingest_once()` at start, then sleeps 12 h: every restart spends a full Bright Data batch and moves the schedule (since 18 Oct ~12:34 / 00:34 UTC) | Restart it only when its own code changed |
+| **The forgotten third unit** | `vibejobhunter-web` still runs 12 Oct code | After any judge/gate change restart all three and compare each start time with the file |
+| **Shared laptop checkouts** | Several sessions work the cto-aipa and VJH clones at once (19 Oct: 3 uncommitted VJH files belong to another live claim) | Stage named files only and commit with `git commit --only <files>`; never `git add -A`, never reset or check out another session's file |
+| **pii-guard pre-commit hook** | cto-aipa runs `scripts/pii-guard.cjs` on staged files; VJH's hook calls that same cto-aipa script by its laptop path and lets the commit through with the gate OFF if the path is missing; a credential or third-party address blocks the commit (these repos are licensed, and one finding makes a listing unsellable) | Keep addresses in gitignored `data/` or `.env`; `--no-verify` only for a proven false positive |
+| **Torre is dormant on purpose** | It has refused outside requests since 2 Oct (HTTP 400) and its terms forbid scraping | Do not "fix" it in code; partner access is Elena's email |
+| **The watchdog watches one board** | `qualify_job_board.py --watch` re-checks only `WIRED_BOARDS` (one board); the Bright Data Google feed and other sources are not covered, and from 9 Sep to 18 Oct it could not run at all | After Tuesday 11:00 UTC read `~/logs/job-board-watch.log`; no `RESULT:` line means it did not run |
+| **systemd start limit ignored** | `StartLimitIntervalSec=` sits under `[Service]` in every unit that sets it (the `resilience.conf` drop-ins, `aw-portal.service`, the `openclaw-gateway` user unit), so systemd 255 ignores it (89 journal warnings this boot); the real limit is 10 s / burst 10, i.e. restart forever | Know it before diagnosing a crash loop; move it to `[Unit]` only on purpose |
+| **A zero that looks healthy, again** | `resend-reconcile` logs `"checked": 0, "errors": []` since ~16 Oct only because no send is in its 3-day window; the key still returns 401 | Read `checked: 0` as *not tested*, not as OK |
+| **This repo is public** | AIPA_AITCF stays public until ~20 Nov (employers) | No IPs, third-party or personal emails, phone numbers, record ids, key values or key-exposure notes in docs, NOW.md or commit subjects, and no new port numbers (older sections still name localhost ports; the published sender `aipa@aideazz.xyz` is allowed) |
+
+**Failure modes named this period (the words to use in interviews):**
+- *Fate-sharing:* the inbox check lived inside the "new jobs found" branch, so a quiet day also meant no reply check.
+- *Poisoned feedback loop:* one misheard voice note became a lesson the coach obeyed in every reply.
+- *Configuration precedence:* a second settings file silently outranked the one being edited.
+- *Ignored configuration:* a systemd key in the wrong section is accepted with a warning and does nothing.
+- *Silent failure:* `/cleartasks auto` answers "nothing obviously stale" when its Claude call fails; `resend-reconcile` reports a clean zero.
+- *Stale deploy:* one of three units that load the same code was never restarted.
+- *Who watches the watchdog:* the board watchdog could not execute for six weeks, and its first run found the board degraded.
+- *Grounding enforced in code:* the document desk takes facts and numbers only from the verified sheet, and leaves a placeholder otherwise.
+
 ## 🟢 12–15 Oct 2026 — what the products do now, how each change was proven, and the traps to know first
 
-**Read this section first.** It gives the state on **15 Oct 2026**, checked against logs, md5s and read-backs, not against config. Everything below it is kept as history. Where an older line still read as *current* and was wrong, it now carries **(updated 15 Oct 2026)**. Whose move each item is: `docs/oracle/NOW.md` (PART 2). Full process table: `docs/oracle/2026-10-12_fleet_sync_audit.md`. House rule since 13 Oct (NOW.md §6b): **no rebuilding**. Only surgical, additive fixes inside existing code are allowed, and each must name the paying client or hiring manager it moves Elena toward.
+**Newer: the 16–19 Oct section above supersedes this one where they differ — read it first.** This section gives the state on **15 Oct 2026**, checked against logs, md5s and read-backs, not against config. Everything below it is kept as history. Where an older line still read as *current* and was wrong, it now carries **(updated 15 Oct 2026)**, or **(updated 19 Oct 2026)** where the 19 Oct read-only check against Oracle found it stale. Whose move each item is: `docs/oracle/NOW.md` (PART 2). Full process table: `docs/oracle/2026-10-12_fleet_sync_audit.md`. House rule since 13 Oct (NOW.md §6b): **no rebuilding**. Only surgical, additive fixes inside existing code are allowed, and each must name the paying client or hiring manager it moves Elena toward.
 
-### 🔄 Fleet state — laptop = GitHub = Oracle = running process (checked 15 Oct ~12:00 and ~17:00 UTC)
+### 🔄 Fleet state — laptop = GitHub = Oracle = running process (checked 15 Oct ~12:00 and ~17:00 UTC; re-checked read-only 19 Oct ~13:20 UTC)
 
 | Product | Runs on Oracle as | Code that runs | How it deploys |
 |---|---|---|---|
-| CTO AIPA + Atuona | PM2 `cto-aipa` | all 371 runtime files + 94 `dist/*.js` = a build of origin/main (last code commit `de06ac75`) | laptop build → named-file `scp` → `pm2 restart cto-aipa --update-env`. The Oracle checkout HEAD stays at `782abc2` **on purpose** (4 Oracle-only Atlas lead commits; bundle backup on the laptop). Never `git pull` / `reset` / `clean`. Never `deploy-product.sh PRODUCT=cto_aipa` (it runs `git reset --hard`) |
-| VJH + CMO | systemd `vibejobhunter`, `vibejobhunter-web` + PM2 `serpapi-jobs` (the Bright Data job-board door; the name is legacy) | `6b9ebd4` fast-forwarded 15 Oct with 0 local edits; then `e864641` + `006c1ed` (team wiring #5, #6), with `vibejobhunter` restarted 16:12:49 UTC | git fast-forward. After any change to `llm_judge.py`, `fit_gate.py` or `job_gate.py`, restart all three |
-| OpenClaw (interview coach) | systemd **user** unit `openclaw-gateway` (`systemctl --user`) | npm `openclaw` **2026.2.14, pinned**, plus 2 local dist patches. Workspace + skill files = job-list-filter branch `docs` (latest `b272588`). `~/job-list-filter` is a copy of `main` with no git | config + named files. Live map: job-list-filter `docs/openclaw/ORACLE_LIVE_SETUP.md` |
-| Atlas Shifted | PM2 `whitespace` (:8095) | `48ecab5` | git fast-forward (12 Oct) |
-| aideazz.xyz | 4everland builds GitHub `main`; `~/aideazz` is only the wiki/blog **push** clone | `3dabeca` at the sync; GitHub `main` is now `37ec1cd` (15 Oct wiki entry) | nightly `wiki-ship.cjs`, 21:30 UTC |
+| CTO AIPA + Atuona | PM2 `cto-aipa` | 94 `dist/**/*.js` on 19 Oct: 93 = a fresh build of origin/main `6bd10869` by md5 after CR strip (last code commit `6582fe58`, the 19 Oct document desk), plus the orphan `dist/hashnode-daily.js` (22 Aug; no source builds it since `hashnode-daily.ts` became `daily-blog-publisher.ts`, `dist/` is gitignored, and nothing requires it); the 9 non-test scripts changed since `de06ac75` = GitHub by md5. pm2 restart 12:35:16 UTC > newest file 12:34:35 **(updated 19 Oct 2026)** | laptop build → named-file `scp` → `pm2 restart cto-aipa --update-env`. The Oracle checkout HEAD stays at `782abc2` **on purpose** (4 Oracle-only Atlas lead commits; bundle backup on the laptop). Never `git pull` / `reset` / `clean`. Never `deploy-product.sh PRODUCT=cto_aipa` (it runs `git reset --hard`) |
+| VJH + CMO | systemd `vibejobhunter`, `vibejobhunter-web` + PM2 `serpapi-jobs` (the Bright Data job-board door; the name is legacy) | `406e83b` (18 Oct) = GitHub = laptop, 0 local edits (fast-forwards 15–18 Oct: team wiring #5/#6, truthful bot screens, bilingual Q&A, PDF/Word reading, careful posting reads + alert buttons, radar Clean fix, watchdog +x). `vibejobhunter` restarted 18 Oct 12:34:06 UTC and `serpapi-jobs` ~12:34 UTC, after the newest code they load (`followup_radar.py` runs from cron); `vibejobhunter-web` up since 12 Oct **(updated 19 Oct 2026)** | git fast-forward. After any change to `llm_judge.py`, `fit_gate.py` or `job_gate.py`, restart all three |
+| OpenClaw (interview coach) | systemd **user** unit `openclaw-gateway` (`systemctl --user`) | npm `openclaw` **2026.2.14, pinned**, plus 2 local dist patches. Workspace + skill files: `build-cards.py` = job-list-filter branch `docs` (latest `eb20bc9`, 16 Oct); `AGENTS.md`, `HELP.md`, `IDENTITY.md` and `interview-spar/SKILL.md` were edited on Oracle 16–17 Oct and are newer than the public `docs` copies, so Oracle is the source — never copy the repo copies onto Oracle. Gateway up since 15 Oct 23:44 UTC **(updated 19 Oct 2026)**. `~/job-list-filter` is a copy of `main` with no git | config + named files. Live map: job-list-filter `docs/openclaw/ORACLE_LIVE_SETUP.md` |
+| Atlas Shifted | PM2 `whitespace` | `48ecab5` | git fast-forward (12 Oct) |
+| aideazz.xyz | 4everland builds GitHub `main`; `~/aideazz` is only the wiki/blog **push** clone | GitHub `main` = Oracle `~/aideazz` = `81cde4b` (18 Oct 21:30 UTC wiki-ship refresh; checked 19 Oct) | nightly `wiki-ship.cjs`, 21:30 UTC; the 19:30 UTC daily blog also commits its static page to `main` **(updated 19 Oct 2026)** |
 | EspaLuz WhatsApp + Telegram, DragonTrade / Algom | systemd / PM2 | **deliberate hold**: Oracle lags GitHub because the newer commits untrack customer data. No GitHub commits since 12 Oct | never `git pull`. Deploying the Sep PII refactor is Elena's call |
 | EspaLuz Influencer, `aw-portal` (systemd), ops dashboard (`/var/www/ops`) | — | unchanged, equal to git | — |
 
@@ -20,9 +112,9 @@
 
 ### 🎙️ CTO AIPA — Telegram bot `@aitcf_aideazz_bot` (PM2 `cto-aipa`)
 
-- **Voice in → voice out (14–15 Oct; `f001beaf`, review fixes `1b1fde29`).** Every reply to a voice note also comes back as a voice note (`speakBack`, OpenAI nova, Opus), threaded to the note. A Spanish note gets a Spanish voice reply, translated by the waterfall. `translationBreaks` refuses the translation if a number, month, AM/PM or *not* changed. A reply is dropped if a newer note came first or if more than 3 min passed. `repairNames` (written 2 Sep, never called until now) runs on every note: STO AIPA → CTO AIPA, CETA → Cita. The 3-lens adversarial review also found and fixed a **pre-existing loop** in which `handleQuestion`'s shortcuts re-fed the same voice note. Off switch: `CTO_SPEAK_REPLIES=0` in Oracle `.env`, then restart. *Verified:* tsc; `test-trello-voice-dates` 72/72; helper checks 14/14 + 21/21. An Oracle probe kept the digits through translation, and the nova Opus file read back word for word. md5 laptop = origin = Oracle. `pm2` restarted 00:30:07 UTC on 15 Oct; files 00:30:04. **Not yet seen on a real turn:** her first voice note must log `[Voice] transcribed by` and `[Voice] spoke the reply`.
+- **Voice in → voice out (14–15 Oct; `f001beaf`, review fixes `1b1fde29`).** Every reply to a voice note also comes back as a voice note (`speakBack`, OpenAI nova, Opus), threaded to the note. A Spanish note gets a Spanish voice reply, translated by the waterfall. `translationBreaks` refuses the translation if a number, month, AM/PM or *not* changed. A reply is dropped if a newer note came first or if more than 3 min passed. `repairNames` (written 2 Sep, never called until now) runs on every note: STO AIPA → CTO AIPA, CETA → Cita. The 3-lens adversarial review also found and fixed a **pre-existing loop** in which `handleQuestion`'s shortcuts re-fed the same voice note. Off switch: `CTO_SPEAK_REPLIES=0` in Oracle `.env`, then restart. *Verified:* tsc; `test-trello-voice-dates` 72/72; helper checks 14/14 + 21/21. An Oracle probe kept the digits through translation, and the nova Opus file read back word for word. md5 laptop = origin = Oracle. `pm2` restarted 00:30:07 UTC on 15 Oct; files 00:30:04. **Still not seen on a real turn (19 Oct: 0 matching lines in the 14–19 Oct cto-aipa logs):** her first voice note must log `[Voice] transcribed by` and `[Voice] spoke the reply`.
 - **Voice model `tts-1` (15 Oct; `9e4ec2c8`, `de06ac75`).** `gpt-4o-mini-tts` hung for 60 s+ on 1 call in 4. Oracle `.env` now sets `CTO_VOICE_TTS_MODEL=tts-1` (pm2 restart 16:20:07 UTC), and `tts-1` has been the code default since `de06ac75` (`src/telegram-bot.ts`, `src/sprint-briefing/tts-openai.ts`). *Verified:* bench `tts-1` 12/12 in 1.7–3.5 s, same nova voice.
-- **Typed text → Trello, like voice (12 Oct; `762c7218`).** Voice and typed text now share one `routeToTrello`; typed text had not reached Trello since 8 May. *Wire this link* appends the URL verbatim to the card description and reads it back. Work meetings are orange. A card with no subject is titled `Cita <date>` and gets no colour. `Kira` is a board name, not a person. When Claude fails, screenshots fall through `completeWithProfileDetailed('quality', …, image)` (OpenAI and Gemini read images). *Verified:* 72/72, plus `test-chain-vision` 4/4 on Oracle; restart 23:06:50 UTC, files 23:06:39. **Waiting:** the first live typed task or screenshot in the log (`[TrelloVoice] Classification:` → `✅ Card created`).
+- **Typed text → Trello, like voice (12 Oct; `762c7218`).** Voice and typed text now share one `routeToTrello`; typed text had not reached Trello since 8 May. *Wire this link* appends the URL verbatim to the card description and reads it back. Work meetings are orange. A card with no subject is titled `Cita <date>` and gets no colour. `Kira` is a board name, not a person. When Claude fails, screenshots fall through `completeWithProfileDetailed('quality', …, image)` (OpenAI and Gemini read images). *Verified:* 72/72, plus `test-chain-vision` 4/4 on Oracle; restart 23:06:50 UTC, files 23:06:39. **Waiting:** a typed task or screenshot that becomes a card. On 17 Oct a non-voice message did reach `[TrelloVoice] Classification:` and was judged `isTask: false` (no card, correct); `✅ Card created` from typed text has not appeared yet **(updated 19 Oct 2026)**.
 
 ### 🎓 OpenClaw — Elena's interview coach (Telegram `@OpenClaw_VibeJobsList_bot` + her WhatsApp)
 
@@ -30,10 +122,10 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 
 | Date | Change | Evidence | Verified by |
 |---|---|---|---|
-| 12 Oct | **Local patch #1:** OpenAI's new wording *no credits remaining* was added to `ERROR_PATTERNS.billing` in the 4 dist files that hold it (counted 15 Oct). An empty OpenAI account now fails over to Gemini instead of replying that it has no credits | job-list-filter `2a7c8fd`; NOW.md 11–12 Oct | session log `openai gpt-4.1 error` → `google gemini-2.5-flash stop` on every turn |
+| 12 Oct | **Local patch #1:** OpenAI's new wording *no credits remaining* was added to `ERROR_PATTERNS.billing` in the 5 dist files that hold it (4 `pi-embedded-helpers-*.js` + `plugin-sdk/index.js`; recounted 19 Oct, all dated 12 Oct 00:03). An empty OpenAI account now fails over to Gemini instead of replying that it has no credits | job-list-filter `2a7c8fd`; NOW.md 11–12 Oct | session log `openai gpt-4.1 error` → `google gemini-2.5-flash stop` on every turn |
 | 12 Oct | New `/menu`. Retired figures (420+ audits, median 85, 100/100, 2,800+ deals) removed from everything the coach and the kit read. `/cards` also reads sessions that `/new` renamed | job-list-filter `913801b`, `63b67e9`, `9b5038f`; cto-aipa `e637acd9`, `84ad2c60` | live `/menu`; a spar test copied *39 audits of 18 websites* word for word; cards rebuild `6 answers across 2 role(s)` |
 | 14 Oct | Spanish mode (`prep me for <company> en español`). The deep-dive's questions print as their own block, 🎤 THIS COMPANY'S LIKELY QUESTIONS. Whisper vocabulary prompt (`tools.media.audio.prompt`). Voice provider Edge → OpenAI nova | job-list-filter `ace8611`, `d2324b7`, `87f7b3d`, `4166a2d`; cto-aipa `95d92d21`, `6bcc40a6` | live tests es3–es6; Whisper terms recognised: groq 9/15 → 15/15, OpenAI 7/15 → 14/15 |
-| 15 Oct | **Verified facts sheet** `~/.openclaw/workspace/proof/TOOLS.md`, written by `hs-deal-prep.cjs --digest --proof-out=` (same `*/30` line) and injected into every reply (~21,400 chars). Caps raised to `bootstrapMaxChars 25000` / `bootstrapTotalMaxChars 70000`. Since 7 Oct the default 24,000-char TOTAL had silently cut the deals sheet 10,984 → 7,676 and the cards 4,247 → 661 (189 journal warnings) | cto-aipa `dca5e84d`; job-list-filter `1e91c9b` | 8 test sessions: 0 invented items in 7, 0 truncation warnings |
+| 15 Oct | **Verified facts sheet** `~/.openclaw/workspace/proof/TOOLS.md`, written by `hs-deal-prep.cjs --digest --proof-out=` (same `*/30` line) and injected into every reply (~21,400 chars then; 24,598 chars on 19 Oct). Caps raised to `bootstrapMaxChars 25000` / `bootstrapTotalMaxChars 70000`, then to 40000 / 90000 at 23:44 UTC the same day for the deep-dive company facts (live config, 19 Oct). Since 7 Oct the default 24,000-char TOTAL had silently cut the deals sheet 10,984 → 7,676 and the cards 4,247 → 661 (189 journal warnings) | cto-aipa `dca5e84d`; job-list-filter `1e91c9b` | 8 test sessions: 0 invented items in 7, 0 truncation warnings |
 | 15 Oct | **Learns from her corrections:** the `*/10` `build-cards.py` cron keeps `workspace/interview-cards/lessons.json` (her own words that carry a clear correction signal) at the top of every reply. Commands: `my lessons`, `forget: <words>` | job-list-filter `d602035`, `dd795a3` | copy test 10/10; real history → exactly 1 lesson; live `my lessons` exact |
 | 15 Oct | **WhatsApp Business *Message yourself*** linked on her explicit go. Allowlist = her own number only, `selfChatMode: true`, `sendReadReceipts: false`, groups on allowlist, credentials chmod 700/600. Clients are never answered. WhatsApp and Telegram share one session | job-list-filter `f2ca182`; cto-aipa `a9e96df7` | her screenshot + log `[whatsapp] Inbound … (direct)` → `Auto-replied` 16:08 UTC |
 | 15 Oct | Voice model `tts-1`. With `gpt-4o-mini-tts`, 7 of 15 voice replies failed at exactly 30 s and then fell back to Edge, which returns 403 | job-list-filter `6a40767` | 3/3 test voice replies in 2–3 s |
@@ -44,17 +136,17 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 
 ### 🔎 VJH — job hunter and its self-learning judge
 
-- **12 Oct — US Mountain/Pacific hours fit Panama (UTC-5), now enforced in code** (`timezone_veto_is_wrong`; `7b4a975` + `6a0a94e`). A prompt line alone did not stop the live judge from vetoing Epoch AI. *Verified:* tests 568/568; live `judge_fit(Epoch AI)` → `criterion-2 veto overruled — US time-zone overlap fits UTC-5`; restarted 12:25:38 UTC, file 12:24:04.
+- **12 Oct — US Mountain/Pacific hours fit Panama (UTC-5), now enforced in code** (`timezone_veto_is_wrong`; `7b4a975` + `6a0a94e`). A prompt line alone did not stop the live judge from vetoing a US-Pacific employer. *Verified:* tests 568/568; live `judge_fit(<that employer>)` → `criterion-2 veto overruled — US time-zone overlap fits UTC-5`; restarted 12:25:38 UTC, file 12:24:04.
 - **12 Oct — no fresh jobs since 10 Oct, because Bright Data had suspended the account on 7 Oct for an unpaid balance.** 180/180 searches came back empty, and every run still logged `Done — new jobs: 0`. Elena topped up $10; the 18:58 UTC run logged `Done — new jobs: 78`. Torre has refused outside requests since 2 Oct (HTTP 400). Its terms rule out a code fix; partner access is Elena's call. Diagnosis: `docs/oracle/2026-10-12_vjh_no_fresh_jobs_diagnosis.md`.
 - **15 Oct — No-fit screenshots read in full (`6b9ebd4`).** The reader takes only images on her notes (the kit's CV PDFs had filled both slots) and joins up to 4. When one model says NONE, a second model is asked. Failed reads are retried, not cached, and recent rejections that have no reason are re-read. On-site, hybrid and must-live-in teach the location lesson. Vision: `gpt-4o-mini` first, Gemini fallback (`GEMINI_JUDGE_MODEL`, default `gemini-3.5-flash-lite`), `_VISION_PROMPT_VERSION = 5`. *Verified:* the live *why* now reads *Location: New York City … hybrid*; reasons 53 → 54.
 - **15 Oct — lesson provenance (`e864641`).** cto-aipa's staging note *🚨 The form pre-fills* is an agent note, not her reason, so it was added to `_KIT_NOTE` and cached kit reasons were re-derived. *Verified:* the 16:17 run shows 54 → 47 with her reason; pre-fills 7/6 → 0/0; the false *pay below her floor* lesson 8× → 1× (her own words). New wiki concept `label-provenance`.
 - **15 Oct — an interview invite with a real booking link now reaches HubSpot and Telegram (`006c1ed`).** Before, every consumer dropped it: 0 `interview_request` rows had ever been saved. Her own scheduler links and links in the quoted thread are ignored, and alert fields are HTML-escaped. *Verified:* restart 16:12:49 UTC, file 16:12:38; the response step ran with 0 tracebacks. **Not yet proven on a real invite.**
-- **Judge sync cadence is HOURLY `17 * * * *`** and lives **only in Oracle's crontab**, in no repo. Preserve it on any cron edit. The 9 Oct crontab snapshot (`scripts/oracle-resilience/live-2026-10-09/crontab.txt`) runs it with `venv/bin/python`, but NOW.md (1 Sep) says a plain `python3` was chosen on purpose. Read `crontab -l` before changing either.
+- **Judge sync cadence is HOURLY `17 * * * *`** and lives **only in Oracle's crontab** (no repo installs it; git holds only the 9 Oct snapshot). Preserve it on any cron edit. The live crontab (read 19 Oct) runs it with `venv/bin/python`, as did the 9 Oct snapshot (`scripts/oracle-resilience/live-2026-10-09/crontab.txt`); NOW.md (1 Sep) says a plain `python3` was chosen on purpose, but that is outdated since VJH `45f6411` (28 Sep): the sync now imports `src.core.decision_memory`, which the system `python3` cannot load (`No module named 'pydantic_settings'`), so keep the venv **(updated 19 Oct 2026)**. Read `crontab -l` before changing either.
 
 ### 🧰 Apply kit → HubSpot job deals (cto-aipa)
 
-- **12 Oct — one verified evidence pool** (`ce95f79d`, `9201d521`, `4117f202`). The letter and the 🎯 role defense read `cv-bank.json` (+6 reviewed lines). The defense bank gained 3 answers (hallucination, cost, stakeholders). The kit's ✅ letter now runs on every deal and carries that deal's own CV. CV headings keep the posting's exact word forms, and the reviewer's `fit_note` is printed on the 🛡️ CV line. *Verified:* md5 laptop = Oracle for 5 files; `test-cover-letter-model` 15/15; cron 22:30 `already had a letter 2 · wrote 8`.
-- **13 Oct — claim gates** (`0cd71a14`, `8314d446`). The 🎯 pitch joins the answers the gpt-5 reviewer checks: unsupported → redraft, and on the last attempt it is dropped rather than shipped bent. The ✅ letter's sentences go through the same reviewer. The CV composer floor is 2 sections / 5 lines. *Verified:* dry run on a real posting: `PITCH: (dropped by the reviewer)`, `review dropped 3 sentence(s)`, CV 2 sections / 6 lines with `fit_note`; tsc 0 errors. **Waiting:** the next VJH deal is the first production proof.
+- **12 Oct — one verified evidence pool** (`ce95f79d`, `9201d521`, `4117f202`). The letter and the 🎯 role defense read `cv-bank.json` (+6 reviewed lines). The defense bank gained 3 answers (hallucination, cost, stakeholders). The kit's ✅ letter runs on every deal it fills and carries that deal's own CV. **(updated 19 Oct 2026)** Since 18 Oct (`72601410`) a job VJH parks as not a fit gets no letter when it is staged and stays out of the daily queue; the kit drafts the letter only if Elena moves the deal to 🔥 I act today. CV headings keep the posting's exact word forms, and the reviewer's `fit_note` is printed on the 🛡️ CV line. *Verified:* md5 laptop = Oracle for 5 files; `test-cover-letter-model` 15/15; cron 22:30 `already had a letter 2 · wrote 8`.
+- **13 Oct — claim gates** (`0cd71a14`, `8314d446`). The 🎯 pitch joins the answers the gpt-5 reviewer checks: unsupported → redraft, and on the last attempt it is dropped rather than shipped bent. The ✅ letter's sentences go through the same reviewer. The CV composer floor is 2 sections / 5 lines. *Verified:* dry run on a real posting: `PITCH: (dropped by the reviewer)`, `review dropped 3 sentence(s)`, CV 2 sections / 6 lines with `fit_note`; tsc 0 errors. **Production proof (updated 19 Oct 2026):** the 10-min kit cron logged `[cover-letter] review dropped N sentence(s)` on real deals 5 times, 13 Oct 18:40 → 15 Oct 08:20 UTC (`~/logs/apply-kit.log`). No 🎯 pitch drop has appeared in that log yet.
 - **13 Oct — posting fetcher** (`b7edaf04`, `e9189da0`, `b89f5d98`). A posting cut at 6,000 chars inside an emoji left a lone UTF-16 surrogate, and every OpenAI structured call failed with `400 Invalid body` (Gemini silently carried the load). Numeric entities such as `&#x27;` are now decoded too. *Verified:* bisect probe A 400 / B (surrogate stripped) 200; after deploy `openai:gpt-4.1 + review openai:gpt-5`. Wiki + blog: aideazz `a9fab1f`, `3334377`.
 - **14 Oct** (`6bcc40a6`): `hs-files.cjs` gained an optional `access` setting and `.txt` support, so a posting can live in an unlisted HubSpot file. `cv-bank.json` gained `text_es` for all 23 verified stories, with the numbers checked EN = ES.
 - Rule unchanged (CLAUDE.md §4): for a posting Elena sends by hand, run `stage-manual-job.cjs`, then `hs-fill-apply-kit.cjs --apply --only=<dealId>` on Oracle twice, and check with `hs-audit-apply-kit.cjs`.
@@ -74,11 +166,11 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 ### 🌐 Blog, site and the free audit API
 
 - **The daily blog ships to aideazz.xyz FIRST (13 Oct, `e109bd9c`).** Cache + static page go first. The Dev.to cross-post is best-effort: a 401, a missing key or `DEVTO_PAUSED=1` skips it, and Telegram says so. `incident-to-blog.cjs` respects the flag, and the ES bundle falls back to the aideazz URL. *Verified:* log `📰 Dev.to cross-post paused (DEVTO_PAUSED=1 or no key) — aideazz.xyz only today`; both new pages 200; restart 20:20:47 UTC, files 20:20:40.
-- **Dev.to suspended the account.** Every authenticated call has returned 401 since ~11 Oct; the last Dev.to post was 10 Oct, and no daily article went out anywhere from 10 to 13 Oct. Appeal sent 13 Oct (`docs/oracle/2026-10-13_devto_suspension_appeal.md`). **Do not** create new keys or retry in a loop. To re-enable after reinstatement, remove `DEVTO_PAUSED` from Oracle `.env`.
+- **Dev.to suspended the account.** Every authenticated call has returned 401 since ~11 Oct; the last Dev.to post was 10 Oct, and no daily article went out anywhere from 10 to 13 Oct. Appeal sent 13 Oct (`docs/oracle/2026-10-13_devto_suspension_appeal.md`); no reply recorded by 17 Oct, and on 19 Oct the public profile page returns 404 **(updated 19 Oct 2026)**. **Do not** create new keys or retry in a loop. To re-enable after reinstatement, remove `DEVTO_PAUSED` from Oracle `.env`.
 - **13 Oct — two near-duplicate posts on one incident** (57% shared vocabulary). A restart catch-up and a manual `/blog/daily-run` started 10 s apart, so the near-duplicate guard saw neither. Elena decides which to keep and which to canonicalise (canonical only, never delete).
 - **AI Visibility Audit API + $100 Diagnostic (13 Oct; `cdb8fe62`, PR #60 `06862c94`).** Instagram / Facebook / WhatsApp / TikTok / Linktree / Google Maps links now return `422 no_owned_website` and log a `[visibility-lead] no-owned-website` line. The Diagnostic intake treats *none* / *no tengo* as no website, stores a social link as `intake.presence` (never scanned), and the client email says *your business online*. *Verified:* live curl: instagram 422, aideazz.xyz 200 100/A+; `test-diagnostic-delivery` 69/69.
-- **Repeat outside audits muted (13 Oct, `c33abb0e`).** When an outside key re-audits the same site from the same IP within 30 days, the audit is logged (`data/visibility-lead-seen.json`) but not pinged to Telegram. Elena's own `aidz_owner_` key pings as before.
-- **AI Ops Wiki:** three incidents — 12 Oct (the reviewer's verdict nobody read), 13 Oct (the cut landed inside an emoji), 15 Oct (another agent wrote her top lesson; new concept `label-provenance`, marked `blog: yes`). aideazz `f0c1307`, `a9fab1f`, `37ec1cd`.
+- **Repeat outside audits muted (13 Oct, `c33abb0e`).** When an outside key re-audits the same site from the same IP within 30 days, the audit is logged (`data/visibility-lead-seen.json`) but not pinged to Telegram. Elena's own owner key pings as before.
+- **AI Ops Wiki:** four incidents — 12 Oct (the reviewer's verdict nobody read), 13 Oct (the cut landed inside an emoji), 15 Oct (another agent wrote her top lesson; new concept `label-provenance`, marked `blog: yes`), 16 Oct (the inbox was read only on busy hours; new concept `fate-sharing`). aideazz `f0c1307`, `a9fab1f`, `37ec1cd`, `f1039b4`. **(updated 19 Oct 2026)** The daily article goes to IndexNow + Bluesky since 15 Oct (`2958f904`); each published field note also goes to IndexNow + Bluesky (`bb4aeb4f`, 16 Oct) and to LinkedIn through the existing Buffer helpers with a model-free caption (`6b770a36`, 18 Oct; Oracle `.env` reads `FIELDNOTE_LINKEDIN=post` on 19 Oct).
 
 ### 🎬 Atuona / AI Film Studio
 
@@ -91,8 +183,8 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 
 ### ⏸️ Held for Elena (decided, not built)
 
-- **`resend-reconcile` is failing:** every `GET /emails/{id}` returns 401 (451 × 401 on 15 Oct), so **suppressed sends are not being detected**. The one-line key fix is held until its dedup marker is fixed — the marker is an HTML comment, which HubSpot strips (`docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md`, item 3).
-- Also held: UTM on Atlas links (item 4) · EspaLuz voice moves 2–4 (`docs/oracle/2026-10-14_voice_agents_compare.md`) · the EspaLuz PII-refactor deploy · 2 unmerged Cursor branches · the Sprinter Lambda CodeSha256 check · the OpenClaw upgrade · a Google-side Places quota · the `/tasks` cleanup.
+- **`resend-reconcile` is failing:** every `GET /emails/{id}` returns 401 (451 × 401 on 15 Oct), so **suppressed sends are not being detected**. Since ~16 Oct its hourly runs check 0 sends and log no errors only because no send is in its window — the key still gets 401 on any send (a zero that looks like a quiet day) **(updated 19 Oct 2026)**. The one-line key fix is held until its dedup marker is fixed — the marker is an HTML comment, which HubSpot strips (`docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md`, item 3).
+- Also held: UTM on Atlas links (item 4) · EspaLuz voice moves 2–4 (`docs/oracle/2026-10-14_voice_agents_compare.md`) · the EspaLuz PII-refactor deploy · 2 unmerged Cursor branches · the Sprinter Lambda CodeSha256 check · the OpenClaw upgrade · a Google-side Places quota · the `/tasks` cleanup · **(updated 19 Oct 2026)** the daily-blog fact-check fixes (`docs/oracle/BLOG_FACTCHECK_2026-10-17.md`: the 16 Oct post still answers 200 and `src/blog-evidence.ts` is unchanged since 15 Oct, so the pm2 lifetime restart counter can still be told as recent restarts — the 18 Oct slug says 218) · Torre partner access (request drafted 18 Oct, `docs/applications/2026-10-18_torre_partner_access_email.md`; Elena sends it) · OpenClaw reading PDF/Word (held 18 Oct: it answered a 6-page contract from pages 1–4 only) · Make.com publishing the 01:00 UTC CMO post twice (NOW.md 18 Oct).
 
 ### ⚠️ Standing traps — each of these has already cost a session
 
@@ -101,7 +193,7 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 | **Node 22 pin** | Oracle's system Node is 22.22.0 and serves 13 processes. OpenClaw ≥2026.7.1 needs Node ≥22.22.3, and 2026.10.3 needs ≥24.16. On 2026.6.35 (the newest that runs), `Unknown model: openai/gpt-4.1` silently sent every turn to Gemini, the config needed a TTS/Telegram key relabel, and the first start ran one-way state migrations | Keep `openclaw` at **2026.2.14**. Never upgrade it in place on Oracle; retest only on copies (job-list-filter `ORACLE_LIVE_SETUP.md` § Upgrade) |
 | **OpenClaw local dist patches** | Two one-line patches live only in OpenClaw's `dist/`: the billing failover pattern and Opus for WhatsApp. Any reinstall or upgrade silently overwrites both | After any OpenClaw install, re-check both (job-list-filter `docs` `b272588` § Local patches) |
 | **Microsoft Edge voices return 403** | Free Edge TTS has returned 403 everywhere since 14 Oct (a Microsoft-side change). It used to be the fallback for slow or failed OpenAI voice | Voice now depends on OpenAI `tts-1`. When OpenAI is empty, OpenClaw and CTO AIPA reply in text only. EspaLuz uses gTTS and is unaffected |
-| **Credits** | Anthropic is **EMPTY**: fallbacks carry the load, the failing `test_provider_chain[claude]` eval is deliberate, and `/research_*` returns an unverified Groq report with 0 Bright Data calls. OpenAI ran out 11 Oct ~22:40 UTC (answering again 12 Oct ~11:19) and 15 Oct ~11:00 UTC (Elena topped it up ~11:35; probes 200). Bright Data was suspended 7 Oct (unpaid); Elena topped it up $10 on 12 Oct. X API credits were $0 on 7 Oct, so Algom posting is blocked. The Luma wallet was empty at the 22 Sep audit | Probe the provider with a 1-token call; a key existing proves nothing. Topping up is Elena's call |
+| **Credits** | Anthropic is **EMPTY**: fallbacks carry the load, the failing `test_provider_chain[claude]` eval is deliberate, and `/research_*` falls back to Perplexity `sonar-pro` (a searched, sourced report) when Claude fails on its first call (`b7ba3f73`, 15 Oct; Groq only summarises what tools already gathered). A 1-token probe on 19 Oct still returns *credit balance is too low* **(updated 19 Oct 2026)**. OpenAI ran out 11 Oct ~22:40 UTC (answering again 12 Oct ~11:19) and 15 Oct ~11:00 UTC (Elena topped it up ~11:35; probes 200). Bright Data was suspended 7 Oct (unpaid); Elena topped it up $10 on 12 Oct. X API credits were $0 on 7 Oct, so Algom posting is blocked. The Luma wallet was empty at the 22 Sep audit | Probe the provider with a 1-token call; a key existing proves nothing. Topping up is Elena's call |
 | **A zero that looks like a quiet day** | A suspended Bright Data account produced 180/180 empty searches, each logged `Done — new jobs: 0` | Grep the *result* line and compare it with yesterday's |
 | **PM2 boot unit** | `pm2-ubuntu.service` has been `failed (Result: protocol)` since 28 Jul, and the running daemon was started by hand (9 Oct classification) | After any reboot, check `pm2 list` and bring the apps back by hand |
 | **Health-check blind spots** | `~/check_oracle_health.sh` (repo copy = live copy) watches cto-aipa, the 4 EspaLuz units, vibejobhunter, vibejobhunter-web and dragontrade-main/dashboard. It does **not** watch `whitespace`, `serpapi-jobs`, `algom-stream`, `algom-poll`, `openclaw-gateway`, `aw-portal` or `n8n` | Check those by hand after any incident |
@@ -109,7 +201,7 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 | **CRLF** | The laptop checks out CRLF (`core.autocrlf=true`); on 13 Oct a CRLF source put 146 CRs into a dist file | Build deploy files from LF (`git show origin/main:<f>`) and compare md5 after stripping CRs |
 | **Restart catch-up race** | A cto-aipa restart fires the daily-blog catch-up; a manual `/blog/daily-run` on top of it publishes twice | After a restart, look for `📰 Daily blog: startup/catch-up run starting…` before any manual run |
 | **Judge cadence** | `judge_feedback_sync.py` runs hourly only because of one line in Oracle's crontab | Keep `17 * * * *` on any cron edit |
-| **Log retention** | Oracle keeps pm2 `retain 10`, journal 1 GB and app logs `rotate 4` (Elena, 11 Oct); PM2 logs from before 1 Oct are already gone. The first compressed pm2-logrotate rotation was never confirmed | Run `scripts/oracle-resilience/archive-to-laptop.sh` on rotated logs at least every 10 days, and grep `~/.pm2/logs` for `*.log.gz` |
+| **Log retention** | Oracle keeps pm2 `retain 10`, journal 1 GB and app logs `rotate 4` (Elena, 11 Oct); cto-aipa's PM2 log history reaches back only to 10 Oct (`retain 10`). Before 1 Oct only leftovers remain: old process-id logs from Mar–Apr, a few late-Sep rotations of quiet apps, and the paused DragonTrade bots' May logs. Compression is proven: every nightly rotation since 10 Oct is a `.log.gz` (116 `*.log.gz` in `~/.pm2/logs`; `compress true`, `max_size 50M`; checked 19 Oct) | Run `scripts/oracle-resilience/archive-to-laptop.sh` on rotated logs at least every 10 days, and grep `~/.pm2/logs` for `*.log.gz` |
 | **No renders on Oracle** | On 8 Oct one film build froze the box for ~50 min, with every bot down | Build films on the laptop; Oracle only receives the finished file |
 | **WhatsApp *Message yourself*** | Since 15 Oct OpenClaw reads Elena's WhatsApp self-chat | To unlink: WhatsApp Business → Linked devices, or `openclaw channels logout --channel whatsapp` |
 
@@ -139,7 +231,7 @@ Forensics (two read-only rounds, 12 agents, claims adversarially verified): `doc
   own pmx Autocast hands it the boolean → 0 of 107 rotated logs gzipped; the install left an 842 MB daemon log uncompressed.
 - **Unverified fix.** The note "VERIFY tomorrow: rotated *.log.gz exist" was never acted on.
 - Plus: the health check had restarted the dead duplicate `espaluz-webhook.service` **29,637 times** since 28 Jun (same
-  `paypal_webhook_server.py` as `espaluz-payments-webhook`, which owns :5000), writing ~280 MB of "Address already in use".
+  `paypal_webhook_server.py` as `espaluz-payments-webhook`, which owns the webhook port), writing ~280 MB of "Address already in use".
 
 **9 Oct cleanup (Elena: "free up maximum space possible but without destroying live products; remove only the garbage or
 duplicated stuff"):** read-only liveness map (40 live paths) + classifiers + skeptics (8 vetoes honoured) → garbage 9.4 GB
@@ -152,10 +244,10 @@ every step.** Kept on purpose: `~/atuona-film7/venv` + `models` (film #9 still-m
 **Prevention now in place (re-runnable: `scripts/oracle-resilience/disk-prevention-apply.sh`):**
 | Piece | What it does | Proof |
 |---|---|---|
-| `~/health_monitor.sh` (repo `docs/oracle/health_monitor.sh`) | Telegram to Elena when the disk crosses 85/90/95 % up, 12 h reminder at 95 %+, "back below 80 %" — delivery checked (`"ok":true`), state `~/.disk_alert_level` | "DISK ALERT DELIVERED" 98 % (13:03) and "back to 73 %" (13:55) on 9 Oct |
-| `~/check_oracle_health.sh` (repo `scripts/oracle-resilience/check_oracle_health.sh` = the live copy) | watches `espaluz-payments-webhook` (the real :5000 unit) instead of the dead duplicate; the repo copy no longer carries the May dragontrade restart loop | payments :5000 = 200 after |
-| `espaluz-webhook.service` | **disabled** (duplicate, could never bind :5000) | `is-enabled` = disabled |
-| pm2-logrotate | `parseBool` patched to accept boolean true (re-run the apply script after any `pm2 install pm2-logrotate`) | first rotation verify: see NOW.md. **(updated 15 Oct 2026) No result was ever recorded:** NOW.md holds only the instruction and the 12 Oct audit is silent. Treat compression as unproven until `ls ~/.pm2/logs` shows `*__2026-10-1*.log.gz` files and the app logs have `.1.gz` |
+| `~/health_monitor.sh` (repo `docs/oracle/health_monitor.sh`) | Telegram to Elena when the disk crosses 85/90/95 % up, 12 h reminder at 95 %+, "back below 80 %" — delivery checked (`"ok":true`), state `~/.disk_alert_level` | "DISK ALERT DELIVERED" 98 % (13:03) and "back to 73 %" (13:55) on 9 Oct. (19 Oct: those lines are no longer on Oracle, because the script keeps only the last 1,000 lines of `~/health.log`, about 3.5 days. `~/.disk_alert_level` still reads level 0 since 9 Oct 13:55; disk 53 %) |
+| `~/check_oracle_health.sh` (repo `scripts/oracle-resilience/check_oracle_health.sh` = the live copy) | watches `espaluz-payments-webhook` (the real payments unit) instead of the dead duplicate; the repo copy no longer carries the May dragontrade restart loop | payments webhook = 200 after |
+| `espaluz-webhook.service` | **disabled** (duplicate, could never bind the port the payments unit holds) | `is-enabled` = disabled |
+| pm2-logrotate | `parseBool` patched to accept boolean true (re-run the apply script after any `pm2 install pm2-logrotate`) | **(updated 19 Oct 2026) Proven working:** every nightly rotation since 10 Oct is gzipped. `~/.pm2/logs` holds 10–13 `*__2026-10-1x_00-00-00.log.gz` files per day from 10 to 19 Oct (116 `.gz` of 144 files), with 0 rotated files left uncompressed and `gzip -t` OK on the 19 Oct file. `~/logs` has 26 `.1.gz`. Module conf: `compress 'true'`, `retain 10`, daily `0 0 * * *` |
 | `/etc/logrotate.d/aideazz-app-logs` | health/familybot/joblist/keepalive logs + `~/logs/*.log`, `su root syslog` for /var/log (as ubuntu = "Permission denied") | forced rotation 9 Oct OK |
 | journald | `SystemMaxUse=1G` (28 Sep, re-asserted) | 1015 MB |
 | sysstat | `-S XDISK` → `sar -F` keeps disk history | from 9 Oct |
@@ -166,9 +258,9 @@ every step.** Kept on purpose: `~/atuona-film7/venv` + `models` (film #9 still-m
 refuses protected paths, anything outside home//tmp//var/cache/apt, and anything a running process holds; logs `~/safe-remove.log`),
 `archive-to-laptop.sh` (copy + md5 both ends; prints VERIFIED only on a full match), `compress-verified.sh` (gzip, original
 removed only if the .gz unpacks to the same bytes). Lists and logs: `docs/oracle/disk-cleanup-2026-10-09/`.
-**Still open:** VJH data growth (`autonomous_data/ats_cache` 698 MB never pruned, checkpoint DB +3 MB/day) — a VJH design
-decision; resizing the boot volume (VM.Standard.E5.Flex, cost unverified). **Before any write to Oracle: `df -h /`.**
-**Log retention (Elena, 11 Oct; added 15 Oct 2026):** Oracle keeps short log windows on purpose: pm2-logrotate `retain 10`, journald 1 GB, app logs `rotate 4`. PM2 logs from before 1 Oct are already gone. To keep history, run `scripts/oracle-resilience/archive-to-laptop.sh` on the rotated logs **at least every 10 days**, or they rotate out. The repo copy of the film #9 generator is `scripts/atuona-film9-gen.mjs`.
+**Still open:** VJH data growth (`autonomous_data/ats_cache` never pruned: 698 MB on 9 Oct → 738 MB on 19 Oct (`du -sh`). Checkpoint DB was 442 MB on 9 Oct (+3.1 MB/day then) and `du -sh` 434M on 19 Oct) — a VJH design
+decision; resizing the boot volume (VM.Standard.E5.Flex, cost unverified). **Before any write to Oracle: `df -h /`** (19 Oct: 53 %, 21 GB free).
+**Log retention (Elena, 11 Oct; added 15 Oct 2026):** Oracle keeps short log windows on purpose: pm2-logrotate `retain 10`, journald 1 GB, app logs `rotate 4`. PM2 history is short: the running cto-aipa's rotated logs reach back only to 10 Oct (checked 19 Oct). Its Audit-API lines from before 1 Oct were deleted by `retain 10`, and the only pre-October files left are leftovers (old process-id logs from Mar–Apr, a few late-Sep rotations of quiet apps, the paused DragonTrade bots' May logs kept on purpose). To keep history, run `scripts/oracle-resilience/archive-to-laptop.sh` on the rotated logs **at least every 10 days**, or they rotate out. The repo copy of the film #9 generator is `scripts/atuona-film9-gen.mjs`.
 
 ## 🟢 4everland pin + the sitemap's second writer (August 21-22 2026)
 
@@ -224,7 +316,7 @@ from all but one of them — silently reverting the 4 August canonical fix recor
 below. `public/sitemap.txt`, regenerated in the same window, still held all 132.
 The two files disagreed with each other and nothing noticed.
 
-There are **two independent writers of that one file**:
+On 22 Aug there were **two independent writers of that one file** (the second was removed on 23 Aug; see the update below):
 
 | Writer | Where | Sources blog URLs from | Trailing slash |
 | --- | --- | --- | --- |
@@ -268,7 +360,7 @@ what a human reading the repo saw.
 **Removed the function and all four call sites** (daily publisher, voice campaign,
 `incident-to-blog`, `republish-blog-html`) in `cto-aipa` `4c6ef11`; sitemap
 regenerated from the build generator in `aideazz` `d133fab`. Verified live:
-**134 URLs, 120 trailing-slashed**, and `grep -c` for the function returns 0 in
+**134 URLs, 120 trailing-slashed**, and no definition or call of the function is left (19 Oct re-check: `grep -rn` finds only the removal comment, plus a stale declaration in Oracle's unused `dist/hashnode-daily.d.ts`) in
 both `src/` and `dist/` on the VM.
 
 > **Rule, sharpened:** restoring the data is not fixing the defect. If a bad value
@@ -301,8 +393,8 @@ git diff --diff-filter=D --name-only <live-sha> <head>      # must be 0
 git ls-tree -d --name-only <live-sha> public/blog/ | wc -l  # vs head — must not shrink
 
 # 4. SEO surfaces after any deploy
-curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>' | wc -l          # 132 on 22 Aug; 200 at aideazz 3dabeca (14 Oct); grows with every post and must never shrink (updated 15 Oct 2026)
-curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>[^<]*/</loc>' | wc -l  # 118 slashed on 22 Aug; 186 at 3dabeca (14 Oct) = the <loc> count minus the few unslashed static routes (updated 15 Oct 2026)
+curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>' | wc -l          # 132 on 22 Aug; 200 at aideazz 3dabeca (14 Oct); 206 on 19 Oct (aideazz 81cde4b, the latest 4everland production deploy); grows with every post and must never shrink (updated 19 Oct 2026)
+curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>[^<]*/</loc>' | wc -l  # 118 slashed on 22 Aug; 186 at 3dabeca (14 Oct); 192 on 19 Oct = the <loc> count minus the 14 unslashed static routes (updated 19 Oct 2026)
 curl -s -L https://aideazz.xyz/blog | grep -oE '<title>[^<]*</title>'      # NOT the homepage title
 ```
 
@@ -322,7 +414,7 @@ starving: it learned 6 rejected *titles* and nothing else, while the explanation
 types (and the screenshots she attaches) sat unread in HubSpot. Commits in
 `VibeJobHunterAIPA_AIMCF`: `41ccc36` → `7017d05`, docs `02d47b9`.
 
-**Cron changed: `17 3 * * 0` (Sundays) → `17 6 * * *` (DAILY).** **(updated 15 Oct 2026: since about 1 Sep it runs HOURLY, `17 * * * *`. That line exists ONLY in Oracle's crontab and in no repo, so preserve it on any cron edit.)** It is a read-only
+**Cron changed: `17 3 * * 0` (Sundays) → `17 6 * * *` (DAILY).** **(updated 15 Oct 2026: since about 1 Sep it runs HOURLY, `17 * * * *`. No repo installs it: the only copy in git is the 9 Oct snapshot `scripts/oracle-resilience/live-2026-10-09/crontab.txt`, identical to the live line, which runs `venv/bin/python` (checked 19 Oct). Preserve it on any cron edit.)** It is a read-only
 HubSpot pull and a full week of her manual triage was sitting unlearned between runs.
 Crontab backup before the edit: `/home/ubuntu/crontab.bak-20260814`.
 
@@ -344,12 +436,12 @@ the correction was already written in the deal note — being thrown away.
 - VJH's Telegram-approval note is a bot template and was not being stripped.
 
 **🔑 The HubSpot credential is a SERVICE KEY, not a private app.** `AIdeazz_Marketing_Engine`,
-id `39045903`, portal `51409153` — one token, `HUBSPOT_API_KEY` in `/home/ubuntu/cto-aipa/.env`,
+(its key id and portal id are kept out of this public repo) — one token, `HUBSPOT_API_KEY` in `/home/ubuntu/cto-aipa/.env`,
 used by the whole fleet. **No private app was ever created**, so ⚙️ Settings → *Private Apps*
 ("your private apps have moved") and *Legacy Apps* ("no legacy apps available") are both
 **empty dead ends** — do not send anyone there. Scopes are edited at
 **⚙️ Settings → Integrations → Service Keys** →
-`https://app.hubspot.com/service-keys/51409153/key/39045903` → *Edit → Add new scope*,
+open the `AIdeazz_Marketing_Engine` key → *Edit → Add new scope*,
 then *Save → "Yes, save"*. `access-token-info` lags a few seconds behind the save —
 **verify by actually fetching a file, not by reading the scope list.**
 
@@ -378,7 +470,7 @@ then *Save → "Yes, save"*. `access-token-info` lags a few seconds behind the s
   clearing an 8-char length gate. Gate on **≥3 real words**, and always render the real
   prompt:
 ```bash
-cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && python3 scripts/judge_feedback_sync.py && \
+cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && venv/bin/python scripts/judge_feedback_sync.py && \
   venv/bin/python -c "from src.core.llm_judge import _feedback_block; print(_feedback_block())"
 ```
 
@@ -419,6 +511,8 @@ the dashboard's `OpsRow`) → Respond to Webhook (**All Incoming Items**, not Fi
 | `webhook.aideazz.xyz/crm/` | n8n editor | n8n's own owner login |
 | `webhook.aideazz.xyz/crm/webhook/ops` | the data feed | **HTTP basic** (`.htpasswd-ops`) |
 | `webhook.aideazz.xyz/ops/` | React dashboard, `/var/www/ops` | **HTTP basic** (same file) |
+| `webhook.aideazz.xyz/queue/` | Elena's two-card daily queue (cto-aipa `src/queue-routes.ts`) | **HTTP basic** (same file, so a password reset changes this lock too) |
+| `webhook.aideazz.xyz/crm/webhook/*` (all others) | future external webhooks | **none, deliberately** — Resend/HubSpot cannot type a password |
 
 ### Lost the ops password? Reset it — it cannot be recovered (30 Aug 2026)
 
@@ -432,7 +526,7 @@ move is replacement, and there are two ways to do it:
 ssh -t oracle-cto-aipa
 sudo grep -rn auth_basic_user_file /etc/nginx/     # derive the path, never assume it
 sudo cp /etc/nginx/.htpasswd-ops /etc/nginx/.htpasswd-ops.bak-$(date +%F)
-sudo htpasswd -B /etc/nginx/.htpasswd-ops elena    # -B = bcrypt; the default is MD5
+sudo htpasswd -B /etc/nginx/.htpasswd-ops <user>   # -B = bcrypt (default is MD5); <user> = the existing login: sudo cut -d: -f1 /etc/nginx/.htpasswd-ops
 ```
 
 **Or from Telegram, phone-only:** send `/opspw <new password>` to the CTO bot. It
@@ -450,7 +544,6 @@ reads, and the reset looks successful while the old password stays live.
 ⚠️ Whoever holds the Telegram account can reset this lock. That is the accepted
 trade for phone-only access, not an oversight — which is why `/opspw` hardcodes the
 username and cannot mint accounts.
-| `webhook.aideazz.xyz/crm/webhook/*` (all others) | future external webhooks | **none, deliberately** — Resend/HubSpot cannot type a password |
 
 Dashboard and feed share one origin on purpose: no CORS, and the browser sends
 credentials to both automatically. A static page cannot hold a secret, so
@@ -483,7 +576,7 @@ at all. Now both paths return **401** unauthenticated; `/whitespace/`,
 **Data:** SQLite at `~/.n8n` — deliberately NOT the shared Postgres, so n8n
 cannot affect EspaLuz or anything else.
 
-**Purpose:** Stop all AI bots on Oracle from silently dying. One plan, one deployment, covers every product on `170.9.242.90`. This file also lists **canonical Git repos**, **Oracle VM directories**, and **authoritative local Windows clones** so nothing is duplicated or misplaced across machines.
+**Purpose:** Stop all AI bots on Oracle from silently dying. One plan, one deployment, covers every product on the one Oracle VM (SSH alias `oracle-cto-aipa`; its address is kept out of this public repo). This file also lists **canonical Git repos**, **Oracle VM directories**, and **authoritative local Windows clones** so nothing is duplicated or misplaced across machines.
 
 **Related:** The **AIdeazz AI Lab** story (marketing engine phases, Atlas measure layer, client-facing narrative) lives in [`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md) — start there for *what the lab does*; use **this file** for *where it runs and how to keep it alive*.
 
@@ -535,7 +628,7 @@ the entire pipeline**:
 | Surface | State |
 | --- | --- |
 | `aideazz/scripts/generate-sitemap.mjs` | **Removed** — was the only live call |
-| `cto-aipa/src/daily-blog-publisher.ts` | Already dev.to-only. `devtoOnly()` returns true when `HASHNODE_ACCESS_TOKEN` is absent, so it self-switched when the token went away. This is why posts kept shipping. **(updated 15 Oct 2026: there is still no Hashnode call, and the helper is now `dailyBlogDevToOnly()`. Since `e109bd9c` (13 Oct) the article ships to aideazz.xyz FIRST and the Dev.to cross-post is best-effort. Dev.to suspended the account around 11 Oct, and `DEVTO_PAUSED=1` is set on Oracle.)** |
+| `cto-aipa/src/daily-blog-publisher.ts` | Already dev.to-only. `devtoOnly()` returns true when `HASHNODE_ACCESS_TOKEN` is absent, so it self-switched when the token went away. This is why posts kept shipping. **(updated 19 Oct 2026: there is still no Hashnode call, but not because of the token. `HASHNODE_ACCESS_TOKEN` IS set in Oracle's cto-aipa `.env`, so `dailyBlogDevToOnly()` returns false and the startup log reads `mode: Dev.to + aideazz.xyz cross-post — listed: yes`. Posts ship because `_runDailyBlogPost_inner_may25()` always calls `runDailyDevToPost()`; the mode label is cosmetic. Since `e109bd9c` (13 Oct) the article ships to aideazz.xyz FIRST and the Dev.to cross-post is best-effort. Dev.to suspended the account around 11 Oct, and `DEVTO_PAUSED=1` is set on Oracle.)** |
 | `aideazz/src/pages/BlogIndex.tsx` | Calls `mergeHashnodeWithLocal([], local)` — empty array, pure merge, no fetch |
 | `aideazz/src/lib/hashnode-public.ts` | `fetchHashnodePostList` / `fetchHashnodePostBySlug` have **no callers** — dead code |
 
@@ -701,11 +794,11 @@ says. Both files carry a comment saying so.
 | `GET /cto/v1/citations` | `src/visibility-api.ts` | Latest run + 12-run trend. Returns `measured:false` (not `0%`) when nothing has run. |
 | `scripts/citation-probe.cjs` | CLI | `--save` persists, `--notify` pings Telegram, `--json` for storage. **Exits 1 when nothing could be measured.** |
 | `ai_citation_runs` | Oracle | Auto-created on first save (ORA-955 ignored, same idiom as the rest of the schema). |
-| `.github/workflows/citation-probe.yml` | CI | Mondays 13:00 UTC, an hour after the visibility self-audit. **(updated 15 Oct 2026: the schedule moved to Oracle's crontab on 17 Aug as `0 13 * * 1 /home/ubuntu/run-citation-probe.sh`, because Oracle's `.env` holds the engine keys. The workflow now runs only on a push of `.citation-trigger` or a manual `workflow_dispatch`.)** |
+| `.github/workflows/citation-probe.yml` | CI | Mondays 13:00 UTC. *(updated 19 Oct 2026: the self-audit workflow is scheduled Mondays 12:00 UTC, but GitHub starts it hours late — the last three runs began 19:07, 20:05 and 20:46 UTC — so in practice the probe now runs first.)* **(updated 15 Oct 2026: the schedule moved to Oracle's crontab on 17 Aug as `0 13 * * 1 /home/ubuntu/run-citation-probe.sh`, because Oracle's `.env` holds the engine keys. The workflow now runs only on a push of `.citation-trigger` or a manual `workflow_dispatch`.)** |
 
-**Keys it needs (any one is enough; all are optional). Updated 15 Oct 2026: SerpAPI was cancelled on 11 Aug, so the Google AI Overview engine runs on `BRIGHTDATA_API_TOKEN` + `BRIGHTDATA_ZONE` (its `altKeyEnv`). `PERPLEXITY_API_KEY` IS now in Oracle's cto-aipa `.env` (probed 20 Sep). Check the run log before claiming an engine ran:** `SERPAPI_KEY` (Google AI
+**Keys it needs (any one is enough; all are optional). Updated 15 Oct 2026: SerpAPI was cancelled on 11 Aug, so the Google AI Overview engine runs on `BRIGHTDATA_API_TOKEN` + `BRIGHTDATA_ZONE` (its `altKeyEnv`). `PERPLEXITY_API_KEY` IS now in Oracle's cto-aipa `.env` (probed 20 Sep). Check the run log before claiming an engine ran. `SERPAPI_KEY` is still set on Oracle, so each AI-Overview probe first calls the cancelled SerpAPI, logs `[citation] SerpAPI AI-Overview failed (HTTP 429`, then falls back to Bright Data — 6 such lines in each of the 12 and 19 Oct runs; expected noise, not an outage (added 19 Oct 2026):** `SERPAPI_KEY` (Google AI
 Overviews), `GEMINI_API_KEY` (grounded search), `OPENAI_API_KEY` (web search),
-`PERPLEXITY_API_KEY` (optional, not currently in the fleet). The keys live in the
+`PERPLEXITY_API_KEY` (optional; set in Oracle's `.env` since ~20 Sep, and the 12 and 19 Oct runs measured all four engines — updated 19 Oct 2026). The keys live in the
 Oracle VM `.env` — **the laptop `.env` has none of them**, so a local run will
 correctly report "not measured" and exit 1. That is the designed behaviour, not a bug.
 
@@ -723,7 +816,7 @@ at module load (verified: a top-level import throws DPI-1047 / NJS-125 off-VM).
 the homepage template and scoring A+ 100/100 for it. `_redirects` alone cannot fix
 this — the per-article pages make `/blog` a **real directory** in the IPFS build and
 gateways resolve real directories before `_redirects`, and `fix-blog-index.mjs`
-deliberately fills it with `dist/index.html`. `scripts/prerender-routes.mjs` runs last
+deliberately fills it with `dist/index.html`. `scripts/prerender-routes.mjs` runs after `vite build` and `fix-blog-index.mjs` (since 19 Aug only `stamp-page-dates.mjs`, which stamps dates, runs later)
 and now also writes `dist/blog/index.html` with blog identity. If `/blog` ever reverts
 to the homepage title, check that ordering first.
 
@@ -733,7 +826,7 @@ share a `<title>`. Score alone cannot catch a homepage fallback, because the fal
 real values rather than parsing a display string.
 
 **Known local-build trap:** `npm run build` in the `aideazz` repo regenerates
-`public/sitemap*.xml|txt`. If the Hashnode fetch fails (it does from some networks —
+`public/sitemap*.xml|txt` *(updated 19 Oct 2026: the Hashnode cause below is gone — since the 4 Aug afternoon fix `generate-sitemap.mjs` reads the shipped `public/blog/<slug>/index.html` files and makes no network call, so only a stale clone produces a shorter sitemap; pull before any laptop build)*. Historically, if the Hashnode fetch failed (it did from some networks —
 returns HTML, not JSON), the regenerated sitemap **silently drops published URLs**.
 Never commit sitemap files from a laptop build; `git checkout --` them and let the
 deploy runner regenerate.
@@ -779,7 +872,7 @@ distinction is the entire point of measuring.
   returned r/AskParents, r/careeradvice and a Palantir earnings summary. Use `sort=relevance`.
 - Rate limits bite fast: three quick requests earned a 429 and then **empty 200 bodies**,
   which is worse than an error because it looks like a quiet market. Calls are spaced by
-  `REDDIT_RSS_GAP_MS` (default 2500).
+  `REDDIT_RSS_GAP_MS` (code default 2500; Oracle's `.env` sets 6000 — updated 19 Oct 2026).
 
 **Two relevance gates, both earned:**
 
@@ -826,7 +919,7 @@ codes cannot be used to validate a URL.
   blacklisted on precisely the platforms where the wedge is cheapest.
 
 **Deploy trap (bit me again):** Oracle has **no `tsc`** — `npm run build` on the VM
-fails with `sh: 1: tsc: not found`. Build on Windows, `scp dist/*.js`, then
+fails with `sh: 1: tsc: not found` *(updated 19 Oct 2026: no longer true — TypeScript 5.9.3 has sat in `~/cto-aipa/node_modules/.bin/tsc` since 6 Sep — but the rule stands: never build or deploy from the Oracle checkout)*. Build on the laptop from LF sources, `scp` only the named `dist/*.js` files that changed (never the whole `dist/`; compare md5 after stripping CRs), then
 `pm2 restart cto-aipa --update-env`. Also: **shell scripts scp'd from Windows carry
 CRLF** and fail with `$'\r': command not found` — run `sed -i 's/\r$//'` first.
 
@@ -849,7 +942,7 @@ Deployed to the VM the same evening. Story in
 | `POST /cto/v1/newsletter/subscribe` | `src/newsletter-api.ts` | Honeypot + validation, writes `pending`, sends opt-in mail. 10/hour per IP. |
 | `GET /cto/v1/newsletter/confirm` | same | Single-use token, HTML page (a human clicked a link, not an API). |
 | `GET /cto/v1/newsletter/unsubscribe` | same | Per-subscriber token, flips status — **the row is never deleted**. |
-| `GET /cto/v1/newsletter/stats` | same | Owner key (`aidz_owner_`) only. |
+| `GET /cto/v1/newsletter/stats` | same | Owner key only (its prefix is kept out of this public repo, 19 Oct 2026). |
 | `newsletter_subscribers` | Oracle | Auto-created, ORA-955 ignored, same idiom as the rest of the schema. |
 | `scripts/newsletter-broadcast.cjs` | CLI | Needs `npm run build` first (reads `dist/newsletter-store.js`). |
 | `POST /cto/v1/citations/run` | `src/visibility-api.ts` | Owner key only — a run spends real SerpAPI/OpenAI credit *(updated 15 Oct 2026: SerpAPI is cancelled, so a run now spends Bright Data, OpenAI, Gemini and Perplexity credit, depending on which keys are set)*. |
@@ -901,7 +994,7 @@ Elena asked to confirm every agent actually surfaces its outcomes to HubSpot (cl
 - **HIRING-OPENCLAW, CLIENT-CMO, CLIENT-PLACES** — still genuinely not wired (no code path exists yet), as previously documented.
 - **ESPALUZ — was 100% dark, now FIXED:** `_push_espaluz_to_crm()` / `_push_espaluz_tg_to_crm()` (in EspaLuzWhatsApp/EspaLuzFamilybot) both had `if not secret: return` with **`OUTREACH_SECRET` never set in either bot's `.env`** — silent no-op, no log line, ever. Confirmed via Postgres: **28 real WhatsApp trial users** (real phone numbers, multiple countries, back to 2025-07) had never once reached HubSpot. Fixed: added `OUTREACH_SECRET` + `CTO_AIPA_WEBHOOK_URL` to both `.env` files, restarted both services (forward-going trials verified live via direct API test), then ran a one-off backfill (`EspaLuzWhatsApp/scripts/backfill_espaluz_hubspot.py`) — all 28 now live in HubSpot as `[ESPALUZ] WA {phone} — trial` deals.
 - **EspaLuz_Influencer daily CRM signal — separate bug, also FIXED:** `_CRM_HUB_URL` was hardcoded to `127.0.0.1:8080` (VJH's web port) instead of cto-aipa's `:3000` — every daily content-post signal 404'd for at least 14 straight days (log-confirmed: `CRM signal sent ... Status: 404` nightly). One-line fix, `EspaLuz_Influencer` commit `c488625`, deployed + restarted.
-- **Noted, not fixed (low priority):** `espaluz-webhook.service` (`paypal_webhook_server.py`, port 5000) is crash-looping — **154,000+ restarts** — almost certainly because `espaluz-payments-webhook.service` already owns port 5000 and is the live one (`active running`). Looks like dead/superseded legacy service; safe to `systemctl disable` in a future pass, not urgent since the real payment receiver is healthy. **→ Disabled 9 Oct 2026** (29,637 health-check restarts since 28 Jun); the health check now watches `espaluz-payments-webhook` — see the Disk section at the top.
+- **Noted, not fixed (low priority):** `espaluz-webhook.service` (`paypal_webhook_server.py`, port 5000) is crash-looping — **154,000+ restarts** — almost certainly because `espaluz-payments-webhook.service` already owns port 5000 and is the live one (`active running`). Looks like dead/superseded legacy service; safe to `systemctl disable` in a future pass, not urgent since the real payment receiver is healthy. **→ Disabled 9 Oct 2026** (29,637 health-check restarts since 28 Jun); the health check now watches `espaluz-payments-webhook` — see the 8–9 Oct Disk section near the top.
 
 ## ✅ VJH `detected_responses` — FIXED July 16 2026 (was: real replies detected, surfaced to NOBODY)
 
@@ -918,8 +1011,8 @@ Elena asked to confirm every agent actually surfaces its outcomes to HubSpot (cl
 HubSpot, Telegram, or anything Elena reads.** 189 rows accumulated Jan–Jul 2026 in silence.
 
 **What was actually in there** (this is why it matters — it is not a hygiene issue, it is lost money):
-- `alex@alex.com` **2026-07-15 — "Interview Invitation for Senior Full-Stack Engineer (TypeScript / AI Automation) at Truelogic"** + an Event Confirmation for a scheduled AI-assisted interview. Elena was shortlisted; the invite lived in SQLite.
-- `adriana.vargas@oracle.com` — **"Reunión Aideazz + Oracle"** (June 24) and "Aideazz Future Projects" (Jan 19): real Zoom invites from the Oracle Startup Program contact.
+- A recruiter's address, **2026-07-15 — "Interview Invitation for Senior Full-Stack Engineer (TypeScript / AI Automation) at Truelogic"** + an Event Confirmation for a scheduled AI-assisted interview. Elena was shortlisted; the invite lived in SQLite.
+- An Oracle Startup Program contact — **"Reunión Aideazz + Oracle"** (June 24) and "Aideazz Future Projects" (Jan 19): real Zoom invites from the Oracle Startup Program contact.
 - Foundever Panama interview invitation; a stranger offering LangGraph help; article-collab follow-ups.
 
 **Honest triage of the 189 (don't repeat "186 lost jobs" — it's wrong):** ~90 are **Torre.ai "Emma" bot** mail, 11 are
@@ -991,7 +1084,7 @@ GROQ_MODEL=<new-model-id>
 - **Provider reality:** the **Anthropic** key AND the **Gemini** key are OUT OF CREDITS (`400` / `429 prepayment depleted`). Working free/cheap: **Groq** (`llama-3.3-70b-versatile`, free) + **OpenAI** (`gpt-4o-mini`, cheap). Every AI path now falls back: `claude_helper`→Groq; VJH `response_detector` classify→Groq; VJH **LLM judge → OpenAI → Groq**. **Keys are read from each repo's `.env` directly** (bots do NOT export them to `os.environ`, which would otherwise fail-open/degrade). Groq sits behind Cloudflare → **must send a browser `User-Agent`** or it 403s the default urllib UA.
 - **Atlas Shifted (`whitespace` PM2, port 8095) — added June 25 2026; performance bridge June 29 2026; GA4 sync July 3 2026:** the marketing-angle radar (repo [`atlas-shifted`](https://github.com/ElenaRevicheva/atlas-shifted), Oracle `/home/ubuntu/whitespace`). Daily capture cron **`0 14 * * *` UTC** (= **9 AM Panama**). Most complete LLM chain in the fleet: **Claude → Groq → OpenAI → Grok** (text/JSON, per-process circuit breaker) + **OpenAI `text-embedding-3-small`** for the angle classifier (⚠️ embeddings are **OpenAI-only — no failover**; if OpenAI dies, classification halts). Image: Flux (Replicate) → OpenAI `gpt-image-1`. Video: Runway → **Luma Agents API** (`ray-3.2` i2v fallback). **Jun 29 performance bridge:** Atlas exports **`concept_id` + UTM tags**; CTO AIPA **`POST /cto/api/performance-event`** → Oracle **`atlas_performance_events`**; Atlas UI shows ROAS/CPA/leads/**ga4_sessions** when hub wired (`ATLAS_PERFORMANCE_SECRET` = `OUTREACH_SECRET`). **Jul 3 GA4 adapter:** **`scripts/sync-atlas-ga4.mjs`** cron **`15 6 * * *` UTC** on `cto-aipa` (separate from Atlas capture — measure only). **Jul 3 UI:** public banner client-safe before 9 AM (`atlas-shifted` `eb9e99c`). Detect→create pipeline **unchanged**. **Gotcha fixed June 25:** a standalone CLI that reads `process.env.*` directly (e.g. `video.ts`) **must `import 'dotenv/config'`** or every key is undefined and providers skip silently (looked like "dry credits"; it wasn't). **Jul 9 [ATLAS-RADAR] CRM bridge:** brief cron pushes ENTER windows → HubSpot `[ATLAS-RADAR]` deals via `/cto/api/crm-event` `source=atlas_radar` (`radar-to-crm.ts`, fail-open, dealname-deduped, no conversion attribution — see §13). **Jul 9 EN/ES i18n:** `atlas.html` + `index.html` have a portfolio-style EN/ES toggle (browser auto-detect `es` → Spanish for LATAM clients, localStorage `atlas_lang`/`ws_lang`; ENTER/WATCH/AVOID stay untranslated as product vocabulary; LLM ad copy renders in its generated language) — `e192b9c`. **⚠️ Jul 6-9 SILENT-DEATH POSTMORTEM — Bright Data account invalid:** the account went "Customer has invalid status" (HTTP 422 on `api.brightdata.com/zone?zone=…`) after the Scraping Browser burned the balance → every `atlas_scraping_browser` websocket got **403** → capture wrote **0 new ads for 4 days** while the cron kept exiting 0 (classify/brief/concept "succeeded" on stale JSONL — dashboard snapshot froze at 07-05, agg cells thinned 45→18). **The unlocker zone still returned 200** on the same token, which masks the account state — do NOT conclude "Bright Data is fine" from an unlocker probe. **Diagnosis:** `curl api.brightdata.com/zone?zone=atlas_scraping_browser -H "Authorization: Bearer $BRIGHTDATA_API_TOKEN"` → `422 Customer has invalid status` = balance/suspension (Elena tops up at brightdata.com/cp) vs `200` = zone fine, look elsewhere. **Fix Jul 9:** $20 top-up → zone 200 → manual `atlas-capture-cron.sh` run → fresh snapshot 2026-07-09 (44 cells) same day. **✅ Outage guard BUILT same day (atlas-shifted `2393a33`):** `capture.ts` now sends a Telegram alert (fleet bot creds in `whitespace/.env`) when a full run finds **0 ads across ALL verticals** — the outage signature — with the diagnose-curl in the message. Delivery verified live July 9. Single-vertical (`only`) runs don't alert.
 - **Fleet LLM failover — UNIVERSAL `Claude → Groq` spine (re-audited in code June 25):** **every** agent falls to **Groq (free `llama-3.3-70b-versatile`)** on Claude 400/credit-exhaustion — EspaLuz Telegram (`main.py` ~L4255), EspaLuz WhatsApp (`espaluz_bridge.py` ~L2880 + `whatsapp_convo_mode.py`), EspaLuz Influencer (`cto_milestone_module.py`), VJH (`claude_helper` / `response_detector` / judge `OpenAI→Groq`), cto-aipa (`claudeWithGroqFallback`, `src/llm-resilience.ts`), Algom, Atlas. **Extended tiers** in higher-volume/critical paths: **Grok (xAI)** in cto-aipa / Algom / Atlas (`XAI_MODEL` default `grok-4.20-0309-non-reasoning`); **OpenAI** in Atlas / Sprinter / VJH-judge; **Gemini** in Sprinter / blog-es. Fullest chain = Atlas (**Claude → Groq → OpenAI → Grok**). **CORRECTION (June 25):** an earlier draft of this note wrongly stated EspaLuz was "Claude + OpenAI only, no Groq/Grok" — that was a grep artifact (matched backup files). EspaLuz has the Claude→Groq fallback; "free grok" = **Groq**, the free Llama provider (not xAI Grok). The fleet is uniformly resilient to a single Anthropic outage.
-- **VibeJobHunter (`vibejobhunter` systemd):** honest-LEAD mode — surfaces right-fit (fully-remote · LATAM-open · AI-augmented · no-coding) jobs to Telegram + HubSpot "🔥 I Act TODAY", **capped at 6/cycle** (`VJH_SURFACE_CAP`). Deploy: `cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && git pull && sudo systemctl restart vibejobhunter`. Full chain + the "0-surfacing" bug-chain gotchas: VJH `CLAUDE.md` → "CURRENT PIPELINE". **Dedup stores:** `autonomous_data/seen_jobs.json` (`seen_jobs_v2`) + `vjh_checkpoint.db` — clearing them WITHOUT the surface cap **floods Telegram** (happened June 23; cap added).
+- **VibeJobHunter (`vibejobhunter` systemd):** honest-LEAD mode — surfaces right-fit (fully-remote · LATAM-open · AI-augmented · no-coding) jobs to Telegram + HubSpot "🔥 I Act TODAY", **capped at 6/cycle** (`VJH_SURFACE_CAP`). Deploy: `cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && git pull --ff-only`, then restart the unit(s) whose code changed — after any `llm_judge.py`/`fit_gate.py`/`job_gate.py` change all three (`vibejobhunter`, `vibejobhunter-web`, `pm2 restart serpapi-jobs`) — and prove each start time is newer than the file *(updated 19 Oct 2026)*. Full chain + the "0-surfacing" bug-chain gotchas: VJH `CLAUDE.md` → "CURRENT PIPELINE". **Dedup stores:** `autonomous_data/seen_jobs.json` (`seen_jobs_v2`) + `vjh_checkpoint.db` — clearing them WITHOUT the surface cap **floods Telegram** (happened June 23; cap added).
 
 ## 🟢 VJH retargeting + self-evolving judge (July 8-9 2026)
 
@@ -1010,8 +1103,8 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 - **`dc54b6c` Elena's CORRECTED target lanes** (her words July 9: *"I am not a Machine Learning Engineer… I am not a researcher"*): **(a) AI-augmented products/agents/systems BUILDER, (b) GEO/AEO/Tech SEO, (c) AI Automation & AI-augmented engineering SOLUTIONS ARCHITECT** — encoded in all three layers: `job_gate.py` (new \b-bounded `seo_term` standalone title lane — "Technical SEO Lead" had no AI term so the ai×builder detector never fired — plus SEO/AEO/product-owner include phrases), `fit_gate.py` (`_SEO_AEO_PATTERNS` in `ai_aug`; "seoul"/"archaeology" substring-guarded), `llm_judge.py` (prompt names the 3 lanes; **vetoes pure ML/AI research** — research scientist/engineer, academic). Live-verified on Oracle: SEO lane → approve, ML Research Scientist → veto.
 - **`a550977` Self-evolving judge (the JobCopilot adaptation):** weekly cron (`17 3 * * 0`, ubuntu crontab) runs **`scripts/judge_feedback_sync.py`** (stdlib-only) → pulls `[HIRING-*]` outcomes from HubSpot → writes `autonomous_data/judge_feedback.json` → `llm_judge.py` injects the titles as few-shot taste calibration ("refines judgment, does NOT override criteria 1-4"). **Signal honesty:** positives = ONLY stages Elena moves by hand (`presentationscheduled`/`contractsent`/`closedwon`) — **`qualifiedtobuy` is bot-filed and does NOT count**; negatives = `closedlost`. **Fail-safe:** file absent/corrupt → prompt byte-identical to pre-feature; sync failure → existing file untouched (atomic tmp+rename). First run July 9: 6 real negatives, 0 positives (honest — none manually advanced yet). Log: `autonomous_data/judge_feedback_sync.log`.
 - **Outcome report (cto-aipa `fa1367c`):** `scripts/vjh-outcome-report.cjs` (read-only) — acted-on/rejected/untriaged buckets by source prefix + top title words per bucket. **July 9 findings:** SERP-LEAD path = 414 deals, **0% acted-on**; bot path = 78 deals, 46% (inflated — see qualifiedtobuy caveat above). ⚠️ **Open question:** whether the SERP/Google-Jobs ingest path is worth keeping at all.
-- **Restart rule (Iron Rule #11 still applies):** after touching `fit_gate.py`/`job_gate.py`/`llm_judge.py`, restart BOTH `sudo systemctl restart vibejobhunter` AND `pm2 restart serpapi-jobs`. The judge reads `judge_feedback.json` per-call (no restart needed for feedback updates alone).
-- **Honest capability line vs JobCopilot:** VJH discovers more broadly, filters more precisely, tracks outcomes in a real CRM, and now updates its judge's taste weekly from Elena's demonstrated behavior. It deliberately does NOT click the final submit (LEAD mode) — that stays Elena's call. JobCopilot's remaining edge is only the auto-fill/submit step.
+- **Restart rule (Iron Rule #11 still applies):** after touching `fit_gate.py`/`job_gate.py`/`llm_judge.py`, restart ALL THREE: `sudo systemctl restart vibejobhunter`, `sudo systemctl restart vibejobhunter-web` AND `pm2 restart serpapi-jobs`, then prove each start time is newer than the file *(updated 19 Oct 2026: `vibejobhunter-web` loads the same code and was still running since 12 Oct 19:20 UTC, older than `llm_judge.py` of 18 Oct)*. The judge reads `judge_feedback.json` per-call (no restart needed for feedback updates alone).
+- **Honest capability line vs JobCopilot:** VJH discovers more broadly, filters more precisely, tracks outcomes in a real CRM, and now updates its judge's taste HOURLY (`17 * * * *`, Oracle crontab only; weekly at launch — updated 19 Oct 2026) from Elena's demonstrated behavior. It deliberately does NOT click the final submit (LEAD mode) — that stays Elena's call. JobCopilot's remaining edge is only the auto-fill/submit step.
 
 ---
 
@@ -1024,30 +1117,30 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 **Failure modes + fixes:**
 - `[400] credit balance is too low` (Make Claude module) → Anthropic API is prepaid — top up at console.anthropic.com Plans & Billing.
 - No TG after form submit → (1) Make filter must be `message` contains `AIDEAZZ-FORM` (not "own forms"/analytics source — form ≡ radar fingerprint). (2) Reused non-test email needs `MAKE_CONCIERGE_WEBHOOK_URL` on Oracle. (3) Test emails (`CONCIERGE_TEST_EMAILS`; *updated 15 Oct 2026: set ONLY in `.env` on the laptop and Oracle. The code default has been an empty list since 6 Oct, so if the variable is unset no address is force-recreated*) recreate the contact — check Make history + `grep inquiry ~/.pm2/logs/cto-aipa-out*.log`. (4) `grep concierge` for `/concierge/draft`.
-- "Recipient could not be determined" TG notice → >1 contact created in the 45-min window with no name match; reply manually from the notice.
+- "Recipient could not be determined" TG notice → at least one form-created contact exists in the 90-min window (since `f164ca67`, 17 Jul) but none is uniquely named in the draft — a name match has been required since `1fd39ec0` (17 Jul), even when only one contact is in the window; with no form contact in the window the draft is dropped quietly; reply manually from the notice.
 - **`🚫 SPAM from unknown` TG noise every 15 min — FIXED July 17 2026 (`1e11dde`, completes the `e3feb31`→`1fd39ec`→`f164ca6` junk-drop chain).** HubSpot auto-imports (CalendarSync dumped ~90 inbox contacts July 16) kept firing Make's Contacts/Created trigger; Fable 5 correctly said SPAM, but the SPAM branch in `src/concierge.ts` returned BEFORE the quiet-drop logic and paged Telegram unconditionally. Now: SPAM verdict with **no name AND no email** → console-log only (`SPAM verdict for unidentifiable sender — dropped quietly`); a **named** sender flagged SPAM still pages Elena (possible misjudged real lead). Upstream waste remains: Make still burns ops + Fable 5 tokens on each junk contact — the real cure is a filter in scenario `5633833` skipping contacts not created by our integration (Make UI change, not code).
 - Confirmation/reply emails "not received" → Resend accepted + DNS verified OK (DKIM `resend._domainkey`, SPF on `send.aideazz.xyz`, DMARC p=none): **check Gmail Spam** — cold sender reputation; verify true delivery status in the Resend dashboard (API key is send-only, can't query events).
-- **CONFIRMED July 16 2026 — replies DO land in Gmail spam.** A real lead (`espaluztester@gmail.com`) reported nothing arrived while Telegram said `✅ SENT`; it was in spam. Full DNS re-check that day: SPF `send.aideazz.xyz` = `v=spf1 include:amazonses.com ~all` ✅, DKIM `resend._domainkey.aideazz.xyz` present + aligns with From `aipa@aideazz.xyz` ✅, DMARC `p=none` ✅, SES bounce MX `feedback-smtp.us-east-1.amazonses.com` ✅ — **auth is not the problem; sender trust is** (new domain, near-zero volume). Two fixes shipped: (1) `src/concierge.ts` now **captures Resend's message id**, persists it on the draft, logs it, and shows it in the TG receipt — previously the id was discarded and the key is send-only (`401` on `GET /emails`), so every "never arrived" was unfalsifiable; (2) mail now sends **multipart `text` + `html`** (HTML-only is a structural spam signal). Remaining levers are Elena's, not code: mark **"Report not spam"** in Gmail (highest value), cut first-reply link count in the Fable 5 prompt (that reply carried 4 links), and only later raise DMARC `p=none` → `p=quarantine`. **"✅ SENT" means Resend ACCEPTED, never "delivered" — look the id up in the dashboard.**
+- **CONFIRMED July 16 2026 — replies DO land in Gmail spam.** A real lead (a Gmail address; *the 27 Jul concierge note further down lists that inbox as one of Elena's own test identities*) reported nothing arrived while Telegram said `✅ SENT`; it was in spam. Full DNS re-check that day: SPF `send.aideazz.xyz` = `v=spf1 include:amazonses.com ~all` ✅, DKIM `resend._domainkey.aideazz.xyz` present + aligns with From `aipa@aideazz.xyz` ✅, DMARC `p=none` ✅, SES bounce MX `feedback-smtp.us-east-1.amazonses.com` ✅ — **auth is not the problem; sender trust is** (new domain, near-zero volume). Two fixes shipped: (1) `src/concierge.ts` now **captures Resend's message id**, persists it on the draft, logs it, and shows it in the TG receipt — previously the id was discarded and the key is send-only (`401` on `GET /emails`), so every "never arrived" was unfalsifiable; (2) mail now sends **multipart `text` + `html`** (HTML-only is a structural spam signal). Remaining levers are Elena's, not code: mark **"Report not spam"** in Gmail (highest value), cut first-reply link count in the Fable 5 prompt (that reply carried 4 links), and only later raise DMARC `p=none` → `p=quarantine`. **"✅ SENT" means Resend ACCEPTED, never "delivered" — look the id up in the dashboard.**
 - Scenario won't toggle ON → Make active-scenario plan limit.
 - Trigger pointer consumes contacts per run — re-testing needs a NEW test contact (fresh email, gmail `+alias` works).
 - Buttons dead after pm2 restart → drafts survive (`data/concierge/`), but reply-to-edit needs the draft's `tgMessageId` — drafts created before July 12 evening lack it.
 
-**Case study published July 11 (the meta-play):** https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 (+ LinkedIn via Buffer, + Make Community). Watch HubSpot for `utm_campaign=fable5-case-study`.
+**Case study published July 11 (the meta-play):** https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 (+ LinkedIn via Buffer, + Make Community). *(updated 19 Oct 2026: this Dev.to URL and the Dev.to profile now return 404 — Dev.to suspended the account ~11 Oct; no aideazz.xyz copy of the case study exists.)* Watch HubSpot for `utm_campaign=fable5-case-study`.
 
 ---
 
 ## 🟢 SELLING PIVOT + SerpAPI re-subscribed (July 10-11 2026)
 
-> **(updated 15 Oct 2026) The SerpAPI half below is history.** The plan was cancelled on 11 Aug and is not coming back, and `dd527da2` (18 Aug) removed the quota probe, the alert and the SerpAPI fallback from `serpapi-prospects.ts`. Bright Data is the SERP supply for client discovery and the citation probe. The Atlas lead machine has read Google Places first since 13 Oct (`65e74faa`). VJH's PM2 app `serpapi-jobs` keeps a legacy name: it runs on Bright Data and never used SerpAPI.
+> **(updated 15 Oct 2026) The SerpAPI half below is history.** The plan was cancelled on 11 Aug and is not coming back, and `dd527da2` (18 Aug) removed the quota probe, the alert and the SerpAPI fallback from `serpapi-prospects.ts`. Bright Data is the SERP supply for client discovery and the citation probe. The Atlas lead machine has read Google Places first since 13 Oct (`65e74faa`). VJH's PM2 app `serpapi-jobs` keeps a legacy name: it has run on Bright Data since 31 May 2026 (VJH `98bcf85`, when SerpAPI's google_jobs quota ran out; SerpAPI fed it 16–31 May, `f77d170`) and no longer calls SerpAPI (corrected 19 Oct 2026).
 
 **Elena's directive July 10: done building without selling — every hour goes to putting her in front of a buyer.** Canonical selling kit: **`docs/selling/SELLING_KIT.md`** (positioning names, 3 offers with pricing, Upwork/Fiverr copy, proposal template, week-1 firing sequence). Umbrella identity: **Production AI Builder**; lanes: Conversational AI Agent Builder (WhatsApp·Telegram) · AI Automation & Integration Architect · AI Search Visibility Architect (GEO/AEO/Tech SEO).
 
 **July 10 live fleet audit (verify-from-logs, both ends — Oracle logs + HubSpot API), key findings:**
 - HubSpot funnel truth (861 deals): **0 contractsent / 0 won ever** — intake works, conversion motion never existed. Success metric now = buyer replies landing at `contractsent`.
 - 🟢 Alive writers: VJH SERP (`[HIRING-VJH-SERP-LEAD]` 222 deals/28d, hourly) + VJH LangGraph (79) + cto-aipa crm-event hub.
-- 🔴 `algom-stream` crash-looping since ~June 13: X API **account 1910676161845186560 has no credits** (restart loop every 30s — top-up or `pm2 stop algom-stream`). `[CLIENT-ALGOM]` frozen since June 13.
+- 🔴 `algom-stream` crash-looping since ~June 13: X API **account has no credits** (restart loop every 30s — top-up or `pm2 stop algom-stream`). *(superseded: PM2 shows no restart since 16 Aug 2026; on 19 Oct `algom-stream` is online and logs a 5-min heartbeat with 0 events. Posting stays blocked while X credits are $0.)* `[CLIENT-ALGOM]` frozen since June 13.
 - 🔴 `openclaw-gateway` systemd **inactive** *(July; superseded: it is LIVE as a `systemctl --user` unit, verified 7 Oct 2026)*; `[HIRING-OPENCLAW]` never wired (0 deals ever).
-- 🔴 `[ESPALUZ]` HubSpot deals = June 29 wiring TESTS only (incl. duplicates) — no live EspaLuz→HubSpot writer exists.
+- 🔴 `[ESPALUZ]` HubSpot deals = June 29 wiring TESTS only (incl. duplicates) — no live EspaLuz→HubSpot writer exists. *(superseded 16 Jul 2026: the writers existed but were a silent no-op because `OUTREACH_SECRET` was unset in both bots' `.env`; fixed and 28 trials backfilled — see the 16 Jul audit above. Both `.env` files still carry it on 19 Oct.)*
 - 🟡 `[CLIENT-CTO-SERP]` was dry June 22→July 10 (BrightData SERP sparse + gate); `[CLIENT-CTO-INGEST]` trickle; `[ATLAS-RADAR]` 1 deal (July 9, by design new).
 
 **SerpAPI re-subscribed July 11 (Starter, 1,000 searches/mo) — cto-aipa `48f38b1`:**
@@ -1062,28 +1155,28 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 
 | Field     | Value |
 |----------|--------|
-| **Public IP** | `170.9.242.90` |
-| **SSH**  | `ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90` |
+| **Public IP** | *not recorded in this public repo; it lives in the laptop's `~/.ssh/config` (host `oracle-cto-aipa`)* |
+| **SSH**  | `ssh oracle-cto-aipa` (alias in the laptop's `~/.ssh/config`, which holds the address, user and key file) |
 | **OS**   | Ubuntu 24.04, 12 GB RAM, VM.Standard.E5.Flex |
 
 ---
 
 ## All 11 AI Agents on Oracle (Canonical List)
 
-> **(updated 15 Oct 2026)** The "11" is historical. The table has 13 numbered rows plus 8.1 (Sprinter, on AWS), and #10 AILA is not deployed. Live process inventory (15 processes): `docs/oracle/2026-10-12_fleet_sync_audit.md`. What changed 12–15 Oct: the section at the top of this doc. One process runs on Oracle without a row here: systemd `aw-portal` (repo `aw-client-report-portal`).
+> **(updated 15 Oct 2026)** The "11" is historical. The table has 13 numbered rows plus 8.1 (Sprinter, on AWS), and #10 AILA is not deployed. Live process inventory (16 processes on 19 Oct 2026: 8 PM2 apps including `n8n`, 7 systemd units, 1 user unit `openclaw-gateway`; the 12 Oct audit's 15 leaves out `n8n`): `docs/oracle/2026-10-12_fleet_sync_audit.md`. What changed since 12 Oct: the 16–19 Oct and 12–15 Oct sections at the top of this doc. One process runs on Oracle without a row here: systemd `aw-portal` (repo `aw-client-report-portal`).
 
 Every agent on this instance **must** have: (1) restart hardening, (2) a health-check (HTTP or process liveness) that restarts if unhealthy, (3) included in OCI keep-alive — **except AWS-only modules** (Sprinter), which use CloudWatch + EventBridge instead.
 
 | # | Name | Repo | Try it / See it | Process manager | Service / PM2 name | Health URL or check | Public web (4everland) | Web repo (`main` deploy) | Local checkout note |
 |---|------|------|------------------|------------------|--------------------|----------------------|--------------------------|---------------------------|---------------------|
-| 1 | **EspaLuz WhatsApp** | [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp) | [wa.me/50766623757](http://wa.me/50766623757) | systemd | `espaluz-whatsapp` | `http://127.0.0.1:8081/webhook` | — | — | — |
+| 1 | **EspaLuz WhatsApp** | [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp) | WhatsApp (public number on [aideazz.xyz](https://aideazz.xyz), EspaLuz section) | systemd | `espaluz-whatsapp` | `http://127.0.0.1:8081/webhook` | — | — | — |
 | 2 | **EspaLuz Telegram** | [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot) | [t.me/EspaLuzFamily_bot](https://t.me/EspaLuzFamily_bot) | systemd | `espaluz-familybot` + `espaluz-payments-webhook` (:5000, the single PagueloFacil receiver for every payment on the account, including the aideazz $100 Diagnostic) *(updated 15 Oct 2026)* | `systemctl is-active espaluz-familybot espaluz-payments-webhook`. Both are watched by `~/check_oracle_health.sh`; the duplicate `espaluz-webhook.service` was disabled 9 Oct. Deliberate hold: never `git pull` here | — | — | — |
 | 3 | **EspaLuz Influencer** | [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | [t.me/Influencer_EspaLuz_bot](https://t.me/Influencer_EspaLuz_bot) | systemd | `espaluz-influencer` | `systemctl is-active espaluz-influencer`, already watched by `~/check_oracle_health.sh` *(updated 15 Oct 2026)* | — | — | — |
 | 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 | `dragontrade-main`, `dragontrade-dashboard` (:3001), `algom-stream`, `algom-poll`. `dragontrade-bybit` / `-binance` paused on purpose since 28 Sep *(updated 15 Oct 2026)* | `pm2 list` status (the health script watches `dragontrade-main` + `dragontrade-dashboard`). Deliberate hold: never `git pull` here. Posting is blocked while X API credits are $0 (7 Oct) | — | — | — |
-| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd + PM2 | `vibejobhunter` (systemd) + `serpapi-jobs` (PM2, the Bright Data job-board door; legacy name) *(updated 15 Oct 2026)* | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) · `pm2 list` for `serpapi-jobs`. After judge or gate code changes, restart both, and `vibejobhunter-web` too | — | — | — |
-| 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter-web` | `http://127.0.0.1:8080/health` (FastAPI: CTO `/api/tech-update`, `/health`) | [aideazz.xyz](https://aideazz.xyz) | [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` |
+| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd + PM2 | `vibejobhunter` (systemd) + `serpapi-jobs` (PM2, the Bright Data job-board door; legacy name) *(updated 15 Oct 2026)* | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) · `pm2 list` for `serpapi-jobs`. After judge or gate code changes, restart both, and `vibejobhunter-web` too *(updated 19 Oct 2026: at `406e83b` VJH answers EN/ES from the shared deals/proof/cards sheets and checks the employer-reply inbox every cycle (16 Oct). It reads PDF/.docx like screenshots and sends one-tap ⏳ I applied / ❌ Not a fit alert buttons (18 Oct). `vibejobhunter` + `serpapi-jobs` were restarted 18 Oct 12:34 UTC. `vibejobhunter-web` was not, and still holds the 12 Oct judge code; it serves the dashboard, `/api/tech-update` and an hourly count-only ATS fetch, none of which calls the judge)* | — | — | — |
+| 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter` (the daily CMO LinkedIn post runs in the autonomous loop) + `vibejobhunter-web` (FastAPI) *(corrected 19 Oct 2026)* | `http://127.0.0.1:8080/health` on `vibejobhunter-web` (FastAPI: CTO `/api/tech-update`, `/health`) | [aideazz.xyz](https://aideazz.xyz) | [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` |
 | 7 | **OpenClaw — Elena's interview coach** ✅ *LIVE (updated 15 Oct 2026): mock interviews, LIVE mode, Spanish mode with voice. It reads her HubSpot deals and answers on Telegram AND on her WhatsApp Business "Message yourself" chat (since 15 Oct; allowlist = her own number only). npm `openclaw` **2026.2.14 PINNED**, plus 2 local dist patches; see the 12–15 Oct section. The repo name is legacy: the YC shortlist cron still exports 20 companies every 6 h, but VJH never applies them (PRIORITY BOOST = 0)* | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | **systemd `--user`**: `systemctl --user status openclaw-gateway`. A plain `systemctl` does NOT see it | `openclaw-gateway` (npm `openclaw`, state `~/.openclaw`) | `http://127.0.0.1:18789/` | — | — | — |
-| 8 | **Tech Co-Founder (CTO AIPA)** *(updated 15 Oct 2026: voice note in → voice note out, EN/ES, OpenAI `tts-1`/nova. Typed text and voice both reach Trello. Screenshots go through the Claude → OpenAI → Gemini waterfall. Its repo also holds the apply-kit and Atlas lead-machine cron scripts; see the 12–15 Oct section)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` | — | — | — |
+| 8 | **Tech Co-Founder (CTO AIPA)** *(updated 15 Oct 2026: voice note in → voice note out, EN/ES, OpenAI `tts-1`/nova. Typed text and voice both reach Trello. Screenshots go through the Claude → OpenAI → Gemini waterfall. Its repo also holds the apply-kit and Atlas lead-machine cron scripts; see the 12–15 Oct section)* *(updated 19 Oct 2026: free chat and photos are answered from the verified proof sheet in her language (16 Oct, `fb698e86`). It reads PDF and .docx (18 Oct, `c730706d`). **Document desk** since 19 Oct (`6582fe58`, pm2 restart 12:35:16 UTC): it makes a PDF / Word / HTML from her voice or text task, EN/ES, and attaches it to the HubSpot deal only when exactly one deal matches. Facts and numbers come only from the verified sheet. Details: NOW.md 16–19 Oct)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` | — | — | — |
 | 8.1 | **Sprint Briefing (Sprinter)** *(CTO AIPA — AWS)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (`src/sprint-briefing/`); the packaging lives in this repo too: `infra/aws/sprint-briefing/template.yaml`, `dist-lambda/sprint/`, `scripts/oracle-resilience/deploy-sprinter-aws.sh` *(updated 15 Oct 2026: `D:\aideazz\SprintBriefingAgent` holds only an empty `evals/` folder from 28 Apr)* | Private Telegram (Sprint Briefing audio) | AWS Lambda | `sprint-briefing-agent` | CloudWatch `/aws/lambda/sprint-briefing-agent` · EventBridge schedule `cron(0 13 * * ? *)` (~8:00 America/Panama) | — | — | **Sprinter:** Lambda/SAM workspace — not an Oracle systemd/PM2 process (see [AILA symphony §8.1](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md)) |
 | 9 | **Creative Co-Founder Atuona** *(updated 15 Oct 2026: the AI Film Studio holds nine films, and AREAREA v17 went live 12 Oct. Films render on the laptop, never on Oracle)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` | [atuona.xyz](https://atuona.xyz) | [atuona](https://github.com/ElenaRevicheva/atuona) | *Local clone `D:\aideazz\atuona`; deploy site from GitHub `main` only (4everland)* |
 | 10 | **AILA** (Adaptive Intelligent Life Assistant) | [AILA](https://github.com/ElenaRevicheva/AILA) | *Not deployed as its own process on Oracle* — repo holds architecture, blueprint, Hive integration notes. **PAUSED deliberately; Elena is returning to it.** See the AELA note below. | — | — | — | — | — | `D:\aideazz\AILA` (planning repo) |
@@ -1097,9 +1190,9 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 > **Rule going forward:** AILA is **paused deliberately** and Elena is returning to it. Work from `D:\aideazz\AILA` (branch `docs`) against `github.com/ElenaRevicheva/AILA`. Do **not** recreate a clone on Oracle — it is a planning repo, not a deployed process. If you meet the name "AELA" anywhere, it is the old name for this same repo.
 | 11 | **Atlas Shifted** (Marketing Strategist) | [atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted) | [live radar](https://webhook.aideazz.xyz/whitespace/atlas.html) | PM2 | `whitespace` (port 8095) | `http://127.0.0.1:8095/healthz` | via `webhook.aideazz.xyz/whitespace/` (nginx → :8095) | — | `D:\aideazz\whitespace` (Oracle `/home/ubuntu/whitespace`; folder ≠ repo). Data backup repo: `atlas-captures` (weekly push, Mon 14:00 UTC). The Monday **lead machine** is a cto-aipa cron (`scripts/atlas-lead-machine.cjs`, Mon 16:00 UTC), supplied by Google Places since 13 Oct *(updated 15 Oct 2026)* |
 | 12 | **n8n** (ops/CRM automation engine) | *no repo — workflows live in n8n's own SQLite at `~/.n8n`* | [editor](https://webhook.aideazz.xyz/crm/) (n8n owner login) | PM2 | `n8n` (port 5678, **bound to 127.0.0.1**) | `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5678/` → 200 · executions: `sqlite3 ~/.n8n/database.sqlite "SELECT id,status FROM execution_entity ORDER BY id DESC LIMIT 5;"` | via `webhook.aideazz.xyz/crm/` (nginx → :5678) | — | No local checkout — n8n is installed globally (`npm i -g n8n`), workflows are edited in the browser. **Export workflows to git before any upgrade.** |
-| 13 | **Ops dashboard** (private CRM view) | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) — **HTTP basic auth**, user `elena`; password is a bcrypt hash — **not recoverable, only resettable** (`/opspw` in Telegram, or see the reset recipe in the n8n + ops dashboard section) | nginx static (`/var/www/ops`) | — (no process) | `curl -o /dev/null -w '%{http_code}' https://webhook.aideazz.xyz/ops/` → **401 expected** (200 would mean the lock is off) | served from `webhook.aideazz.xyz/ops/`, deliberately NOT on the public marketing site | — | `D:\aideazz\aideazz-ops-dashboard`. Deploy: `MSYS_NO_PATHCONV=1 npx vite build --base=/ops/` then `scp -r dist/* oracle:/var/www/ops/` |
+| 13 | **Ops dashboard** (private CRM view) | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) — **HTTP basic auth** (user name not recorded here); password is a bcrypt hash — **not recoverable, only resettable** (`/opspw` in Telegram, or see the reset recipe in the n8n + ops dashboard section) | nginx static (`/var/www/ops`) | — (no process) | `curl -o /dev/null -w '%{http_code}' https://webhook.aideazz.xyz/ops/` → **401 expected** (200 would mean the lock is off) | served from `webhook.aideazz.xyz/ops/`, deliberately NOT on the public marketing site | — | `D:\aideazz\aideazz-ops-dashboard`. Deploy: `MSYS_NO_PATHCONV=1 npx vite build --base=/ops/` then `scp -r dist/* oracle:/var/www/ops/` |
 
-**Repos (8 on Oracle VM):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for agents **on the VM**; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF). *(updated 15 Oct 2026: AILA is NOT on the VM; its Oracle clone was removed 16 Aug, see the note above. On the VM today: EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF; openclaw-vibejob-shortlist as `~/job-list-filter` (a copy with no git); AIPA_AITCF as `~/cto-aipa` (HEAD held at `782abc2` on purpose); atlas-shifted as `~/whitespace`, with `atlas-captures` in `~/whitespace/data`; and aideazz as `~/aideazz` (the wiki/blog push clone). The ops dashboard ships as static files to `/var/www/ops`.)* **Sprinter** uses the same **AIPA_AITCF** codebase path plus optional **`D:\aideazz\SprintBriefingAgent`** workspace for AWS packaging — runtime on **AWS Lambda**, not under `/home/ubuntu/` PM2/systemd.
+**Repos (8 on Oracle VM):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for agents **on the VM**; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF). *(updated 15 Oct 2026: AILA is NOT on the VM; its Oracle clone was removed 16 Aug, see the note above. On the VM today: EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF; openclaw-vibejob-shortlist as `~/job-list-filter` (a copy with no git); AIPA_AITCF as `~/cto-aipa` (HEAD held at `782abc2` on purpose); atlas-shifted as `~/whitespace`, with `atlas-captures` in `~/whitespace/data`; and aideazz as `~/aideazz` (the wiki/blog push clone). The ops dashboard ships as static files to `/var/www/ops`. aw-client-report-portal runs from `~/aw-portal`, a copy with no git (`app.py` md5 = laptop, 19 Oct).)* **Sprinter** uses the same **AIPA_AITCF** codebase path plus optional **`D:\aideazz\SprintBriefingAgent`** workspace for AWS packaging — runtime on **AWS Lambda**, not under `/home/ubuntu/` PM2/systemd.
 
 **Public sites:** [aideazz.xyz](https://aideazz.xyz) and [atuona.xyz](https://atuona.xyz) — **4everland** hosting, deploy from GitHub **`main`**. Not Oracle processes; columns above tie each site to its owning agent narrative.
 
@@ -1127,7 +1220,7 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 >   2. Then Dynamic redirect → `concat("https://aideazz.xyz", http.request.uri.path)` (preserve query string)
 >   3. Status **301** · place at top of rules
 >   Verify: `curl -sI https://www.aideazz.xyz/sop-ai-ops.html` → **301** `Location: https://aideazz.xyz/sop-ai-ops.html`, then apex **200** with fresh title. Optional: add `CLOUDFLARE_API_TOKEN` + zone id to `cto-aipa/.env` so agents can restore this without a dashboard login.
-### Canonical deploy directories on Oracle (`ubuntu@170.9.242.90`)
+### Canonical deploy directories on Oracle (`ssh oracle-cto-aipa`)
 
 Each **GitHub repo** has **one** working tree on the VM — **no duplicate clones** for the same product. Agents that share a repo share **one directory** and differ only by **process** (systemd unit or PM2 app name).
 
@@ -1146,7 +1239,7 @@ Each **GitHub repo** has **one** working tree on the VM — **no duplicate clone
 | [atlas-captures](https://github.com/ElenaRevicheva/atlas-captures) | `/home/ubuntu/whitespace/data` (weekly capture push) *(added 15 Oct 2026)* | 11 (data) |
 | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | `/var/www/ops`: static `dist/`, no git *(added 15 Oct 2026)* | 13 |
 | *(no repo — n8n)* | `~/.n8n` (SQLite), PM2 `n8n` *(added 15 Oct 2026)* | 12 |
-| [aw-client-report-portal](https://github.com/ElenaRevicheva/aw-client-report-portal) | systemd `aw-portal`; its Oracle path is not recorded in this doc *(added 15 Oct 2026)* | — |
+| [aw-client-report-portal](https://github.com/ElenaRevicheva/aw-client-report-portal) | systemd `aw-portal` from `/home/ubuntu/aw-portal` (a copy, no git; uvicorn bound to 127.0.0.1 with `--root-path /aw-portal`; `app.py` md5 = laptop `201789c`) *(added 15 Oct 2026; path recorded 19 Oct 2026)* | — |
 
 **Same repo, two agents (still one clone):** **#8 + #9** → one checkout **`/home/ubuntu/cto-aipa`**, one PM2 app `cto-aipa`. **#5 + #6** → one checkout **`/home/ubuntu/VibeJobHunterAIPA_AIMCF`**, three processes *(updated 15 Oct 2026)*: `vibejobhunter`, `vibejobhunter-web` (systemd) and `serpapi-jobs` (PM2, the Bright Data job-board door, which loads the same judge code).
 
@@ -1173,7 +1266,7 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 | [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | **[aideazz.xyz](https://aideazz.xyz)** — **4everland** hosting, deploy from GitHub **`main`**. Pages: [`/portfolio`](https://aideazz.xyz/portfolio) (AI products portfolio card), [`/pitch.html`](https://aideazz.xyz/pitch.html) (pitch page). i18n content in `src/i18n/locales/en.json` + `es.json`. Static assets / PDFs in `public/`. |
 | [atuona](https://github.com/ElenaRevicheva/atuona) | `D:\aideazz\atuona` **(corrected 19 Sep 2026 — this row said "No local checkout"; the clone exists and is where the GEO work was done)** | **[atuona.xyz](https://atuona.xyz)** — **4everland**, deploy from GitHub `main` **only**; **no Oracle checkout by design** (the `/home/ubuntu/atuona-*` dirs are film-render working dirs, not clones; the Atuona *agent* runs inside `cto-aipa`). Vite: `index.html` is the home page, `public/` ships verbatim, and `npm run build` runs `vault:build`, which rewrites only its own marked region of `index.html`. GEO surfaces added 19 Sep: `public/robots.txt`, `public/llms.txt`, `public/sitemap.xml`. `/aifilmstudio/` loads its films from `webhook…/cto/films.json` **with JavaScript**, so the films (**seven** since 22 Sep 2026; **nine** since 10–12 Oct, when ATUONA and AREAREA were added, atuona `524b83db`; updated 15 Oct 2026) are ALSO emitted as VideoObject JSON-LD plus a `<noscript>` list — add each new one with `cto-aipa/scripts/atuona-add-film-to-site.py` — without that a crawler sees only "Loading films…". Audit: **69/C, 0/6 crawlers → 93/A+, 6/6** (studio 89/A). |
 | **Sprinter** (Lambda workspace; pairs with AIPA_AITCF) | `D:\aideazz\ai-cofounders\cto-aipa` *(updated 15 Oct 2026: `D:\aideazz\SprintBriefingAgent` is an empty leftover)* | AWS SAM/Lambda packaging for Sprint Briefing — mirrors **`src/sprint-briefing/`** in AIPA_AITCF (see §8.1 in symphony doc). |
-| [atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted) | `D:\aideazz\whitespace` | **Atlas Shifted** marketing-angle radar. Folder **`whitespace`** ≠ repo `atlas-shifted` (renamed whitespace→atlas-aipa→atlas-shifted). Oracle `/home/ubuntu/whitespace`, PM2 `whitespace`:8095. Data time-series backup repo: **`atlas-captures`** (private; *updated 15 Oct 2026:* `atlas-capture-cron.sh` pushes `captures.jsonl` WEEKLY, Mon 14:00 UTC, in cheap mode since 19 Jul; the Oracle clone is `/home/ubuntu/whitespace/data`). |
+| [atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted) | `D:\aideazz\whitespace` | **Atlas Shifted** marketing-angle radar. Folder **`whitespace`** ≠ repo `atlas-shifted` (renamed whitespace→atlas-aipa→atlas-shifted). Oracle `/home/ubuntu/whitespace`, PM2 `whitespace`:8095. Data time-series backup repo: **`atlas-captures`** (GitHub shows it **public** on 19 Oct 2026, not private; *updated 15 Oct 2026:* `atlas-capture-cron.sh` pushes `captures.jsonl` WEEKLY, Mon 14:00 UTC, in cheap mode since 19 Jul; the Oracle clone is `/home/ubuntu/whitespace/data`). |
 
 **Also cloned locally (added 15 Oct 2026, checked with `git remote get-url origin`):** `aideazz-ops-dashboard` → `D:\aideazz\aideazz-ops-dashboard` (served from Oracle `/var/www/ops`) · `atlas-captures` → `D:\aideazz\atlas-captures` · `aw-client-report-portal` → `D:\aideazz\aw-portal` (Oracle systemd `aw-portal`) · `aideazz-private-docs` → `D:\aideazz\aideazz-private-docs` · `hive` → `D:\aideazz\hive` · `handy_manny-s` → `D:\aideazz\ai-cofounders\handy_manny-s` · `manukora-sop-brief` → `D:\aideazz\manukora-sop-brief` (no remote).
 
@@ -1183,7 +1276,7 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 
 **On your Windows dev machine:** every repo is cloned at the canonical path in the table above. Git credentials are configured locally — `git pull` and `git push` work without additional login.
 
-**On Oracle VM:** HTTPS + a classic PAT. GitHub **deploy keys are one-repo-only** — the atlas key cannot pull private repos like `EspaLuzFamilybot`. Do **not** rely on `https://github.com/...` without credentials (fails with `could not read Username`).
+**On Oracle VM:** HTTPS + a classic PAT. GitHub **deploy keys are one-repo-only** — the atlas key cannot pull private repos like `EspaLuzWhatsApp` (on 19 Oct the only private one of the seven the token serves). Do **not** rely on `https://github.com/...` without credentials (fails with `could not read Username`).
 
 #### 🔑 The token has TWO homes, and both must be written (rewritten 7 Sep 2026)
 
@@ -1198,7 +1291,7 @@ This is the whole lesson of the 7 Sep incident — full write-up:
 
 **⚠️ `/ghtoken` writes the first two homes only.** The Lambda is off-box and is not touched
 by the Telegram rotation command, so it goes stale on its own schedule. This has now bitten
-twice — **19 Jun 2026** and again **18 Sep 2026** (see §"Sprinter token" below). After any
+twice — **19 Jun 2026** and again **18 Sep 2026** (see §"18 Sep 2026 — the SAME Lambda token died again" below). After any
 rotation, also run: `GH=<valid-pat> python scripts/update-sprinter-token.py`.
 
 **Rotating only the wallet is the trap.** git keeps working perfectly, so nothing looks
@@ -1226,7 +1319,7 @@ guarantees, hidden prompt. Repo copy: `scripts/github-token-set.sh`.
 `oracle-whitespace-deploy` (`~/.ssh/id_ed25519_github`), a live deploy key created through
 the `repo` scope. Deleting the token deletes the key; regenerating keeps it.
 "Update token" saves **scope** changes and keeps the value — only "Regenerate" issues a new
-one. Measured minimum scopes: **`repo` + `workflow`** (6 of 8 repos are private; cto-aipa
+one. Measured minimum scopes: **`repo` + `workflow`** (*updated 19 Oct 2026:* of the 7 repos the token serves only `EspaLuzWhatsApp` is private today, because the rest went public for employers until ~20 Nov, so keep `repo` for it and for when they go private again; cto-aipa
 and aideazz carry 10 workflow files).
 
 **The expiry alarm:** `~/bin/github-token-watch.sh`, cron `0 9 * * *`. Warns at ≤14 days,
@@ -1280,7 +1373,7 @@ Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.git
 
 #### Fleet sync status — laptop / GitHub / Oracle (7 Oct 2026, verified live)
 
-> **(updated 15 Oct 2026) This table is the 7 Oct snapshot.** Newer verified syncs: 12 Oct (`docs/oracle/2026-10-12_fleet_sync_audit.md`, all 15 processes) and 15 Oct (~12:00 + ~17:00 UTC, NOW.md). Rows that have moved since: VJH is at `006c1ed` (processes `vibejobhunter`, `vibejobhunter-web` + PM2 `serpapi-jobs`). OpenClaw is npm 2026.2.14 PINNED, with WhatsApp and 2 local dist patches (job-list-filter `docs` `b272588`). cto-aipa is 371 runtime + 94 dist files = a build of origin/main (last code commit `de06ac75`), with Oracle HEAD at `782abc2` holding 4 Oracle-only Atlas commits. Atlas is `48ecab5`. aideazz was `3dabeca` at the sync (GitHub `37ec1cd`). The EspaLuz ×2 / DragonTrade holds are unchanged. One running process is missing from this table: `aw-portal` (systemd).
+> **(updated 15 Oct 2026) This table is the 7 Oct snapshot.** Newer verified syncs: 12 Oct (`docs/oracle/2026-10-12_fleet_sync_audit.md`, all 15 processes) and 15 Oct (~12:00 + ~17:00 UTC, NOW.md). Rows that have moved since (re-checked read-only 19 Oct 2026 ~13:15 UTC): VJH is at `406e83b` = GitHub = laptop, with 0 tracked edits on Oracle. `vibejobhunter` was restarted 18 Oct 12:34:06 UTC and PM2 `serpapi-jobs` 12:34:07. `vibejobhunter-web` still runs since 12 Oct 19:20 (dashboard, `/api/tech-update`, count-only ATS fetch). OpenClaw is npm 2026.2.14 PINNED, with WhatsApp and 2 local dist patches (job-list-filter `docs` `b272588`). cto-aipa runs a build of origin/main through the 19 Oct document desk `6582fe58` (Oracle md5 `dist/telegram-bot.js` ca574988, `dist/hubspot-client.js` b6aaf1bd, `scripts/build-lane-cv.cjs` 14411505 = NOW.md 19 Oct; 94 `dist/**/*.js`; pm2 start 12:35:16 UTC > files 12:34:34; the full 371-file compare was last run 15 Oct), with Oracle HEAD at `782abc2` holding 4 Oracle-only Atlas commits. Atlas is `48ecab5`. aideazz `~/aideazz` = GitHub `main` `81cde4b` on 19 Oct (the laptop clone was 2 commits behind GitHub at that check). The EspaLuz ×2 / DragonTrade holds are unchanged. One running process is missing from this table: `aw-portal` (systemd).
 
 Checked repo by repo against this doc's own tables. **Running code is what counts.** A checkout can lag on purpose.
 
@@ -1304,7 +1397,7 @@ Checked repo by repo against this doc's own tables. **Running code is what count
 > (backup → code-only → restore runtime JSON), and check the env vars first.
 >
 > **Duplicate clone (violates "one clone per repo"):** `~/EspaLuzWhatsApp_backup_jan23_prefix` has the same remote as #1 and is 60 behind.
-> No process uses it. Left in place (never-wipe rule); remove only with Elena's go after a backup.
+> No process uses it. Left in place (never-wipe rule); remove only with Elena's go after a backup. *(superseded 9 Oct 2026: archived to the laptop `D:\ORACLE_ARCHIVE_2026-10-09\` (270 files, `VERIFIED` in `docs/oracle/disk-cleanup-2026-10-09/archive_run.log`) and removed from Oracle in the disk cleanup; absent on 19 Oct)*
 
 #### EspaLuz bots — sync status (June 30, 2026, verified live) — *superseded by the 7 Oct table above*
 
@@ -1324,7 +1417,7 @@ Checked repo by repo against this doc's own tables. **Running code is what count
 
 **Expected `git status` on Oracle Telegram:** runtime JSON files show `M` (prod data vs empty placeholders still tracked in git) — **normal; do not commit**. Untracked `??` backup/mp3 files are safe to delete. **⛔ (updated 15 Oct 2026) No longer: never delete untracked files, and never `git pull` / `reset` / `clean`, in Oracle EspaLuz checkouts. Live customer data (subscriber JSONs, the 180 MB WhatsApp login) is untracked there.**
 
-**WhatsApp Oracle stash:** `stash@{0}: pre-atlas-deploy-oracle-local` — old local hotfixes; drop with `git stash drop stash@{0}` when confirmed unneeded. **⛔ (updated 15 Oct 2026) Never `git stash drop` / `clear` on Oracle.** Stashes there (VJH 2, Familybot 2, EspaLuzWhatsApp 5, whitespace 3) are sometimes the only copy of old work.
+**WhatsApp Oracle stash:** `stash@{0}: pre-atlas-deploy-oracle-local` — old local hotfixes; drop with `git stash drop stash@{0}` when confirmed unneeded. **⛔ (updated 15 Oct 2026) Never `git stash drop` / `clear` on Oracle.** Stashes there (VJH 2, Familybot 2, EspaLuzWhatsApp 5, whitespace 3, cto-aipa 12; counted 19 Oct 2026) are sometimes the only copy of old work.
 
 **Before cloud-agent deploy:** set `ORACLE_SSH_KEY` on AIPA_AITCF; use `PRODUCT=telegram` or `deploy-telegram-june30-sync.sh` pattern for future Telegram code-only deploys. **⛔ (updated 15 Oct 2026) Not any more:** both would ship the held PII refactor. `PRODUCT=telegram` checks out `main.py` and other files from origin/main, and the June 30 script fast-forwards. Telegram deploys are on a deliberate hold, and Elena decides.
 
@@ -1343,9 +1436,9 @@ If a path says **"no local checkout"** in the table → use GitHub API or browse
 
 **Note on #10:** The [AILA](https://github.com/ElenaRevicheva/AILA) product is listed as the tenth *agent slot* in the canonical inventory (longitudinal personal assistant). There is no separate systemd/PM2 service or health URL until AILA is deployed; add `check_oracle_health.sh` / `oci_keepalive.sh` hooks when a runnable service exists.
 
-**Action:** On the server run `pm2 list` and `systemctl list-units --type=service --all | grep -E 'espaluz|cto|vibe|dragon|algom'` and set the exact service/PM2 names and ports in the health script. Add a simple HTTP health endpoint in any bot that doesn’t have one (e.g. `/health` returning 200) so the cron can detect hangs, not only crashes.
+*(updated 19 Oct 2026: done for 9 processes. `~/check_oracle_health.sh` (repo copy = live copy since 9 Oct) watches cto-aipa, the 4 EspaLuz units, vibejobhunter, vibejobhunter-web and dragontrade-main/dashboard. Still unwatched: whitespace, serpapi-jobs, algom-stream, algom-poll, openclaw-gateway, aw-portal, n8n (see Standing traps). Original action, kept as history:)* **Action:** On the server run `pm2 list` and `systemctl list-units --type=service --all | grep -E 'espaluz|cto|vibe|dragon|algom'` and set the exact service/PM2 names and ports in the health script. Add a simple HTTP health endpoint in any bot that doesn’t have one (e.g. `/health` returning 200) so the cron can detect hangs, not only crashes.
 
-**DragonTrade (Algom Alpha) on Oracle:** PM2 app names are `dragontrade-main`, `dragontrade-dashboard`, `algom-stream`, `algom-poll` *(updated 15 Oct 2026. `dragontrade-bybit` / `dragontrade-binance` have been paused on purpose since 28 Sep: they are not in PM2, and their code and state are kept. `scripts/oracle-resilience/oracle-products.conf` still lists the old two)*. In the app's `.env` on the server set `COINGECKO_USE_DIRECT_API_ONLY=1` and `COINGECKO_API_KEY=<key>` to avoid crash-loops from CoinGecko MCP (mcp.api.coingecko.com 500/SSE errors). See `docs/DRAGONTRADE_ORACLE_SILENT_DEATH_FIX.md` for the full diagnosis.
+**DragonTrade (Algom Alpha) on Oracle:** PM2 app names are `dragontrade-main`, `dragontrade-dashboard`, `algom-stream`, `algom-poll` *(updated 15 Oct 2026. `dragontrade-bybit` / `dragontrade-binance` have been paused on purpose since 28 Sep: they are not in PM2, and their code and state are kept. `scripts/oracle-resilience/oracle-products.conf` still lists the old two)*. In the app's `.env` on the server set `COINGECKO_USE_DIRECT_API_ONLY=1` and `COINGECKO_API_KEY=<key>` to avoid crash-loops from CoinGecko MCP (mcp.api.coingecko.com 500/SSE errors). See `docs/oracle/DRAGONTRADE_ORACLE_SILENT_DEATH_FIX.md` for the full diagnosis.
 
 ---
 
@@ -1361,7 +1454,7 @@ If a path says **"no local checkout"** in the table → use GitHub API or browse
 
 ## 1. Systemd Services (EspaLuz WhatsApp, Telegram, Influencer; others if using systemd)
 
-Apply to every systemd-run bot: **Restart:** `Restart=always`, `RestartSec=10`, `StartLimitIntervalSec=300`, `StartLimitBurst=10`. **Do not add** `WatchdogSec` unless the app calls `sd_notify(WATCHDOG=1)` (see `ORACLE_RESILIENCE_PLAN_REVIEW.md`).
+Apply to every systemd-run bot: **Restart:** `Restart=always`, `RestartSec=10`, `StartLimitIntervalSec=300`, `StartLimitBurst=10`. *(updated 19 Oct 2026: `StartLimitIntervalSec=` is a `[Unit]` key. Every Oracle unit that sets it puts it under `[Service]`: the resilience.conf drop-ins of espaluz-whatsapp, -familybot, -influencer, vibejobhunter and vibejobhunter-web, plus `aw-portal.service` and the `openclaw-gateway` user unit. There systemd 255 logs `Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring`. The live value is `StartLimitIntervalUSec=10s` (the default) with `StartLimitBurst=10`. With `RestartSec=10` that limit never trips, so systemd restarts the bots indefinitely. Moving the key to `[Unit]` would make systemd stop retrying a crash-looping bot after 10 starts in 5 min, and recovery would then wait for the `*/5` health check. Only move it on purpose.)* **Do not add** `WatchdogSec` unless the app calls `sd_notify(WATCHDOG=1)` (see `ORACLE_RESILIENCE_PLAN_REVIEW.md`).
 
 Example (adjust service name and paths for each):
 
@@ -1372,6 +1465,7 @@ RestartSec=10
 StartLimitIntervalSec=300
 StartLimitBurst=10
 # No MemoryMax needed (12 GB RAM). No WatchdogSec unless app supports it.
+# 19 Oct 2026: systemd 255 IGNORES StartLimitIntervalSec in [Service] ("Unknown key name ... ignoring"). It belongs in [Unit]; see the note above before moving it.
 # 8 Oct 2026: 12 GB is NOT enough for a video render next to the bots — no ffmpeg/film builds on this box (see Disk section).
 ```
 
@@ -1397,19 +1491,19 @@ sudo systemctl restart espaluz-whatsapp
 
 ## 3. One Health-Check Script (All Services)
 
-Single script that checks every product and restarts only the unhealthy ones. Run from cron every 5 minutes.
+Single script that checks the core products and restarts only the unhealthy ones. *(updated 19 Oct 2026, live = repo md5 `83c5b93f`: it HTTP-checks cto-aipa and the espaluz-whatsapp webhook. It uses `systemctl is-active` for espaluz-familybot, espaluz-influencer, espaluz-payments-webhook, vibejobhunter-web and vibejobhunter, and `pm2 jlist` for dragontrade-main and dragontrade-dashboard. It does NOT watch whitespace, serpapi-jobs, algom-stream, algom-poll, openclaw-gateway, aw-portal or n8n; see the 12–15 Oct trap table.)* Run from cron every 5 minutes.
 
 **Path on server:** `/home/ubuntu/check_oracle_health.sh`
 
 > **9 Oct 2026 — the CURRENT script is `scripts/oracle-resilience/check_oracle_health.sh` (repo copy = the live copy).** The
-> example below is the original Feb design and is out of date: the live script uses `pm2 jlist` + jq for dragontrade (the old
+> example below is the original Feb design and is out of date. It HTTP-checks VJH's health URL, leaves Influencer commented out and has no familybot, dragontrade or payments block. The live script uses `systemctl is-active` / `pm2 jlist` for those (live md5 = repo `83c5b93f`, re-verified 19 Oct 2026). Specifically: the live script uses `pm2 jlist` + jq for dragontrade (the old
 > `grep "status: online"` restarted it every 5 min for weeks, fixed by hand 25 May) and watches `espaluz-payments-webhook`
 > instead of the disabled duplicate `espaluz-webhook`. Deploy the repo copy (`disk-prevention-apply.sh` installs it), not this
 > example. Its log `/var/log/oracle-health.log` is now rotated (`/etc/logrotate.d/aideazz-app-logs`).
 
 ```bash
 #!/bin/bash
-# Oracle 170.9.242.90 — health check all products, restart if unhealthy
+# Oracle VM — health check all products, restart if unhealthy
 LOG=/var/log/oracle-health.log
 exec >> "$LOG" 2>&1
 
@@ -1478,7 +1572,7 @@ echo "$(date -Iseconds): keepalive" >> "$LOG"
 Do this once on the server (SSH as above).
 
 - [ ] **Systemd units** (for every bot run by systemd: EspaLuz WhatsApp, EspaLuz Telegram, EspaLuz Influencer, and any others)  
-  - [ ] Add `Restart=always`, `RestartSec=10`, `StartLimitIntervalSec=300`, `StartLimitBurst=10`; no `WatchdogSec`.  
+  - [ ] Add `Restart=always`, `RestartSec=10`, `StartLimitBurst=10` under `[Service]`. `StartLimitIntervalSec=` only works under `[Unit]`; under `[Service]` systemd ignores it (see §1, 19 Oct 2026). No `WatchdogSec`.  
   - [ ] `sudo systemctl daemon-reload` and `enable <service>` for each.
 
 - [ ] **PM2**  
@@ -1486,19 +1580,19 @@ Do this once on the server (SSH as above).
   - [ ] `pm2 save`.
 
 - [ ] **Health script**  
-  - [ ] Create `/home/ubuntu/check_oracle_health.sh` (content above).  
-  - [ ] Uncomment/fix EspaLuz Influencer block when port/path known.  
+  - [ ] Install the repo copy `scripts/oracle-resilience/check_oracle_health.sh` as `/home/ubuntu/check_oracle_health.sh` (`disk-prevention-apply.sh` does it), not the Feb example above *(live md5 = repo `83c5b93f`, 19 Oct 2026)*.  
+  - [ ] EspaLuz Influencer: already watched by `systemctl is-active espaluz-influencer` in the repo/live script; no port needed *(updated 19 Oct 2026)*.  
   - [ ] `chmod +x /home/ubuntu/check_oracle_health.sh`.  
   - [ ] Crontab: `*/5 * * * * /home/ubuntu/check_oracle_health.sh`.
 
 - [ ] **Keep-alive**  
-  - [ ] Create `/home/ubuntu/oci_keepalive.sh` (content above).  
+  - [ ] Install the repo copy `scripts/oracle-resilience/oci_keepalive.sh` as `/home/ubuntu/oci_keepalive.sh`, not the example above. It curls the same three local health URLs as the live copy *(19 Oct 2026)*.  
   - [ ] `chmod +x /home/ubuntu/oci_keepalive.sh`.  
   - [ ] Crontab: `0 */4 * * * /home/ubuntu/oci_keepalive.sh`.
 
 - [ ] **Verify**  
   - [ ] `sudo systemctl status espaluz-whatsapp espaluz-influencer` (and any other systemd bots)  
-- [ ] `pm2 list` (all 10 agents: 8+9 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 7 = openclaw-gateway; 10 = AILA when deployed) *(updated 15 Oct 2026: `pm2 list` shows cto-aipa, whitespace, dragontrade-main, dragontrade-dashboard, algom-stream, algom-poll, serpapi-jobs, n8n. `systemctl` covers espaluz-whatsapp, espaluz-familybot, espaluz-payments-webhook, espaluz-influencer, vibejobhunter, vibejobhunter-web, aw-portal. OpenClaw needs `systemctl --user status openclaw-gateway`)*  
+- [ ] `pm2 list` (8 apps, verified 19 Oct 2026: cto-aipa = #8 + #9; whitespace = #11; dragontrade-main, dragontrade-dashboard, algom-stream, algom-poll = #4; serpapi-jobs = #5 (VJH's main loops are systemd); n8n = #12. #7 OpenClaw is a systemd --user unit, not PM2. #10 AILA is not deployed) *(updated 15 Oct 2026: `pm2 list` shows cto-aipa, whitespace, dragontrade-main, dragontrade-dashboard, algom-stream, algom-poll, serpapi-jobs, n8n. `systemctl` covers espaluz-whatsapp, espaluz-familybot, espaluz-payments-webhook, espaluz-influencer, vibejobhunter, vibejobhunter-web, aw-portal. OpenClaw needs `systemctl --user status openclaw-gateway`)*  
   - [ ] Wait 5 minutes and `tail -50 /var/log/oracle-health.log`
 
 ---
@@ -1521,7 +1615,7 @@ Do this once on the server (SSH as above).
 |--------|-----|
 | **Wallet** | Download **fresh client credentials** from OCI for **`ctoaipadb2025`** → deploy under **`/home/ubuntu/cto-aipa/wallet/`** (flatten nested folders). |
 | **`sqlnet.ora`** | Set **`WALLET_LOCATION`** `DIRECTORY` to **`"/home/ubuntu/cto-aipa/wallet"`** (absolute). Default OCI zip often uses **`?/network/admin`**, which does not point at the PM2 wallet directory → **ORA-28759**. Use **LF** line endings. |
-| **Secrets** | **`WALLET_PASSWORD`** in **`.env`** (password from wallet download). **`DB_PASSWORD`** is the **database user** password — they differ. Pass **`walletPassword`** into the node-oracledb pool when **`WALLET_PASSWORD`** is set. |
+| **Secrets** | **`WALLET_PASSWORD`** in **`.env`** (password from wallet download). *(superseded — verified 19 Oct 2026: in the live `.env` that line is commented out, with the placeholder value `disabled`. The server runs node-oracledb thick mode on the auto-login `cwallet.sso` and logs `Connected to Oracle Autonomous Database (mTLS)`; see §8.)* **`DB_PASSWORD`** is the **database user** password — they differ. Pass **`walletPassword`** into the node-oracledb pool when **`WALLET_PASSWORD`** is set. |
 | **Service name** | **`DB_SERVICE_NAME`** must match an alias in **`tnsnames.ora`** (e.g. **`ctoaipadb2025_high`**). |
 | **Code** | Restore **ORA-29024** / transient **retry + pool reset** in **`database.ts`**; optional **`TNS_ADMIN`** env override. |
 | **Deploy** | **`pm2 restart cto-aipa --update-env`** after **`npm run build`**. |
@@ -1551,7 +1645,7 @@ Oracle wallet for CTO AIPA lives at **`/home/ubuntu/cto-aipa/wallet/`** on the O
 | `tnsnames.ora` | TNS aliases (e.g. `ctoaipadb2025_high`). |
 | Others | `keystore.jks`, `truststore.jks`, `ojdbc.properties`, `README` |
 
-**Critical:** `ewallet.p12` and `ewallet.pem` are encrypted with a wallet password. The server `.env` has `#WALLET_PASSWORD=disabled` — the thick-mode Oracle server uses `cwallet.sso` (auto-login, no password). The wallet password for PKCS12 files is **not stored anywhere** and was never set in `.env`. Do NOT attempt thin-mode from Lambda using these files.
+**Critical:** `ewallet.p12` and `ewallet.pem` are encrypted with a wallet password. The server `.env` has `#WALLET_PASSWORD=disabled` — the thick-mode Oracle server uses `cwallet.sso` (auto-login, no password). The wallet password for the PKCS12 files is **not in the live `.env`** (verified 19 Oct 2026: its only line there is commented out, with the placeholder value `disabled`), and no stored copy is known. §7's April row says it was once set there, but nothing on the VM shows it now. Do NOT attempt thin-mode from Lambda using these files.
 
 ### Why thin-mode from Lambda doesn't work
 
@@ -1575,7 +1669,7 @@ Returns last 5 diary entries + up to 15 pending tasks per user from `knowledge_b
 |-----|-------|
 | `SPRINT_KNOWLEDGE_API_URL` | `https://webhook.aideazz.xyz/cto/sprint-knowledge` |
 | `OUTREACH_SECRET` | (see server `.env` — the shared outreach auth secret) |
-| `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS` | `5481526862` (Elena's Telegram user ID — **required** so `parseUserIdsEnv()` returns a non-empty array) |
+| `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS` | her numeric Telegram user id, kept in the Lambda env and not published here (Elena's Telegram user ID — **required** so `parseUserIdsEnv()` returns a non-empty array) |
 
 **⚠️ Critical: `SPRINT_BRIEFING_SKIP_ORACLE=1` is set in the Lambda handler code (`src/lambda/sprint-briefing-aws.ts` line 19) to prevent direct Oracle connections from Lambda. The flag must NOT be used to gate the HTTP proxy path.** Fixed May 3, 2026: `SKIP_ORACLE` gate moved inside `knowledge-context.ts` so it only blocks paths 2 & 3 (Oracle direct), leaving path 1 (HTTP proxy) always reachable. Without this fix, voice notes were always missing from the briefing even though they were saved correctly in Oracle.
 
@@ -1624,7 +1718,7 @@ row[0] = id (hex string)
 row[1] = category  
 row[2] = title
 row[3] = content
-row[4] = status
+row[4] = tags  (tasks store the word 'pending' here; knowledge_base has no status column)
 row[5] = project
 row[6] = source  ('voice', 'telegram', etc.)
 row[7] = created_at (ISO string)
@@ -1635,7 +1729,7 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 ### Voice notes → briefing flow
 
 1. User sends voice message to CTO AIPA Telegram bot
-2. Whisper transcribes → `detectPersonalAIIntent` → `handlePersonalAIAction` → `saveKnowledge(userId, 'task'|'diary', title, content, 'pending', ...)` *(updated 15 Oct 2026: the path is now Groq `whisper-large-v3` → OpenAI `whisper-1` → `repairNames` (on every note since 14 Oct) → `tryAttachLink` / `routeToTrello` FIRST (shared with typed text since 12 Oct; it creates a Trello card plus a `voice_note` row). Only if Trello does not take the note: `detectPersonalAIIntent` → `handlePersonalAIAction`, else `handleQuestion`. Every reply is also spoken back (`speakBack`, OpenAI `tts-1`/nova, Opus). A Spanish note gets a Spanish voice. Off switch: `CTO_SPEAK_REPLIES=0`)*
+2. Whisper transcribes → `detectPersonalAIIntent` → `handlePersonalAIAction` → `saveKnowledge(userId, 'task'|'diary', title, content, 'pending', ...)` *(updated 15 Oct 2026: the path is now Groq `whisper-large-v3` → OpenAI `whisper-1` → `repairNames` (on every note since 14 Oct). Then a VibeJob Hunter / job-search phrase goes to `handleJobSearchVoiceIntent` and stops. Next is `documentFromTask`, the document desk (live 19 Oct, `6582fe58`): "make me / hazme … PDF/Word/HTML" returns the file. Only then come `tryAttachLink` / `routeToTrello` (shared with typed text since 12 Oct; it creates a Trello card plus a `voice_note` row). Only if Trello does not take the note: `detectPersonalAIIntent` → `handlePersonalAIAction`, else `handleQuestion`. Every reply is also spoken back (`speakBack`, OpenAI `tts-1`/nova, Opus). A Spanish note gets a Spanish voice. Off switch: `CTO_SPEAK_REPLIES=0`)*
 3. Knowledge saved to Oracle `knowledge_base` with `source='voice'`
 4. Next morning: Lambda Sprinter fires (EventBridge `cron(0 13 * * ? *)` = 8AM Panama / UTC-5)
 5. Lambda calls `/sprint-knowledge` → gets tasks → includes in briefing prompt → Claude generates script → OpenAI TTS → audio sent to Telegram *(updated 15 Oct 2026: it receives diary + tasks + voice notes. Groq writes the script first, then OpenAI `gpt-4o-mini`, then Claude (only once Anthropic credit is topped up), then Gemini, per `src/sprint-briefing/synthesize.ts`. The repo's TTS default has been `tts-1` since 15 Oct. The deployed Lambda keeps whatever its bundle and env say until it is rebuilt, and the CodeSha256 check is still open)*
@@ -1669,7 +1763,7 @@ Claude Opus encodings reviewed and kept. Real defects, not cosmetic: PagueloFaci
 
 **Residual:** `streak_days` is still only updated on the JSON fallback path, not the Postgres existing-user UPDATE. Dashboard streak remains decorative until that column is derived from `daily_activity`.
 
-**Deploy files:** Telegram `espaluz_paguelofacil.py espaluz_pf_durable.py espaluz_rag.py json_store_guard.py` + restart `espaluz-familybot espaluz-payments-webhook`. WhatsApp `espaluz_rag.py user_analytics.py` + restart `espaluz-whatsapp`. Timer install: `sudo cp deploy/espaluz-json-guard.* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now espaluz-json-guard.timer`.
+**Deploy files (14 Aug record; updated 19 Oct 2026: do not repeat. EspaLuz ×2 are a deliberate hold on Oracle, 11 and 7 commits behind GitHub on purpose; see the ⛔ note under the fleet sync table):** Telegram `espaluz_paguelofacil.py espaluz_pf_durable.py espaluz_rag.py json_store_guard.py` + restart `espaluz-familybot espaluz-payments-webhook`. WhatsApp `espaluz_rag.py user_analytics.py` + restart `espaluz-whatsapp`. Timer install: `sudo cp deploy/espaluz-json-guard.* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now espaluz-json-guard.timer`.
 
 ---
 
@@ -1680,9 +1774,9 @@ Claude Opus encodings reviewed and kept. Real defects, not cosmetic: PagueloFaci
 | **EspaLuz WhatsApp** | ✅ Live | PagueloFacil `pagar` (shared webhook), help menu payment section, iron-clad access gate, trial + PF expiry reminders. PayPangea removed. Repo: [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp). Status doc: `docs/CURRENT_STATUS_JUNE29.md`. |
 | **EspaLuz Telegram** | ✅ Live | Fixed `is_subscribed()` (removed 7-day grace + default allow). `enforce_learning_access()` on voice/text/photo. Same reminder + pause logic via `espaluz_paypal_system.py`. Repo: [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot). |
 | **Payment webhooks** | ✅ Live | Shared `espaluz_paguelofacil.py` — `WA:` / `TG:` user keys, `paguelofacil_payments.json`, `https://webhook.aideazz.xyz/paguelofacil-webhook`. systemd `espaluz-payments-webhook`. |
-| **Git on Oracle** | ✅ PAT auth | `git fetch origin main` works for all private repos via `GITHUB_TOKEN` in `cto-aipa/.env`. Deploy code: `git checkout origin/main -- <files>` (avoid blind pull — runtime JSON drift). Script: `scripts/oracle-resilience/oracle-fix-git-https-auth.sh`. |
+| **Git on Oracle** | ✅ PAT auth | `git fetch origin main` works for all private repos via `GITHUB_TOKEN` in `cto-aipa/.env`. Deploy code: `git checkout origin/main -- <files>` (avoid blind pull — runtime JSON drift). Script: `scripts/oracle-resilience/oracle-fix-git-https-auth.sh`. *(updated 19 Oct 2026: superseded. git authenticates from `~/.git-credentials` (`credential.helper=store`); the `GITHUB_TOKEN` in `.env` is the API copy (see "The token has TWO homes"). `oracle-fix-git-https-auth.sh` is deprecated because it takes the token on the command line; rotate with `/ghtoken`. EspaLuz ×2 no longer take `git checkout origin/main` code: deliberate hold)* |
 
-**Deploy rule (unchanged):** canonical local clone → push GitHub → Oracle `git fetch` + checkout specific files → `systemctl restart espaluz-whatsapp espaluz-familybot espaluz-payments-webhook`.
+**Deploy rule (June 29; updated 19 Oct 2026: SUPERSEDED for EspaLuz. Oracle's EspaLuzWhatsApp and EspaLuzFamilybot are 11 and 7 commits behind GitHub on purpose, because the Sep PII refactor untracks live customer data. No `git fetch` + checkout of origin/main code there; deploying it is Elena's call, named files only, keeping the `AIDEAZZ_SVC_HOOK` block):** canonical local clone → push GitHub → Oracle `git fetch` + checkout specific files → `systemctl restart espaluz-whatsapp espaluz-familybot espaluz-payments-webhook`.
 
 **Docs updated:** `EspaLuzFamilybot/docs/CURRENT_STATUS_JUNE26.md`, `docs/SWOT_ANALYSIS_ESPALUZ.md`, `EspaLuzWhatsApp/docs/CURRENT_STATUS_JUNE29.md`.
 
@@ -1746,13 +1840,13 @@ Dedup otherwise returns `{"ok":true,"skipped":true}` once the day's briefing has
 
 | Agent | Status | Notes |
 |-------|--------|-------|
-| CTO AIPA + Atuona | ✅ Running | **Multi-agent HubSpot hub + BrightData live May 14–15**: `/api/crm-event` unified hub (all agents POST, Bearer OUTREACH_SECRET); `/api/crm-pipeline/setup` + `/api/crm-pipeline/ids`; `src/brightdata-enrich.ts` (NEW — zone `web_unlocker1`, max 10/run, 1 req/s); `src/hubspot-client.ts` additions: `HS_HIRING_PIPELINE_ID`, `HS_HIRING_STAGE_IDS`, `HiringStage`, `createHiringPipeline()`, `pushHiringDealToHubSpot()`. Free-tier hiring pipeline: `[HIRING] {jobTitle} @ {company}`. Oracle env: `BRIGHTDATA_API_TOKEN`, `BRIGHTDATA_ZONE=web_unlocker1`. **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. Body parser fixed (express.json verify callback — raw body saved before json() consumes stream). twitter-api-v2 added as dependency. **HubSpot duplicate posting loop fixed May 10** (see §11). Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
+| CTO AIPA + Atuona | ✅ Running | **Multi-agent HubSpot hub + BrightData live May 14–15**: `/api/crm-event` unified hub (all agents POST, Bearer OUTREACH_SECRET); `/api/crm-pipeline/setup` + `/api/crm-pipeline/ids`; `src/brightdata-enrich.ts` (NEW — zone `web_unlocker1`, max 10/run, 1 req/s); `src/hubspot-client.ts` additions: `HS_HIRING_PIPELINE_ID`, `HS_HIRING_STAGE_IDS`, `HiringStage`, `createHiringPipeline()`, `pushHiringDealToHubSpot()`. Free-tier hiring pipeline: `[HIRING] {jobTitle} @ {company}`. *(updated 19 Oct 2026: the portal is paid HubSpot Starter, and VJH deals are named `[HIRING-VJH-LEAD] …` since 21 May)* Oracle env: `BRIGHTDATA_API_TOKEN`, `BRIGHTDATA_ZONE=web_unlocker1`. **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. *(updated 19 Oct 2026: removed 13 May in `d24df0b6`; Oracle `dist/cto-aipa.js` has no X webhook or follow code. See the §11 note)* Body parser fixed (express.json verify callback — raw body saved before json() consumes stream). twitter-api-v2 added as dependency. **HubSpot duplicate posting loop fixed May 10** (see §11). Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** + **me_01–me_32 rotation fix (Jun 27)** | **⚠️ Corrected 15 Sep 2026 — not odd/even any more:** since `83bd2e4` the day is Panama `ordinal % 3` (2 → EspaLuz, 0/1 → GEO/AEO promo of aideazz.xyz/api via `geo_api_promo.py`); GEO days take their image from a separate pool (6 GEO ×10, then `me_01–me_32`). Images are served from `webhook.aideazz.xyz/influencer-images/` (repo is private), padded to 4:5 for Instagram. See NOW.md 15 Sep. *Historical text follows:* **Odd** days → EspaLuz tutor images (`image_urls`). **Even** days → AI Marketing Engine **round-robin** through 36 assets (4 legacy PNGs + [32 agent cards](https://github.com/ElenaRevicheva/EspaLuz_Influencer/tree/main/marketing_engine_images)); Groq copy uses `marketing_engine_image_meta.py` focus hints. **CTO milestone** (even days, `sprinter.jpg`) **max once per 7 days** — was blocking every even day when the CMO queue had pending items (Jun logs: 77 milestone vs 23 marketing posts). `content_memory.json` tracks `marketing_image_rotation_index` + `last_milestone_influencer_post`. |
-| VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** + **HubSpot CRM push live May 14–15** | `vibejobhunter-web` (port 8080). **NEW: `src/langgraph_pipeline/crm_hub.py`** — after each job application, posts to `/api/crm-event` (pipeline=hiring). Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`. `nodes.py` modified to call CRM push after submit. CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). `sprinter.jpg` added to image rotation pool. |
-| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X Activity API full automation live May 10** + **HubSpot CRM push live May 14–15** | **NEW: `pushProspectToCRM()` in `stream-listener.js`** — high-intent keyword matches (`need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`, `fractional_cto`) POST to `/api/crm-event` → Client Pipeline in HubSpot. Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL`. Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone. **X webhook automation May 10**: Account Activity API subscription active — Follow/DM/Mention/Like events stream to CTO AIPA in real-time → Elena's personal Telegram (@aitcf_aideazz_bot). Auto-follow back: when @reviceva gets a new follower → `v2.follow()` fires instantly. Engagement bot (`engagement-bot.js`): replies to mentions every 45min (max 2/run), auto-follows substantive commenters. Filtered stream (`stream-listener.js`): monitors "fractional CTO", "AI engineer hiring", "HubSpot CRM pain" keywords across all X in real-time → auto-like + follow prospects. **DM auto-reply**: Claude Haiku generates contextual reply — blocked at PPU tier (X API 403, requires Basic $100/mo). Profile events subscribed via X Activity API console: Bio/Pic/Screenname. Credentials: `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET` in both `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`. Elena's correct Twitter user ID: `1563632998863577092`. |
-| Sprint Briefing (Sprinter) | ✅ AWS Lambda — **voice notes fixed May 3** | Bug: `SPRINT_BRIEFING_SKIP_ORACLE=1` in Lambda handler was gating the ENTIRE personal-context load (including HTTP proxy). Fix: gate moved to `knowledge-context.ts` paths 2/3 only. `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS=5481526862` confirmed set in Lambda. Code + Lambda bundle redeployed May 3. Voice notes from prior day will appear in next 8AM briefing. See §8 for full architecture. |
+| VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** + **HubSpot CRM push live May 14–15** | `vibejobhunter-web` (port 8080). **NEW: `src/langgraph_pipeline/crm_hub.py`** — after each job application, posts to `/api/crm-event` (pipeline=hiring). Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`. `nodes.py` modified to call CRM push after submit. CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). *(updated 19 Oct 2026: the post is fired by the systemd `vibejobhunter` loop, not `vibejobhunter-web`, and is written by the OpenAI-first waterfall while Anthropic is empty. The Dev.to crosspost is blocked while Dev.to suspends the account. VJH never applies: `crm_hub.py` pushes every surfaced job as `[HIRING-VJH-LEAD]`, MANUAL APPLY, with `ATS_SUBMISSION_ENABLED=false`)* `sprinter.jpg` added to image rotation pool. |
+| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X Activity API full automation live May 10** + **HubSpot CRM push live May 14–15** | **NEW: `pushProspectToCRM()` in `stream-listener.js`** — high-intent keyword matches (`need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`, `fractional_cto`) POST to `/api/crm-event` → Client Pipeline in HubSpot. Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL`. Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone. **X webhook automation May 10**: Account Activity API subscription active — Follow/DM/Mention/Like events stream to CTO AIPA in real-time → Elena's personal Telegram (@aitcf_aideazz_bot). Auto-follow back: when @reviceva gets a new follower → `v2.follow()` fires instantly. *(updated 19 Oct 2026: the CTO AIPA receiver and the auto-follow were removed 13 May, `d24df0b6`. The engagement bot still runs every 45 min but fails `credits depleted` (19 Oct log), because X API credits are $0. `dragontrade-main` runs with `DISABLE_STREAM=1`; the stream is `algom-stream`)* Engagement bot (`engagement-bot.js`): replies to mentions every 45min (max 2/run), auto-follows substantive commenters. Filtered stream (`stream-listener.js`): monitors "fractional CTO", "AI engineer hiring", "HubSpot CRM pain" keywords across all X in real-time → auto-like + follow prospects. **DM auto-reply**: Claude Haiku generates contextual reply — blocked at PPU tier (X API 403, requires Basic $100/mo). Profile events subscribed via X Activity API console: Bio/Pic/Screenname. Credentials: `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET` in both `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`. Elena's correct Twitter user ID: `1563632998863577092`. |
+| Sprint Briefing (Sprinter) | ✅ AWS Lambda — **voice notes fixed May 3** | Bug: `SPRINT_BRIEFING_SKIP_ORACLE=1` in Lambda handler was gating the ENTIRE personal-context load (including HTTP proxy). Fix: gate moved to `knowledge-context.ts` paths 2/3 only. `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS` (Elena's Telegram user id) confirmed set in Lambda. Code + Lambda bundle redeployed May 3. Voice notes from prior day will appear in next 8AM briefing. See §8 for full architecture. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
 ### CTO AIPA → All Posting Channels Pipeline (live May 1, 2026)
@@ -1764,7 +1858,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 | 1 | CTO AIPA detects real milestone (commit to monitored repos) | `cto-aipa` PM2, `src/cto-aipa.ts` |
 | 2 | Notifies CMO AIPA via `POST http://127.0.0.1:8080/api/tech-update` | Same Oracle VM, localhost |
 | 3 | Milestone queued in `pending_tech_updates.json` | `/home/ubuntu/VibeJobHunterAIPA_AIMCF/cto_aipa_updates/` |
-| 4 | **LinkedIn** — CMO picks it up at 20:00 Panama, generates post via Claude, sends via Make.com | `linkedin_cmo_v4.py`, `vibejobhunter-web` |
+| 4 | **LinkedIn** — CMO picks it up at 20:00 Panama, generates the post, sends via Make.com *(updated 19 Oct 2026: the text comes from the OpenAI-first waterfall while Anthropic is empty (journal 19 Oct 01:01 UTC `content generated via openai (waterfall; Claude unavailable…)`). Make.com currently publishes it twice; a fix needs Elena's go, NOW.md 18 Oct)* | `linkedin_cmo_v4.py`, fired by the systemd `vibejobhunter` loop (`src/autonomous/orchestrator.py`); `vibejobhunter-web` only receives the milestone (`POST /api/tech-update`) |
 | 5 | **Dev.to only** — blog crosspost fires after LinkedIn, fire-and-forget (Hashnode dropped — paid plan only; NOT in use). ⛔ *Blocked (updated 15 Oct 2026): Dev.to suspended the account around 11 Oct (API 401) and an appeal was sent 13 Oct. Do not retry or create keys* | `blog_publisher.py` |
 | 6 | **X @reviceva** — dragontrade posts tweet on next 5th-post slot. ⛔ *Blocked (updated 15 Oct 2026) while X API credits are $0 (7 Oct)* | `x-tech-updater.js`, `dragontrade-main` PM2 |
 | 7 | **Instagram** — EspaLuz Influencer uses milestone on next even day at 18:00 Panama (23:00 UTC) | `cto_milestone_module.py`, `espaluz-influencer` systemd |
@@ -1794,7 +1888,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 |--------|-------------|--------|
 | **Hacker News "Who is Hiring"** | Monthly thread — Algolia API, no key needed. Parses company name, email, website, description from top-level comments. | ~150–250 companies/month |
 | **GitHub repo search** | Searches repos tagged `ai-agent`, `automation`, `llm` with contact email in README. GitHub token (free, already have it) for higher rate limits. | ~20–30/run |
-| **Product Hunt AI launches** | GraphQL API, personal developer token. Fetches recent AI-category launches, extracts maker name + website. Token: `JqSMu_wrfci5Anxe1RV7QcaJyO9EfIWIw7QBLk305Eg` (env: `PRODUCT_HUNT_TOKEN`, added May 9). | ~30–50/run |
+| **Product Hunt AI launches** | GraphQL API, personal developer token. Fetches recent AI-category launches, extracts maker name + website. Token: in Oracle `.env` as `PRODUCT_HUNT_TOKEN` (added May 9; the value is not recorded in this public doc, 19 Oct 2026). | ~30–50/run |
 
 ### Filters — real data only
 - Pattern emails (`founder@domain.com`) never pushed to HubSpot — company record still created
@@ -1811,7 +1905,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 
 ### Cron schedule
 - **Tue + Fri 7:00 AM Panama** — automatic fresh leads pull (HN + GitHub)
-- After each run: `/triage` classifies new signals → qualified leads auto-push to HubSpot
+- After each run: `/triage` classifies new signals → qualified leads auto-push to HubSpot *(updated 19 Oct 2026: about half of triage rows since June read "Classification failed" (`TRIAGE_SKIP_GROQ=1` on Oracle, plus no Anthropic credit). Lab 2 (NOW.md 18 Oct) found the rows are almost all Elena's tests and scraped job posts, so real inbound ≈ 0: do not tune it. The fresh-leads cron is silent on success since 6 Oct; Telegram hears only failures)*
 
 ### HubSpot account
 - Account: `aipa@aideazz.xyz`
@@ -1825,7 +1919,7 @@ Oracle `.env` additions:
 
 | Var | Value |
 |-----|-------|
-| `BRIGHTDATA_API_TOKEN` | `77c17e6d-bb2d-42da-84d5-f300420a1721` |
+| `BRIGHTDATA_API_TOKEN` | set in Oracle `.env` (cto-aipa and VJH); the value is not recorded in this public doc (19 Oct 2026) |
 | `BRIGHTDATA_ZONE` | `web_unlocker1` |
 
 Zone: `web_unlocker1`, $1.50/CPM, 30-day trial active *(updated 15 Oct 2026: there is no trial any more; it is a prepaid account. Bright Data suspended it on 7 Oct for an unpaid balance, and Elena topped up $10 on 12 Oct. It has also been the only SERP supply since SerpAPI was cancelled)*. Max 10 enrichments/run, 1 req/sec throttle. Integrated in `src/brightdata-enrich.ts` → called from `fresh-leads-ingest.ts` after dedup, before Claude pain classification.
@@ -1837,7 +1931,7 @@ New CTO AIPA endpoints:
 | Endpoint | Auth | Purpose |
 |----------|------|---------|
 | `POST /api/crm-event` | `Bearer OUTREACH_SECRET` | Unified hub — all agents route here; validates, deduplicates, writes to HubSpot, logs to `crm_event_log` |
-| `GET /api/crm-pipeline/setup` | `Bearer OUTREACH_SECRET` | Returns free-tier strategy (`[HIRING] {jobTitle} @ {company}` naming, stage map) |
+| `POST /api/crm-pipeline/setup` *(corrected 19 Oct 2026: the route is POST)* | `Bearer OUTREACH_SECRET` | Returns free-tier strategy (`[HIRING] {jobTitle} @ {company}` naming, stage map) |
 | `GET /api/crm-pipeline/ids` | `Bearer OUTREACH_SECRET` | Reads existing pipeline IDs from HubSpot |
 
 VJH + Algom Alpha env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`.
@@ -1849,16 +1943,16 @@ VJH + Algom Alpha env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https
 | Feature | File | What it does |
 |---------|------|-------------|
 | Daily Trello briefing | `src/board-briefing.ts` | Every morning (13:00 UTC = 8AM Panama): fetches Kira* + VibeJob boards, categorises cards (overdue/today/dueSoon/dueWeek/undated), Claude Haiku generates one actionable suggestion. Sent as a separate Telegram message after Sprinter. *(updated 15 Oct 2026: since 6 Oct (`952faca7`, `a2af40cd`) this is ONE 08:00 Panama "Good morning" message showing Trello Today / Next 3 days per board. Overdue and undated cards appear only in Monday's digest. The 💡 Haiku line appears only while Anthropic has credit, and the credit is empty now)* |
-| Weekly Trello digest | `src/board-briefing.ts` | Every Monday 9AM Panama: full board snapshot + Claude Haiku insight paragraph (patterns, bottlenecks, what to tackle first). |
+| Weekly Trello digest | `src/board-briefing.ts` | Every Monday 9AM Panama: full board snapshot + Claude Haiku insight paragraph (patterns, bottlenecks, what to tackle first). *(updated 19 Oct 2026: `askHaiku()` calls Anthropic directly with no fallback and returns empty on error, so while credit is empty Monday's digest arrives without the insight paragraph)* |
 | `/done N` | `telegram-bot.ts` | Delete task(s) by number from `/tasks` list. `/done 1,4,7` removes three at once. |
-| `/cleartasks auto` | `telegram-bot.ts` | Claude reads all tasks, identifies stale ones, proposes a list to delete. |
+| `/cleartasks auto` | `telegram-bot.ts` | Claude reads all tasks, identifies stale ones, proposes a list to delete. ⚠️ *(updated 19 Oct 2026: a direct Anthropic call with no fallback. While credit is empty the call fails and the bot replies "✅ Claude found nothing obviously stale — all tasks look relevant", a false all-clear (silent failure). Use `/done N` until credit returns or the call joins the waterfall; Elena's call)* |
 | `/cleartasks confirm N,M` | `telegram-bot.ts` | Executes Claude's suggestion. |
 
 ---
 
 ## 11. X Full Automation + HubSpot Duplicate Loop Fix (May 10, 2026)
 
-> **(updated 15 Oct 2026) The CTO AIPA half of the X table below no longer exists.** `d24df0b6` (13 May 2026) removed the X webhook, the auto-follow-back and the Telegram follow alerts from `src/cto-aipa.ts`, and CTO AIPA reads no `TWITTER_*` variable. The filtered stream runs as its own PM2 app, `algom-stream`, and `dragontrade-main` runs with `DISABLE_STREAM=1`. Engagement replies, follows and posts need X API credits, which were $0 on 7 Oct (the alert now repeats at most weekly). The HubSpot duplicate-loop fix further down is still current.
+> **(updated 15 Oct 2026) The CTO AIPA half of the X table below no longer exists.** `d24df0b6` (13 May 2026) removed the X webhook, the auto-follow-back and the Telegram follow alerts from `src/cto-aipa.ts`, and CTO AIPA reads no `TWITTER_*` variable. The filtered stream runs as its own PM2 app, `algom-stream`, and `dragontrade-main` runs with `DISABLE_STREAM=1`. Engagement replies, follows and posts need X API credits, which were $0 on 7 Oct (the alert now repeats at most weekly). The HubSpot duplicate-loop fix further down is only half live: the GET filter is in the code, but the 3-tier mark matching never reached git (corrected 19 Oct 2026; see below).
 
 ### X Webhook & Automation — What Shipped
 
@@ -1874,7 +1968,7 @@ VJH + Algom Alpha env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https
 | Engagement bot | `dragontrade-agent/engagement-bot.js` | ✅ Runs every 45min — max 2 replies + 3 follows per run. State in `engagement_state.json`. |
 | Elena's correct Twitter user ID | All files | ✅ `1563632998863577092` — confirmed via `client.v2.me()`. Was incorrectly `30551469` in prior versions. |
 
-**Credentials location:** `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET/BEARER_TOKEN` in **both** `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`.
+**Credentials location:** `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET/BEARER_TOKEN` in **both** `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`. *(updated 19 Oct 2026: the 6 `TWITTER_*` lines are still in cto-aipa `.env`, but no cto-aipa module reads them since `d24df0b6`. That leaves an unused second copy of the X credentials; removing it is Elena's call)*
 
 ---
 
@@ -1890,7 +1984,7 @@ VJH + Algom Alpha env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https
 | 2 | **Timestamp field mismatch** | Mark endpoint matched on `repo + timestamp`. Old HubSpot items had no `timestamp` field — only `received_at`. Match always failed → `posted_x` never set → items stayed "pending" forever. |
 | 3 | **5 backlog items with no `posted_x`** | Already-posted items accumulated `posted: true` but never got `posted_x: true`. Backfill needed. |
 
-**Fixes applied — `VibeJobHunterAIPA_AIMCF/src/api/app.py`:**
+**Fixes applied — `VibeJobHunterAIPA_AIMCF/src/api/app.py`:** *(corrected 19 Oct 2026: only the GET filter below is in the code. `7fd733c` changed 2 lines of `app.py` although its message claims the 3-tier mark; the live `POST /api/x-updates/mark` (VJH `406e83b`, Oracle = origin/main) still matches `repo` + `timestamp` only and ignores the `title` the updater sends. Today the queue holds 0 pending of 20 and X posting is blocked on credits, so nothing double-posts; restore the mark fallback before X credits return)*
 
 ```python
 # GET /api/x-updates — now excludes BOTH fields
@@ -1930,17 +2024,20 @@ All 4 HubSpot items: `posted_x=True AND posted=True`. Queue clean. Future milest
 
 | Channel | Status | Notes |
 |---------|--------|-------|
-| **Dev.to** | ⛔ Suspended *(updated 15 Oct 2026)* | It was the primary channel, via `DEVTO_API_KEY`. Dev.to suspended the account around 11 Oct: every authenticated call returns 401, and the last post was 10 Oct. An appeal was sent 13 Oct (`docs/oracle/2026-10-13_devto_suspension_appeal.md`), and `DEVTO_PAUSED=1` is set on Oracle. Once reinstated, Dev.to becomes a best-effort cross-post AFTER aideazz.xyz. Never create new keys or retry in a loop |
+| **Dev.to** | ⛔ Suspended *(updated 15 Oct 2026)* | It was the primary channel, via `DEVTO_API_KEY`. Dev.to suspended the account around 11 Oct: every authenticated call returns 401, and the last post was 10 Oct. An appeal was sent 13 Oct (`docs/oracle/2026-10-13_devto_suspension_appeal.md`), and `DEVTO_PAUSED=1` is set on Oracle. Once reinstated, Dev.to becomes a best-effort cross-post AFTER aideazz.xyz. Never create new keys or retry in a loop. *(19 Oct 2026: still suspended; since 17 Oct the profile and all 211 article pages return 404 and the appeal is unanswered, per NOW.md 17 Oct)* |
 | **aideazz.xyz/blog** | ✅ PRIMARY *(updated 15 Oct 2026)* | Since `e109bd9c` (13 Oct) the daily publisher writes the cache + the per-article static page (pushed to the `aideazz` repo) FIRST, then tries Dev.to. Runs daily at 14:30 America/Panama, plus a catch-up at startup. (Before: auto-populated from the Dev.to crosspost) |
-| **Hashnode** | ❌ NOT IN USE | Dropped — paid plan only. `HASHNODE_ACCESS_TOKEN` is NOT set in `.env` |
+| **Hashnode** | ❌ NOT IN USE | Dropped — paid plan only (its GraphQL API went paid 13 May 2026). *(corrected 19 Oct 2026: `HASHNODE_ACCESS_TOKEN` IS set, non-empty, in Oracle `.env`. No publish code uses it; it only flips the startup-log label)* |
+| **LinkedIn (Buffer)** | ✅ Live *(added 19 Oct 2026)* | Every daily article goes to Buffer → LinkedIn (`BUFFER_SOCIAL_ENABLED=true`, `BUFFER_TARGET_SERVICES=linkedin`); log `📣 [Buffer] article=<slug> posted=1/1` for every daily article published 9–18 Oct (the pm2 logs kept on Oracle). Field notes are wired too since 18 Oct (`6b770a36`; `FIELDNOTE_LINKEDIN=post` on Oracle); the 16 Oct field note went to Buffer as a draft and none has been published since |
+| **Bing (IndexNow)** | ✅ Live since 15 Oct *(added 19 Oct 2026)* | `announceNewArticle` pings api.indexnow.org once the page answers 200 (`2958f904`); log `📡 [IndexNow] HTTP 200` for the 16, 17 and 18 Oct articles. Do not re-ping or backfill |
+| **Bluesky** | ✅ Live since 15 Oct *(added 19 Oct 2026)* | Link card as aideazz.bsky.social, no model (`2958f904`); log `🦋 [Bluesky] posted` for the 16, 17 and 18 Oct articles. ⚠️ The 16 Oct article and its LinkedIn/Bluesky copies carry false claims; the fix awaits Elena (`docs/oracle/BLOG_FACTCHECK_2026-10-17.md`) |
 
-> **Important:** The blog publisher source file is **`src/daily-blog-publisher.ts`** (renamed from `hashnode-daily.ts` May 2026). It runs in **Dev.to-only mode** whenever `HASHNODE_ACCESS_TOKEN` is absent from env. *(updated 15 Oct 2026: "Dev.to-only" now survives only as a legacy label in the startup log. The publisher always ships to aideazz.xyz first, and skips Dev.to when `DEVTO_PAUSED=1` or the key is missing)*
+> **Important:** The blog publisher source file is **`src/daily-blog-publisher.ts`** (renamed from `hashnode-daily.ts` May 2026). It runs in **Dev.to-only mode** whenever `HASHNODE_ACCESS_TOKEN` is absent from env. *(updated 19 Oct 2026: the mode is only a startup-log label — `runDailyBlogPost` always calls `runDailyDevToPost`. Because `HASHNODE_ACCESS_TOKEN` is set on Oracle, the live label reads `mode: Dev.to + aideazz.xyz cross-post — listed: yes`, which is also out of date: the publisher ships to aideazz.xyz first, skips Dev.to while `DEVTO_PAUSED=1`, then sends the article to Buffer → LinkedIn, IndexNow and Bluesky)*
 
 ### Source file
 
 `/home/ubuntu/cto-aipa/src/daily-blog-publisher.ts`
 
-When `HASHNODE_ACCESS_TOKEN` is not set → Dev.to-only mode (Hashnode path skipped entirely).
+When `HASHNODE_ACCESS_TOKEN` is not set → Dev.to-only mode (Hashnode path skipped entirely). *(corrected 19 Oct 2026: there is no Hashnode path left. The token only picks the startup-log label, and it is set on Oracle)*
 
 ### PM2 process
 
@@ -1954,7 +2051,7 @@ Logs: `pm2 logs cto-aipa --lines 200 | grep -i blog`
 
 | Env var | Value |
 |---------|-------|
-| `GOOGLE_ANALYTICS_CREDENTIALS` | JSON string — service account key from GCP project `vaulted-circle-368018` |
+| `GOOGLE_ANALYTICS_CREDENTIALS` | JSON string — service account key from the analytics-only GCP project (id kept in Oracle `.env`, not in this public file) |
 | `GSC_SITE_URL` | `sc-domain:aideazz.xyz` |
 
 Function: `fetchGscTopQueries()` in **`src/daily-blog-publisher.ts`** — JWT from `GOOGLE_ANALYTICS_CREDENTIALS`; returns top search queries to inform blog topic selection.
@@ -1965,9 +2062,9 @@ Service account added to GSC property as `siteFullUser` (verified May 16 2026).
 | Env var | Value |
 |---------|-------|
 | `GOOGLE_ANALYTICS_CREDENTIALS` | Same service account JSON as GSC (reused) |
-| `GA4_PROPERTY_ID` | `515154124` |
+| `GA4_PROPERTY_ID` | set in Oracle `.env` |
 
-**GCP project:** `vaulted-circle-368018` — **analytics only** (GA4 + GSC). Service account **`aideazz-analytics-reader@vaulted-circle-368018.iam.gserviceaccount.com`**. Do **not** conflate with the separate **Aldeazz** GCP project (reCAPTCHA Enterprise, Google Places) — leave both projects as-is.
+**GCP project:** the analytics-only project (GA4 + GSC); its service account is the `client_email` inside `GOOGLE_ANALYTICS_CREDENTIALS` on Oracle. Do **not** conflate with the separate **Aldeazz** GCP project (reCAPTCHA Enterprise, Google Places) — leave both projects as-is.
 
 | Use | Where | Script / endpoint |
 |-----|-------|-------------------|
@@ -1988,10 +2085,10 @@ Called from `linkedin_cmo.py` via the `POST /api/crm-event` hub endpoint. *(upda
 |-----|----------|---------|
 | `DEVTO_API_KEY` | optional *(updated 15 Oct 2026)* | Best-effort Dev.to cross-post; a missing key or a 401 is skipped and the article still ships to aideazz.xyz |
 | `DEVTO_PAUSED` | `1` on Oracle since 13 Oct | Skips Dev.to while the account is suspended; remove it only after Dev.to reinstates the account *(added 15 Oct 2026)* |
-| `HASHNODE_ACCESS_TOKEN` | ❌ Not set | Leave unset — Hashnode is dropped |
+| `HASHNODE_ACCESS_TOKEN` | set on Oracle (non-empty) *(corrected 19 Oct 2026)* | Unused by any publish path; it only flips the startup-log mode label. Hashnode is dropped |
 | `GOOGLE_ANALYTICS_CREDENTIALS` | ✅ Yes | GSC + GA4 auth (same service account) |
 | `GSC_SITE_URL` | ✅ Yes | `sc-domain:aideazz.xyz` |
-| `GA4_PROPERTY_ID` | ✅ Yes | `515154124` |
+| `GA4_PROPERTY_ID` | ✅ Yes | set in Oracle `.env` |
 
 
 ## 13. HubSpot Income Dashboard + BrightData Full Wiring (May 14–16, 2026)
@@ -2006,7 +2103,7 @@ All agents now feed HubSpot as a unified income dashboard. Three deal types in o
 | `[CLIENT]` | SEO inquiry form, Algom Alpha X stream, EspaLuz Influencer (marketing days) | Appointment Scheduled (= Prospected) |
 | `[ESPALUZ]` | EspaLuz WhatsApp `user_trial_system.py`, EspaLuz Telegram `espaluz_database.py`, EspaLuz Influencer (EspaLuz days) | Appointment Scheduled (= Trial Started) |
 
-Stage progression mapping (free-tier stage names → real meaning):
+Stage progression mapping (free-tier stage names → real meaning) *(updated 19 Oct 2026: SUPERSEDED, May history only. Live meaning = Elena's labels in the note above and `STAGE_PROGRESSION` in `src/hubspot-client.ts`: 🤖 AI working → 🔥 I act TODAY → ⚡ I act this week → ⏳ Sent → 💬 They replied → ✅ Won / ❌ No fit)*:
 - Appointment Scheduled = Applied / Prospected / Trial Started
 - Qualified to Buy = Recruiter Responded / Contacted / Trial Active
 - Presentation Scheduled = Interview / Demo Call / Personal Outreach Sent
@@ -2106,9 +2203,9 @@ Fixed May 16:
 
 ### aipa@aideazz.xyz email — status
 
-SMTP: `smtp.zoho.com:587` ✅ authenticated  
-IMAP: `imappro.zoho.com:993` ✅ authenticated (403 messages in inbox)  
-Response detector: `src/autonomous/response_detector.py` — scans inbox every VJH cycle for recruiter replies, alerts via Telegram with `🔥🔥🔥 INTERVIEW REQUEST DETECTED`
+SMTP (Zoho) ✅ authenticated  
+IMAP (Zoho) ✅ authenticated  
+Response detector: `src/autonomous/response_detector.py` — scans inbox every VJH cycle for recruiter replies *(updated 19 Oct 2026: it reads two inboxes, Zoho and Gmail. Until 16 Oct it ran only in cycles that found a new job; since `9c804b8` it runs every cycle (journal 19 Oct: `Checking for responses` 12:26 and 13:27 UTC). Since `006c1ed` (15 Oct) an invite with a real booking link also reaches HubSpot)*, alerts via Telegram with `🔥🔥🔥 INTERVIEW REQUEST DETECTED`
 
 ### EspaLuz bots → HubSpot wiring
 
@@ -2155,6 +2252,13 @@ Active prefixes (full reference: `docs/HUBSPOT_NAMING.md`):
 | `[CLIENT-CTO-INGEST]` | `fresh-leads-ingest.ts` + `lead-triage.ts` (CTO) | CLIENT |
 | `[CLIENT-CTO-SERP]` | `serpapi-prospects.ts` (CTO) | CLIENT |
 | `[CLIENT-ALGOM]` | `algom-poll.js` + `stream-listener.js` (dragontrade) | CLIENT |
+| `[CLIENT-CTO-INQUIRY]` *(this row and those below added 19 Oct 2026)* | `chat-concierge.ts` + the aideazz.xyz contact-form path in `cto-aipa.ts` (CTO) | CLIENT |
+| `[CLIENT-SERVICE-PAID]` | `paid-order-hubspot.ts` (CTO; a paid order, never a prospect) | CLIENT |
+| `[ATLAS-RADAR]` | `pushAtlasRadarDealToHubSpot` in `hubspot-client.ts` ← whitespace radar via `/api/crm-event` | CLIENT |
+| `[CLIENT-ATLAS]` | `scripts/atlas-lead-machine.cjs` (Mondays 16:00 UTC) | CLIENT |
+| `[CLIENT-MANUAL]` | `scripts/stage-manual-prospect.cjs` | CLIENT |
+| `[HIRING-MANUAL]` | `scripts/stage-manual-job.cjs` + `scripts/stage-hiring-outreach.cjs` | HIRING |
+| `[HIRING-MICRO1]` | `scripts/stage-micro1-deals.cjs` | HIRING |
 
 Backwards compatible: callers without `sourcePrefix` keep legacy naming. New writers MUST set `sourcePrefix` — pick from the table or add a new reserved prefix.
 
@@ -2185,20 +2289,20 @@ Fix in `src/trello-voice.ts`: `targetList` added to the move action + prompt rul
 
 Verified against the live board/list names with the compiled `dist/trello-voice.js`: "Kira Agosto"+"Cita" → `Kira Agosto 2026 / Датировано / "Cita"`; "kira julio"+"поток" → `Kira Julio 2026 / Надо сделать / "Поток"`; no column named → `Поток` fallback.
 
-**Deploy note (bit me here):** Oracle has **no `tsc`** (`node_modules/typescript` absent) — `npm run build` on the server fails with `sh: 1: tsc: not found`. Build locally on Windows, back up the server file, then `scp dist/<file>.js oracle-cto-aipa:/home/ubuntu/cto-aipa/dist/` and `pm2 restart cto-aipa --update-env`.
+**Deploy note (bit me here):** On 25 Jul Oracle had **no `tsc`** (`node_modules/typescript` absent) — `npm run build` on the server failed with `sh: 1: tsc: not found`. *(updated 19 Oct 2026: `typescript` 5.9.3 has been in Oracle's `node_modules` since 6 Sep 2026 (`node_modules/.bin/tsc --version` → 5.9.3; ts-node is still absent). The rule has not changed: Oracle's checkout lags on purpose, so never build there.)* Build locally on Windows, back up the server file, then `scp dist/<file>.js oracle-cto-aipa:/home/ubuntu/cto-aipa/dist/` and `pm2 restart cto-aipa --update-env`.
 
 **Card purge (same day):** 54 stale `[HIRING-VJH-LEAD]` cards (auto-pushed recruiter/job emails) deleted from the Kira boards; 0 remain across all 11 boards; `[hs:]` client cards and real job cards untouched. Full card data backed up first to `backups/trello-vjh-cards-20260724-175218.json` on Oracle **and** on the Windows clone. That file is **gitignored on purpose — this repo is PUBLIC and the dump carries recruiter names, emails and message bodies.** Never commit it.
 
 ### XAI_API_KEY env requirement (added May 20 2026)
 
-xAI team key for `rhino-sneezing-lemon` (X account `1910676161845186560`) is now in env on both:
+An xAI team key is now in env on both (the team name and linked X account id are kept in `.env` only, as `XAI_TEAM_NAME` / `XAI_TEAM_X_ACCOUNT_ID`):
 
 - `/home/ubuntu/cto-aipa/.env` — `XAI_API_KEY`, `XAI_TEAM_NAME`, `XAI_TEAM_X_ACCOUNT_ID`
 - `/home/ubuntu/dragontrade-agent/.env` — same 3 keys
 
 **Status:** key available in env, **not yet wired to any code**. *(updated 15 Oct 2026: wired since then. dragontrade uses it in `grok-content.js` + `llm-chain.mjs` (25 May). cto-aipa uses `grokComplete` in `llm-resilience.ts` as a tier in all three profiles (`XAI_MODEL`, default `grok-4.20-0309-non-reasoning`, since 11 Jun). OpenClaw's chain uses `xai/grok-3`. Only option (3), xAI team-level X API access, is still unwired.)* Three pending wiring options (each its own session): (1) Algom backup Twitter listener with higher rate limits, (2) Grok-as-LLM in CTO AIPA model routing, (3) xAI team-level X API access.
 
-**Security note:** key was shared in chat on May 20 2026; rotate before production use.
+**Security note:** this key's handling and rotation status are tracked outside this public doc.
 
 
 ---
@@ -2214,18 +2318,18 @@ aideazz.xyz blog URLs were all serving identical generic SPA shell HTML to Googl
 **cto-aipa commit 8984a02:**
 - NEW file src/blog-static-pages.ts - reads data/blog-posts-cache.json, renders markdown to HTML inline (no new npm deps), generates per-article static HTML with article-specific title/OG tags/JSON-LD/article body, pushes to ElenaRevicheva/aideazz/public/blog/SLUG/index.html via GitHub Contents API.
 - RENAMED src/hashnode-daily.ts to src/daily-blog-publisher.ts (file name now matches function; Hashnode was already removed in b30c334).
-- WIRED into the renamed file alongside pushSitemapToGithub (fire-and-forget; auto-fires after every blog publish).
+- WIRED into the renamed file alongside pushSitemapToGithub (fire-and-forget; auto-fires after every blog publish). *(superseded: `pushSitemapToGithub()` was removed on 23 Aug (see the 4everland section above; the sitemap has one writer), and since 13 Oct (`e109bd9c`) the static page is pushed FIRST and awaited, before any cross-post. It is the publish itself, not a side effect.)*
 - 14 cached articles backfilled (one-shot run).
 
 **aideazz commit e4fe4ee:**
 - 1-line additive rule in public/_redirects: `/blog/:slug    /blog/:slug/index.html    200`
-- Inserted ABOVE the SPA catch-all so /blog/SLUG (no trailing slash) serves the static HTML.
+- Inserted ABOVE the SPA catch-all so /blog/SLUG (no trailing slash) serves the static HTML. *(updated 19 Oct 2026: the rule is still in `public/_redirects`, but the host now answers `/blog/<slug>` with **301 → `/blog/<slug>/`**. The page is served at the trailing-slash URL.)*
 - All other existing rules preserved.
 
 ### Verification (live)
 
 ```bash
-curl -s 'https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-ai-startups' | grep -oE '<title>[^<]+</title>'
+curl -sL 'https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-ai-startups/' | grep -oE '<title>[^<]+</title>'
 # Returns: <title>What a Fractional CTO Actually Does for AI Startups | AIdeazz</title>
 ```
 
@@ -2235,7 +2339,7 @@ Now: article-specific title, OG tags, JSON-LD, real article body in HTML.
 ### Operational notes
 
 - Future articles auto-generate static HTML when daily-blog-publisher cron fires (no manual action)
-- If GITHUB_TOKEN expires, BlogStatic logs a warning and skips - daily blog publish still works
+- If GITHUB_TOKEN is missing or expired, the page push fails (`📄 BlogStatic: GITHUB_TOKEN not set — skipping` / `📄 BlogStatic: canonical HTML push failed — GEO/AEO page will 404 until retry`). *(updated 19 Oct 2026: since 13 Oct (`e109bd9c`) this page IS the publish. With Dev.to paused (`DEVTO_PAUSED=1`), a token failure means the day's article is live nowhere. The Telegram card then says `⚠️ canonical HTML push FAILED — GEO page may 404 until retry.`)*
 - 4everland deploy lag: ~90-180 seconds after GitHub commit
 - Google re-crawl + ranking impact: ~1-2 weeks
 
@@ -2250,13 +2354,13 @@ Was: ARTICLE_SYSTEM prompt required `## Frequently Asked Questions` (3-5 Q&A pai
 
 Now: `cto-aipa/src/blog-static-pages.ts` has `extractFaqPairs()` that parses the markdown FAQ section and emits a second `<script type="application/ld+json">` with FAQPage schema. Purely additive — BlogPosting unchanged. Falls back gracefully (no FAQPage emitted) if article lacks the section.
 
-Verified live: every blog URL on aideazz.xyz now serves both BlogPosting + FAQPage JSON-LD blocks. Google AI Overview / Perplexity / Bing Chat now pull from your Q&A as authoritative. *(updated 15 Oct 2026: this was never measured. The last citation probe recorded in NOW.md found aideazz.xyz cited in 1 of 23 AI answers (4%, Perplexity only). Only the emission of BlogPosting + FAQPage JSON-LD is verified.)*
+Verified live (24 May): pages from the daily publisher serve both BlogPosting + FAQPage JSON-LD blocks. *(updated 19 Oct 2026: not every blog URL does. 35 of the 190 `public/blog/*/index.html` pages on aideazz `main` carry no FAQPage block, e.g. the field notes from `incident-to-blog.cjs`. FAQPage is emitted only when the markdown has the FAQ section.)* Google AI Overview / Perplexity / Bing Chat now pull from your Q&A as authoritative. *(updated 15 Oct 2026: this was never measured. The last citation probe recorded in NOW.md found aideazz.xyz cited in 1 of 23 AI answers (4%, Perplexity only). Only the emission of BlogPosting + FAQPage JSON-LD is verified.)*
 
 ### Groq 413 (request too large) pre-check
 
 Code-review path was sending full PR diffs to Llama 3.3 70B on Groq, exceeding ~8K token context. Returned 413 repeatedly. Fallback to Claude Haiku worked, but warnings flooded logs.
 
-Fix in `cto-aipa.ts`: pre-check `aiPrompt.length > 24_000` chars before calling Groq. If too big, throw a typed pre-check error logged quietly (not warn). Saves ~100 noisy log lines per cycle.
+Fix in `cto-aipa.ts`: pre-check `aiPrompt.length > 24_000` chars before calling Groq. If too big, throw a typed pre-check error logged quietly (not warn). Saves ~100 noisy log lines per cycle. *(updated 19 Oct 2026: the Groq model is now `GROQ_MODEL` = `openai/gpt-oss-120b`, but the 24,000-char cap sized for Llama still applies. Going 'straight to Claude' now fails: Anthropic credit is empty, and this path calls Anthropic directly, not the `llm-resilience.ts` chain. The pm2 logs kept on Oracle (9–19 Oct) hold 147 size pre-checks, 190 `❌ Haiku fallback failed: 400 … credit balance is too low` and 24 `🔐 Haiku fallback failed` (critical reviews). Those reviews returned static analysis only.)*
 
 ### Groq 429 (rate limit) 60-second cooldown
 
@@ -2267,11 +2371,11 @@ Fix in `cto-aipa.ts`: module-scope `groqCooldownUntil` timestamp. On 429, set co
 ### Claude Code Remote Control activation (works on Windows)
 
 Successfully activated `claude remote-control` for working from phone while away from laptop. Stack:
-- Claude Code v2.1.149 installed via MSIX (Windows Store package, at `C:\\Users\\kirav\\AppData\\Local\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code\\2.1.149\\claude.exe`)
-- Auth: `claude auth login --claudeai` (browser OAuth to elena.revicheva2016@gmail.com Pro account)
+- Claude Code CLI = the `claude.exe` packaged with the Claude desktop app (MSIX), under `%LOCALAPPDATA%\Packages\Claude_*\LocalCache\Roaming\Claude\claude-code\<version>\`. Always use the newest version folder *(updated 19 Oct 2026: 2.1.149 in May, 2.1.299 on 19 Oct)*
+- Auth: `claude auth login --claudeai` (browser OAuth to Elena's claude.ai account)
 - TUI requires Windows Terminal (not raw cmd.exe — MSIX symlink + ConPTY issues)
 - Workspace trust dialog accepted by running interactive Claude in the worktree path once
-- Desktop launcher: `claude-remote.bat` (PowerShell wrapper, auto-finds latest claude.exe version)
+- Desktop launcher: `claude-remote.bat` on the OneDrive Desktop (PowerShell wrapper: picks the newest `claude.exe` by LastWriteTime, then runs `remote-control` from the cto-aipa repo root)
 
 Ritual: plug in laptop → double-click `claude-remote.bat` → press `y` + Enter (default spawn mode) → press SPACE for QR → Win+L to lock screen → take phone (Claude app, Code tab, scan QR) → continue work from phone.
 
@@ -2287,7 +2391,7 @@ curl -s 'https://aideazz.xyz/blog/<slug>/' | python3 -c "import sys,re; html=sys
 pm2 logs cto-aipa --nostream --lines 100 | grep -E 'pre-check|429 hit|cooldown'
 
 # Remote control auth + version:
-& 'C:\\Users\\kirav\\AppData\\Local\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code\\2.1.149\\claude.exe' auth status
+& (Get-ChildItem "$env:LOCALAPPDATA\Packages\Claude_*\LocalCache\Roaming\Claude\claude-code" -Filter claude.exe -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName auth status
 ```
 
 ### Commits
@@ -2299,8 +2403,8 @@ pm2 logs cto-aipa --nostream --lines 100 | grep -E 'pre-check|429 hit|cooldown'
 
 ### XAI status update — May 25 2026 — Grok wiring complete in dragontrade-agent
 
-The May 20 2026 note above said the `XAI_API_KEY` (rhino-sneezing-lemon
-team, X account `1910676161845186560`) was "in env, not yet wired to any
+The May 20 2026 note above said the `XAI_API_KEY` (xAI team
+key) was "in env, not yet wired to any
 code." That's now superseded for **option (1) Algom backup / Grok routing**:
 
 **Wired in `dragontrade-agent` commit `294efee`** (pushed to origin/main):
@@ -2323,15 +2427,15 @@ code." That's now superseded for **option (1) Algom backup / Grok routing**:
 
 **Posting identity unchanged.** The bot still posts from `@reviceva`
 (Elena's personal X dev account via existing `TWITTER_API_KEY` /
-`TWITTER_ACCESS_TOKEN` in `dragontrade-agent/.env`). The rhino-sneezing-
-lemon team account ID `1910676161845186560` is **not** used for posting —
+`TWITTER_ACCESS_TOKEN` in `dragontrade-agent/.env`). The xAI team's
+linked X account is **not** used for posting —
 only the team's xAI key is consumed, for the educational slot only.
 
 **Cadence note for future ops.** `POST_INTERVAL_MIN` and
 `POST_INTERVAL_MAX` are read from `process.env` first with `'300'`/`'420'`
 as fallbacks. `dragontrade-agent/.env` was previously set to `120`/`180`
 which silently overrode the new code defaults. Both `.env` and code now
-agree on `300`/`420` (≈4 posts/day, *but only while X API credits are above $0; they were $0 on 7 Oct. Updated 15 Oct 2026*). If you tweak cadence, update both
+agree on `300`/`420` (≈4 posts/day, *but only while X API credits are above $0. Updated 19 Oct 2026: still $0 (NOW.md: dead since 21 Aug). On 19 Oct Grok still wrote the post (`✅ Generated via Grok (xAI)` 04:11 UTC) and X refused it: `❌ [THREAD 1/2] Failed to post: Request failed with code 402 … credits depleted`*). If you tweak cadence, update both
 or remove the `.env` lines so the code defaults take effect.
 
 **Still pending wiring** for the same xAI key (separate future sessions):
@@ -2383,9 +2487,9 @@ notification.
 
 **Verification anchors in logs:**
 
-- Engagement cycle success: `[Engagement] Done — N replies sent, M new follows` in `pm2 logs dragontrade-main`
+- Engagement cycle success: `[Engagement] Done — N replies sent, M new follows` in `pm2 logs dragontrade-main` *(updated 19 Oct 2026: this line still prints every 45 min, but as `Done — 0 replies sent, 0 new follows`, right after `[Engagement] Cycle error: credits depleted` in `dragontrade-main-error.log`. A Done line is not a success; read the error log.)*
 - Engagement state file exists at `/home/ubuntu/dragontrade-agent/engagement_state.json`
-- Blog publish success: `📰 Article published.` followed by Telegram notify
+- Blog publish success: the Telegram card starts `📰 Article published.` (it is not a pm2 log line). In `pm2 logs cto-aipa` the proof is `📡 [IndexNow] HTTP 200 — https://aideazz.xyz/blog/<slug>/`, sent only once the page answers 200 (since 15 Oct)
 - Blog publish skipped: `📰 Daily blog SKIPPED: ...` + dedicated skip notify to Telegram
 
 **Lesson rule documented in SKILL.md** (Interview story #5): "Verify from
@@ -2438,8 +2542,8 @@ to `src/blog-es-bundle.ts`, which uses Hashnode public GraphQL as a vestigial
 
 **Verification anchors:**
 
-- Startup log: `📰 Daily blog: scheduled 30 14 * * * (America/Panama) — mode: Dev.to + aideazz.xyz cross-post — listed: yes`
-- Successful publish: `📰 Daily blog published` (Telegram notify text starts with this)
+- Startup log: `📰 Daily blog: scheduled 30 14 * * * (America/Panama) — mode: Dev.to + aideazz.xyz cross-post — listed: yes` *(updated 19 Oct 2026: still printed verbatim on every restart, even with `DEVTO_PAUSED=1`. The `mode:` text checks only `HASHNODE_ACCESS_TOKEN` / `DAILY_BLOG_DEVTO_ONLY`. Each run's real state is `📰 Dev.to cross-post paused (DEVTO_PAUSED=1 or no key) — aideazz.xyz only today`.)*
+- Successful publish: the Telegram notify text starts with `📰 Article published.` *(updated 19 Oct 2026: the `📰 Daily blog published` prefix is used only for a one-line message, and the publisher always sends a multi-line card)*
 - Failure: `🚨 Daily blog FAILED` (Telegram notify text)
 - Skip (mutex): `📰 Daily blog SKIPPED: last publish was N.Nh ago (< 12h cooldown)`
 
@@ -2453,6 +2557,8 @@ only at draft-CREATION time (`generateBatchDrafts`). The actual SEND step
 (`sendApprovedDrafts`) iterates `outreach_log` status='draft' and sends
 ALL of them without checking — old bogus drafts retried every cron run
 forever.
+
+*(updated 19 Oct 2026: this Phase 4 cycle is still armed and sending. The pm2 logs kept on Oracle show `📧 Phase 4 outreach: healthy cycle (sent 8, generated 8)` on 9 Oct, `(sent 9, generated 9)` on 13 Oct and `(sent 1, generated 1)` on 16 Oct, each `— Telegram SUPPRESSED`, so Telegram stays silent while these cold emails go out unreviewed. Keep or switch off is Elena's call (NOW.md, OPEN item 4).)*
 
 **Three-layer fix in commit `daf757b`:**
 
@@ -2506,7 +2612,7 @@ but useless "no signals" / "0 new" daily noise.
 - `📧 Phase 4 outreach: healthy cycle (sent N, generated M) — Telegram SUPPRESSED` *(updated 15 Oct 2026: since 6 Oct every normal cycle stays silent and Telegram fires only on a failure. The old `quiet cycle (0 actionable signals)` anchor no longer exists, so grepping for it returns 0)*
 - `🎯 [cron] Triage: quiet day (0 Oracle signals + 0 HubSpot actionable) — Telegram SUPPRESSED`
 
-**Required env vars for hiring-stage filtering** (already configured):
+**Required env vars for hiring-stage filtering** *(updated 19 Oct 2026: NOT configured, and obsolete. Oracle `.env` has `HUBSPOT_API_KEY` only, and none of the four hiring vars appears in any `.env` backup since 15 Aug. Every deal, hiring included, lives in the single `default` pipeline (`pushHiringDealToHubSpot` hard-codes `pipelineId = 'default'`), so 🔥 job deals reach the brief through `qualifiedtobuy` and the three hiring-stage filters are silently skipped)*:
 - `HUBSPOT_API_KEY`
 - `HUBSPOT_HIRING_PIPELINE_ID`
 - `HUBSPOT_HIRING_STAGE_RECRUITER_RESPONDED`
@@ -2525,23 +2631,23 @@ loop + tool dispatcher) + `src/brightdata-enrich.ts` (the BD primitives:
 
 **Telegram commands** (all gated by `TELEGRAM_AUTHORIZED_USERS`):
 - `/research_company <name>` — client prospect mode
-- `/research_employer <name>` — hiring target mode
+- `/research_employer <name>` — interview deep-dive *(since 15 Oct, `b7ba3f73`: finds the open job deal first, then writes a sourced deep-dive note on it that OpenClaw reads; one research per deal at a time)*
 - `/research_competitor <domain>` — SEO/AEO competitor mode
 
 **Env vars required (single set — all 4 BD products share):**
 - `BRIGHTDATA_API_TOKEN` (already set since May 14-15)
 - `BRIGHTDATA_ZONE` (= `web_unlocker1` since May 14-15)
-- `ANTHROPIC_API_KEY` (Claude Sonnet 4.5 for the agent's tool-use) *(updated 15 Oct 2026: Anthropic credit is EMPTY. On the credit error, `/research_*` falls back to a Groq single-shot report written from the prompt alone, with **0 Bright Data calls**, while the Telegram header still says `model claude-sonnet-4-5`. Treat that output as unverified until Elena tops up.)*
+- `ANTHROPIC_API_KEY` (Claude Sonnet 4.5 for the agent's tool-use) *(updated 19 Oct 2026: Anthropic credit is still EMPTY. Since 15 Oct (`b7ba3f73` + `36561154`), Groq only summarises Bright Data results already gathered. With none, Perplexity (`RESEARCH_PERPLEXITY_MODEL`, default `sonar-pro`) writes the report with its own sources, and the header names the engine that actually wrote it. While Anthropic is empty, every run fails on its first Claude call, so the report comes from Perplexity with 0 Bright Data calls.)*
 
 **Operational characteristics:**
-- Loop budget: max 8 BD tool calls per command, 120s timeout
+- Loop budget: max 8 BD tool calls per command (10 for `/research_employer`), with a 150 s timeout as the Telegram commands call it (the function defaults are 8 / 120 s)
 - Returns structured markdown report (sent to Telegram chunked at 4000 char)
 - Falls back gracefully on any single BD call failure
-- Telegram reply format: `📊 Research: <target> (<mode>) · N BD calls · Ns · model claude-sonnet-4-5`
+- Telegram reply format: `📊 **Research: <target>** (<mode>)`, then `N BrightData tool calls · Ns · <engine>`, where the engine is the one that actually wrote the report (e.g. `perplexity sonar-pro`)
 
 **Verification anchors in logs:**
 - Bot startup: standard initTelegramBot output (no special line)
-- Successful run: `🔍 Researching <target> (<mode>) via Bright Data + Claude tool-use loop` then `[BrightData] ...` / `[BD-SERP] ...` lines per tool call
+- Successful run: `🔍 Researching <target> (<mode>) via Bright Data + Claude tool-use loop` then `[BrightData] ...` / `[BD-SERP] ...` lines per tool call *(updated 19 Oct 2026: `🔍 Researching …` is the Telegram acknowledgement, not a log line, and `/research_employer` replies `🔎 Interview deep-dive on …` instead. With Claude down, the log shows `[research-agent] Claude unavailable — report by perplexity sonar-pro (N chars)`.)*
 - Errors: `❌ Research agent error: ...`
 
 **MCP Server config for IDE-side use (`.mcp.json` at cto-aipa repo root):**
@@ -2550,10 +2656,11 @@ loop + tool dispatcher) + `src/brightdata-enrich.ts` (the BD primitives:
   "mcpServers": {
     "Bright Data": {
       "command": "npx",
-      "args": ["@brightdata/mcp"],
+      "args": ["-y", "--prefer-offline", "@brightdata/mcp@2.11.3"],
       "env": {
         "API_TOKEN": "${BRIGHTDATA_API_TOKEN}",
         "WEB_UNLOCKER_ZONE": "${BRIGHTDATA_ZONE}",
+        "BROWSER_ZONE": "${BRIGHTDATA_BROWSER_ZONE}",
         "GROUPS": "browser,advanced_scraping"
       }
     }
@@ -2593,6 +2700,8 @@ sites import. Exports:
   Non-credit errors re-throw so existing retry/error handling is unchanged.
   *(updated 15 Oct 2026: no longer true. `claudeWithGroqFallback` now fails over on ANY Anthropic error and walks Groq (`GROQ_MODEL`; the code default is the dead llama model, so the env var must stay set) → Gemini → Grok (`XAI_MODEL`) → OpenAI `gpt-4o-mini`. It re-throws only when neither `GROQ_API_KEY` nor `XAI_API_KEY` is set. New code should call `completeWithProfile` / `completeWithProfileDetailed` with `quality`, `classify` or `bulk`.)*
 
+*(updated 19 Oct 2026: not every Anthropic call is covered today. The code-review path calls Anthropic directly (`anthropicTextReview` in `src/cto-aipa.ts`): the pm2 logs kept on Oracle (9–19 Oct) hold 190 `❌ Haiku fallback failed: 400 … credit balance is too low` and 24 `🔐 Haiku fallback failed`. Lead-triage classification runs on Haiku because Oracle `.env` sets `TRIAGE_SKIP_GROQ=1`, and it falls back to a default triage on failure (35 `🎯 [triage] Haiku fallback failed`). Whether to change either is Elena's call.)*
+
 **All 12 newly-protected call sites (commit `dbc8b90`):**
 
 | File:fn | Model (primary) | Fallback label |
@@ -2625,16 +2734,16 @@ instead of `ok:false`.
 **Verification — isolation test (does NOT touch the live key).**
 `scripts/test-llm-resilience.ts` mocks an Anthropic client that throws the exact
 `400 credit balance` error, then calls `claudeWithGroqFallback` for every label and
-asserts Groq returns a non-empty response. Run on Oracle (where `GROQ_API_KEY` is set):
+asserts Groq returns a non-empty response. It ran on Oracle on 28 May (where `GROQ_API_KEY` is set); today, run it on the laptop:
 
 ```bash
-# (updated 15 Oct 2026) Oracle has no typescript / ts-node: run this test on the laptop; on Oracle, check the chain with `npm run eval:llm`
+# (updated 19 Oct 2026) Oracle has no ts-node (typescript 5.9.3 is installed there since 6 Sep; ts-node is not): run this test on the laptop. On Oracle, check the chain with `npm run eval:llm` (= `node scripts/eval-llm-chain.cjs`, reads `dist/llm-resilience.js`)
 ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/test-llm-resilience.ts"
 ```
 
 **Result on Oracle May 28 2026:** `11 passed, 0 failed` — every path logged
 `Anthropic credit exhausted — falling back to Groq llama-3.3-70b-versatile` and
-returned real content. Deployed: `git pull` → `npm run build` → `pm2 restart cto-aipa`
+returned real content. Deployed: `git pull` → `npm run build` → `pm2 restart cto-aipa` *(superseded: never `git pull` Oracle's cto-aipa now, because its checkout lags on purpose. Deploy = laptop build → named-file `scp` → `pm2 restart cto-aipa --update-env`; see the 12–15 Oct section)*
 (online, build clean, `tsc --noEmit` zero errors).
 
 **Pattern earned:** *"graceful degradation is not resilience — a feature that
@@ -2652,13 +2761,13 @@ closed-loop attribution, WITHOUT disturbing the existing CMO path.
 1. **VJH CMO → Make.com → Buffer → LinkedIn/IG** (milestone posts) — *unchanged, untouched.*
 2. **cto-aipa → Buffer GraphQL API → LinkedIn** (blog-article distribution) — *new this release.*
 
-They are different processes (`vibejobhunter-web` vs `cto-aipa`) posting different content.
+They are different processes (`vibejobhunter-web` vs `cto-aipa`) posting different content. *(updated 19 Oct 2026: the CMO post runs in systemd `vibejobhunter`, not `vibejobhunter-web`. Journal, 18 Oct 01:00:18 UTC: `LINKEDIN CMO: TRIGGERING DAILY POST` → `Sent to Make.com`. Since 18 Oct a third process also posts through Buffer: wiki-ship's field notes go out via `scripts/incident-to-blog.cjs`, with `FIELDNOTE_LINKEDIN=post` in Oracle `.env`.)*
 Only shared resource is the Buffer account posting queue (handled by graceful skip).
 
 **Buffer API facts (verified live 2026-05-28):**
 - Endpoint `https://api.buffer.com`, auth `Authorization: Bearer <BUFFER_API_TOKEN>`.
-- Org `6837714cc8be66c3825d0904`. Channels: LinkedIn `68389647d6d25b49a18a0de2`,
-  Instagram `68389b15d6d25b49a1d75b8e`, YouTube `68389437d6d25b49a1665d44`, TikTok (LOCKED).
+- Org = `BUFFER_ORG_ID` in `.env`. Channels: LinkedIn,
+  Instagram, YouTube, TikTok (LOCKED). Channel ids come from `buffer-cli.ts channels` and are kept out of this public doc.
 - Mutations: `createPost` (input requires `channelId`, `schedulingType: automatic`,
   `mode: addToQueue|shareNow|shareNext|customScheduled|recommendedTime`, `assets: []`;
   optional `saveToDraft: true`, `dueAt`), `createIdea`, `editPost`, `deletePost`.
@@ -2675,19 +2784,20 @@ Only shared resource is the Buffer account posting queue (handled by graceful sk
 
 **UTM loop (the measurement):** each post carries
 `aideazz.xyz/blog/{slug}?utm_source=linkedin&utm_medium=buffer_cmo&utm_campaign={slug}` →
-click-through → `/marketing/inquiry` → lead-triage → HubSpot. Wires the pending `[CLIENT-CMO]`
+click-through → `/marketing/inquiry` → lead-triage → HubSpot *(updated 19 Oct 2026: with `TRIAGE_SKIP_GROQ=1` in Oracle `.env`, `src/lead-triage.ts` classifies on Claude Haiku only and falls back to the default triage when Haiku fails, and Anthropic credit is empty. 410 of 856 `lead_triage` rows since June read "Classification failed"; almost all were Elena's own tests or scraped job posts (NOW.md, 18 Oct))*. Wires the pending `[CLIENT-CMO]`
 attribution from the UTM side (no LinkedIn API needed).
 
 **Env (gitignored, set local + Oracle):** `BUFFER_API_TOKEN`, `BUFFER_ORG_ID`,
 `BUFFER_TARGET_SERVICES=linkedin`, `BUFFER_SOCIAL_ENABLED=true` (live on Oracle).
 
 **Verified on Oracle:** `createIdea` test OK; `channels` lists 4; `dry` generated a real
-LinkedIn variant w/ UTM link; `draft` created Buffer draft `6a18a026c50122d5a577c8cc`
+LinkedIn variant w/ UTM link; `draft` created a Buffer draft
 (saveToDraft, not published). Build clean, `tsc --noEmit` zero errors, `cto-aipa` online
-after restart. Next daily blog cron (14:30 Panama) auto-distributes via `addToQueue`.
+after restart. Next daily blog cron (14:30 Panama) auto-distributes. *(updated 19 Oct 2026: it posts with `shareNow`, not `addToQueue`. Commit `0b46fa5d`, made the same day, switched the default because `addToQueue` silently creates a draft when the channel has no posting schedule. Oracle sets no `BUFFER_POST_MODE`, and the latest daily posts log `📣 [Buffer] article=… posted=1/1`.)*
 
 **Safety verification command (run anytime):**
 ```bash
+# (updated 19 Oct 2026) ts-node is not installed on Oracle: it is not in package.json, node_modules/.bin or global npm, so npx downloads it from the npm registry at run time. `dry` also spends one LLM call per channel.
 ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/buffer-cli.ts dry"
 ```
 
@@ -2716,16 +2826,15 @@ CLIs: `scripts/voice-engine-cli.ts`, `scripts/podcast-host-cli.ts` (init|info|re
 **External infra (NEW):**
 - **Podcast site/repo:** `ElenaRevicheva/aideazz-podcast` (separate repo) → **4everland** → `https://podcast.aideazz.xyz`
   (Cloudflare CNAME `podcast` → ddnsweb3.com, DNS-only). Feed `…/feed.xml`. Episodes commit via GitHub API → 4everland auto-redeploys.
-- **Distribution LIVE:** Spotify for Creators (auto-polls feed) + YouTube @AIdeazz podcast (Public, auto-uploads). Apple pending.
+- **Distribution LIVE:** Spotify for Creators (auto-polls feed) + YouTube @AIdeazz podcast (Public, auto-uploads). Apple not submitted *(updated 19 Oct 2026: skipped by decision on 31 May because there is no Apple device. The live site links only Spotify and YouTube. The feed has 11 episodes; the newest is from 28 Jul 2026.)*
 - **Fonts:** Figtree TTF installed on Oracle `~/.fonts/Figtree.ttf` (+`fc-cache`) — required for the
   server-rendered cover PNG (sharp/librsvg via fontconfig). If cover reverts to Arial, re-install.
 
 **Env added to `/home/ubuntu/cto-aipa/.env` (gitignored):** `SPEECHMATICS_API_KEY`, `SPEECHMATICS_REGION=eu1`,
 `BUFFER_API_TOKEN`, `BUFFER_ORG_ID`, `BUFFER_TARGET_SERVICES`, `BUFFER_SOCIAL_ENABLED`, `VOICE_ENGINE_ENABLED`,
 `PODCAST_ENGINE_ENABLED`, `PODCAST_PUBLISH_ENABLED`, `PODCAST_SITE_URL=https://podcast.aideazz.xyz`.
-(Rotate Speechmatics + Buffer keys — they appeared in chat during setup.)
 
-**Verify command:** `ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/voice-engine-cli.ts health"`
+**Verify command** *(updated 19 Oct 2026: ts-node is not installed on Oracle (not in package.json, node_modules/.bin or global npm), so `npx` downloads it from the npm registry at run time; the same applies to the next line)*: `ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/voice-engine-cli.ts health"`
 (Speechmatics auth) and `npx ts-node scripts/podcast-host-cli.ts info`.
 
 **Pattern earned:** *"distribute once, prove each leg from evidence — feed item, Dev.to URL, Buffer
@@ -2740,7 +2849,7 @@ but by `src/blog-static-pages.ts` with `[skip ci]`, so 4everland never rebuilt. 
 
 **Fix (cto-aipa `1cc388a`):** `[skip ci]` is appended only when UPDATING an existing page (GitHub
 Contents API returned a `sha`). A NEW page commits normally → exactly one deploy per new article.
-Bulk-regenerate deploy-storm protection preserved (unchanged files produce no commits at all).
+Bulk-regenerate deploy-storm protection preserved (unchanged files produce no commits at all). *(updated 19 Oct 2026: superseded on 19 Aug by `8ae7fccf`. `[skip ci]` now goes only on a BULK regeneration of a file that already exists (`githubCommitMessage` in `src/blog-github-commit.ts`). A single publish always deploys: re-publishing a page whose first deploy had not landed used to skip the build again, which stranded 3 field notes and one daily post.)*
 
 **Deploy:** `git pull` + `npm run build` (tsc clean) + `pm2 restart cto-aipa` on Oracle.
 **Verified:** `pm2 jlist | jq -r '.[] | select(.name==$n) | .pm2_env.status'` → `online`,
@@ -2763,7 +2872,7 @@ branch `backup/atuona-pre-multiprovider-20260613` pushed to GitHub. Restore: `gi
 **Shipped in `src/atuona-creative-ai.ts`:**
 - **Luma Ray-2 → Ray-3** (`VIDEO_MODELS.lumaDirect`), env-overridable `LUMA_VIDEO_MODEL`. Ray-3 =
   native 1080p, ~3x cheaper, 16-bit HDR, best-in-class video-to-video. Replicate fallback deliberately
-  KEPT on `ray-2-720p` so the fallback never shares a Ray-3 enum/schema surprise.
+  KEPT on `ray-2-720p` so the fallback never shares a Ray-3 enum/schema surprise. *(updated 19 Oct 2026: no longer. Luma via Replicate now defaults to `luma/ray-3.2`, env `REPLICATE_LUMA_MODEL`, in `src/atuona-creative-ai.ts`.)*
 - **Operator-selectable engine:** `/visualize <provider> NNN` where provider ∈ luma | runway | veo
   (aliases ray3/gen4/google). Explicit provider runs FIRST, then falls back through
   Luma→Replicate→Runway with honest provider labeling on the delivered clip. Bare `/visualize NNN`
@@ -2784,7 +2893,7 @@ delivered the base cut. Luma API wallet is SEPARATE from the consumer app: top u
 https://lumalabs.ai/dream-machine/api/billing/overview (not Account→Subscription). *(updated 15 Oct 2026: the current Luma API is billed per project at https://platform.lumalabs.ai → project → Billing, not on this page. The wallet was EMPTY at the 22 Sep audit, so `/visualize luma` and Director's Cut fail for lack of money.)*
 
 **Fallback truth (answer to "do I fall back to runway/dalle?"):** video falls back Luma→Replicate→Runway
-(yes Runway). Images are **Flux-only** (Ultra→Pro→Dev) — **no DALL-E** anywhere in /visualize.
+(yes Runway). Images are **Flux-only** (Ultra→Pro→Dev) — **no DALL-E** anywhere in /visualize. *(updated 19 Oct 2026: no longer Flux-only. The image chain is Flux 2 Max → Flux 1.1 Ultra → Pro → Dev, then Luma uni-1-max → Gemini 3.1 Flash Image → Runway gen4_image (`src/atuona-image-pins.ts`). Since 22 Sep, nine Replicate image models can also be picked by name, including OpenAI's `openai/gpt-image-2`. DALL-E itself is still unused. The current video chain is in the note under 14 Jun.)*
 
 ## NEW June 13 2026 — Luma migrated to current API (agents.lumalabs.ai/v1 + ray-3.2), commit `e523b8b`
 
@@ -2804,7 +2913,7 @@ Real key 52 chars. Fixed in place (`${K%n}` + `tr -d "[:space:]"`); never re-typ
 
 **Deploy:** pull + build (tsc clean) + `pm2 restart cto-aipa` → online (restart 14), boot log
 `🎭 Atuona Creative AI started`. Director's Cut (Modify) still on legacy schema — skips gracefully,
-open follow-up. Veo 3.1 needs GEMINI_API_KEY + billing; Runway keyed, needs Runway credits.
+open follow-up. Veo 3.1 needs GEMINI_API_KEY + billing; Runway keyed, needs Runway credits. *(updated 19 Oct 2026: Veo is done. It is funded, pinned and in the default chain (see the update above), and `GEMINI_API_KEY` is set on Oracle. Director's Cut moved to the new API the same day (next section). At the 22 Sep audit (`docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`), Luma's project wallet was EMPTY and Runway had 4 credits, so the "$8" above is spent. `/visualize luma|runway` and Director's Cut need a top-up first. No newer balance check is recorded.)*
 
 ## June 13 2026 (cont.) — Director's Cut (Modify Video) working on new Luma API (`7a8531c`)
 
@@ -2851,7 +2960,7 @@ per-poem shots into a finished film, all on Oracle via ffmpeg (ffmpeg 6.1.1 + ff
   prior shots by probing `atuona-state.json` (repo root) and curling live URLs into shots/.
 
 **First film: `finding-paradise` — 97s, 5 shots, 12.8MB, full poem VO + melancholic ambient score.**
-Backup tag `atuona-pre-filmcompiler-20260615`. Restore points clean; existing engines untouched.
+Backup tag `atuona-pre-filmcompiler-20260615`. Restore points clean; existing engines untouched. *(updated 19 Oct 2026: the `finding-paradise` mp4 itself no longer exists. It is not in Oracle's `data/atuona/films/out/`, and no file with that name is anywhere under `data/`. It was lost in the 1 Jul `data/` wipe, and git has no copy because `data/` is gitignored.)*
 
 ---
 
@@ -2866,12 +2975,12 @@ send, a HubSpot **EMAIL activity**, and a delivery stamp. Files: `src/chat-conci
 
 > **Make's Lead Concierge trigger is HubSpot `Watch CRM Objects → Contacts CREATED`.**
 > A first-time person is **created** → Make drafts. A person already in the CRM is only
-> **updated** → **Make never fires**. Proven July 27: Malina Choke (`espaluztester@`) wrote on
+> **updated** → **Make never fires**. Proven July 27: one of Elena's test identities wrote on
 > Jul 16 (new contact → draft sent) and again via chat (existing contact → silence).
 
 Elena's four test inboxes hide this, because `isConciergeTestEmail()` force-recreates them
-(delete + create) so Make fires every time: `adamvelena@`, `marinakulaginabowen@`,
-`kiravelerevich@`, `espaluztester@` (added Jul 27). **All four are hers — never add a real
+(delete + create) so Make fires every time (the addresses live only in `CONCIERGE_TEST_EMAILS` in Oracle `.env`, never in this public doc);
+the fourth was added Jul 27. **All four are hers — never add a real
 prospect, their history is destroyed on every touch.** *(updated 15 Oct 2026: since 6 Oct the list lives ONLY in `CONCIERGE_TEST_EMAILS` in `.env`. The code default is empty, so if the variable is unset nobody is force-recreated.)*
 
 **Fix (`dc5465f`):** `chat-concierge` checks `findContactByEmail()` **before** pushing.
@@ -2903,14 +3012,14 @@ HubSpot seeds every inbox with a sample thread (`emailmaria@hubspot.com`) — sk
 
 ### `src/resend-webhook.ts` — acceptance is NOT delivery
 
-Dental Connect's sends were **Suppressed** by Resend while HubSpot read ⏳ Sent + `📧 EMAILED`.
+One prospect's sends were **Suppressed** by Resend while HubSpot read ⏳ Sent + `📧 EMAILED`.
 `POST /cto/resend/webhook` (Svix-signed, `RESEND_WEBHOOK_SECRET` in Oracle `.env`) stamps the
 **outreach note** — at the TOP, under the FU buttons — with `✅ ENTREGADO` / `⛔ REBOTE` /
 `🚫 QUEJA` / `👀 ABIERTO` / `🔗 CLIC`; bounce and complaint also raise a HIGH task and flip the
 logged email SENT → BOUNCED. Signature verified manually (no svix dep): valid 200, forged 401,
 unsigned 401, replayed 401.
 
-**Suppressed sends emit NO webhook at all** *(⚠️ updated 15 Oct 2026: the reconciler below currently FAILS. Every `GET /emails/{id}` returns 401 (451 × 401 on 15 Oct), so suppressed sends are NOT being detected. The key fix is held for Elena until its dedup marker is fixed; the marker is an HTML comment, which HubSpot strips. See `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` item 3)* → `scripts/resend-reconcile.cjs` (cron `17 * * * *`,
+**Suppressed sends emit NO webhook at all** *(⚠️ updated 15 Oct 2026: the reconciler below cannot read Resend: every `GET /emails/{id}` returned 401 (451 × 401 on 15 Oct), so suppressed sends are NOT being detected. *(19 Oct 2026: since about 16 Oct 19:00 UTC every hourly run has logged `"checked": 0` with `"errors": []`. That looks healthy and is not. The newest ledger entry is from 13 Oct 19:44 UTC and the run looks back only 3 days, so it has nothing to fail on. The code still reads `RESEND_API_KEY`, so the next one-click send will return 401 again.)* The key fix is held for Elena until its dedup marker is fixed; the marker is an HTML comment, which HubSpot strips. See `docs/oracle/2026-10-15_AIDEAZZ_TEAM_WIRING_PLAN.md` item 3)* → `scripts/resend-reconcile.cjs` (cron `17 * * * *`,
 log `~/logs/resend-reconcile.log`) polls `GET /emails/{id}` for recent ledger entries and stamps
 `⛔ SUPRIMIDO` + a task. Ledger: `data/resend-ledger.json` (resendId → dealId/engagementId).
 
@@ -2976,7 +3085,7 @@ reading config.
 Order is per USE CASE, never a fleet template. Each product has its own eval; re-run it
 before changing any model id.
 
-> **(updated 15 Oct 2026) The HEAD column shows the 17 Aug state; the chains and evals still match the code.** GitHub `main` on 15 Oct: cto-aipa `de06ac75` (last code commit; Oracle's checkout HEAD stays at `782abc2` on purpose), VJH `006c1ed`, EspaLuz_Influencer `62f4c82`, dragontrade-agent `0e6849d`, EspaLuzWhatsApp `5fb6b7e`, EspaLuzFamilybot `c9bb721`, whitespace `48ecab5`. EspaLuz ×2 and dragontrade run older code on Oracle on purpose. The table has seven rows; OpenClaw and Sprinter are added at the end.
+> **(updated 15 Oct 2026) The HEAD column shows the 17 Aug state; the chains and evals still match the code.** GitHub `main` on 19 Oct (re-checked 19 Oct 2026; the chains were re-read in each repo and on Oracle and still match): cto-aipa `6582fe58` (last code commit, the document desk; Oracle's checkout HEAD stays at `782abc2` on purpose), VJH `406e83b` (= Oracle), EspaLuz_Influencer `62f4c82`, dragontrade-agent `0e6849d`, EspaLuzWhatsApp `5fb6b7e`, EspaLuzFamilybot `c9bb721`, whitespace `48ecab5`. EspaLuz ×2 and dragontrade run older code on Oracle on purpose: on 19 Oct their Oracle HEADs are still the 17 Aug values in the table (`24e5c15`, `58cdb4b`, `17558e2`). EspaLuz_Influencer `62f4c82` and whitespace `48ecab5` match Oracle. The title says six products; the table holds the seven 17 Aug rows plus OpenClaw and Sprinter, added 15 Oct (nine in all).
 
 | Product | Chain | Eval | HEAD |
 |---|---|---|---|
@@ -3074,7 +3183,7 @@ also not in git, and `espaluz-payments-webhook` is active. This is **money code 
 version control**. Backed up 2026-08-17 to
 `backups/oracle-only-code/aideazz_service_payments.py.20260817-1507`; contains no
 hardcoded secrets, so it is safe to commit whenever Elena decides.
-`EspaLuzWhatsApp/scripts/backfill_espaluz_hubspot.py` also differs on Oracle (one-off
+`EspaLuzWhatsApp/scripts/backfill_espaluz_hubspot.py` also differs on Oracle *(updated 19 Oct 2026: the file is now missing from Oracle's working tree; `git status` shows ` D`, and no cron job calls it)* (one-off
 script, low risk).
 
 ## Sync audit — 2026-08-17
@@ -3085,7 +3194,7 @@ All 8 repos **local == origin/main**. Oracle git HEADs for cto-aipa, EspaLuzFami
 whitespace had drifted behind while their *files* were current (deployed by scp/checkout
 without moving the pointer) — realigned with **`git reset --mixed origin/main`**, which
 moves HEAD and index and never touches working files. Verify with
-`git diff --ignore-cr-at-eol --ignore-all-space origin/main`, **not md5**: scp preserves
+`git diff --ignore-cr-at-eol --ignore-all-space origin/main`, **not raw md5** *(updated 19 Oct 2026: the current check is md5 after stripping CRs, comparing `git show origin/main:<f> | md5sum` with `tr -d '\r' < <f> | md5sum`, as in the trap table at the top)*: scp preserves
 Windows CRLF while `git checkout` writes LF, so hashes differ on identical content.
 All services active; `cto-aipa` restarted so `visibility-api.ts`'s dynamic import of the
 tracker could not serve a cached pre-Bright-Data copy.
