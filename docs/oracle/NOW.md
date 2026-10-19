@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 21:10 | Atlas: 2 dental no-website STAGED (real run, Elena's go) + GEO/AEO primary lane every week (Elena: "make sure GEO AEO marketing is chosen") | `scripts/atlas-lead-machine.cjs` · Oracle: same file by named scp, `--dry` only from here | 1352f49a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
