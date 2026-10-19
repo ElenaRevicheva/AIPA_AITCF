@@ -187,11 +187,11 @@ git log keeps the record.
 ### ✅ 18 Oct — Field notes → LinkedIn via the EXISTING Buffer path, model-free caption · first one = Buffer DRAFT · claim released
 - **DONE (`6b770a36`, Elena's "wire LinkedIn"):** `scripts/incident-to-blog.cjs` → after Bluesky, `bufferCreatePost` (dist/buffer-publisher.js)
   with caption = incident title + subtitle + link (UTM `buffer_fieldnote`), assembled, NO model. `FIELDNOTE_LINKEDIN=draft|post` in Oracle
-  `.env` (unset = off; now **draft**). `--linkedin-draft` for an already-published note. Leak scan covers the caption. wiki-ship logs
+  `.env` (unset = off; was **draft**; *19 Oct: Oracle `.env` reads `post`, file changed 18 Oct 12:03 UTC — the next field note goes straight to LinkedIn; the 16 Oct note is still a Buffer draft*). `--linkedin-draft` for an already-published note. Leak scan covers the caption. wiki-ship logs
   `LinkedIn (Buffer) …`. No pm2 restart (wiki-ship cron spawns node fresh). Backups `~/_session-backups/fieldnote-linkedin-20261018/`.
 - **VERIFIED BY:** `test-fieldnote-linkedin.cjs` 26/26 on laptop AND Oracle (all 20 publishable incidents); md5 laptop = GitHub = Oracle
   (3 files); Buffer API lists `6ad4abac769b457934bd22f2` **draft**, sentAt null (16 Oct field note).
-- **NEXT (Elena):** approve that draft in Buffer (or say "post it") → then set `FIELDNOTE_LINKEDIN=post`. Daily → LinkedIn unchanged (her call).
+- **NEXT (Elena):** approve that draft in Buffer (or say "post it") → then set `FIELDNOTE_LINKEDIN=post` (*already `post` on Oracle, 19 Oct*). Daily → LinkedIn unchanged (her call).
 - **RISK:** Make.com still doubles the 01:00 VJH CMO post daily (18 Oct: 2 identical at 01:01) — not touched, needs her go.
 
 ### ⛔ 17 Oct ~24:00 UTC — DAILY BLOG PUBLISHES FALSE CLAIMS + leaked employer names (16 Oct) · read-only check · fix awaits Elena
@@ -227,7 +227,7 @@ git log keeps the record.
   🛡️, 🎯, 📋 Comet); kit fill every 10 min "11 ACT TODAY · brief already had 11 · failed 0"; OpenClaw proof sheet 24,598 chars (EN+ES
   facts, 23 examples, Pitz deep-dive facts + cautions), deals sheet by stage (🔥 11 listed = HubSpot 11), 6 corrections; Pitz deal reader
   prints 🛡️/🎯/✅ letter/📋 Comet/likely questions/verified examples/READ-PROOF.
-- **Also found (not acted on):** VJH weekly watchdog cron `job-board-watch.sh` lacks +x ("Permission denied", next run Tue 20 Oct);
+- **Also found:** VJH weekly watchdog cron `job-board-watch.sh` lacked +x — *fixed 18 Oct (VJH `406e83b`); its first run REJECTED AI-Native-Builder (~47 live postings, needs ≥50) and sent the Telegram alert; next cron Tue 20 Oct 11:00 UTC*;
   Torre.ai dormant since 2 Oct (terms forbid scraping — Elena's call, see 12 Oct entry; belongs in §7 DELIBERATE).
 
 ### ✅ 18 Oct ~12:40 UTC — VJH reads postings carefully + learns her full notes · one-tap alert buttons · PDF/Word in VJH + CTO AIPA · no letters for parked jobs · claim released
@@ -441,7 +441,7 @@ git log keeps the record.
   without signature check + public EspaLuz admin/analytics (task card in her sidebar; never write details into this public repo) · (2) #3 resend
   dedup fix (visible marker) before Mon 19 Oct Atlas sends · (3) WA follow-ups: `hs-watch-manual-emails` gives a deal entering ⏳ Sent with no
   open task its FU (needs her go) · (4) **auto-sender:** `src/outreach.ts runDailyOutreachCycle` (cron `OUTREACH_CRON` 15:00 Panama) drafts with
-  Claude and SENDS cold emails with no review; last runs sent 0 (3 errors) but it is armed — Elena decides off/keep · (5) VJH: client replies →
+  Claude and SENDS cold emails with no review; it DOES send — pm2 logs rotated 10, 14 and 17 Oct carry `[outreach-auto] Sent 8` / `Sent 9` / `Sent 1` (other days 0, one with 3 errors; checked 19 Oct) — Elena decides off/keep · (5) VJH: client replies →
   fake [HIRING-VJH-LEAD] + paid letter; hourly re-classification of the same mail · (6) EspaLuz payments never reach HubSpot.
   Money decisions: Algom X credits (dead since 21 Aug), Claude credits at zero.
 - **Wiki:** `aideazz` `37ec1cd` incident "Another agent wrote her top lesson" + concept `label-provenance` (blog: yes → wiki-ship 21:30 UTC).
@@ -4473,9 +4473,9 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   backup, or infer the cadence from the code, and it silently reverts to daily — a
   19-hour learning lag that looks exactly like a working system. If you touch VJH
   cron, preserve this line.
-- 🚫 **The `python3` in that cron is deliberately NOT the venv.** The script uses only
-  `urllib` and `json` and is verified working under a stripped `env -i`. Do not
-  "fix" it to `venv/bin/python`.
+- ✅ *(corrected 19 Oct)* **The cron now runs `venv/bin/python`** — switched 28 Sep when the sync began calling
+  `scripts/link_evidence.py` (SQLAlchemy/LangGraph; backup `~/crontab.bak-20260928-evidence`). Keep the venv: bare
+  `python3` would now fail on those imports.
 
 ## ⚠️ Standing traps
 
