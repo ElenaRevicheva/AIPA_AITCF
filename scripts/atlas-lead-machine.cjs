@@ -129,7 +129,20 @@ if (require.main === module && (!HS || !VIS || (!SERP && !BD_OK))) {
 }
 
 const DRY = process.argv.includes('--dry');
-const MAX_NEW = Number(process.env.LEAD_MAX_NEW || 8);
+const MAX_NEW = (() => {
+  const n = Number(process.env.LEAD_MAX_NEW || 8);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 8; // a typo must never make the run uncapped
+})();
+// 19 Oct 2026 (Elena: "make sure GEO AEO marketing is chosen!"). The weekly pick took the top-scoring lane only,
+// so GEO/AEO — her flagship and career lane, whitespace score 13 — was never worked. Now PRIMARY_LANE is worked
+// EVERY week, first, with up to PRIMARY_MIN of the MAX_NEW slots; the top-scoring other lane fills the rest; if it
+// comes up short, the primary lane fills again. ATLAS_PRIMARY_LANE='' (process env) restores the old top-score-only
+// pick. LEAD_LANE= still forces a single lane, as before.
+const PRIMARY_LANE = String(process.env.ATLAS_PRIMARY_LANE ?? g('ATLAS_PRIMARY_LANE') ?? 'geo_aeo_tech_seo_makers').trim();
+const PRIMARY_MIN = (() => {
+  const n = Number(process.env.ATLAS_PRIMARY_MIN || g('ATLAS_PRIMARY_MIN') || Math.ceil(MAX_NEW / 2));
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : Math.ceil(MAX_NEW / 2); // a typo must not disable the split
+})();
 // No-website businesses (Elena, 13 Oct 2026): ON TOP of MAX_NEW, stage the best NOWEB_MAX (2)
 // of the Places results this run already paid for that have no website — or only an Instagram/
 // Facebook page as their "website". Most reviews first, high-ticket queries only, ≥5 reviews.
@@ -364,14 +377,19 @@ const LANE_OFFER = {
   },
 };
 
-/** Highest-scoring Atlas lane that has a reachable ICP. Score alone is not enough. */
-function pickLane() {
+/**
+ * Highest-scoring Atlas lane that has a reachable ICP. Score alone is not enough.
+ * `exclude` (19 Oct 2026): the primary lane is worked anyway, so the second leg is the best OTHER lane;
+ * returns lane null when no other lane has a score.
+ */
+function pickLane(exclude = null) {
   const forced = process.env.LEAD_LANE;
-  if (forced && ICP_BY_LANE[forced]) return { lane: forced, score: null, forced: true };
-  let best = { lane: 'geo_aeo_tech_seo_makers', score: -1 };
+  if (!exclude && forced && ICP_BY_LANE[forced]) return { lane: forced, score: null, forced: true };
+  let best = { lane: exclude ? null : 'geo_aeo_tech_seo_makers', score: -1 };
   try {
     const c = JSON.parse(fs.readFileSync(CONCEPTS_PATH, 'utf8'));
     for (const lane of Object.keys(ICP_BY_LANE)) {
+      if (lane === exclude) continue;
       const s = c[lane]?.move?.score;
       if (typeof s === 'number' && s > best.score) best = { lane, score: s };
     }
@@ -379,6 +397,16 @@ function pickLane() {
     /* no concepts — fall back to the lane Elena provably converts on */
   }
   return best;
+}
+
+/** A lane's whitespace score this week, or null (for the log). */
+function laneScore(lane) {
+  try {
+    const s = JSON.parse(fs.readFileSync(CONCEPTS_PATH, 'utf8'))[lane]?.move?.score;
+    return typeof s === 'number' ? s : null;
+  } catch {
+    return null;
+  }
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1475,143 +1503,225 @@ async function telegram(text) {
 // its letter templates would fire the whole machine — Google searches, audits, and
 // real HubSpot contacts and deals — as an import side effect.
 if (require.main === module) (async () => {
-  const picked = pickLane();
   const yieldLedger = loadYield();
-  const TARGETS = orderTargets(picked.lane, ICP_BY_LANE[picked.lane], yieldLedger);
-  const angle = atlasAngle(picked.lane);
+  const forcedLane = process.env.LEAD_LANE && ICP_BY_LANE[process.env.LEAD_LANE] ? process.env.LEAD_LANE : null;
+  const primary = !forcedLane && PRIMARY_LANE && ICP_BY_LANE[PRIMARY_LANE] ? PRIMARY_LANE : null;
+  if (!forcedLane && PRIMARY_LANE && !ICP_BY_LANE[PRIMARY_LANE]) {
+    console.warn(`[lead-machine] ⚠️ ATLAS_PRIMARY_LANE="${PRIMARY_LANE}" is not a lane — falling back to the top-score pick`);
+  }
+  // The week's legs, worked in order (19 Oct 2026). No primary lane (or a forced one): one leg, as before.
+  const legs = [];
+  if (primary) {
+    const other = pickLane(primary);
+    if (other.lane && other.lane !== primary) {
+      legs.push({ lane: primary, score: laneScore(primary), role: 'primary', quota: Math.min(PRIMARY_MIN, MAX_NEW) });
+      legs.push({ lane: other.lane, score: other.score, role: 'top score', quota: Infinity });
+      legs.push({ lane: primary, score: laneScore(primary), role: 'primary refill', quota: Infinity, resume: true });
+    } else {
+      // No other lane scored (or concepts.json unreadable): one primary leg, no split, nothing thrown away.
+      legs.push({ lane: primary, score: laneScore(primary), role: 'primary', quota: Infinity });
+    }
+  } else {
+    const picked = pickLane();
+    legs.push({
+      lane: picked.lane,
+      score: picked.score,
+      role: picked.forced ? 'forced via LEAD_LANE' : 'top score',
+      quota: Infinity,
+    });
+  }
   console.log(
     `[lead-machine] start${DRY ? ' (DRY RUN — nothing written)' : ''} · max ${MAX_NEW} · band ${AUDIT_MIN}-${AUDIT_MAX}`,
   );
   console.log(
-    `[lead-machine] LANE: ${picked.lane}${picked.forced ? ' (forced via LEAD_LANE)' : ` (Atlas score ${picked.score})`}` +
-      ` · offer: ${LANE_OFFER[picked.lane].label} · ${TARGETS.length} ICP queries` +
-      ` · order: ${TARGETS.slice(0, 3).map((t) => t.q).join(' → ')} …` +
-      (angle ? ` · angle ${angle.angle}` : ' · no fresh angle'),
+    `[lead-machine] WEEK: ${legs.map((l) => `${l.lane} (${l.role}${Number.isFinite(l.quota) ? ` ≤${l.quota}` : ''})`).join(' → ')}`,
   );
   const known = await loadKnown();
   console.log(`[lead-machine] dedup set: ${known.names.size} companies, ${known.domains.size} domains already worked`);
   const staged = [];
   const skip = { noEmail: 0, dupe: 0, band: 0, noAudit: 0, seen: 0, rescued: 0 };
 
-  for (const target of TARGETS) {
-    if (staged.length >= MAX_NEW) break;
-    let businesses = [];
-    try {
-      // Best supply first: the SerpAPI maps engine carries phone + reviews, which
-      // organic search cannot. When it has no quota (cancelled Aug 11 2026) we go
-      // straight to Bright Data rather than throwing the lane away — that `continue`
-      // is what would have made this Monday, and every Monday after, produce zero.
-      businesses = placesReady() || (await serpHasQuota()) ? await mapsSearch(target) : await bdSerpBusinesses(target);
-    } catch (e) {
-      console.warn(`[lead-machine] "${target.q}" primary supply failed: ${String(e.message).slice(0, 90)}`);
-      // A provider hiccup must not silently cost a lane. Try the other supply once.
-      try {
-        businesses = await bdSerpBusinesses(target);
-        console.log(`[lead-machine] "${target.q}" recovered via Bright Data`);
-      } catch (e2) {
-        console.warn(`[lead-machine] "${target.q}" Bright Data also failed: ${String(e2.message).slice(0, 90)}`);
-        continue;
-      }
-    }
-    console.log(`[lead-machine] ${target.city} · "${target.q}" → ${businesses.length} with a website`);
-    const before = { seen: skip.seen, dupe: skip.dupe, staged: staged.length };
+  // Run-wide memory (19 Oct 2026 review). Resume by IDENTITY, not by position: orderTargets() re-sorts as the yield
+  // ledger changes mid-run, so an index from leg 1 points at the wrong query in the refill. Lanes also share queries
+  // ('yacht charter' Panama City), so a search any leg already ran is never paid for twice. And the unprocessed tail
+  // of a search a leg stopped in on its quota is carried to the refill instead of buying a new search.
+  const searchKey = (t) => `${t.q}|${t.city}|${t.ll || ''}`;
+  const searchedRun = new Set();
+  const leftover = {};
 
-    for (const b of businesses) {
-      // A social profile is not a website: skip before spending an audit on it.
-      if (isPlatformSite(b.website)) {
-        // An Instagram/Facebook page as the Google "website" = a business with no site of its
-        // own: a no-website candidate (13 Oct 2026). Places only — it carries phone + reviews.
-        if (b.source === 'places' && socialPlatform(b.website)) {
-          noWebsiteSeen.push({ ...b, presence: b.website, query: target.q, highTicket: target.hl === 'en' });
+  for (const leg of legs) {
+    if (staged.length >= MAX_NEW) break;
+    const fresh = orderTargets(leg.lane, ICP_BY_LANE[leg.lane], yieldLedger)
+      .filter((t) => !searchedRun.has(searchKey(t)))
+      .map((t) => ({ t }));
+    const carry = leg.resume && leftover[leg.lane] ? [leftover[leg.lane]] : [];
+    delete leftover[leg.lane];
+    const TARGETS = [...carry, ...fresh];
+    if (!TARGETS.length) continue;
+    const angle = atlasAngle(leg.lane);
+    const legStart = staged.length;
+    const legFull = () => staged.length >= MAX_NEW || staged.length - legStart >= leg.quota;
+    console.log(
+      `[lead-machine] LANE: ${leg.lane} (${leg.role}${leg.score != null ? ` · Atlas score ${leg.score}` : ''})` +
+        ` · offer: ${LANE_OFFER[leg.lane].label} · ${TARGETS.length} ICP queries` +
+        ` · order: ${TARGETS.slice(0, 3).map((x) => x.t.q).join(' → ')} …` +
+        (angle ? ` · angle ${angle.angle}` : ' · no fresh angle'),
+    );
+
+    for (const item of TARGETS) {
+      if (legFull()) break;
+      const target = item.t;
+      // A carried tail is already paid for: work it without a new search.
+      let businesses = item.businesses || [];
+      if (!item.businesses) searchedRun.add(searchKey(target));
+      if (!item.businesses) try {
+        // Best supply first: the SerpAPI maps engine carries phone + reviews, which
+        // organic search cannot. When it has no quota (cancelled Aug 11 2026) we go
+        // straight to Bright Data rather than throwing the lane away — that `continue`
+        // is what would have made this Monday, and every Monday after, produce zero.
+        businesses = placesReady() || (await serpHasQuota()) ? await mapsSearch(target) : await bdSerpBusinesses(target);
+      } catch (e) {
+        console.warn(`[lead-machine] "${target.q}" primary supply failed: ${String(e.message).slice(0, 90)}`);
+        // A provider hiccup must not silently cost a lane. Try the other supply once.
+        try {
+          businesses = await bdSerpBusinesses(target);
+          console.log(`[lead-machine] "${target.q}" recovered via Bright Data`);
+        } catch (e2) {
+          console.warn(`[lead-machine] "${target.q}" Bright Data also failed: ${String(e2.message).slice(0, 90)}`);
+          continue;
         }
-        skip.noEmail++;
-        continue;
       }
-      if (staged.length >= MAX_NEW) break;
-      skip.seen++;
-      // Cheapest checks first: never spend a scrape or an audit on a business
-      // Elena has already worked.
-      const fp = fingerprint(b.company);
-      let domain = '';
-      try {
-        domain = new URL(b.website).hostname.replace(/^www\./, '').toLowerCase();
-      } catch {
-        /* handled below by findEmail */
+      console.log(
+        `[lead-machine] ${target.city} · "${target.q}" → ${businesses.length} ` +
+          (item.businesses ? 'left from the primary leg (no new search)' : 'with a website'),
+      );
+      const before = { seen: skip.seen, dupe: skip.dupe, staged: staged.length };
+
+      for (let bi = 0; bi < businesses.length; bi++) {
+        const b = businesses[bi];
+        // A social profile is not a website: skip before spending an audit on it.
+        if (isPlatformSite(b.website)) {
+          // An Instagram/Facebook page as the Google "website" = a business with no site of its
+          // own: a no-website candidate (13 Oct 2026). Places only — it carries phone + reviews.
+          if (b.source === 'places' && socialPlatform(b.website)) {
+            noWebsiteSeen.push({ ...b, presence: b.website, query: target.q, highTicket: target.hl === 'en' });
+          }
+          skip.noEmail++;
+          continue;
+        }
+        if (legFull()) {
+          // Stopped on the LEG quota (not MAX_NEW): keep the unworked tail for the refill leg.
+          if (staged.length < MAX_NEW && bi < businesses.length) leftover[leg.lane] = { t: target, businesses: businesses.slice(bi) };
+          break;
+        }
+        skip.seen++;
+        // Cheapest checks first: never spend a scrape or an audit on a business
+        // Elena has already worked.
+        const fp = fingerprint(b.company);
+        let domain = '';
+        try {
+          domain = new URL(b.website).hostname.replace(/^www\./, '').toLowerCase();
+        } catch {
+          /* handled below by findEmail */
+        }
+        if ((fp && known.names.has(fp)) || (domain && known.domains.has(domain))) {
+          skip.dupe++;
+          console.log(`   ↺ ${b.company.slice(0, 34)} — already in the CRM, skipped`);
+          continue;
+        }
+        const email = await findEmail(b.website);
+        if (!email) {
+          skip.noEmail++;
+          continue;
+        }
+        // Restore the WhatsApp close channel the maps engine used to supply. Only
+        // fills a gap — if a supply ever returns a real phone again, that one wins.
+        if (!b.phone && domain && phoneByDomain.has(domain)) {
+          b.phone = phoneByDomain.get(domain);
+          console.log(`      ↳ WhatsApp number found on their site: ${formatPhone507(b.phone)}`);
+        }
+        if (await contactExists(email)) {
+          skip.dupe++;
+          continue;
+        }
+        // Remember within this run too, so two branches of the same chain don't
+        // both get staged.
+        if (fp) known.names.add(fp);
+        if (domain) known.domains.add(domain);
+        const audit = await auditSite(b.website);
+        if (!audit) {
+          skip.noAudit++;
+          continue;
+        }
+        // A site that blocks GPTBot/ClaudeBot scores near zero on AI access, which
+        // drags its TOTAL under the floor — so the hardest blockers were being
+        // discarded as "broken site" when they are the strongest prospects we have:
+        // being invisible to ChatGPT is the entire pitch, and they are provably
+        // real businesses (Google reviews, a live site that answers humans).
+        // Rescue them below the floor; never above it, where there is nothing to sell.
+        const crawlerBlocked = audit.aiAccess != null && audit.aiAccess <= 50;
+        // Google reviews/stars are the maps-engine signal. Bright Data organic has
+        // neither — so without a second signal this rescue would silently stop firing
+        // the moment the supply switched, quietly undoing the Aug 4 fix that exists to
+        // save exactly these prospects. Ranking on page one for a local commercial
+        // query is its own proof of a real business, so it stands in for the stars.
+        const realBusiness =
+          (b.reviews || 0) >= 5 ||
+          (b.rating || 0) >= 4 ||
+          (b.source === 'brightdata' && (b.serpRank || 99) <= 10);
+        const rescued = crawlerBlocked && realBusiness && audit.score < AUDIT_MIN;
+        if ((audit.score < AUDIT_MIN && !rescued) || audit.score > AUDIT_MAX) {
+          skip.band++;
+          console.log(`   ✗ ${b.company.slice(0, 30)} — ${audit.score}/100 outside band`);
+          continue;
+        }
+        if (rescued) {
+          skip.rescued++;
+          console.log(`   ⭐ ${b.company.slice(0, 30)} — ${audit.score}/100 but BLOCKS AI crawlers (access ${audit.aiAccess}) — top prospect`);
+        }
+        const r = await stageLead({ ...b, email, lane: leg.lane, query: target.q }, audit, angle);
+        staged.push({ ...b, email, lane: leg.lane, score: audit.score, grade: audit.grade, ...r });
+        console.log(`   ✅ ${b.company.slice(0, 32)} · ${audit.score}/${audit.grade} · ${email}`);
+        await sleep(400);
       }
-      if ((fp && known.names.has(fp)) || (domain && known.domains.has(domain))) {
-        skip.dupe++;
-        console.log(`   ↺ ${b.company.slice(0, 34)} — already in the CRM, skipped`);
-        continue;
+      // Record this query's yield so next Monday orders it by measured saturation. Never let a
+      // weaker run erase a real measurement: a failed search (0 found — indistinguishable from
+      // a Bright Data outage) writes nothing, and a run cut short by MAX_NEW or too small to
+      // judge (< 4 looked at) does not overwrite an earlier record that was big enough to.
+      const k = yieldKey(leg.lane, target);
+      const rec = {
+        last: new Date().toISOString().slice(0, 10),
+        found: businesses.length,
+        seen: skip.seen - before.seen,
+        dupe: skip.dupe - before.dupe,
+        staged: staged.length - before.staged,
+      };
+      const prev = yieldLedger[k];
+      const carried = leftover[leg.lane] && leftover[leg.lane].t === target ? leftover[leg.lane] : null;
+      if (carried) {
+        // Cut by the leg quota: hold the partial count until the tail is worked (or the run ends).
+        carried.rec = rec;
+      } else if (item.businesses) {
+        // A carried tail: record leg 1 + tail as ONE measurement of the query.
+        const part = item.rec || { found: businesses.length, seen: 0, dupe: 0, staged: 0 };
+        const merged = { last: rec.last, found: part.found, seen: part.seen + rec.seen, dupe: part.dupe + rec.dupe, staged: part.staged + rec.staged };
+        if (merged.found && !(merged.seen < 4 && prev && prev.seen >= 4)) yieldLedger[k] = merged;
+      } else if (businesses.length && !(rec.seen < 4 && prev && prev.seen >= 4)) {
+        yieldLedger[k] = rec;
       }
-      const email = await findEmail(b.website);
-      if (!email) {
-        skip.noEmail++;
-        continue;
-      }
-      // Restore the WhatsApp close channel the maps engine used to supply. Only
-      // fills a gap — if a supply ever returns a real phone again, that one wins.
-      if (!b.phone && domain && phoneByDomain.has(domain)) {
-        b.phone = phoneByDomain.get(domain);
-        console.log(`      ↳ WhatsApp number found on their site: ${formatPhone507(b.phone)}`);
-      }
-      if (await contactExists(email)) {
-        skip.dupe++;
-        continue;
-      }
-      // Remember within this run too, so two branches of the same chain don't
-      // both get staged.
-      if (fp) known.names.add(fp);
-      if (domain) known.domains.add(domain);
-      const audit = await auditSite(b.website);
-      if (!audit) {
-        skip.noAudit++;
-        continue;
-      }
-      // A site that blocks GPTBot/ClaudeBot scores near zero on AI access, which
-      // drags its TOTAL under the floor — so the hardest blockers were being
-      // discarded as "broken site" when they are the strongest prospects we have:
-      // being invisible to ChatGPT is the entire pitch, and they are provably
-      // real businesses (Google reviews, a live site that answers humans).
-      // Rescue them below the floor; never above it, where there is nothing to sell.
-      const crawlerBlocked = audit.aiAccess != null && audit.aiAccess <= 50;
-      // Google reviews/stars are the maps-engine signal. Bright Data organic has
-      // neither — so without a second signal this rescue would silently stop firing
-      // the moment the supply switched, quietly undoing the Aug 4 fix that exists to
-      // save exactly these prospects. Ranking on page one for a local commercial
-      // query is its own proof of a real business, so it stands in for the stars.
-      const realBusiness =
-        (b.reviews || 0) >= 5 ||
-        (b.rating || 0) >= 4 ||
-        (b.source === 'brightdata' && (b.serpRank || 99) <= 10);
-      const rescued = crawlerBlocked && realBusiness && audit.score < AUDIT_MIN;
-      if ((audit.score < AUDIT_MIN && !rescued) || audit.score > AUDIT_MAX) {
-        skip.band++;
-        console.log(`   ✗ ${b.company.slice(0, 30)} — ${audit.score}/100 outside band`);
-        continue;
-      }
-      if (rescued) {
-        skip.rescued++;
-        console.log(`   ⭐ ${b.company.slice(0, 30)} — ${audit.score}/100 but BLOCKS AI crawlers (access ${audit.aiAccess}) — top prospect`);
-      }
-      const r = await stageLead({ ...b, email, lane: picked.lane, query: target.q }, audit, angle);
-      staged.push({ ...b, email, score: audit.score, grade: audit.grade, ...r });
-      console.log(`   ✅ ${b.company.slice(0, 32)} · ${audit.score}/${audit.grade} · ${email}`);
-      await sleep(400);
     }
-    // Record this query's yield so next Monday orders it by measured saturation. Never let a
-    // weaker run erase a real measurement: a failed search (0 found — indistinguishable from
-    // a Bright Data outage) writes nothing, and a run cut short by MAX_NEW or too small to
-    // judge (< 4 looked at) does not overwrite an earlier record that was big enough to.
-    const k = yieldKey(picked.lane, target);
-    const rec = {
-      last: new Date().toISOString().slice(0, 10),
-      found: businesses.length,
-      seen: skip.seen - before.seen,
-      dupe: skip.dupe - before.dupe,
-      staged: staged.length - before.staged,
-    };
+  }
+  // Tails no leg came back for: record the partial count (the old single-lane behaviour for a query cut short)
+  // and keep their Instagram/Facebook-only businesses as no-website candidates, so a cut never loses them.
+  for (const [lane, lo] of Object.entries(leftover)) {
+    const k = yieldKey(lane, lo.t);
     const prev = yieldLedger[k];
-    if (businesses.length && !(rec.seen < 4 && prev && prev.seen >= 4)) yieldLedger[k] = rec;
+    if (lo.rec && lo.rec.found && !(lo.rec.seen < 4 && prev && prev.seen >= 4)) yieldLedger[k] = lo.rec;
+    for (const b of lo.businesses) {
+      if (isPlatformSite(b.website) && b.source === 'places' && socialPlatform(b.website)) {
+        noWebsiteSeen.push({ ...b, presence: b.website, query: lo.t.q, highTicket: lo.t.hl === 'en' });
+      }
+    }
   }
   if (!DRY) saveYield(yieldLedger);
 
@@ -1675,7 +1785,7 @@ if (require.main === module) (async () => {
     const lines = [
       `🔥 ${staged.length + nowebStaged.length} nuevos leads listos — 🔥 I Act TODAY`,
       ``,
-      ...staged.map((s) => `· ${s.company} — ${s.score}/${s.grade} · ${s.city}`),
+      ...staged.map((s) => `· ${s.company} — ${s.score}/${s.grade} · ${s.city} · ${LANE_OFFER[s.lane]?.label || s.lane}`),
       ...(nowebLine ? [``, nowebLine] : []),
       ``,
       `Cada uno ya tiene contacto, deal, tarea y el botón ENVIAR en la nota de HubSpot.`,
