@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 18:10 | Mundo Dental v3: ChatGPT API answers (credit restored) + Infoguia source link in finding 2 | private repo `bia/mundo-dental/*` · Oracle: overwrite the 2 diagnostic files in `/var/www/aideazz-docs/` (no restart) | private 3120dc7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
