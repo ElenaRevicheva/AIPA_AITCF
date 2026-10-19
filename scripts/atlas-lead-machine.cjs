@@ -908,6 +908,21 @@ async function loadKnown() {
   return { names, domains };
 }
 
+/**
+ * A company with this exact phone is already in HubSpot (19 Oct 2026). The name fingerprint missed
+ * "Dr. Enzo Cano - Cirujano Oral y Maxilofacial" vs the pilot deal "Dr. Enzo Cano" (enzo-cano-cirujano
+ * vs enzo-cano). Places-sourced companies keep Google's phone format, so an exact match is reliable.
+ */
+async function companyPhoneExists(phone) {
+  if (!phone) return false;
+  const d = await hs('POST', '/crm/v3/objects/companies/search', {
+    filterGroups: [{ filters: [{ propertyName: 'phone', operator: 'EQ', value: String(phone).trim() }] }],
+    properties: ['name'],
+    limit: 1,
+  });
+  return (d?.total || 0) > 0;
+}
+
 async function contactExists(email) {
   const d = await hs('POST', '/crm/v3/objects/contacts/search', {
     filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: email }] }],
@@ -1590,10 +1605,18 @@ if (require.main === module) (async () => {
   }
 
   // ── No-website businesses: the best NOWEB_MAX, on top of the regular MAX_NEW ──
-  const nowebPicked = pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX);
+  // A wider pool, so a candidate already in HubSpot by phone is replaced by the next best one.
+  const nowebPicked = pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX * 3);
   const nowebStaged = [];
+  let nowebKnownByPhone = 0;
   for (const c of nowebPicked) {
+    if (nowebStaged.length >= NOWEB_MAX) break;
     try {
+      if (await companyPhoneExists(c.phone)) {
+        nowebKnownByPhone++;
+        console.log(`   ↺ ${c.company.slice(0, 32)} — already in HubSpot (same phone), skipped`);
+        continue;
+      }
       const r = await stageNoWebsiteLead(c);
       nowebStaged.push({ ...c, ...r });
       console.log(`   🧭 ${c.company.slice(0, 32)} · no website · ${c.rating ?? '—'}★ ${c.reviews} · ${c.phone}`);
@@ -1601,7 +1624,7 @@ if (require.main === module) (async () => {
       console.warn(`   ⚠️ no-website lead not staged (${c.company.slice(0, 32)}): ${String(e.message).slice(0, 90)}`);
     }
   }
-  console.log(`[lead-machine] no-website: ${noWebsiteSeen.length} seen · ${nowebPicked.length} picked · ${nowebStaged.length} staged (max ${NOWEB_MAX})`);
+  console.log(`[lead-machine] no-website: ${noWebsiteSeen.length} seen · ${nowebPicked.length} eligible · ${nowebKnownByPhone} already in HubSpot by phone · ${nowebStaged.length} staged (max ${NOWEB_MAX})`);
 
   console.log(
     `[lead-machine] done · staged ${staged.length} · looked at ${skip.seen} · ` +
