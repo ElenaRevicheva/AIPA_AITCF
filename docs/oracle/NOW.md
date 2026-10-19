@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 19 Oct 01:00 | Document desk (Elena 19 Oct): CTO AIPA + VJH read and CREATE PDF/Word/HTML from her voice/text task (analysis, promo, presentation, quote from catalog, kit-verbatim fit docs) — laptop-only uncommitted edits, NOT deployed; earlier rounds failed review on honesty | cto-aipa scripts/build-lane-cv.cjs, src/telegram-bot.ts, src/hubspot-client.ts · VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later pm2 cto-aipa + systemd vibejobhunter | b563a820 |
+| Claude Code | 19 Oct 12:40 | VJH document desk finish (port CTO detector + honesty checks) — laptop-only; CTO desk LIVE 12:35 | VJH telegram_bot_enhanced.py, telegram_qa_helper.py, evals · later systemd vibejobhunter | 6582fe58 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -205,6 +205,19 @@ git log keeps the record.
 - **Elena chose to focus on Dev.to's lost reach first** (fixes above NOT approved — do not do them). Verified research plan:
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
+
+### ✅ 19 Oct ~12:35 UTC — CTO AIPA DOCUMENT DESK LIVE: read + create PDF / Word / HTML from her voice or text task (EN/ES)
+- **DONE** `6582fe58`, pm2 restart 12:35:16 (files 12:34:34): renderer `scripts/build-lane-cv.cjs` 14411505 (text mode pdf|docx|html; CV
+  path byte-identical — live kit CV smoke: 2 pages, 47,896 bytes; HTML = escaped allowlisted page, no scripts), dist/telegram-bot.js
+  ca574988 (+1,927 lines, 0 removed), dist/hubspot-client.js b6aaf1bd (addNoteToDeal optional attachmentIds; existing calls same).
+  Backups `~/_session-backups/doc-desk-10191234/`.
+- **What she can do:** "hazme/make me … PDF/Word/HTML/presentación/cotización/propuesta/análisis …" → the file in chat, attached to the
+  HubSpot deal only when exactly one subject deal matches. Honesty in CODE: facts/numbers about her + products only from the verified sheet
+  ([dato]/[cifra] else); fit docs = kit notes verbatim; quotes = catalog offer + her words, missing terms [plazo]/[validez].
+- **VERIFIED BY:** 5 review rounds; final fresh held-out 0/60 false triggers, 30/30 requests; real outputs read back (every number sourced).
+- **Known limits (proof):** lowercase company → no deal; a request mid-message or starting with the doc type stays chat; soft promo outcomes
+  pass the word-list gate; kit documents stay English; HTML may upload to HubSpot as octet-stream.
+- **NEXT:** VJH desk round running (port the CTO rule; her "hazme en Word la carta para Pitz" must fire); OpenClaw after a delivery test.
 
 ### ⏸️ 18 Oct ~19:05 UTC — Task → document (PDF/Word from her task) NOT built yet · kit + prep verified INTACT · claim released
 - **Not built:** the build run stopped (a builder took a relayed chat message as its task, then the session limit cut the rest).
