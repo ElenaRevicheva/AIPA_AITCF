@@ -1,0 +1,31 @@
+SUBJECT: Four Seasons Hotel Cartagena: su página de bodas bloquea la lectura automática — ¿también a ChatGPT?
+
+TO: reservations.ctc@fourseasons.com
+
+Estimado equipo de Four Seasons Hotel Cartagena:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio
+
+En Cartagena Colombia casi nadie ha optimizado todavía para búsquedas con IA — por eso el lugar en la respuesta sigue libre. Cuando sus competidores lo hagan, recuperarlo cuesta mucho más que tomarlo hoy.
+
+Intenté analizar https://www.fourseasons.com/cartagena/weddings/ con mi motor de visibilidad en IA y su servidor bloqueó la lectura (acceso denegado, HTTP 403) antes de mostrar la página. Esa misma protección contra bots puede estar frenando también a los rastreadores de IA (GPTBot, ClaudeBot, PerplexityBot): si no los deja pasar, ChatGPT no puede leer su oferta de bodas para recomendarla.
+
+La mayoría de los negocios en Cartagena Colombia pierden consultas simplemente porque llegan fuera de horario y nadie contesta a tiempo. Instalo un agente de WhatsApp que responde al instante 24/7 en español e inglés, califica al cliente, agenda y deja todo registrado en su CRM.
+
+Si les parece bien, se lo muestro en 15 minutos, sin ningún compromiso.
+
+La auditoría completa es gratuita aquí: https://aideazz.xyz/api
+
+Nuestra presentación (8 páginas): https://aideazz.xyz/AIdeazz_AI_Growth_Operator_2026_ES.pdf
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan reservas y eventos 24/7 (EN/ES, conectados a su CRM), automatización de intake de grupos, y video con IA para marketing del destino. Todo con demos en vivo en mi portafolio 👆
+
+Y dos videos cortos que hicimos con IA para negocios de turismo:
+▶️ Yates: https://youtu.be/kUrKw61Uo4Q
+▶️ Islas, villas y charters: https://youtu.be/Tg9N0PprsaI
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab ✨

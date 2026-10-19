@@ -3753,5 +3753,478 @@
     "phone": "5219982257890",
     "emailDraft": "docs/selling/drafts/medical-care-cancun-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/medical-care-cancun-atlas-fu.txt"
+  },
+  "ford-realty": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/ford-realty.txt",
+    "company": "Ford Realty",
+    "email": "ronald@fordrealtyweb.com",
+    "emailDraft": "docs/selling/drafts/ford-realty-email.txt",
+    "dealId": "65762863272",
+    "score": 64,
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ]
+  },
+  "weddings-at-legend-santa-clara-in-cartagena-atlas": {
+    "company": "Sofitel Legend Santa Clara",
+    "email": "Dannys.gonzalez@sofitel.com",
+    "score": 94,
+    "dealId": "65887518592",
+    "phone": "573145965134",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/weddings-at-legend-santa-clara-in-cartagena-atlas-email.txt",
+    "draft": "docs/selling/drafts/weddings-at-legend-santa-clara-in-cartagena-atlas.txt"
+  },
+  "weddings-at-legend-santa-clara-in-cartagena-atlas-fu": {
+    "company": "Sofitel Legend Santa Clara",
+    "email": "Dannys.gonzalez@sofitel.com",
+    "score": 94,
+    "dealId": "65887518592",
+    "phone": "573145965134",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/weddings-at-legend-santa-clara-in-cartagena-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/weddings-at-legend-santa-clara-in-cartagena-atlas-fu.txt"
+  },
+  "cartagena-wedding-venues-atlas": {
+    "company": "Two Travel",
+    "email": "reservations@two.travel",
+    "score": 98,
+    "dealId": "65885418388",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-wedding-venues-atlas-email.txt"
+  },
+  "cartagena-wedding-venues-atlas-fu": {
+    "company": "Two Travel",
+    "email": "reservations@two.travel",
+    "score": 98,
+    "dealId": "65885418388",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-wedding-venues-atlas-fu-email.txt"
+  },
+  "this-is-how-much-my-destination-wedding-cost-in--atlas": {
+    "company": "This is how much my destination wedding cost in Cartagena ...",
+    "email": "courtneylmuro@gmail.com",
+    "score": 90,
+    "dealId": "65876833280",
+    "phone": "9162208546",
+    "emailDraft": "docs/selling/drafts/this-is-how-much-my-destination-wedding-cost-in--atlas-email.txt",
+    "draft": "docs/selling/drafts/this-is-how-much-my-destination-wedding-cost-in--atlas.txt"
+  },
+  "this-is-how-much-my-destination-wedding-cost-in--atlas-fu": {
+    "company": "This is how much my destination wedding cost in Cartagena ...",
+    "email": "courtneylmuro@gmail.com",
+    "score": 90,
+    "dealId": "65876833280",
+    "phone": "9162208546",
+    "emailDraft": "docs/selling/drafts/this-is-how-much-my-destination-wedding-cost-in--atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/this-is-how-much-my-destination-wedding-cost-in--atlas-fu.txt"
+  },
+  "cartagena-colombia-wedding-venues-hyatt-regency-atlas": {
+    "company": "Hyatt Regency Cartagena",
+    "email": "hyattregency.cartagena@hyatt.com",
+    "score": null,
+    "dealId": "65887630192",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-colombia-wedding-venues-hyatt-regency-atlas-email.txt"
+  },
+  "cartagena-colombia-wedding-venues-hyatt-regency-atlas-fu": {
+    "company": "Hyatt Regency Cartagena",
+    "email": "hyattregency.cartagena@hyatt.com",
+    "score": null,
+    "dealId": "65887630192",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-colombia-wedding-venues-hyatt-regency-atlas-fu-email.txt"
+  },
+  "cartagena-weddings-atlas": {
+    "company": "Four Seasons Hotel Cartagena",
+    "email": "reservations.ctc@fourseasons.com",
+    "score": null,
+    "dealId": "65885692990",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-weddings-atlas-email.txt"
+  },
+  "cartagena-weddings-atlas-fu": {
+    "company": "Four Seasons Hotel Cartagena",
+    "email": "reservations.ctc@fourseasons.com",
+    "score": null,
+    "dealId": "65885692990",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/cartagena-weddings-atlas-fu-email.txt"
+  },
+  "shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas": {
+    "company": "Shaka Costa Rica: Surf Camp & Yoga - Santa Teresa, Costa ...",
+    "email": "reservations@shakacostarica.com",
+    "score": 90,
+    "dealId": "65887539300",
+    "phone": "50626401118",
+    "emailDraft": "docs/selling/drafts/shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas-email.txt",
+    "draft": "docs/selling/drafts/shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas.txt"
+  },
+  "shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas-fu": {
+    "company": "Shaka Costa Rica",
+    "email": "reservations@shakacostarica.com",
+    "score": 90,
+    "dealId": "65887539300",
+    "phone": "50626401118",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/shaka-costa-rica-surf-camp-yoga-santa-teresa-cos-atlas-fu.txt"
+  },
+  "surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas": {
+    "company": "Surf Vacations in Costa Rica Yoga Retreat in Santa Teresa",
+    "email": "info@surfandyogacostarica.com",
+    "score": 82,
+    "dealId": "65887646270",
+    "phone": "50663877253",
+    "emailDraft": "docs/selling/drafts/surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas-email.txt",
+    "draft": "docs/selling/drafts/surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas.txt"
+  },
+  "surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas-fu": {
+    "company": "Believe Surf & Yoga Costa Rica",
+    "email": "info@surfandyogacostarica.com",
+    "score": 82,
+    "dealId": "65887646270",
+    "phone": "50663877253",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/surf-vacations-in-costa-rica-yoga-retreat-in-san-atlas-fu.txt"
+  },
+  "surf-camp-costa-rica-atlas": {
+    "company": "Surf Camp Costa Rica",
+    "email": "info@dreamsea.com",
+    "score": 81,
+    "dealId": "65878642958",
+    "emailDraft": "docs/selling/drafts/surf-camp-costa-rica-atlas-email.txt"
+  },
+  "surf-camp-costa-rica-atlas-fu": {
+    "company": "Dreamsea Surf Camp",
+    "email": "info@dreamsea.com",
+    "score": 81,
+    "dealId": "65878642958",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/surf-camp-costa-rica-atlas-fu-email.txt"
+  },
+  "offshore-circle-atlas": {
+    "company": "Offshore Circle",
+    "email": "info@offshorecircle.com",
+    "score": 97,
+    "dealId": "66314968879",
+    "phone": "5072974717",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-circle-atlas-email.txt",
+    "draft": "docs/selling/drafts/offshore-circle-atlas.txt"
+  },
+  "offshore-circle-atlas-fu": {
+    "company": "Offshore Circle",
+    "email": "info@offshorecircle.com",
+    "score": 97,
+    "dealId": "66314968879",
+    "phone": "5072974717",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-circle-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/offshore-circle-atlas-fu.txt"
+  },
+  "offshore-law-center-atlas": {
+    "company": "Offshore Law Center",
+    "email": "info@offshorelawcenter.com",
+    "score": 74,
+    "dealId": "66314968895",
+    "phone": "5073108211",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-law-center-atlas-email.txt",
+    "draft": "docs/selling/drafts/offshore-law-center-atlas.txt"
+  },
+  "offshore-law-center-atlas-fu": {
+    "company": "Offshore Law Center",
+    "email": "info@offshorelawcenter.com",
+    "score": 74,
+    "dealId": "66314968895",
+    "phone": "5073108211",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-law-center-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/offshore-law-center-atlas-fu.txt"
+  },
+  "international-wealth-atlas": {
+    "company": "International Wealth",
+    "email": "info@internationalwealth.info",
+    "score": 53,
+    "dealId": "66310478462",
+    "phone": "37254895337",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/international-wealth-atlas-email.txt",
+    "draft": "docs/selling/drafts/international-wealth-atlas.txt"
+  },
+  "international-wealth-atlas-fu": {
+    "company": "International Wealth",
+    "email": "info@internationalwealth.info",
+    "score": 53,
+    "dealId": "66310478462",
+    "phone": "37254895337",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/international-wealth-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/international-wealth-atlas-fu.txt"
+  },
+  "offshore-protection-atlas": {
+    "company": "Offshore protection",
+    "email": "info@offshore-protection.com",
+    "score": 87,
+    "dealId": "66307072260",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-protection-atlas-email.txt"
+  },
+  "offshore-protection-atlas-fu": {
+    "company": "Offshore protection",
+    "email": "info@offshore-protection.com",
+    "score": 87,
+    "dealId": "66307072260",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/offshore-protection-atlas-fu-email.txt"
+  },
+  "fidex-group-sa-atlas": {
+    "company": "Fidex Group SA",
+    "email": "fidexgroupsa@gmail.com",
+    "score": 88,
+    "dealId": "66308620701",
+    "phone": "5072271741",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/fidex-group-sa-atlas-email.txt",
+    "draft": "docs/selling/drafts/fidex-group-sa-atlas.txt"
+  },
+  "fidex-group-sa-atlas-fu": {
+    "company": "Fidex Group SA",
+    "email": "fidexgroupsa@gmail.com",
+    "score": 88,
+    "dealId": "66308620701",
+    "phone": "5072271741",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/fidex-group-sa-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/fidex-group-sa-atlas-fu.txt"
+  },
+  "avia-and-slogold-group-s-a-atlas": {
+    "company": "Avia and Slogold Group S.A.",
+    "email": "sale@slogold.net",
+    "score": 88,
+    "dealId": "66304061976",
+    "phone": "5072657958",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/avia-and-slogold-group-s-a-atlas-email.txt",
+    "draft": "docs/selling/drafts/avia-and-slogold-group-s-a-atlas.txt"
+  },
+  "avia-and-slogold-group-s-a-atlas-fu": {
+    "company": "Avia and Slogold Group S.A.",
+    "email": "sale@slogold.net",
+    "score": 88,
+    "dealId": "66304061976",
+    "phone": "5072657958",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/avia-and-slogold-group-s-a-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/avia-and-slogold-group-s-a-atlas-fu.txt"
+  },
+  "mata-pitti-lawyers-law-firm-panama-atlas": {
+    "company": "Mata & Pitti Lawyers - Law Firm | Panama",
+    "email": "info@matapitti.com",
+    "score": 89,
+    "dealId": "66306074986",
+    "phone": "5072645931",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/mata-pitti-lawyers-law-firm-panama-atlas-email.txt",
+    "draft": "docs/selling/drafts/mata-pitti-lawyers-law-firm-panama-atlas.txt"
+  },
+  "mata-pitti-lawyers-law-firm-panama-atlas-fu": {
+    "company": "Mata & Pitti Lawyers - Law Firm | Panama",
+    "email": "info@matapitti.com",
+    "score": 89,
+    "dealId": "66306074986",
+    "phone": "5072645931",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/mata-pitti-lawyers-law-firm-panama-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/mata-pitti-lawyers-law-firm-panama-atlas-fu.txt"
+  },
+  "gtc-panama-business-immigration-services-atlas": {
+    "company": "GTC Panama Business & Immigration Services",
+    "email": "info@panama12.com",
+    "score": 88,
+    "dealId": "66316826777",
+    "phone": "50768664411",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/gtc-panama-business-immigration-services-atlas-email.txt",
+    "draft": "docs/selling/drafts/gtc-panama-business-immigration-services-atlas.txt"
+  },
+  "gtc-panama-business-immigration-services-atlas-fu": {
+    "company": "GTC Panama Business & Immigration Services",
+    "email": "info@panama12.com",
+    "score": 88,
+    "dealId": "66316826777",
+    "phone": "50768664411",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/gtc-panama-business-immigration-services-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/gtc-panama-business-immigration-services-atlas-fu.txt"
   }
 }
