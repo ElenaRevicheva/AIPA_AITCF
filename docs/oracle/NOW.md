@@ -146,7 +146,7 @@ git log keeps the record.
 
 ### ✅ 18 Oct ~13:20 UTC — Interview loop (1 🔥 deal, Developer Mid — Fullstack & AI Agents): prompt × model × temperature drill MEASURED + 2 practice notes · no service touched
 - **Why (Elena):** the employer asked how she prompts/evaluates models in Claude Code + Cursor and sets temperature; next step = take-home test.
-- **Lab 2 CLOSED (read-only, 18 Oct) — null result, do NOT tune lead triage:** `TRIAGE_SKIP_GROQ=1` (since 12 Apr) + unpaid Claude →
+- **Lab 2 CLOSED (read-only, 18 Oct) — null result, do NOT tune lead triage:** `TRIAGE_SKIP_GROQ=1` (since 12 Apr) + Claude Haiku failing (404 retired model IDs, then no credit from mid-Aug) →
   410/856 `lead_triage` rows "Classification failed" since June, BUT Elena checked the rows: almost all are her own tests or scraped job
   posts ("Pain point … hn_hiring"), not customers — real traffic ≈ 0. Kept: gpt-oss cut off 12/26 at 220 tokens vs 0/17 at 600. Optional,
   her call: switch triage off or tag tests at the source. Private cases: Oracle `~/_scratch/lab2/task/` (never git). Next lab: VJH judge.

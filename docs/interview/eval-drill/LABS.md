@@ -62,7 +62,8 @@ knowledge.
 stored as urgency 1, "No summary" — *fail-open*, no error anywhere.
 
 **Step 2 — check production, not the config.** `TRIAGE_SKIP_GROQ=1` has been set since 12 Apr (commit `81877025`, a
-temporary workaround for a Groq crash), so every lead went to Claude Haiku — unpaid since the Anthropic credit ran out.
+temporary workaround for a Groq crash), so every lead went to Claude Haiku — which kept failing: the logs show
+"model not found" 404s for retired Haiku model IDs, and from mid-August the Anthropic credit was empty too.
 Read-only count of the `lead_triage` table:
 
 | month | inbound leads | "Classification failed" | prospects | "Classification failed" |
