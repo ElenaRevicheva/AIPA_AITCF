@@ -56,6 +56,7 @@ usan" became "un CRM (el que ya usan, o uno que les configuramos)".
 3. ¿Cuántos mensajes de WhatsApp reciben al día, y cuántos fuera del horario?
 4. ¿El dominio mundodentalpty.com es suyo? (registered until Oct 2027, nameservers inactive)
 5. ¿Cuál es el horario real de cada sede? (today there are 4 versions)
+6. ¿«Dolor Dento Facial» es la especialidad que quieren promover? (today we only have their WhatsApp description saying so)
 
 ## 5. v4, 19 Oct evening: "don't give them the keys"
 
@@ -70,7 +71,7 @@ A key-leak scan of the client page finds none of them. Private commit `75cf875`.
 |---|---|
 | Verified fact sheet for both branches, confirmed with them | Yes, concierge. The 5 questions in §4 fill it |
 | Google steps: take control of the profile + represent El Dorado **without duplicates** | Yes, concierge. Check first for an existing El Dorado listing under another name or owner |
-| Exact sources feeding Google/AI the wrong data + the fix for each | Yes. Evidence in `SOURCES.md` + `AI_ANSWERS_2026-10-19.json` (Infoguia hours, an old directory address, an extra phone, Grok and Claude citing the dead domain) |
+| Public sources identified with contradictory info + the fix for each (v5 wording: we saw ChatGPT/Gemini cite Infoguia, but cannot prove every engine's retrieval path) | Yes. Evidence in `SOURCES.md` + `AI_ANSWERS_2026-10-19.json` (Infoguia hours, an old directory address, an extra phone, Grok and Claude citing the dead domain) |
 | What to do with the domain and the «Servicios» button | Yes. RDAP facts in `SOURCES.md` |
 | Paste-ready texts, ES + EN | Yes, via the document desk (P1) |
 | Day-30 re-measure in the 5 AIs | **Yes, run by hand.** The day-0 scripts are saved in the private repo's `probes/`. P2 makes it one command |
@@ -78,3 +79,5 @@ A key-leak scan of the client page finds none of them. Private commit `75cf875`.
 
 **Sales order:** send the page and ask which point worries them most. **No second pitch** until they answer. Then the
 $100 plan for their point. The WhatsApp assistant is a second sale, after trust.
+
+**v5, 19 Oct (2nd critique):** the page claims only what was measured ("En nuestra revisión…", "podría…", "conviene confirmar quién lo administra"). A method note sits under the AI table. The **reply** is the main call to action ("¿Por dónde les gustaría empezar?"); the $100 box is the organized option. Private commit `612ceec`.
