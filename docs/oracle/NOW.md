@@ -226,6 +226,21 @@ git log keeps the record.
   `docs/oracle/BORROWED_REACH_PLAN_2026-10-17.md` (field notes → LinkedIn via existing Buffer helpers, model-free caption; Medium import by
   hand; no new automation of the daily stream; Dev.to profile + all 211 article pages now 404, appeal unanswered). Awaits her picks.
 
+### ✅ 19 Oct ~15:12 UTC — OPENCLAW READS PDF IN FULL + WORD (step 1 of its document desk) · making files = step 2, gated on a re-test
+- **DONE:** `~/.openclaw/openclaw.json` only 2 keys added (diffed): `gateway.http.endpoints.responses.files` {maxBytes 20 MB, pdf.maxPages
+  4→50, maxPixels 100000} + `channels.telegram.mediaMaxMb=20`. In-process gateway restart 15:12:36 ("requires gateway restart
+  (gateway.http)"), new "listening on ws" 15:12:37, telegram + whatsapp providers started 15:12:37-39, `maxPages` reads 50. Then
+  `workspace/IDENTITY.md` v5 (fad15143 → f00408f9): one 📄 paragraph after 📸 SCREENSHOT — a .docx is read by a small python-docx command
+  (150,000-char cap), nothing removed, MENU untouched. Backups `*.bak-pre-docdesk-20261019` + `~/_session-backups/openclaw-docdesk-20261019/`.
+- **Why:** OpenClaw silently read only the FIRST 4 PAGES of a PDF (default pdf.maxPages) — a 6-page NDA's page-6 penalty was missed 17 Oct;
+  on copies with 50 the whole file reached the model. Word was not readable at all.
+- **Found + neutralised in the copies:** OpenClaw sends any `MEDIA:<path|url>` line found ANYWHERE in a successful command's output (stdout
+  AND stderr) as a file — a document's text could make it send files/fetch URLs. Both readers filter the token and silence stderr warnings.
+  **Same hole, not fixed:** `scripts/hs-deal-prep.cjs` stdout (scraped postings/briefs) — 1-line patch prepared, needs Elena's go
+  (it would also touch CTO's desk, which copies kit notes from that stdout word for word).
+- **Live proof still to collect (needs Elena to send real files):** a PDF > 4 pages → the reply names something from its last page; a .docx →
+  one reader exec before the answer. Reading-rule limits seen on copies: no warning about a planted instruction; risk list not always given.
+
 ### ✅ 19 Oct ~14:53 UTC — VJH DOCUMENT DESK LIVE: her voice/text task (EN/ES) → PDF / Word / HTML in the VJH chat
 - **DONE** VJH `87b02f1` (3 files: telegram_bot_enhanced.py, telegram_qa_helper.py, evals/test_qa_conscience.py; +5,433/−11, the 11
   removed lines replaced by compatible ones — added params have defaults, the ❌ No-fit reason flow only gains "a file request is never
