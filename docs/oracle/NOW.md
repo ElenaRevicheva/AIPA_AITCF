@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 19 Oct 19:20 | Mundo Dental diagnostic v4: free page = problems + impact only, every how-to moved into the $100 plan (Elena: don't give them the keys) | private repo `bia/mundo-dental/*` · Oracle: overwrite the 2 diagnostic files in `/var/www/aideazz-docs/` (no restart) · `docs/selling/MUNDO_DENTAL_MAKE_IT_REAL_2026-10-19.md` | private cb0ac19 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
