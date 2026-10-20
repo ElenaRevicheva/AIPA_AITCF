@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 18:45 | Atlas/WHITESPACE: running line back under the header (multicolour like /api); Atlas "Today's move" under the hero on laptops | `whitespace` public/ (atlas.html, index.html, skin.js, skin.css) | f05035ae |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
