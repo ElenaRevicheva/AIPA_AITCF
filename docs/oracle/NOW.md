@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 20 Oct 20:15 | WHITESPACE finder: result fits phones; a scan with no live proof is not charged/cached; SERP retry | whitespace `public/index.html`, `src/server.ts`, `src/brightdata.ts`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
