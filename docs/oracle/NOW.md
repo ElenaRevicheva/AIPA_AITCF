@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 20 Oct 16:41 | WHITESPACE/Atlas restructure (Pitz-style header + sections, FAQ single source), name 'The Monday Move' | `whitespace` public/ (index, atlas, skin.js, skin.css); `aideazz` atlas shells + llms.txt + i18n subtitle | 684977fe |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,21 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 20 Oct ~18:00 UTC — Atlas is *The Monday Move*; Atlas + WHITESPACE restructured, FAQ from one source, GA4 bridge · LIVE · claim released
+- **DONE (Elena: "structure the website" like Pitz / Handy Manny; name pick #2; "make atlas and whitespace go live in its full structured version"):**
+  - **Name:** *Atlas — The Monday Move* / *La Jugada del Lunes* (`Skin.NAME` in skin.js; the shell generator refuses to run if its copy differs).
+  - **Structure (both app pages):** fixed header with a Tools menu (burger on phones), hero that answers the page's question, numbered sections, FAQ, one final call. The FAQ text lives ONCE, in `<script type="application/json" id="faqData">` in each app page.
+  - **Shells:** `aideazz/scripts/make_atlas_shells.py` builds `public/atlas.html` + `atlas-finder.html` (crawlable article, FAQPage JSON-LD) from that block and the app's own How-it-works steps. The $100 diagnostic is its own `Service` node (it was an Offer on the app = Atlas priced at $100).
+  - **Nothing lost:** a meaning-level audit of the pre-redesign pages found 4 dropped ideas; restored "adjacent angle" (hero + FAQ #1) and the Atlas "intelligence layer activates after the first brief" note.
+  - **GA4:** the framed app now reports `generate_lead` + `contact_whatsapp` to the shell, which fires them on the site property (origin-checked, allow-listed, no personal data).
+  - Commits: whitespace `68edbee` (Oracle pulled, no restart needed: public files only), aideazz `3e8955c`. Roadmap v27.0 merged (cto-aipa).
+- **VERIFIED BY:** md5 of skin.js / atlas.html / index.html equal on laptop, Oracle and the live webhook; Elena's audit engine on the local shells 97/100 (only miss: HTTPS, local server) and live 100/100 on both /atlas and /atlas/finder (A+, 0 non-passing checks; served bytes identical to the repo); bridge test on the built shell (email + phone params dropped, unknown event and foreign origin fired nothing); burger, folds, language switch, no horizontal scroll at 375 px.
+- **NEXT:**
+  1. **Elena's call:** the old pages called the ad mode "media buyer" — bring it back in FAQ #6 or leave it out?
+  2. Unverified, so NOT written on the page: whether Spanish scans return English ad copy (the old page said so). Check one ES scan before adding a line.
+  3. Watch GA4 for the first `generate_lead` / `contact_whatsapp` with `surface = atlas_frame`.
+- **RISK:** after ANY change to faqData or how1..N in `whitespace/public`, run `python scripts/make_atlas_shells.py` in the aideazz repo and push it (outside 19:00–22:00 UTC), or the crawlable article drifts from the app. Never hand-edit the two shell files.
+
 ### ✅ 20 Oct — WHITESPACE + Atlas: new look, LatAm markets, free → $100 path, owner-only paid actions · **new address aideazz.xyz/atlas (15:20 UTC)** · LIVE · claim released
 - **DONE (Elena's go: "do all 1-3" + redesign):**
   - **Look:** both pages rebuilt in the aideazz.xyz/api style (film behind a dark veil, Instrument Serif, glass cards). **Backgrounds (20 Oct), 8 films per page:** WHITESPACE = catamaran aerial (`G8__runway`, never published, Elena's pick) + jungle island, Cartagena old town, Casco Viejo seawall, surf on a jungle beach, San Blas boats from above, Bocagrande towers, a real sunset; Atlas = night push-in through the snow (`G1__runway`, never published, Elena's pick) + night city grid, Casco Viejo → skyline, Panama banking towers, Medellín cathedral, Monserrate, Panama skyline, lit night towers. The city/sea shots are the graded Pexels/Pixabay clips cut into the October films (originals removed 9 Oct; graded renders reused, QR cropped); each film plays to its last frame, upright phones get a portrait encode. $0 new generation, encoded on the laptop. Rule + inventory: memory `feedback_reuse_only_unused_footage`. The FINAL dig (~4,600 videos, 4 searchers + verifiers) found only that Casco shot; nothing usable is left — do not dig again. Latest `89e461a`.
@@ -161,7 +175,7 @@ git log keeps the record.
 - **VERIFIED BY:** 3 adversarial review rounds (22 + 18 + 15 agents) — every confirmed finding fixed and re-proven on a keyless local copy (gates, quota/refund, cache keys, concurrent-lead race against a mock hub: 5 parallel → exactly 2 relayed); live after deploy: healthz `tokenRequired:true, ownerConfigured:true`; public payload carries no CRM internals; paid actions refuse without the token (403); all pages/media 200; the 7 creatives' md5 = the backup; process start newer than dist; both pages cycle 4 never-used clips. 20 Oct 14:10 UTC: live pages call 7 films + the music; new media 200, audio range requests 206; the track plays on live Atlas in a browser.
 - **NEXT:**
   1. **Elena:** use `aideazz.xyz/atlas` on the AIMUG slide (21 Oct); owner mode stays on the webhook token link.
-  2. **Phase 2, after the talk, needs Elena's go:** old webhook page URLs forward human visitors to the new address (owner/token and framed loads excluded), the frame reports which page it shows, public links (CVs, Lead Concierge, pitch, SOP) move to `aideazz.xyz/atlas`. Steps in the private design file §3.
+  2. ✅ *Shipped 20 Oct ~16:30 UTC (Elena's go: "Do this task here")* — **Phase 2:** old webhook page URLs forward human visitors to the new address (owner/token and framed loads excluded), the frame reports which page it shows, public links (CVs, Lead Concierge, pitch, SOP) move to `aideazz.xyz/atlas`. Steps in the private design file §3.
   3. **Proposed, not started:** URL-fetch hardening in the public Visibility API (a session card is waiting; details private) — Elena starts it with a click.
   4. Watch Monday 26 Oct: GEO/AEO capture with the new phrase should return ads (first real GEO score); `ai_video_generation` gets its first capture.
 - **RISK:** this repo and the whitespace repo are PUBLIC — never write route names, token values or the audit details here. Box scripts that read the WHITESPACE API without the owner token now get the public (sanitized) payload and are metered (`scripts/e2e-feature-cycle.sh` already presents the token). Counters are in memory (a restart resets the day's free-scan and lead caps). **aideazz.xyz/atlas FRAMES the webhook pages:** never add X-Frame-Options or a frame-ancestors CSP to whitespace without allowing https://aideazz.xyz, or the new address goes blank.
