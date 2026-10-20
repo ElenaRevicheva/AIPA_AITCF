@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 19:20 | Atlas/WHITESPACE: "AIdeazz AI Lab" under the wordmark in Sora ExtraLight (Elena's pick #3) | `whitespace` public/ (skin.css, atlas.html, index.html font link) | aec55f99 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
