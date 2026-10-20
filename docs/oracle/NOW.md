@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 20 Oct 20:40 | Free layer = real, clickable ad-market proof on every result (WHITESPACE both modes + Atlas radar) | whitespace `src/ad-sources.ts`, `src/brightdata.ts`, `src/server.ts`, `src/agent.ts`, `public/index.html`, `public/atlas.html`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 20 Oct ~21:10 UTC — Free layer: real clickable proof or nothing · every ad links to ITSELF · the 7 examples open "How it worked" · Claude back on · LIVE · claim released
+- **DONE (Elena: "a user even at free layer should get real proven data with clickable links to ad market, otherwise it makes no sense"; "if a user clicks already-made campaigns he should see how it worked"):**
+  - **No proof → no result** for free visitors: code `no_proof`, not charged, lead form `scan_no_proof` (EN/ES). Owner still sees knowledge mode.
+  - **Per-ad links:** Meta proof = `facebook.com/ads/library/?id=<Library ID>`, never the search page — live scans (ID must be verbatim on the scraped page) and the radar (`classify.ts`; radar.sqlite backfilled: **1,845 of 3,519** rows, before 0). Proof sits open right under the recommendation.
+  - **Examples:** each card has "How it worked →": render-day radar reading, 2–3 real ads behind it, the still, the video (`public/examples-proof.json`, frozen from radar.sqlite + captures). **The June–July campaign TEXT is gone** — weekly concept re-runs overwrote it (searched concepts.json + every backup + archive + git + laptop). It is described, never shown or re-invented. `produce.ts` now keeps `asset.made_from` so it cannot happen again.
+  - **Machinery intact:** concept/produce/video compiled, healthz `ship.image/video true, tokenRequired true`; owner-only since 19 Oct.
+  - Bright Data refusals now logged (`… → empty body: <x-brd-error>`). Commits whitespace `f6d1170`, `10343f0`, `bdce7a6`, `a840a86`.
+- **VERIFIED BY:** live public ad-mode scan "clinica dental · PA" (21:01 UTC): `sources ['Meta Ad Library'] units 6 degraded False`, all 6 evidence links per-ad, 2 opened in Chrome (Ultra Pack Dentista, Dra. Karen Villalobos). All 20 example links opened one by one (medicareadvantage.com 403s to automation → excluded). Live aideazz.xyz/atlas at 390 px: panel opens, video plays 5.1 s, 0 elements off-screen, chat bubbles hidden while open. Live md5 = repo for skin.js/css, index, atlas, examples-proof.json.
+- **NEXT — Elena:** Bright Data **KYC** (brightdata.com/cp/kyc). facebook.com answers "Access … restricted … compliance policies … KYC" on most calls (Scraping Browser always, Web Unlocker intermittently); TikTok Creative Center "requires special permission". The 19 Oct Monday capture got 0 ads on 5 of 7 lanes on its first pass. Until KYC, some free ad scans will end in `no_proof`.
+- **Claude credits (20 Oct ~20:50 UTC):** Max plan now links "Elena's Individual Org" with **$100/month API credit**. All three fleet keys (cto-aipa/whitespace/VJH, EspaLuz Influencer, dragontrade) answered a live call. whitespace restarted (breaker cleared, healthz `claudeDead:false`); cto-aipa has no breaker (retries Claude per call).
+- **RISK:** whitespace restarted 20:58 UTC → today's in-memory free-scan/lead caps reset. Backups: Oracle `~/_session-backups/whitespace-proof-20261020/` (radar.sqlite, concepts.json, dist). A full classify re-run will regenerate the same per-ad links (code fixed), not lose them.
 
 ### ✅ 20 Oct ~20:25 UTC — WHITESPACE free scan: fits phones, never ships without clickable proof unless it says so (and then it is free) · LIVE · claim released
 - **DONE (Elena's phone screenshot: confidence pill cut off; "where is the proof he can click?"):** the free scan "AI agents for auto mechanics · PA" came back with 0 sources. Cause, measured: Bright Data answered the Panama Google search with an **empty body** (200, 45–51 s, twice); the US search for the same query returned 8 results. Fixes (whitespace `f6d1170`, `10343f0`): the pill wraps on phones; SERP retries once (45 s); an empty country search falls back to US results, labelled `Google SERP (US)`; a no-evidence (degraded) scan refunds the visitor's free scan, is never cached, and the page says so in EN/ES; the hook label is cut on a word (≤80), not mid-phrase.
