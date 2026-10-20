@@ -122,7 +122,7 @@ answers already had, and the CV composer's floor is 2 sections / 5 lines — see
 | **YC Work at a Startup not scraped** | Its `/jobs` page *is* public and easy to parse. YC's ToS forbids automated extraction. robots.txt allowing ≠ ToS permission. |
 | **agentic-engineering-jobs.com not wired** | Newest posting 33 days old, 91% past its own expiry. Rejected on measurement. |
 | **Oracle `cto-aipa` behind `main`** | Deploys by named-file `scp`, not `git pull`. See rule 3. |
-| **`test_provider_chain[claude]` fails** | Anthropic credits are at zero. The eval is *correctly* reporting it. |
+| **`test_provider_chain[claude]` fails** | ⚠️ **Out of date since 20 Oct ~20:50 UTC:** the Max plan now funds the API ($100/month, "Elena's Individual Org") and all three fleet keys answered a live call. If this eval still fails, it is a real failure now — investigate. |
 | **AI-Jobs.net / BrightData LinkedIn dormant** | Measured lifetime yield ~0. Env flags exist to wake them. |
 | **Embassy switchboards left in `espaluz_enhancements.py`** | 12 published institutional numbers, served by the emergency-contacts feature. DataVendor's PII check counts them; removing them removes a feature, not a risk. |
 | **`aipa@aideazz.xyz` written as two adjacent literals in VJH** | Value is byte-identical (AST-verified). Our own published sender address was being counted 75 times as third-party PII. |
