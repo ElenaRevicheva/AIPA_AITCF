@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 15:33 | aideazz.xyz/atlas step 2: old webhook pages forward to the new address; public links move | `whitespace` public/ (Oracle git pull); `aideazz` pages; cto-aipa `concierge-prompt.ts`, `hubspot-client.ts` (build, scp, pm2 restart cto-aipa), CV scripts, cv-bank.json | dd4b3555 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
