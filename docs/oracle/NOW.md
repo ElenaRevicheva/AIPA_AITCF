@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 20 Oct 18:45 | Atlas/WHITESPACE: running line back under the header (multicolour like /api); Atlas "Today's move" under the hero on laptops | `whitespace` public/ (atlas.html, index.html, skin.js, skin.css) | f05035ae |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -153,6 +152,7 @@ git log keeps the record.
   - **GA4:** the framed app now reports `generate_lead` + `contact_whatsapp` to the shell, which fires them on the site property (origin-checked, allow-listed, no personal data).
   - Commits: whitespace `68edbee` (Oracle pulled, no restart needed: public files only), aideazz `3e8955c`. Roadmap v27.0 merged (cto-aipa).
 - **VERIFIED BY:** md5 of skin.js / atlas.html / index.html equal on laptop, Oracle and the live webhook; Elena's audit engine on the local shells 97/100 (only miss: HTTPS, local server) and live 100/100 on both /atlas and /atlas/finder (A+, 0 non-passing checks; served bytes identical to the repo); bridge test on the built shell (email + phone params dropped, unknown event and foreign origin fired nothing); burger, folds, language switch, no horizontal scroll at 375 px.
+  - **~18:55 UTC (Elena: "horrible on laptop"):** the running line is back right under the header on both pages, in /api's flowing violet → yellow (amber dots, 30 s loop); Atlas "Today's move" now sits UNDER the headline at every width (`.intro.stack`). whitespace `1f34bad`, md5 laptop = Oracle = live; shells unchanged (no aideazz push needed).
 - **NEXT:**
   1. **Elena's call:** the old pages called the ad mode "media buyer" — bring it back in FAQ #6 or leave it out?
   2. Unverified, so NOT written on the page: whether Spanish scans return English ad copy (the old page said so). Check one ES scan before adding a line.
