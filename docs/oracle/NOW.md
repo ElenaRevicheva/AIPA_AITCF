@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 20 Oct 20:15 | WHITESPACE finder: result fits phones; a scan with no live proof is not charged/cached; SERP retry | whitespace `public/index.html`, `src/server.ts`, `src/brightdata.ts`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 20 Oct ~20:25 UTC — WHITESPACE free scan: fits phones, never ships without clickable proof unless it says so (and then it is free) · LIVE · claim released
+- **DONE (Elena's phone screenshot: confidence pill cut off; "where is the proof he can click?"):** the free scan "AI agents for auto mechanics · PA" came back with 0 sources. Cause, measured: Bright Data answered the Panama Google search with an **empty body** (200, 45–51 s, twice); the US search for the same query returned 8 results. Fixes (whitespace `f6d1170`, `10343f0`): the pill wraps on phones; SERP retries once (45 s); an empty country search falls back to US results, labelled `Google SERP (US)`; a no-evidence (degraded) scan refunds the visitor's free scan, is never cached, and the page says so in EN/ES; the hook label is cut on a word (≤80), not mid-phrase.
+- **VERIFIED BY:** 375 px render of the real payload: no element wider than the screen. Owner re-run of the same scan after deploy: `degraded False units 6 sources ['Google SERP (PA)', 'Competitor sites']`, 6 clickable competitor URLs (now cached for that query, so the visitor gets it). Live `index.html` md5 = repo (`6cabb86b…`), healthz 200.
+- **RISK:** the in-memory free-scan counters reset with the restart (20:15 UTC). The 7 creatives are untouched; they play in the Examples section of both pages.
 
 ### ✅ 20 Oct ~18:00 UTC — Atlas is *The Monday Move*; Atlas + WHITESPACE restructured, FAQ from one source, GA4 bridge · LIVE · claim released
 - **DONE (Elena: "structure the website" like Pitz / Handy Manny; name pick #2; "make atlas and whitespace go live in its full structured version"):**
