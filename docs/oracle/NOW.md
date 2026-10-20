@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 14:38 | WHITESPACE/Atlas: per-page music, HubSpot + WhatsApp bubbles, last footage; then move to aideazz.xyz/atlas (design first) | `whitespace` repo `public/`; Oracle `~/whitespace` git pull; later `aideazz` repo (only after a plan) | 46f8c8a8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
