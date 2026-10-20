@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 20 Oct 20:40 | Free layer = real, clickable ad-market proof on every result (WHITESPACE both modes + Atlas radar) | whitespace `src/ad-sources.ts`, `src/brightdata.ts`, `src/server.ts`, `src/agent.ts`, `public/index.html`, `public/atlas.html`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
