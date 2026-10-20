@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 20 Oct 19:35 | Atlas headline → "Catch the ad scene shifting. / Before the crowd does." (Elena's pick) | `whitespace` public/atlas.html + index.html (I18N strings only) | d9042814 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -157,6 +156,7 @@ git log keeps the record.
   - **~19:10 UTC (Elena):** header see-through over the film and taller (104 px laptop); menu links in the hero line's letters (Manrope 400 17 px); "AIdeazz AI Lab" 16 px on laptops. whitespace `880d8fd`, md5 laptop = Oracle = live.
   - **~19:10 UTC (Elena):** Atlas stats big again (40/44 px, centred row) and the hero centred, as before the restructure; the header $100 button removed on both pages (whitespace `45036cf`). The /atlas shells no longer show the FAQ article as a second page under the app: the frame fills the screen and the article sits CLOSED in one `<details>` at the end, still in the raw HTML + JSON-LD (aideazz `ffa8b4c`, pushed 19:06 UTC, before the 19:30 blog run).
   - **"AIdeazz AI Lab" = Sora ExtraLight** (Elena's pick #3 of 4, 20 Oct): 200 / .5em on laptops, 300 / .2em on phones; whitespace `bcc80f4`, md5 laptop = Oracle = live.
+  - **Atlas headline (Elena, 20 Oct, after 2 numbered rounds):** "Catch the ad scene *shifting*. / Before the crowd does." (ES "Capta cómo *cambia* la escena publicitaria. / Antes que la multitud."); "angle" stays WHITESPACE's word. whitespace `4c33cc0`, md5 laptop = Oracle = live.
 - **NEXT:**
   1. **Elena's call:** the old pages called the ad mode "media buyer" — bring it back in FAQ #6 or leave it out?
   2. Unverified, so NOT written on the page: whether Spanish scans return English ad copy (the old page said so). Check one ES scan before adding a line.
