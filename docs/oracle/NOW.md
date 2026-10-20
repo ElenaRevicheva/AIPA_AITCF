@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 20 Oct 19:20 | Atlas/WHITESPACE: "AIdeazz AI Lab" under the wordmark in Sora ExtraLight (Elena's pick #3) | `whitespace` public/ (skin.css, atlas.html, index.html font link) | aec55f99 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -156,7 +155,7 @@ git log keeps the record.
   - **~18:55 UTC (Elena: "horrible on laptop"):** the running line is back right under the header on both pages, in /api's flowing violet → yellow (amber dots, 30 s loop); Atlas "Today's move" now sits UNDER the headline at every width (`.intro.stack`). whitespace `1f34bad`, md5 laptop = Oracle = live; shells unchanged (no aideazz push needed).
   - **~19:10 UTC (Elena):** header see-through over the film and taller (104 px laptop); menu links in the hero line's letters (Manrope 400 17 px); "AIdeazz AI Lab" 16 px on laptops. whitespace `880d8fd`, md5 laptop = Oracle = live.
   - **~19:10 UTC (Elena):** Atlas stats big again (40/44 px, centred row) and the hero centred, as before the restructure; the header $100 button removed on both pages (whitespace `45036cf`). The /atlas shells no longer show the FAQ article as a second page under the app: the frame fills the screen and the article sits CLOSED in one `<details>` at the end, still in the raw HTML + JSON-LD (aideazz `ffa8b4c`, pushed 19:06 UTC, before the 19:30 blog run).
-  - **Waiting on Elena:** font for "AIdeazz AI Lab" under the wordmark (she asked thinner, tech 2026): options 1 Geist Mono Light · 2 JetBrains Mono ExtraLight · 3 Sora ExtraLight · 4 Unbounded Light. One CSS rule in skin.css (`.wordmark .lab`) + the Google Fonts link in both pages.
+  - **"AIdeazz AI Lab" = Sora ExtraLight** (Elena's pick #3 of 4, 20 Oct): 200 / .5em on laptops, 300 / .2em on phones; whitespace `bcc80f4`, md5 laptop = Oracle = live.
 - **NEXT:**
   1. **Elena's call:** the old pages called the ad mode "media buyer" — bring it back in FAQ #6 or leave it out?
   2. Unverified, so NOT written on the page: whether Spanish scans return English ad copy (the old page said so). Check one ES scan before adding a line.
