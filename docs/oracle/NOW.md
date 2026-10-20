@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 19:05 | Atlas/WHITESPACE: big stat numbers back, Atlas hero centered, no $100 button in the header; font options for "AIdeazz AI Lab" | `whitespace` public/ (atlas.html, index.html, skin.css) | 3c2f459e |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
