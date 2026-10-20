@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 16:41 | WHITESPACE/Atlas restructure (Pitz-style header + sections, FAQ single source), name 'The Monday Move' | `whitespace` public/ (index, atlas, skin.js, skin.css); `aideazz` atlas shells + llms.txt + i18n subtitle | 684977fe |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
