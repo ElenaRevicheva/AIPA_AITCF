@@ -324,9 +324,16 @@ interface TrackEvent {
 /** Stream /api/atlas/track SSE — same as web "Add to radar". */
 async function consumeTrackSse(vertical: string, onStage: (stage: string, message: string) => Promise<void>): Promise<TrackEvent> {
   const url = `${ATLAS_BASE}/api/atlas/track?vertical=${encodeURIComponent(vertical)}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(600_000) });
+  // 19 Oct 2026: track is owner-only on WHITESPACE (a paid capture). The bot is the owner's hand,
+  // so it presents ATLAS_OWNER_TOKEN; without it the server answers 403.
+  const owner = (process.env.ATLAS_OWNER_TOKEN || '').trim();
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(600_000),
+    ...(owner ? { headers: { Authorization: `Bearer ${owner}` } } : {}),
+  });
   if (!res.ok) {
     const err = await res.text().catch(() => '');
+    if (res.status === 403) throw new Error('Atlas track is owner-only — ATLAS_OWNER_TOKEN missing or wrong in the CTO AIPA .env');
     throw new Error(res.status === 409 ? 'Another track capture is in progress — try again in a few minutes.' : err.slice(0, 200) || `HTTP ${res.status}`);
   }
   const reader = res.body?.getReader();
@@ -362,9 +369,9 @@ export async function runAtlasTrack(ctx: any): Promise<void> {
   if (!q) {
     await ctx.reply(
       [
-        '📡 ADD TO RADAR — daily memory + automatic 9 AM Panama refresh',
+        '📡 ADD TO RADAR — weekly memory, refreshed every Monday 9 AM Panama',
         '',
-        'Captures live ads → scores ENTER/WATCH → persists for tomorrow\'s cron.',
+        'Captures live ads now → scores ENTER/WATCH → the Monday cron refreshes it (when the id is in WHITESPACE_CAPTURE_ONLY).',
         '',
         'Usage: /atlas_track personal ai companions on the go',
         '',
