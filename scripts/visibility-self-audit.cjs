@@ -34,9 +34,13 @@ const DEFAULT_TARGETS = [
   { url: 'https://aideazz.xyz/sop-ai-ops.html', enforce: true },
   { url: 'https://podcast.aideazz.xyz/', enforce: true },
   { url: 'https://webhook.aideazz.xyz/cto/v1/visibility', enforce: true },
+  // aideazz.xyz/atlas + /atlas/finder (20 Oct 2026): main-domain shell pages that frame the live app; they scored
+  // 98/100 on first run, so they are enforced like the other money pages.
   // Report-only: Atlas is a static board in the whitespace repo and atuona is
   // out of scope by request. Both are tracked so the numbers stay visible.
   { url: 'https://webhook.aideazz.xyz/whitespace/atlas.html', enforce: false },
+  { url: 'https://aideazz.xyz/atlas', enforce: true },
+  { url: 'https://aideazz.xyz/atlas/finder', enforce: true },
   { url: 'https://atuona.xyz', enforce: false },
 ];
 

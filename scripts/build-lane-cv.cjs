@@ -183,7 +183,7 @@ const STACK = {
 
 const PROOFS = [
   { label: 'Portfolio', url: 'https://aideazz.xyz/portfolio', show: 'aideazz.xyz/portfolio' },
-  { label: 'Atlas', url: 'https://webhook.aideazz.xyz/whitespace/atlas.html', show: 'atlas.html' },
+  { label: 'Atlas', url: 'https://aideazz.xyz/atlas', show: 'aideazz.xyz/atlas' },
   { label: 'Wiki', url: 'https://aideazz.xyz/ai-ops-wiki.html', show: 'ai-ops-wiki.html' },
   { label: 'Ops SOP', url: 'https://aideazz.xyz/sop-ai-ops.html', show: 'sop-ai-ops.html' },
   { label: 'Blog', url: 'https://aideazz.xyz/blog', show: 'aideazz.xyz/blog' },
