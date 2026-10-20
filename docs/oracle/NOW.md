@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 20 Oct 19:00 | Atlas/WHITESPACE header: nav links in the hero-text letter style; bigger "AIdeazz AI Lab" under the wordmark | `whitespace` public/skin.css (+ ?v in atlas.html, index.html) | ac5d2358 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
