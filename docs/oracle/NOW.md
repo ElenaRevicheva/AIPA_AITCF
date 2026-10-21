@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 20 Oct 22:45 | CTO AIPA bot: a photo + "create a card" caption goes to Trello (Panama time) | `src/telegram-bot.ts` (analyzeImage); PM2 `cto-aipa` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 21 Oct ~01:10 UTC — CTO AIPA: screenshot + "create a card" → real Trello card (Panama time) · Oracle webinar card filed · LIVE · claim released
+- **DONE:** photo caption asking for a card now goes through `routeToTrello` (same as text/voice); vision prompt gives Panama time + verbatim links and may not claim "no Trello integration". `reconcileUrgency` counts days from `panamaToday()` (after 19:00 Panama the UTC date sent day-after-tomorrow cards to "just for today"). Card made by hand from Zoho-confirmed data: "Oracle Webinar: AI Database Foundations Certification", Kira Octubre 2026 → Cita, orange, due 22 Oct 11:00 Panama, personal Zoom link in description — trello.com/c/SSSx7N1H.
+- **VERIFIED BY:** Zoho IMAP (read-only): Zoho Calendar invite "Thu Oct 22, 2026 11:00 am - 01:00 pm (America/Panama)" + Zoom confirmation with the join link. Classifier dry run on deployed code → `list dated, 2026-10-22 11:00, orange` (before: `just_for_today`). cto-aipa started 01:06:18 > dist 01:06:12. Oracle src = main before the change (md5).
+- **NOT BUILT (needs Elena's yes — it is a new capability):** the bot cannot search Zoho mail itself. Creds exist only in VJH `.env`; `scripts/reply-radar.py` already reads Zoho by IMAP.
+- **RISK:** backup `~/_session-backups/cto-photo-trello-20261020/`. Re-sending the same screenshot hits the duplicate guard (card exists) — correct.
 
 ### ✅ 20 Oct ~21:10 UTC — Free layer: real clickable proof or nothing · every ad links to ITSELF · the 7 examples open "How it worked" · Claude back on · LIVE · claim released
 - **DONE (Elena: "a user even at free layer should get real proven data with clickable links to ad market, otherwise it makes no sense"; "if a user clicks already-made campaigns he should see how it worked"):**
