@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 21 Oct 01:30 | CTO AIPA bot searches her Zoho + Gmail (read-only, reply-radar.py --search) from a photo caption or a typed lookup | `src/telegram-bot.ts`, `scripts/reply-radar.py`; PM2 `cto-aipa` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -147,7 +146,7 @@ git log keeps the record.
 ### ✅ 21 Oct ~01:10 UTC — CTO AIPA: screenshot + "create a card" → real Trello card (Panama time) · Oracle webinar card filed · LIVE · claim released
 - **DONE:** photo caption asking for a card now goes through `routeToTrello` (same as text/voice); vision prompt gives Panama time + verbatim links and may not claim "no Trello integration". `reconcileUrgency` counts days from `panamaToday()` (after 19:00 Panama the UTC date sent day-after-tomorrow cards to "just for today"). Card made by hand from Zoho-confirmed data: "Oracle Webinar: AI Database Foundations Certification", Kira Octubre 2026 → Cita, orange, due 22 Oct 11:00 Panama, personal Zoom link in description — trello.com/c/SSSx7N1H.
 - **VERIFIED BY:** Zoho IMAP (read-only): Zoho Calendar invite "Thu Oct 22, 2026 11:00 am - 01:00 pm (America/Panama)" + Zoom confirmation with the join link. Classifier dry run on deployed code → `list dated, 2026-10-22 11:00, orange` (before: `just_for_today`). cto-aipa started 01:06:18 > dist 01:06:12. Oracle src = main before the change (md5).
-- **NOT BUILT (needs Elena's yes — it is a new capability):** the bot cannot search Zoho mail itself. Creds exist only in VJH `.env`; `scripts/reply-radar.py` already reads Zoho by IMAP.
+- **✅ BUILT 21 Oct ~01:15 UTC (Elena's yes: "He should access any mail zoho or personal Gmail"):** the bot searches Zoho + Gmail read-only via `scripts/reply-radar.py --search "<words>" --days N` (logins from VJH `.env`, as the radar already did). Triggers on lookup verb + mail word only (photo caption, text, voice); answers from the mail; a card asked for in the same message gets the confirmed links. Verified live: "Adriana Vargas Oracle" → 4 hits (Zoho + Gmail); "Oracle webinar" → Zoom confirmation with join link. Backup `~/_session-backups/cto-mail-search-20261021/`.
 - **RISK:** backup `~/_session-backups/cto-photo-trello-20261020/`. Re-sending the same screenshot hits the duplicate guard (card exists) — correct.
 
 ### ✅ 20 Oct ~21:10 UTC — Free layer: real clickable proof or nothing · every ad links to ITSELF · the 7 examples open "How it worked" · Claude back on · LIVE · claim released
