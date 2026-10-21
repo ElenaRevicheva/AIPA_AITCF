@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop, 2nd) | 21 Oct 23:55 | OpenClaw career depth (--private sheet) + cap 110k | Oracle `~/.openclaw/openclaw.json` (cap), `~/.openclaw/private/`, crontab prod-truth line, `~/cto-aipa/scripts/prod-truth-sheet.cjs` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 21 Oct ~23:40 UTC — OpenClaw knows her background deeply (private career sheet) · cap 110k · claim released
+- **DONE:** `aideazz-private-docs` `b780aa2` `docs/openclaw/CAREER_DEEP.md` (dated timeline 2011→now, Outlook 11 Oct operating model / lanes / evidence floors / failure stories / fit, reviewed ES lines, and a DO-NOT-SAY list for the April résumé claims: "19 countries paying", "$900K / 99%", "applies autonomously"). Kept OFF public repos (résumés left HEAD on 6 Sep). Oracle: `~/.openclaw/private/CAREER_DEEP.md` (700/600); `prod-truth-sheet.cjs` `--private=` (cto-aipa `ed6fd702`), crontab line now `--private=… --max=18000`; `bootstrapTotalMaxChars` 100k → **110k** (backup `~/_session-backups/openclaw-prodtruth-20261021/openclaw.json.pre-cap110k`).
+- **VERIFIED BY:** private session `test-career-20261021`: "¿qué era yo antes?" → full dated timeline (E-GOV OPERATOR 2011–2018 ~60 people, RANEPA 2015 + Bergen, MGIMO 2017, Fundery, Penza 2018, Panamá 2022, OmniBazaar, AIdeazz); "¿por qué confiar si no programas a mano?" → operating model + e-gov lesson + 600+ tests; failure story = EspaLuz 28 users, verbatim. Truncation 0; injected 101,190 / 110k; sheet 17,754 chars, 12 incidents.
+- **RISK:** ~9k headroom. Career file changes = edit in the private repo, then `scp` to `~/.openclaw/private/` (the builder reads it every 30 min).
 
 ### ✅ 21 Oct ~23:25 UTC — OpenClaw answers products/agents from PRODUCTION TRUTH, not filler · LIVE · claim released
 - **DONE:** `docs/oracle/PRODUCT_TRUTH.md` (verified product lines, her recorded "why", how agents really share work, known limits) + `scripts/prod-truth-sheet.cjs` (reads origin/main via git fetch/show — never the lagging checkout; adds the 4 newest NOW.md handoffs that carry VERIFIED BY + newest AI Ops Wiki incidents' measured `verified` lines; neutralises MEDIA:). Oracle: script scp'd, `prod/TOOLS.md` added as 4th of 5 injected paths (before talk), crontab `*/30` line → `~/logs/prod-truth.log`. Backups `~/_session-backups/openclaw-prodtruth-20261021/` (openclaw.json, crontab.before).
