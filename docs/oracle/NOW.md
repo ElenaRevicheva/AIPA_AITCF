@@ -148,7 +148,8 @@ git log keeps the record.
 - **Answer for real (200):** Claude (all 5 bot keys, $96.96 grant), OpenAI, Gemini, Perplexity, xAI, Groq (`openai/gpt-oss-120b`; `llama-3.3-70b-versatile` is GONE), Speechmatics, Replicate (auth only, no balance API).
 - **Empty / dead — anything using these will fail:** SerpAPI **0 of 1000** searches left (Starter, out) · Hunter **0 searches left** (Free, resets 20 Nov) · Luma key **"Not authenticated"** (both cto-aipa + whitespace) · Runway **4 credits** (≈ nothing; a clip needs 25+).
 - **Low:** Venice **$0.55** · DeepSeek **$1.88** · Bright Data balance $5.63 but **$7.49 pending** costs.
-- **NEXT (Elena):** top up only what today's demos touch. Re-probe before claiming any of these fixed.
+- **~17:40 UTC — Elena topped up; re-probed from the bots' own keys:** Runway **2,004 credits** (cto-aipa + whitespace keys) · Venice **$10.55** · OpenAI $12.69 (dashboard). DeepSeek/xAI top-ups not re-probed.
+- **Still open:** SerpAPI 0 searches · Hunter 0 · Luma direct key dead (Luma via Replicate is the fallback; Replicate balance has no API — check replicate.com/account/billing). Re-probe before claiming any of these fixed.
 
 ### ✅ 21 Oct ~01:10 UTC — CTO AIPA: screenshot + "create a card" → real Trello card (Panama time) · Oracle webinar card filed · LIVE · claim released
 - **DONE:** photo caption asking for a card now goes through `routeToTrello` (same as text/voice); vision prompt gives Panama time + verbatim links and may not claim "no Trello integration". `reconcileUrgency` counts days from `panamaToday()` (after 19:00 Panama the UTC date sent day-after-tomorrow cards to "just for today"). Card made by hand from Zoho-confirmed data: "Oracle Webinar: AI Database Foundations Certification", Kira Octubre 2026 → Cita, orange, due 22 Oct 11:00 Panama, personal Zoom link in description — trello.com/c/SSSx7N1H.
