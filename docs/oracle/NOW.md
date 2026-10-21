@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 20 Oct 22:45 | CTO AIPA bot: a photo + "create a card" caption goes to Trello (Panama time) | `src/telegram-bot.ts` (analyzeImage); PM2 `cto-aipa` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
