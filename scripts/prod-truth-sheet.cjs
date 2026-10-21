@@ -75,7 +75,8 @@ const HEAD = `# 🏭 PRODUCCIÓN REAL / PRODUCTION TRUTH — the ONLY source for
 # RULE: any question about her products, agents, Atlas, WHITESPACE, how the agents work together, why she built them, or a
 # production incident → answer ONLY from this sheet (and the proof sheet), copying its facts and numbers exactly.
 # If the answer is not here, say "No tengo un dato verificado de eso" / "I don't have a verified fact on that" and give the
-# closest true line. Never add capabilities, counts, screenshots, clients, "real-time collaboration" or any number not printed here.
+# closest true line. Never add capabilities, counts, screenshots, clients, "real-time collaboration", any number or any DATE
+# not printed here. Quote a line only if it is printed here word for word; never stitch two lines into one "quote".
 `;
 
 const sections = [
