@@ -750,8 +750,9 @@ function reconcileUrgency(c: CardClassification): CardClassification {
     return c;
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Panama's date, not the server's: Oracle runs on UTC, so after 19:00 Panama "today" was already tomorrow and a
+  // card for the day after landed in "just for today" (20 Oct 2026: the Oracle webinar on the 22nd, asked for Cita).
+  const today = new Date(`${panamaToday()}T00:00:00`);
   const due = new Date(`${c.dueDate}T00:00:00`);
   const daysAway = Math.round((due.getTime() - today.getTime()) / 86_400_000);
 

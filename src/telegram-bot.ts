@@ -83,6 +83,7 @@ import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
 import {
   createTrelloCardFromTranscript,
+  detectTrelloTrigger,
   formatVoiceTrelloReply,
   processMultiAction,
   formatMultiActionReply,
@@ -7963,7 +7964,14 @@ Ready to commit? Use:
 
 Keep response concise for Telegram. Use emojis.`;
       const speakIt = asksForVoice(caption);
-      const visionPrompt = `${elenaFacts() ?? AIDEAZZ_CONTEXT}\n\n${analysisPrompt}\n\n${ANSWER_PHOTO_IN_HER_LANGUAGE}${speakIt && voiceRepliesOn() ? `\n${VOICE_IS_AUTOMATIC}` : ''}`;
+      // 20 Oct 2026: "Explore this message in zoho, then create a card in Octubre Cita" with a screenshot got a
+      // description, a Mexico time zone and "I have no Trello integration". A caption that asks for a card now
+      // goes to the same Trello path as typed text and voice, with the screenshot's facts in it.
+      const wantsCard = !!caption && (detectTrelloTrigger(caption) || /trello|tarjeta|\bcard\b|\bcita\b|карточ/i.test(caption));
+      const CARD_FROM_IMAGE = 'A Trello card is created automatically from your answer. List the event or task: title, date, '
+        + 'start and end time in Elena\'s time zone (America/Panama, UTC-5 — she lives in Panama; never convert to another zone), '
+        + 'and every link exactly as shown. Never say you cannot reach Trello.';
+      const visionPrompt = `${elenaFacts() ?? AIDEAZZ_CONTEXT}\n\n${analysisPrompt}\n\n${ANSWER_PHOTO_IN_HER_LANGUAGE}${wantsCard ? `\n${CARD_FROM_IMAGE}` : ''}${speakIt && voiceRepliesOn() ? `\n${VOICE_IS_AUTOMATIC}` : ''}`;
 
       let analysis: string;
       
@@ -8026,6 +8034,16 @@ Keep response concise for Telegram. Use emojis.`;
         }
       } else {
         await ctx.reply(responseMessage);
+      }
+
+      if (wantsCard) {
+        try {
+          if (!(await routeToTrello(ctx, `${caption}\n\nFrom her screenshot:\n${analysis}`, 'text'))) {
+            await ctx.reply('⚠️ I read the image, but no card came out of it. Say the title and date in one line and I file it.');
+          }
+        } catch (trelloErr) {
+          await ctx.reply(`⚠️ Trello did not take it (${String((trelloErr as Error)?.message || trelloErr).slice(0, 120)}).`);
+        }
       }
 
       // Spoken only when the caption asked for it. The map is set here, not at the start: a voice note's reply that is
