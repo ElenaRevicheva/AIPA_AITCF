@@ -21,7 +21,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code (laptop) | 21 Oct 17:25 | Real Meta ads via Bright Data's own Ad Library scraper (no KYC) → WHITESPACE scans + Monday capture; BD key rotated | whitespace `src/brightdata.ts`, `src/ad-sources.ts`, `src/capture.ts`; PM2 `whitespace` restart | — |
-| Claude Code (laptop, 2nd) | 21 Oct 17:55 | AIMUG talk tonight: Spanish talk sheet as OpenClaw's 4th injected file (Elena's go) | Oracle `~/.openclaw/openclaw.json` (bootstrap-extra-files paths), `~/.openclaw/workspace/talk/` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -144,6 +143,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 21 Oct ~18:05 UTC — OpenClaw coaches TALKS/PITCH in Spanish (AIMUG tonight 7 PM Panama) · LIVE · claim released
+- **DONE:** `docs/interview/AIMUG_TALK_SHEET_ES.md` → Oracle `~/.openclaw/workspace/talk/TOOLS.md`, added as the 4th `bootstrap-extra-files` path (hot reload, gateway not restarted; backup `~/_session-backups/openclaw-aimug-20261021/openclaw.json`). Sheet = run-of-show over the ES deck, deck figures only, 10 likely questions → verified example numbers in `proof/TOOLS.md`, "do not claim" list. Reuses existing machinery only.
+- **VERIFIED BY:** 2 private test sessions (`test-aimug-20261021`, `…b`): it skips the deal reader, follows the drill, 2nd run no invented scenario; truncation 0. Injected total ≈86.5k of the 90k cap.
+- **RISK:** model still lightly paraphrases the verified example (true, not word-for-word). Only ~3.5k chars of cap left — anything added to the injected files must check truncation.
+- **NEXT:** sheet is KEPT (Elena, 21 Oct) — after 22 Oct delete only section **A. EVENTO** (venue/time). After the talk: Paul Phelps + anyone who asked a question → HubSpot.
 
 ### ⚠️ 21 Oct ~17:15 UTC — Provider credits probed LIVE (tiny calls / balance APIs, Oracle `cto-aipa/.env`) · read-only · top-ups are Elena's move
 - **Answer for real (200):** Claude (all 5 bot keys, $96.96 grant), OpenAI, Gemini, Perplexity, xAI, Groq (`openai/gpt-oss-120b`; `llama-3.3-70b-versatile` is GONE), Speechmatics, Replicate (auth only, no balance API).
