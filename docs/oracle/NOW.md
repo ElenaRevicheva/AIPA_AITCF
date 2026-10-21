@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop, 2nd — took over the 17:25 claim, its session went idle; Elena's go) | 21 Oct 18:12 | Ad Library jobs that outlive the visitor wait finish in the background and are reused (no cancel); pre-warm tonight's AIMUG demo scans | whitespace `src/brightdata.ts`, `src/ad-sources.ts`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 21 Oct ~18:15 UTC — WHITESPACE real Meta ads: slow Bright Data jobs finish in the background (no cancel) · AIMUG demo scan LIVE · claim released
+- **DONE:** whitespace `a35acbc` (on top of the idle session's `896f28e`/`649a721`/`ea99f40`): an Ad Library job that outlives the visitor's 330 s wait is no longer cancelled — it finishes in the background, rows kept 24 h in `data/adlib-cache/`, next scan of that market served at once; a 2nd scan of a market whose job is running waits on it. Deployed (backup `~/_session-backups/whitespace-adlib-bg-20261021/`), restarted 18:13:01 UTC.
+- **VERIFIED BY:** public scan "clínica dental" PA 18:07→18:12 UTC = `Deliverable ready`, 8 live on-topic ads of 12 rows in 182 s, 6 Ad Library IDs (Odontodent, OrthoStetic, Dental Service, Prime Dental); re-run = 0.64 s "served from this week's cache"; after restart 0.27 s. Uncapped direct BD job: 12 real rows.
+- **RISK:** live Bright Data collection varies 182–322+ s (Bright Data side). Ad-image vision fails (Meta CDN 403 / robots.txt for Claude+OpenAI URL fetch) → analysis is text-only. Log showed "Claude tripped circuit breaker (credit/billing)" at 18:11:54 — reset by the restart; probe before blaming credits (key answered 200 at ~17:10).
+- **NEXT:** test with a curl that sends UTF-8 (`cl%C3%ADnica`) — Git Bash `--data-urlencode` sent `cl%ednica` and wasted a scan.
 
 ### ✅ 21 Oct ~18:05 UTC — OpenClaw coaches TALKS/PITCH in Spanish (AIMUG tonight 7 PM Panama) · LIVE · claim released
 - **DONE:** `docs/interview/AIMUG_TALK_SHEET_ES.md` → Oracle `~/.openclaw/workspace/talk/TOOLS.md`, added as the 4th `bootstrap-extra-files` path (hot reload, gateway not restarted; backup `~/_session-backups/openclaw-aimug-20261021/openclaw.json`). Sheet = run-of-show over the ES deck, deck figures only, 10 likely questions → verified example numbers in `proof/TOOLS.md`, "do not claim" list. Reuses existing machinery only.
