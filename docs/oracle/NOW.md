@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop, 2nd) | 21 Oct 23:40 | OpenClaw production-truth sheet (5th injected file) + cron line | Oracle `~/.openclaw/openclaw.json` paths, `~/.openclaw/workspace/prod/`, crontab (+1 line), `~/cto-aipa/scripts/prod-truth-sheet.cjs` | `010f38ed` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 21 Oct ~23:25 UTC — OpenClaw answers products/agents from PRODUCTION TRUTH, not filler · LIVE · claim released
+- **DONE:** `docs/oracle/PRODUCT_TRUTH.md` (verified product lines, her recorded "why", how agents really share work, known limits) + `scripts/prod-truth-sheet.cjs` (reads origin/main via git fetch/show — never the lagging checkout; adds the 4 newest NOW.md handoffs that carry VERIFIED BY + newest AI Ops Wiki incidents' measured `verified` lines; neutralises MEDIA:). Oracle: script scp'd, `prod/TOOLS.md` added as 4th of 5 injected paths (before talk), crontab `*/30` line → `~/logs/prod-truth.log`. Backups `~/_session-backups/openclaw-prodtruth-20261021/` (openclaw.json, crontab.before).
+- **VERIFIED BY:** private sessions `test-prodtruth-20261021`/`b`: Atlas answer = real Monday chain, last run 19 Oct, 1 alert, 7 markets, lead machine 0 (SerpAPI out) + 2 no-website; "why I built the agents" = her recorded words; collaboration = HubSpot + files on schedules, no live orchestrator. Truncation 0; injected total 93,962 / 100k.
+- **RISK:** ~6k of headroom left — any sheet growth must re-check truncation. Model still lightly paraphrases a line it calls a "quote". The Monday lead machine finds nothing until SerpAPI is topped up (Elena).
+- **NEXT:** when a product changes, update `PRODUCT_TRUTH.md` (verified lines only) — the sheet rebuilds itself within 30 min.
 
 ### ✅ 21 Oct ~19:50 UTC — Spanish visitors get Spanish results (WHITESPACE + API audit) · leads carry UTM · API footer → Atlas · synced
 - **DONE:** whitespace `87e3463` — page sends `lang`; each scan runs in `withOutputLanguage` (AsyncLocalStorage in `llm.ts`), every model call writes human text in that language; run cache keyed by language (EN keys unchanged). `409d1fd` — lead form sends the page's `utm_*`, stored in `leads.jsonl` and in the HubSpot context line. aideazz `37674ee` — API page footer "Start a project" → **Atlas**; `2d6003b` — `src/i18n/auditEs.ts`: Spanish check names / why / fixes / categories for the ES API page (fixed table, no model; observed `detail` stays English).
