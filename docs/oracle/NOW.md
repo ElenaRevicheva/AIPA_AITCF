@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 21 Oct 17:25 | Real Meta ads via Bright Data's own Ad Library scraper (no KYC) → WHITESPACE scans + Monday capture; BD key rotated | whitespace `src/brightdata.ts`, `src/ad-sources.ts`, `src/capture.ts`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
