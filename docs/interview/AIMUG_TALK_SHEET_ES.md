@@ -46,5 +46,15 @@ Decir siempre: "es mi propio sistema, no un caso de cliente" (lo dice la p. 6).
 - No nombres clientes, prospectos ni empleadores en una charla pública.
 - No digas "agentes autónomos que envían solos": todo envío pasa por su aprobación.
 
+## H. ATLAS Y WHITESPACE — cómo mostrarlos y por qué sirven (verificado en vivo el 21 oct 2026)
+- WHITESPACE (aideazz.xyz/atlas/finder): eliges mercado + país → lee los anuncios ACTIVOS reales de la Biblioteca de Anuncios de Meta (Facebook, Instagram, Messenger, Threads) vía Bright Data (hasta 12 por búsqueda, nunca "todos") → muestra qué ángulos están saturados y el ángulo abierto, con el enlace a cada anuncio. Modo "Ad angles" (copy + landing) o "GEO/AEO" (brief de contenido). Toda Latinoamérica + España + EE. UU.; busca en el idioma de los anuncios locales (español; portugués en Brasil).
+- Atlas (aideazz.xyz/atlas, "La Jugada del Lunes"): cada lunes 9 AM Panamá captura los anuncios de los mercados que sigue y marca cada ángulo ENTRAR / VIGILAR / EVITAR con la evidencia a un clic; escribe copy listo para probar.
+- Demo (4 pasos): página en ES → botón "implantes dentales · Panamá" o "alquiler de yates · Cartagena" → mientras recolecta (1–3 min) explica qué hace → abre UN anuncio real en Facebook desde su enlace. Nunca el enlace de dueño en el proyector.
+- Pruebas de hoy: "implantes dentales" Panamá = clínicas locales (Odontodent, Clínicas Dentales Corró, Dental Life); "alquiler de yates" Colombia = 8 anuncios en 84 s; Brasil "implante dentário" = 6 anuncios en 148 s. En inglés, Costa Rica/Colombia/Panamá no dieron nada en 20 min → por eso busca en el idioma local.
+- Por qué encaja: la biblioteca de Meta es pública pero manual (un país y una palabra a la vez, sin análisis); WHITESPACE lo hace en minutos y dice dónde NO competir. Para agencias y dueños que pagan anuncios en Meta en LatAm.
+- Frase honesta: "No predice ventas: las bibliotecas públicas no dan CTR ni ROAS. Mide saturación de ángulos y propone una hipótesis para probar." Si no hay anuncios reales, dice "sin prueba", no inventa.
+- NO afirmar: anuncios de TikTok (hoy no disponibles), anuncios de Google (probados: 0 en Panamá), clientes o ventas de Atlas/WHITESPACE, CTR/ROAS.
+- Preguntas probables: ¿de dónde salen los datos? (Biblioteca de Anuncios de Meta, pública) · ¿por qué tarda? (recolección en vivo, 1–5 min) · ¿qué hago con el resultado? (probar el ángulo abierto con un presupuesto pequeño).
+
 ## G. MODO PRÁCTICA
 Orden: (1) que diga en voz alta la apertura de 1 minuto; (2) las 10 preguntas de E, una a una, como las haría el público; (3) al final, la pregunta difícil: "¿En qué se diferencia esto de HubSpot con IA?" → p. 3: el software vende funciones; nosotros, un operador que trabaja dentro de las herramientas que ya usa y lleva cada oportunidad hasta el contrato.
