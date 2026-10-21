@@ -143,6 +143,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 21 Oct ~19:50 UTC — Spanish visitors get Spanish results (WHITESPACE + API audit) · leads carry UTM · API footer → Atlas · synced
+- **DONE:** whitespace `87e3463` — page sends `lang`; each scan runs in `withOutputLanguage` (AsyncLocalStorage in `llm.ts`), every model call writes human text in that language; run cache keyed by language (EN keys unchanged). `409d1fd` — lead form sends the page's `utm_*`, stored in `leads.jsonl` and in the HubSpot context line. aideazz `37674ee` — API page footer "Start a project" → **Atlas**; `2d6003b` — `src/i18n/auditEs.ts`: Spanish check names / why / fixes / categories for the ES API page (fixed table, no model; observed `detail` stays English).
+- **VERIFIED BY:** visitor scan `alquiler de yates` CO `lang=es` → 8 real ads, 113 s, all angles/copy/insights in Spanish, enum codes intact. GA4 `G-TL5S8V23LT` on /api, /atlas, /atlas/finder; app→shell GA4 bridge (generate_lead, contact_whatsapp) present; lead relay → HubSpot `crm=ok` (14:16 UTC). Footer live after ~160 s.
+- **NOT VERIFIED:** a lead with UTM end-to-end (no fake HubSpot deal created) — check the next real lead's HubSpot note shows `utm:`. API audit `detail` lines remain English on the ES page.
+
 ### ✅ 21 Oct ~19:35 UTC — WHITESPACE: all LatAm + Spain + US (Brasil in Portuguese) · today's limits 10/visitor 40/site · OpenClaw coaches the Atlas/WHITESPACE demo · synced GitHub = laptop = Oracle
 - **DONE:** whitespace `8017891` — 9 more countries (PR, SV, HN, NI, BO, UY, PY, VE, BR), BR searched in Portuguese; every "2 scans a day · 10 LatAm markets" text now says free daily scans + all of Latin America. Oracle checkout fast-forwarded to `8017891` (was 4 behind with a hand-copied page) and **rebuilt from source** there. aideazz `f5e552d`: `make_atlas_shells.py` T1_EN updated, shells regenerated, pushed without [skip ci]. OpenClaw: talk sheet §H (how to demo, why it fits, what NOT to claim) + `bootstrapTotalMaxChars` 90k → **100k** (backup `~/_session-backups/openclaw-aimug-20261021/openclaw.json.pre-cap100k`).
 - **LIMITS (temporary):** `~/whitespace/.env` WHITESPACE_RUN_FREE_PER_IP_DAY=10 / GLOBAL=40 for AIMUG night; **auto-revert** = user timer `whitespace-limits-revert` 22 Oct 13:00 UTC (script + log in `~/_session-backups/whitespace-adlib-bg-20261021/`). Check `revert.log` tomorrow.
