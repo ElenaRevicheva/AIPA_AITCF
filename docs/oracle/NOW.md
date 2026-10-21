@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 21 Oct 01:30 | CTO AIPA bot searches her Zoho + Gmail (read-only, reply-radar.py --search) from a photo caption or a typed lookup | `src/telegram-bot.ts`, `scripts/reply-radar.py`; PM2 `cto-aipa` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
