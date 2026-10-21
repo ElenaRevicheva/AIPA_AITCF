@@ -248,6 +248,75 @@ def list_folders(conn, rx):
     return out
 
 
+# ─── search (20 Oct 2026: the CTO AIPA bot looks things up in her mail) ───────────────────────────────────────────────
+SEARCH_FOLDERS = {'zoho': re.compile(r'^(inbox|notification|newsletter|sent)$', re.I),
+                  'gmail': re.compile(r'^(inbox|\[gmail\]/(sent mail|all mail))$', re.I)}
+
+
+def search_mail(words, days):
+    """Read-only: the newest messages in Zoho + Gmail whose text holds ALL the words, with their links."""
+    words = [w for w in (re.sub(r'[^\w@.\-]', '', w, flags=re.U) for w in words) if len(w) > 1][:6]
+    if not words:
+        return []
+    since = (datetime.now() - timedelta(days=days)).strftime('%d-%b-%Y')
+    out, seen = [], set()
+    for mb in MAILBOXES:
+        user, pwd = env(mb['user_env']), env(mb['pass_env'])
+        if not user or not pwd:
+            continue
+        try:
+            conn = imaplib.IMAP4_SSL(mb['host'], 993)
+            conn.login(user, pwd)
+        except Exception as ex:
+            out.append({'mailbox': mb['name'], 'error': 'login failed: %s' % str(ex)[:80]})
+            continue
+        for folder in list_folders(conn, SEARCH_FOLDERS[mb['name']]):
+            if conn.select('"%s"' % folder, readonly=True)[0] != 'OK':
+                continue
+            crit = ['SINCE', since]
+            for w in words:
+                crit += ['TEXT', '"%s"' % w]
+            try:
+                typ, data = conn.search('UTF-8', *[c.encode('utf-8') for c in crit])
+            except Exception:
+                typ, data = conn.search(None, *crit)
+            for num in (data[0].split() if typ == 'OK' and data and data[0] else [])[-8:]:
+                typ, raw = conn.fetch(num, '(BODY.PEEK[])')
+                if typ != 'OK' or not raw or not isinstance(raw[0], tuple):
+                    continue
+                m = email.message_from_bytes(raw[0][1])
+                key = m.get('Message-ID') or (dh(m.get('Subject')) + (m.get('Date') or ''))
+                if key in seen:
+                    continue
+                seen.add(key)
+                text, links = '', []
+                for part in m.walk():
+                    if part.get_content_maintype() == 'multipart' or part.get('Content-Disposition', '').startswith('attachment'):
+                        continue
+                    try:
+                        payload = part.get_payload(decode=True).decode(part.get_content_charset() or 'utf-8', 'replace')
+                    except Exception:
+                        continue
+                    links += re.findall(r'https?://[^\s"\'<>)\]]+', payload)
+                    if part.get_content_type() == 'text/html':
+                        payload = html.unescape(re.sub(r'<[^>]+>', ' ', re.sub(r'(?is)<(script|style).*?</\1>', ' ', payload)))
+                    text += ' ' + payload
+                junk = re.compile(r'unsubscribe|optout|opt-out|tracking|/track|pixel|\.(png|jpe?g|gif)(\?|$)|list-manage|preferences', re.I)
+                uniq = [u for u in dict.fromkeys(l.rstrip('.,;') for l in links) if not junk.search(u)]
+                try:
+                    when = parsedate_to_datetime(m.get('Date')).isoformat()
+                except Exception:
+                    when = m.get('Date') or ''
+                out.append({'mailbox': mb['name'], 'folder': folder, 'from': dh(m.get('From')), 'subject': dh(m.get('Subject')),
+                            'date': when, 'text': re.sub(r'\s+', ' ', text).strip()[:900], 'links': uniq[:8]})
+        try:
+            conn.logout()
+        except Exception:
+            pass
+    out.sort(key=lambda r: r.get('date', ''), reverse=True)
+    return out[:8]
+
+
 # ─── actions ──────────────────────────────────────────────────────────────────
 def stage_map():
     stages = hs('GET', '/crm/v3/pipelines/deals')['results'][0]['stages']
@@ -339,8 +408,13 @@ def main():
     ap.add_argument('--since-days', type=int, default=3)
     ap.add_argument('--report', help='write matches as JSON (dry run)')
     ap.add_argument('--only', help='act on mail from this one sender only, ignoring the live clock (a controlled test)')
+    ap.add_argument('--search', help='read-only: print JSON of messages holding ALL these words (Zoho + Gmail)')
+    ap.add_argument('--days', type=int, default=60, help='with --search: how far back')
     a = ap.parse_args()
     load_env()
+    if a.search:
+        print(json.dumps(search_mail(a.search.split(), a.days), ensure_ascii=False))
+        return
 
     state = json.loads(STATE_PATH.read_text()) if STATE_PATH.exists() else {}
     if a.init:
