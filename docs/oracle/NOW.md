@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop, 2nd) | 21 Oct 23:55 | OpenClaw career depth (--private sheet) + cap 110k | Oracle `~/.openclaw/openclaw.json` (cap), `~/.openclaw/private/`, crontab prod-truth line, `~/cto-aipa/scripts/prod-truth-sheet.cjs` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push

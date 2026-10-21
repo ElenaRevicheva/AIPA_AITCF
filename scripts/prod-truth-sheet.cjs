@@ -14,8 +14,8 @@
  *   3. aideazz   content/ai-ops-wiki/incidents/*.md — newest incidents: title, measured `verified`, named concepts
  *
  * Run (Oracle crontab, right after the deals digest):
- *   node scripts/prod-truth-sheet.cjs --out=/home/ubuntu/.openclaw/workspace/prod/TOOLS.md
- * Budget: --max=11000 chars (OpenClaw injects every sheet into every reply under a 100k total cap).
+ *   node scripts/prod-truth-sheet.cjs --out=/home/ubuntu/.openclaw/workspace/prod/TOOLS.md --private=/home/ubuntu/.openclaw/private/CAREER_DEEP.md
+ * Budget: --max=15000 chars (OpenClaw injects every sheet into every reply under a 110k total cap).
  */
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
@@ -24,7 +24,10 @@ const os = require('node:os');
 
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=').slice(1).join('=') || d;
 const OUT = arg('out', '');
-const MAX = Number(arg('max', '11000'));
+const MAX = Number(arg('max', '15000'));
+// Her deep background lives in the PRIVATE docs repo and on Oracle only (résumés left git HEAD on 6 Sep for privacy);
+// --private=<file> includes it as written. A missing file is skipped, never fatal.
+const PRIVATE = arg('private', '');
 const ROOT = path.resolve(__dirname, '..');
 const WIKI_REPO = process.env.AIDEAZZ_REPO_PATH || path.join(os.homedir(), 'aideazz');
 const INCIDENTS = 'content/ai-ops-wiki/incidents';
@@ -79,9 +82,13 @@ const HEAD = `# 🏭 PRODUCCIÓN REAL / PRODUCTION TRUTH — the ONLY source for
 # not printed here. Quote a line only if it is printed here word for word; never stitch two lines into one "quote".
 `;
 
+let privateBody = '';
+if (PRIVATE) { try { privateBody = fs.readFileSync(PRIVATE, 'utf8').trim(); } catch { /* not on this box */ } }
+
 const sections = [
   HEAD,
   truthBody,
+  privateBody,
   handoffs.length ? `## LATEST VERIFIED PRODUCTION WORK (NOW.md handoffs, newest first)\n${handoffs.join('\n')}` : '',
 ];
 let sheet = sections.filter(Boolean).join('\n\n');
