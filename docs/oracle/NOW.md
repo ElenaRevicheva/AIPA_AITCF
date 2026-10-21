@@ -143,6 +143,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⚠️ 21 Oct ~17:15 UTC — Provider credits probed LIVE (tiny calls / balance APIs, Oracle `cto-aipa/.env`) · read-only · top-ups are Elena's move
+- **Answer for real (200):** Claude (all 5 bot keys, $96.96 grant), OpenAI, Gemini, Perplexity, xAI, Groq (`openai/gpt-oss-120b`; `llama-3.3-70b-versatile` is GONE), Speechmatics, Replicate (auth only, no balance API).
+- **Empty / dead — anything using these will fail:** SerpAPI **0 of 1000** searches left (Starter, out) · Hunter **0 searches left** (Free, resets 20 Nov) · Luma key **"Not authenticated"** (both cto-aipa + whitespace) · Runway **4 credits** (≈ nothing; a clip needs 25+).
+- **Low:** Venice **$0.55** · DeepSeek **$1.88** · Bright Data balance $5.63 but **$7.49 pending** costs.
+- **NEXT (Elena):** top up only what today's demos touch. Re-probe before claiming any of these fixed.
+
 ### ✅ 21 Oct ~01:10 UTC — CTO AIPA: screenshot + "create a card" → real Trello card (Panama time) · Oracle webinar card filed · LIVE · claim released
 - **DONE:** photo caption asking for a card now goes through `routeToTrello` (same as text/voice); vision prompt gives Panama time + verbatim links and may not claim "no Trello integration". `reconcileUrgency` counts days from `panamaToday()` (after 19:00 Panama the UTC date sent day-after-tomorrow cards to "just for today"). Card made by hand from Zoho-confirmed data: "Oracle Webinar: AI Database Foundations Certification", Kira Octubre 2026 → Cita, orange, due 22 Oct 11:00 Panama, personal Zoom link in description — trello.com/c/SSSx7N1H.
 - **VERIFIED BY:** Zoho IMAP (read-only): Zoho Calendar invite "Thu Oct 22, 2026 11:00 am - 01:00 pm (America/Panama)" + Zoom confirmation with the join link. Classifier dry run on deployed code → `list dated, 2026-10-22 11:00, orange` (before: `just_for_today`). cto-aipa started 01:06:18 > dist 01:06:12. Oracle src = main before the change (md5).
