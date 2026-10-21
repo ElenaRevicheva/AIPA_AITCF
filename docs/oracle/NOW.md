@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 21 Oct 17:25 | Real Meta ads via Bright Data's own Ad Library scraper (no KYC) → WHITESPACE scans + Monday capture; BD key rotated | whitespace `src/brightdata.ts`, `src/ad-sources.ts`, `src/capture.ts`; PM2 `whitespace` restart | — |
+| Claude Code (laptop, 2nd — took over the 17:25 claim, its session went idle; Elena's go) | 21 Oct 18:12 | Ad Library jobs that outlive the visitor wait finish in the background and are reused (no cancel); pre-warm tonight's AIMUG demo scans | whitespace `src/brightdata.ts`, `src/ad-sources.ts`; PM2 `whitespace` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
