@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop, 2nd) | 21 Oct 23:40 | OpenClaw production-truth sheet (5th injected file) + cron line | Oracle `~/.openclaw/openclaw.json` paths, `~/.openclaw/workspace/prod/`, crontab (+1 line), `~/cto-aipa/scripts/prod-truth-sheet.cjs` | `010f38ed` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
