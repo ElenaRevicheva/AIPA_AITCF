@@ -301,7 +301,7 @@ function likelyQuestions(notes) {
 // facts (what the company is, product, customers, founders/funding) now travel with the questions, word for word.
 // The note's own "Cuidado — lo que NO sabemos / no afirmar" section travels too, printed FIRST and never trimmed: without it
 // the coach would state as settled what the note itself flags as disputed (rounds that may overlap, two named tech leads).
-const FACTS_MAX = 5000;          // per deal (15 Oct: 2,200 cut products/customers/founders of a full report); the sheet stays under PROOF_MAX
+const FACTS_MAX = 9000;          // per deal, ALL its deep-dives together (15 Oct: 2,200 cut a full report; 22 Oct: 5,000 → 9,000 when Pitz got a 2nd deep-dive); the sheet stays under PROOF_MAX
 // The cap is OpenClaw's own setting (agents.defaults.bootstrapMaxChars; over it, the MIDDLE of the file is cut), read live
 // so raising it there is the only change needed; 24,500 when no OpenClaw config is on this machine.
 const PROOF_MAX = (() => {
@@ -315,31 +315,41 @@ const PROOF_MAX = (() => {
 const FACTS_END = /^\s*\d+\.\s*(Por qué existe|Why (this|the) role|Dónde encaja|Where (Elena|she) fits|Preguntas probables|Likely (interview )?questions)/i;
 const CAUTION_START = /^\s*\d+\.\s*(Cuidado|Careful|What we (do )?not know|.*no afirmar|.*do not claim)/i;
 const tidyFact = (l) => l.replace(/\s*\[\d+\](\[\d+\])*/g, '').replace(/^\d+\.\s+(?=\S)/, '— ').trim(); // no "[3]" read aloud; headings ≠ the numbered questions
+// 22 Oct 2026: a deal can carry SEVERAL deep-dives (Pitz: the hand-written interview research of 14–15 Oct + the company
+// site read live on 22 Oct). Reading only the newest one would have silently replaced the protected hand-written research
+// in the coach's sheet, so every deep-dive now travels, newest first, each under its own title; every caution line of
+// every note is kept (deduped). The freshness clock is the newest deep-dive's.
 function deepDiveFacts(notes) {
   const dives = [...notes].sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
+  const facts = [];
+  const cautions = [];
+  let len = 0;
+  let ddTs = '';
   for (const n of dives) {
     const lines = stripHtml(n.html).split('\n').map((l) => l.trim());
     if (!/INVESTIGACI[ÓO]N PROFUNDA|DEEP[- ]DIVE/i.test(lines[0] || '')) continue;
     const end = lines.findIndex((l) => FACTS_END.test(l));
-    const facts = [];
-    let len = 0;
+    const own = [];
     for (const l of lines.slice(1, end < 0 ? undefined : end).filter(Boolean).map(tidyFact)) {
       if (len + l.length + 1 > FACTS_MAX) break;
-      facts.push(l);
+      own.push(l);
       len += l.length + 1;
     }
+    if (own.length) {
+      facts.push(`· ${lines[0].slice(0, 110)}`, ...own);
+      ddTs = ddTs || n.ts;
+    }
     const cs = lines.findIndex((l) => CAUTION_START.test(l));
-    const cautions = [];
     if (cs >= 0) {
       for (const l of lines.slice(cs + 1)) {
         if (!l) continue;
         if (/^(Fuentes|Sources)\b/i.test(l) || /^\s*\d+\.\s/.test(l)) break;
-        cautions.push(tidyFact(l));
+        const c = tidyFact(l);
+        if (!cautions.includes(c)) cautions.push(c);
       }
     }
-    if (facts.length) return { facts, cautions, ddTs: n.ts };
   }
-  return { facts: [], cautions: [], ddTs: '' };
+  return { facts, cautions, ddTs };
 }
 // An interview is time-bound: a deep-dive older than 30 days no longer earns space in the sheet.
 const freshDive = (x) => !x.ddTs || !(Date.now() - Date.parse(x.ddTs) > 30 * 864e5);

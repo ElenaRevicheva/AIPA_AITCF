@@ -1,0 +1,29 @@
+🔎 PITZ — DEEP DIVE (sitio web pitz.com.mx leído en vivo, 22 oct 2026)
+1. Qué es Pitz (según su sitio)
+• "Más que un software de gestión: un sistema operativo de IA para talleres." Meta: que cualquier vehículo quede diagnosticado, cotizado, reparado y entregado en menos de 24 horas.
+• Tres pilares: IA (apoyo al diagnóstico, interpretación de síntomas, armado de cotizaciones) · operación del taller (órdenes, inventario, clientes, finanzas, productividad del equipo) · marketplace de refacciones conectado con distribuidores.
+• Fundada en 2025. Opera en México y Brasil; "próximamente" Colombia y Estados Unidos. Inversión internacional (el sitio no nombra inversionistas).
+2. La IA: un solo asistente con nombre por mercado
+• En México se llama "El Chalán"; en el sitio en inglés, "Joe". Describe el síntoma y da el diagnóstico probable, cómo repararlo y qué revisar; arma y gestiona el carrito de refacciones en el marketplace; está disponible en todo el sitio, 24 horas.
+• Etiquetas del hero: EN VIVO · DIAGNÓSTICO LISTO · REFACCIÓN COMPATIBLE (la compatibilidad de la pieza es parte de la propuesta).
+• Blog del 15 oct 2026: diagnóstico por voz en el taller, manos libres ("registra el cambio de bujías en la orden", "consulta disponibilidad del filtro de aceite"), integrado con órdenes, inventario, historial y catálogos.
+3. Tres tipos de cliente, una plataforma con roles
+• Talleres: órdenes y cotizaciones, inventario, clientes y vehículos con historial, contabilidad, marketplace, reportes. Roles: Dueño / Encargado / Mecánico. WhatsApp al cliente final: auto recibido, auto listo, próximo servicio; cotización por WhatsApp en un clic.
+• Refaccionarias: punto de venta y cotizaciones, inventario, compras a proveedores, marketplace. Roles: Dueño / Encargado / Vendedor.
+• Distribuidores: catálogo en línea (stock por SKU, precios), pedidos, campañas de venta; WhatsApp de pedido recibido, surtido y enviado.
+4. Modelo de negocio y precios (MXN al mes, 30 días gratis, sin tarjeta, mes a mes)
+• Talleres y refaccionarias: Ultra Básico $399 · Básico $999 (el más popular) · Plata $2,599 · Oro $4,999. El Chalán/Joe, el historial, los clientes y el marketplace vienen en TODOS los planes.
+• Distribuidores: Gratis (comisión 20%, pago cada 30 días) · Express $2,999 (15%, cada 15 días) · Premium $9,999 (12%, cada 7 días).
+• Es decir: suscripción SaaS + comisión sobre ventas del marketplace (12–20%) + velocidad de pago como mejora de plan.
+5. Prueba que muestran (afirmación del sitio)
+• Taller piloto, 90 días, mismo equipo: ingreso mensual de $120K a $150K (+25%); +22% órdenes al mes; tiempo de cotizar y responder de 6 a 2 días; ciclo completo de 12 a 8 días.
+6. Equipo (página "About")
+• Natalia Salcedo, CEO y fundadora (ex-JOKR, Rappi, Meru). Majo Campo, Product & Tech Director (ex-Quartile, ClearSale, Electrolux). José Molina, Finanzas y Legal. Sergio Agudelo, Operaciones. Laura Roldán, Personas. Bruno Borges de Souza, Country Manager Brasil. Equipo en México y Brasil.
+7. Tecnología visible desde afuera
+• Sitio en Next.js; analítica PostHog + Google Analytics/Tag Manager; datos estructurados (Organization, SoftwareApplication, FAQPage). Un sitio por mercado: pitz.com.mx/es, pitz-app.com.br (Brasil), usepitz.com (EE. UU.). App en app.pitz.com.mx.
+8. Cuidado — lo que NO sabemos / no afirmar
+• Su propio sitio se contradice: +52,300 refacciones en la portada y 80,000+ en "About". Di "según su sitio" y no des una cifra como hecho.
+• El sitio no dice qué modelos de IA usa el Chalán, cómo verifican la compatibilidad de la pieza ni cómo revisan una cotización de la IA antes de que llegue al cliente: son preguntas para hacer, no datos.
+• El enlace de WhatsApp pasa por pitz.trb.ai; el dominio sugiere Treble.ai, pero no está confirmado.
+• Las cifras del taller piloto y "+1,000 talleres" son afirmaciones de marketing del sitio, no datos auditados.
+Fuentes: pitz.com.mx/es, /en, /en/repair-shops, /en/parts-stores, /en/distributors, /en/about-us, /en/contact, /en/blog (leído en Chrome el 22 oct 2026).
