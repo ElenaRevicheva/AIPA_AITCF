@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 22 Oct 16:05 | Deals sheet reads ALL deep-dives of a deal (Pitz site note added) | Oracle `~/cto-aipa/scripts/hs-deal-prep.cjs` (named file) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 22 Oct ~15:55 UTC — Pitz site deep-dive in HubSpot + OpenClaw reads ALL deep-dives of a deal · claim released
+- **DONE:** pitz.com.mx read live in Chrome → `docs/interview/PITZ_SITE_DEEP_DIVE_2026-10-22.md` (EN, full) + HubSpot note `119285534059` on deal `66025927308` (ES, deep-dive format: 7 fact sections + "Cuidado"). `hs-deal-prep.cjs` (`6d7ca384`, named-file scp; backup `~/_session-backups/openclaw-prodtruth-20261021/hs-deal-prep.cjs.pre-merge`): `deepDiveFacts` merges every deep-dive note newest first, all cautions deduped; FACTS_MAX 5k → 9k per deal — a new note can no longer hide the hand-written 14 Oct research.
+- **VERIFIED BY:** rebuilt proof sheet shows both `· 🔎 PITZ — DEEP DIVE (sitio web … 22 oct)` and `· 🔎 PITZ — INVESTIGACIÓN PROFUNDA (14 oct)`, 10 cautions (4 new + 6 old), 18 questions unchanged; private session `test-pitzsite-20261022` answered plans/commission/"El Chalán" from the note with "según su sitio"; truncation 0.
+- **RISK:** OpenClaw injected total **105,991 / 110,000** — ~4k headroom; the next addition must trim (old deals, talk sheet §A) or raise the cap.
 
 ### ✅/⏳ 22 Oct — Pere + Titi web classroom (ascent-saas-builder branch `classroom-pere-titi`, NOT main) · EspaLuz Supabase keep-awake · claim released
 - **DONE:** `/classroom` page reuses the dashboard voice loop (voice-to-text → espaluz-chat → generate-voice) in kids mode; classroom C background, hero clips as avatar, big mic, stars; `/auth?next=/classroom` returns the parent. `espaluz-chat` **deployed v190** (current Claude models + optional `kids` mode; adult chat unchanged except model) — live version before was the repo's 24 Nov 2025 commit (deploy 10 s after it). Commit `c2f19dc` on the branch only (Lovable/GitHub-Supabase link watch `main`).
