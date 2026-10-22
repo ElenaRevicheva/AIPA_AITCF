@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 22 Oct 20:10 | OpenClaw: Pitz case walkthrough sheet (Elena studying on her walk) + cap raise | Oracle `~/.openclaw/openclaw.json` (paths, cap), `~/.openclaw/workspace/case/` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
