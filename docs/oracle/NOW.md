@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 22 Oct | EspaLuz FamilyBot Alisa mode: ages 5–7, bilingual sentences, Pere + Titi hero clips as the reply-video avatar | EspaLuzFamilybot `main.py` (+ `heroes/` clips); systemd `espaluz-familybot` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
