@@ -302,7 +302,9 @@ git log keeps the record.
   410/856 `lead_triage` rows "Classification failed" since June, BUT Elena checked the rows: almost all are her own tests or scraped job
   posts ("Pain point … hn_hiring"), not customers — real traffic ≈ 0. Kept: gpt-oss cut off 12/26 at 220 tokens vs 0/17 at 600. Optional,
   her call: switch triage off or tag tests at the source. Private cases: Oracle `~/_scratch/lab2/task/` (never git). Next lab: VJH judge.
-- **Elena's Claude Architect course (18–19 Oct):** PRIVATE repo `aideazz-private-docs` main `e1ce098` → `START_HERE.md` (topic finder),
+- **⏸ Course PAUSED 22 Oct (Elena: big employer task first).** Resume point = top entry of `LESSONS_PERFORMED.md` (private main
+  `e9cd8c6`): eval-drill Step 4, the three-model comparison never run. Rule added 20 Oct: never rebuild OpenClaw's interview coaching here.
+- **Elena's Claude Architect course (18–19 Oct):** PRIVATE repo `aideazz-private-docs` main `e9cd8c6` → `START_HERE.md` (topic finder),
   `METHOD.md` (how she is taught — follow it), `LESSONS_PERFORMED.md` (log each lesson); she types `/learn <topic>` (personal skill). Also →
   `docs/08-guides-howtos/claude-architect-course/COURSE.md` (safety contract, CCAR-F blueprint, M1–M7 × 4 lessons on her products,
   verified). Taught one lesson at a time in session; she drives. Exercises are read-only or in private copies — keep it that way.
