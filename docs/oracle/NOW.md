@@ -13,6 +13,8 @@ destroying each other's work.
 
 # PART 1 — THE PROTOCOL
 
+**22 Oct (2) — fixed after Elena's test:** /kids greeting now voiced (`heroes/kids-greeting.mp4`, cached; delete it to rebuild); unlabeled video scripts no longer give every line to Pere (the reply's Pere:/Titi: lines are used); each turn plays a mix of all 14 approved shots (+ titi-cheer-2, titi-dance). Voices pinned: Pere A Rudolph, Titi A Anime. Commit EspaLuzFamilybot `44869f8`.
+
 **22 Oct — EspaLuz Alisa mode: Pere + Titi talk in their own voices (LIVE).** DONE: per-hero MiniMax voices (Replicate, `REPLICATE_API_TOKEN` added to the bot `.env`) over 4 new talking clips in `heroes/`; gTTS voice note skipped for Alisa. NEXT (Elena): pick voices from the samples → set `PERE_VOICE` / `TITI_VOICE` in the bot `.env` + restart. VERIFIED BY: Oracle dry run built a 17 s Pere→Titi→Pere video in 31 s; sample sent to CTO Telegram; bot active 14:55 UTC. RISK: adds ~30 s per Alisa reply; a Replicate failure falls back to the old gTTS video. Steps 3–4 (exact lip-sync, live rig) deferred by Elena.
 
 ## 1. The session board — claim before you touch
