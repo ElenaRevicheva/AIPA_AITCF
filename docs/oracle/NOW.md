@@ -13,7 +13,7 @@ destroying each other's work.
 
 # PART 1 — THE PROTOCOL
 
-**⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Assets in 3 copies (laptop `_private-backups/heroes-20261021`, OneDrive, Oracle `~/_session-backups/heroes-20261021-full`); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
+**⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
 **22 Oct (2) — fixed after Elena's test:** /kids greeting now voiced (`heroes/kids-greeting.mp4`, cached; delete it to rebuild); unlabeled video scripts no longer give every line to Pere (the reply's Pere:/Titi: lines are used); each turn plays a mix of all 14 approved shots (+ titi-cheer-2, titi-dance). Voices pinned: Pere A Rudolph, Titi A Anime. Commit EspaLuzFamilybot `44869f8`.
 
