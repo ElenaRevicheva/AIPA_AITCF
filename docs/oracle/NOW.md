@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 22 Oct | EspaLuz FamilyBot Alisa mode: ages 5–7, bilingual sentences, Pere + Titi hero clips as the reply-video avatar | EspaLuzFamilybot `main.py` (+ `heroes/` clips); systemd `espaluz-familybot` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,6 +142,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 22 Oct ~13:35 UTC — EspaLuz FamilyBot: Alisa mode = ages 5–7, bilingual sentences, Pere + Titi as her reply-video avatar · LIVE · claim released
+- **DONE (Elena's yes):** `FAMILY_MEMBERS["alisa"]` age 6 / range 5–7; her prompt now: real sentences, Spanish then English, Pere (calm sloth) + Titi (playful tamarin), 5–10 min lesson rhythm. `alisa_hero_clip()` swaps the reply-video base (`looped_video.mp4`) for a Pere/Titi clip chosen by the reply's words; everyone else unchanged. EspaLuzFamilybot `badb160`.
+- **Clips:** `~/EspaLuzFamilybot/heroes/*.mp4` (8 × 720p, ~0.5 MB, NOT in git). Originals: `D:ideazz\_private-backups\heroes-20261021\` + OneDrive `AIdeazz-heroes-Pere-Titi-20261022` (67 files, md5 list).
+- **VERIFIED BY:** picker unit test (breathing→pere-breathing, knee→titi-crosscrawl, goodbye→duo-goodbye, non-Alisa→usual avatar); Oracle recipe test 8 s TTS over 5 s loop → 7.99 s / 438 KB; deployed md5 = laptop; service active 13:30:20 UTC, log "Starting polling", 0 errors.
+- **NEXT — Elena + Alisa:** "Soy Alisa" in EspaLuz Family bot → first real lesson. **RISK:** Oracle repo has someone's staged deletions under `backup_before_postgres/` — untouched; deploy stays named-file. Backup `~/_session-backups/espaluz-familybot-alisa-heroes-20261022/`.
 
 ### ✅ 21 Oct ~23:40 UTC — OpenClaw knows her background deeply (private career sheet) · cap 110k · claim released
 - **DONE:** `aideazz-private-docs` `b780aa2` `docs/openclaw/CAREER_DEEP.md` (dated timeline 2011→now, Outlook 11 Oct operating model / lanes / evidence floors / failure stories / fit, reviewed ES lines, and a DO-NOT-SAY list for the April résumé claims: "19 countries paying", "$900K / 99%", "applies autonomously"). Kept OFF public repos (résumés left HEAD on 6 Sep). Oracle: `~/.openclaw/private/CAREER_DEEP.md` (700/600); `prod-truth-sheet.cjs` `--private=` (cto-aipa `ed6fd702`), crontab line now `--private=… --max=18000`; `bootstrapTotalMaxChars` 100k → **110k** (backup `~/_session-backups/openclaw-prodtruth-20261021/openclaw.json.pre-cap110k`).
