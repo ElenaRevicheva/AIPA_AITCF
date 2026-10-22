@@ -21,7 +21,16 @@
 • Natalia Salcedo, CEO y fundadora (ex-JOKR, Rappi, Meru). Majo Campo, Product & Tech Director (ex-Quartile, ClearSale, Electrolux). José Molina, Finanzas y Legal. Sergio Agudelo, Operaciones. Laura Roldán, Personas. Bruno Borges de Souza, Country Manager Brasil. Equipo en México y Brasil.
 7. Tecnología visible desde afuera
 • Sitio en Next.js; analítica PostHog + Google Analytics/Tag Manager; datos estructurados (Organization, SoftwareApplication, FAQPage). Un sitio por mercado: pitz.com.mx/es, pitz-app.com.br (Brasil), usepitz.com (EE. UU.). App en app.pitz.com.mx.
-8. Cuidado — lo que NO sabemos / no afirmar
+8. Lo que muestra el producto real (captura + video de 1:43, sin audio)
+• Menú: Dashboard, Clientes, Vehículos, Inventario, Ventas (punto de venta, órdenes, cotizaciones), Contabilidad, Marketplace (tienda, mis pedidos, crédito del marketplace), Club Pitz, Configuración. Estados del vehículo: Diagnóstico → Orden/Cotización → En espera → Pendiente de reparar → En reparación → Terminado; además En pausa, Esperando refacciones, Requiere nueva cotización. Cotizaciones pendientes/aprobadas/rechazadas.
+• El cliente lleva datos de facturación SAT (RFC, régimen fiscal); cada taller tiene una página pública (pitz.com.mx/shops/...). El video está alojado en AWS S3.
+• El chat del sitio es una DEMO guionada: ante el código P0102 explica la causa probable (señal baja del sensor MAF) y hace preguntas antes de concluir.
+9. Brasil, legal y blog
+• En Brasil la IA se llama "João" (sitio y app propios); planes en reales: Essencial R$79, Bronze R$99 (más popular), Prata R$199, Ouro R$299.
+• Razón social: PITZ AUTOMOTIVE TECHNOLOGIES, S.A.P.I. de C.V. (CDMX); pagos con Mercado Pago; la política de privacidad incluye datos inferidos por algoritmos de IA.
+• El "sitio de EE. UU." (usepitz.com) redirige a una página en español: aún no hay sitio en inglés para EE. UU.
+• Blog: 8 artículos genéricos; ninguno menciona a Pitz ni al Chalán; uno publicado dos veces.
+10. Cuidado — lo que NO sabemos / no afirmar
 • Su propio sitio se contradice: +52,300 refacciones en la portada y 80,000+ en "About". Di "según su sitio" y no des una cifra como hecho.
 • El sitio no dice qué modelos de IA usa el Chalán, cómo verifican la compatibilidad de la pieza ni cómo revisan una cotización de la IA antes de que llegue al cliente: son preguntas para hacer, no datos.
 • El enlace de WhatsApp pasa por pitz.trb.ai; el dominio sugiere Treble.ai, pero no está confirmado.
