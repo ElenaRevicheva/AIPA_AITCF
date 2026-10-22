@@ -143,6 +143,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅/⏳ 22 Oct — Pere + Titi web classroom (ascent-saas-builder branch `classroom-pere-titi`, NOT main) · EspaLuz Supabase keep-awake · claim released
+- **DONE:** `/classroom` page reuses the dashboard voice loop (voice-to-text → espaluz-chat → generate-voice) in kids mode; classroom C background, hero clips as avatar, big mic, stars; `/auth?next=/classroom` returns the parent. `espaluz-chat` **deployed v190** (current Claude models + optional `kids` mode; adult chat unchanged except model) — live version before was the repo's 24 Nov 2025 commit (deploy 10 s after it). Commit `c2f19dc` on the branch only (Lovable/GitHub-Supabase link watch `main`).
+- **Keep-awake:** `cto-aipa/scripts/sync-atlas-ga4.mjs` (daily 06:15 UTC) reads `learning_modules` first; Oracle `.env` `ESPALUZ_SUPABASE_URL/_ANON_KEY` (public key). Live test 200. cto-aipa `51e0f2db`.
+- **NEXT — Elena:** sign in on the laptop at http://127.0.0.1:8080/classroom (dev server) and talk to Pere + Titi — this is the first real test of Claude/OpenAI keys INSIDE Supabase (unknown until then). Hosting decision after that.
+- **RISK:** Supabase secrets `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` were never checked (can't be read); if the first lesson errors, those are the first suspects. Never merge the branch to `main` without Elena: main deploys via Lovable/Supabase link.
+
 ### ✅ 22 Oct ~13:35 UTC — EspaLuz FamilyBot: Alisa mode = ages 5–7, bilingual sentences, Pere + Titi as her reply-video avatar · LIVE · claim released
 - **DONE (Elena's yes):** `FAMILY_MEMBERS["alisa"]` age 6 / range 5–7; her prompt now: real sentences, Spanish then English, Pere (calm sloth) + Titi (playful tamarin), 5–10 min lesson rhythm. `alisa_hero_clip()` swaps the reply-video base (`looped_video.mp4`) for a Pere/Titi clip chosen by the reply's words; everyone else unchanged. EspaLuzFamilybot `badb160`.
 - **Clips:** `~/EspaLuzFamilybot/heroes/*.mp4` (8 × 720p, ~0.5 MB, NOT in git). Originals: `D:ideazz\_private-backups\heroes-20261021\` + OneDrive `AIdeazz-heroes-Pere-Titi-20261022` (67 files, md5 list).
