@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 22 Oct 20:10 | OpenClaw: Pitz case walkthrough sheet (Elena studying on her walk) + cap raise | Oracle `~/.openclaw/openclaw.json` (paths, cap), `~/.openclaw/workspace/case/` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 22 Oct ~20:20 UTC — OpenClaw walks Elena through the Pitz case, paragraph by paragraph (private sheet) · claim released
+- **DONE:** `aideazz-private-docs` `f25854c` `docs/pitz/OPENCLAW_CASE_WALKTHROUGH.md` — 36 paragraphs: the PDF's verbatim TEXT + plain-English explanation written only from the case; rule "the case doesn't say" when absent. Oracle: `~/.openclaw/workspace/case/TOOLS.md` (700/600) as 5th injected path (before talk); `bootstrapTotalMaxChars` 110k → **135k** (backup `~/_session-backups/openclaw-pitzcase-20261022/openclaw.json`).
+- **VERIFIED BY:** every number of the PDF present; every quoted TEXT sentence verbatim (1 heading fixed); private session `test-pitzcase-20261022`: P1 and P13 verbatim + plain words; trick question (Chalán's model, paying workshops) → "the case doesn't say" + marketing-claim caution; "what do they want" from P2/P4/P5/P25/P27/P31/P33; truncation 0; injected total 127,730 / 135,000.
+- **RISK / NEXT:** after the case is submitted (Mon 26 Oct), remove `case/TOOLS.md` from the paths and drop the cap back — it costs ~20k chars on every reply.
 
 ### ✅ 22 Oct ~15:55 UTC — Pitz site deep-dive in HubSpot + OpenClaw reads ALL deep-dives of a deal · claim released
 - **DONE:** pitz.com.mx read live in Chrome → `docs/interview/PITZ_SITE_DEEP_DIVE_2026-10-22.md` (EN, full) + HubSpot note `119285534059` on deal `66025927308` (ES, deep-dive format: 7 fact sections + "Cuidado"). `hs-deal-prep.cjs` (`6d7ca384`, named-file scp; backup `~/_session-backups/openclaw-prodtruth-20261021/hs-deal-prep.cjs.pre-merge`): `deepDiveFacts` merges every deep-dive note newest first, all cautions deduped; FACTS_MAX 5k → 9k per deal — a new note can no longer hide the hand-written 14 Oct research.
