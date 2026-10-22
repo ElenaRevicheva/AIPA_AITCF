@@ -173,6 +173,15 @@ async function postPerformanceEvent(payload) {
 }
 
 async function main() {
+  // 22 Oct 2026 (Elena): keep the EspaLuz web app's free Supabase project awake — it pauses after ~7 days without
+  // traffic. One read per day from this existing daily job; never fails the sync. Set in .env; absent = skipped.
+  if (process.env.ESPALUZ_SUPABASE_URL && process.env.ESPALUZ_SUPABASE_ANON_KEY) {
+    const r = await fetch(`${process.env.ESPALUZ_SUPABASE_URL}/rest/v1/learning_modules?select=id&limit=1`, {
+      headers: { apikey: process.env.ESPALUZ_SUPABASE_ANON_KEY, Authorization: `Bearer ${process.env.ESPALUZ_SUPABASE_ANON_KEY}` },
+      signal: AbortSignal.timeout(20_000),
+    }).catch((e) => ({ status: `error ${e.message}` }));
+    console.log(`EspaLuz Supabase keep-awake: ${r.status}`);
+  }
   const syncDate = resolveSyncDate();
   console.log(`GA4 atlas sync for ${syncDate}${DRY_RUN ? ' (dry-run)' : ''}`);
 
