@@ -303,6 +303,8 @@ function renderBlocks(kind, prefix, blocks, notesById, unit) {
 // ───────────────────────────── the OpenClaw sheet ─────────────────────────────
 const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (copy of the ${MARK} notes on the HubSpot deal "${dealName}"; refreshed every 30 min)
 # HOW TO COACH (Elena's rule: her words set the format):
+# - NATURAL DIALOGUE FIRST: if her message is a question or a remark in her own words (not "next", an id, or "quiz me"),
+#   answer THAT directly, in plain words, from this pack — then offer to continue. Never answer a question with the next block.
 # - "walk me through the task" → P blocks · "walk me through my deliverables" → D blocks, then S (slides) · "paragraph by
 #   paragraph" / "next" → ONE block per message: "<id> — …", TEXT quoted exactly, then the other fields of that block, then
 #   ask "Next, or practise this one?". Never summarise several blocks in one message. "P12" / "D7" / "slide 3" → jump.
