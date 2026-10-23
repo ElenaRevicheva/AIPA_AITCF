@@ -151,6 +151,7 @@ git log keeps the record.
 
 ### ⚠️ 23 Oct 22:35 UTC — OpenAI credits RAN OUT · OpenClaw now Claude-first · voice needs an OpenAI top-up (Elena's call)
 - **What happened:** gpt-4.1 → "You have no credits remaining" on every message; Gemini answered (waterfall worked); the fallback alert reached Elena at 22:42. Her voice notes ("tell me this with voice") got "No response generated": voice = OpenAI tts-1 only (Edge 403), and Gemini had put the WHOLE reply inside the `[[tts:text]]` block, which is dropped when TTS fails.
+- **~23:05 UTC, Elena: use the most profound model while the promo lasts → chain is now `anthropic/claude-opus-4-6 → claude-sonnet-4-5 → gemini-2.5-flash → grok-3 → openai/gpt-4.1`** (opus-4-6 = newest Opus OpenClaw 2026.2.14 knows, key 200; live test answered as her). Cost: a cold turn writes ~66.5k tokens to the prompt cache ($0.42), a turn within 5 min reads it (~$0.03).
 - **Fixed:** chain `anthropic/claude-sonnet-4-5 → gemini-2.5-flash → grok-3 → openai/gpt-4.1` (uses the $100 promo before 8 Nov; cached prompt → 10 uncached tokens/turn). AGENTS.md VOICE rule "TEXT FIRST" (verified: 1,010 visible chars before the voice tag). Pack rules "NATURAL DIALOGUE FIRST". `claude-sonnet-5-5` is UNKNOWN to OpenClaw 2026.2.14 → "Agent failed before reply" (not failed over; reverted within ~2 min) — use only ids the installed version knows.
 - **OPEN (Elena):** OpenAI top-up restores voice replies (tts-1 ≈ $15 per 1M characters). Until then the daily probe will alert once per 12 h.
 
