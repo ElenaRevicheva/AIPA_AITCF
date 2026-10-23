@@ -110,6 +110,44 @@ different category of claim — and it is the one he said he was screening for.
 **Verified before posting:** 20 incident files, 18 concept files, and all three
 one-liners quoted above are the exact text published on the site.
 
+## STEP 3 — the LinkedIn DM (5 Sep — he asked)
+
+He replied to Elena's comment: *"DM me the details of what you have built and I’ll take a closer look."*
+
+This is not a second comment. It is the answer to that ask. Do not resend the comment. Give the missing operating detail and one place he can verify.
+
+**Paste this into LinkedIn → Aryaman Upmanyu → Message:**
+
+Verified 5 Sep 12:24 UTC on the live VPS (Actions `33965958007`). `espaluz-whatsapp` active since 4 Sep 10:49:22 UTC, `NRestarts=0`. The 4 Sep repro files were still in `/tmp`. Do not invent a stack list around this.
+
+```
+Hi Aryaman — you asked for the details. I went back to the machine.
+
+EspaLuz, WhatsApp tutor. systemd unit espaluz-whatsapp is active on the VPS, last restart 4 Sep 10:49 UTC, zero restarts since. Tutor-mode voice notes were unopenable for about a month. Translate mode on the same bot, same account, played.
+
+The 4 Sep repro files are still on disk. I re-ran ffprobe on them today:
+
+speech  /tmp/sp.mp3   → sample_rate=24000
+silence /tmp/pa.mp3   → sample_rate=44100
+splice  /tmp/mixed.mp3 → ffmpeg reports 24000 (first header), then:
+
+[mp3float] Header missing
+Error submitting packet to decoder: Invalid data found when processing input
+
+After the fix the matching pair is both 24000 (/tmp/a_sp.mp3, /tmp/a_pa.mp3) and the join decodes clean. Live code now generates silence with anullsrc=r=24000 and concatenates through ffmpeg -ar 24000 -ac 1 -c:a libmp3lame -b:a 64k.
+
+The carrier had already said delivered. The decoder was the only place the fault was still visible.
+
+https://aideazz.xyz/ai-ops-wiki.html (the-repair-that-hid-the-fault)
+
+Happy to walk the two files if you want to look closer.
+
+Elena
+Panama
+```
+
+Do not add a tool list. Do not attach the resume in the first DM. Do not put compensation here — that belongs on Torre if he takes it further.
+
 ## STEP 2 — the Torre application
 
 Torre asks for expected compensation. **Do not leave it blank.**
@@ -142,7 +180,8 @@ have one.
 
 ## Checklist
 
-- [ ] Comment on the LinkedIn post (STEP 1) — this is the one he reads
+- [x] Comment on the LinkedIn post (STEP 1) — posted; Aryaman replied 5 Sep and asked for a DM
+- [ ] Paste the STEP 3 DM to Aryaman on LinkedIn
 - [ ] Apply on Torre with the note and the compensation range (STEP 2)
 - [ ] Attach `29.08.26_EN_Resume_Elena Revicheva.pdf`
 - [ ] Tell the agent "applied LanceMart" so the deal stage moves and VJH learns it
