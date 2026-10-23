@@ -361,6 +361,11 @@ async function activate(deal, company) {
   const files = [...byTitle.keys()].map((h) => `#   - ${h.replace(`${MARK} · `, '')}`);
   const sections = [`# FILES in this pack:\n${files.join('\n')}`, ...[...byTitle.entries()].map(([h, parts]) => `# ===== ${h}\n${parts.join('\n')}`)];
   const r = writeSheet(company, deal.name, sections);
+  // A merged deal gets a NEW id (Pitz, 23 Oct: 4 deals → 66670194056). Keep ONE id everywhere — the registry follows.
+  const reg = readJson(REGISTRY, {});
+  if (reg[company.toLowerCase()] && reg[company.toLowerCase()].dealId !== deal.id) {
+    Object.assign(reg[company.toLowerCase()], { dealId: deal.id, dealName: deal.name }); writeJson(REGISTRY, reg);
+  }
   writeJson(ACTIVE, { company, dealId: deal.id, dealName: deal.name, activatedAt: readJson(ACTIVE, {}).dealId === deal.id ? readJson(ACTIVE, {}).activatedAt : new Date().toISOString() });
   return { ok: true, ...r, notes: byTitle.size };
 }
