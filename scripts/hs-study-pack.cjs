@@ -201,17 +201,32 @@ function unbacked(field, allowed) {
   return (field.match(NUM_RE) || []).map(normNum).filter((n) => n && !allowed.has(n) && !allowed.has(n.replace(/%$/, '')));
 }
 
+/**
+ * Opus first; on ANY failure (the $100 promo credit ends 8 Nov 2026, a 529, a timeout) the fleet's own waterfall
+ * llm-resilience 'quality' (Claude → OpenAI → Gemini → Groq → Grok) takes over — the same chain CTO AIPA uses, not a
+ * second one. The number check in coach() applies to whichever model answered. `usedFallback` is reported to her.
+ */
+let usedFallback = '';
 async function claude(prompt, maxTokens = 8000) {
   const key = envValue('ANTHROPIC_API_KEY');
-  if (!key) throw new Error('ANTHROPIC_API_KEY missing');
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] }),
-  });
-  const j = await r.json();
-  if (!r.ok) throw new Error(`Claude ${r.status}: ${JSON.stringify(j).slice(0, 200)}`);
-  return (j.content || []).map((c) => c.text || '').join('');
+  try {
+    if (!key) throw new Error('ANTHROPIC_API_KEY missing');
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(`Claude ${r.status}: ${JSON.stringify(j).slice(0, 160)}`);
+    return (j.content || []).map((c) => c.text || '').join('');
+  } catch (e) {
+    require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+    const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
+    const r = await completeWithProfileDetailed('quality', 'You follow the instructions exactly and return only what is asked.', prompt, maxTokens, 'study-pack');
+    usedFallback = `${MODEL} failed (${String(e.message).slice(0, 90)}) → the fleet waterfall answered${r.provider ? ` with ${r.provider}` : ''}`;
+    log(`fallback: ${usedFallback}`);
+    return r.text;
+  }
 }
 
 function parseJsonArray(text) {
@@ -402,7 +417,8 @@ async function cmdAdd() {
   const act = await activate(deal, company);
   const msg = `✅ ${company} study pack ready: ${blocks.length} ${unit}s (${prefix}1–${prefix}${blocks.length}) from ${name}, saved on the HubSpot deal "${deal.name}"`
     + `${deal.others.length ? ` (the company has ${deal.others.length + 1} open deals)` : ''}. ${warn ? `⚠️ ${warn} block(s) carry a number to check. ` : ''}`
-    + `Loaded now — say "walk me through ${kind === 'task' ? 'the task' : 'my deliverables'}" or "quiz me".`;
+    + `Loaded now — say "walk me through ${kind === 'task' ? 'the task' : 'my deliverables'}" or "quiz me".`
+    + (usedFallback ? ` ⚠️ Written by a backup model: ${usedFallback}.` : '');
   log(msg + ` [note parts ${parts}, sheet ${act.chars} chars in ${act.files} file(s)]`);
   if (flag('notify')) notify(msg);
 }
