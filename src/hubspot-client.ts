@@ -700,6 +700,48 @@ export async function findDealByName(name: string): Promise<{ id: string; stage:
   }
 }
 
+/**
+ * The company's open hiring deal, for an EMPLOYER email whose subject matches no deal name (23 Oct 2026).
+ *
+ * response_detector.py names the deal after the email subject, so every new thread from one employer opened a
+ * new deal: Pitz had four ("Envío de caso práctico…", "Elena Revicheva/PM", "Re: Boardy Intro…" and the job
+ * itself), and the coach read the job deal while the case lived on another. Only employer events use this —
+ * a re-sighting of a job posting keeps the exact-name rule. Newest-created open deal wins (not
+ * hs_lastmodifieddate: HubSpot bumps that whenever a shared contact gets mail). `others` names the rest so the
+ * note can say the company has more than one deal.
+ */
+export async function findOpenHiringDealByCompany(
+  company: string,
+): Promise<{ id: string; stage: string; name: string; others: string[] } | null> {
+  const c = (company || '').trim();
+  if (!c || /^unknown$/i.test(c)) return null;
+  try {
+    const data = await hsPost<{ results?: Array<{ id: string; properties: { dealname: string; dealstage: string } }> }>(
+      '/crm/v3/objects/deals/search',
+      {
+        filterGroups: [{ filters: [{ propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: `*${c}*` }] }],
+        properties: ['dealname', 'dealstage'],
+        sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+        limit: 50,
+      },
+    );
+    const tail = ` @ ${c}`.toLowerCase();
+    const open = (data?.results ?? []).filter((d) => {
+      const n = (d.properties.dealname || '').trim().toLowerCase();
+      return n.startsWith('[hiring') && n.endsWith(tail)
+        && d.properties.dealstage !== HS_STAGES.won && d.properties.dealstage !== HS_STAGES.lost;
+    });
+    const hit = open[0];
+    return hit
+      ? { id: hit.id, stage: hit.properties.dealstage, name: hit.properties.dealname,
+          others: open.slice(1).map((d) => d.properties.dealname) }
+      : null;
+  } catch (e) {
+    console.warn('[HubSpot] findOpenHiringDealByCompany error:', (e as Error).message?.slice(0, 80));
+    return null;
+  }
+}
+
 /** Deal IDs associated with a contact (Concierge drafts park on the right deal). */
 /**
  * Elena's own stage order, by how far along the deal is. Index = progress.
@@ -1832,7 +1874,7 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
     // used to run after the contact/company upserts and after the paid
     // cover-letter call, so every repeat of a job already in HubSpot cost a
     // letter attempt nobody would read.
-    const existing = await findDealByName(dealName);
+    let existing = await findDealByName(dealName);
     // 2026-10-06 — only a RE-SIGHTING (VJH finding the same posting again) is
     // quiet on a decided deal. A reply, an interview invite or an offer is new
     // information about a deal she owns: response_detector.py sends those as
@@ -1842,6 +1884,18 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
     // vanish. 'lead_parked' is not in the HiringStage type, but VJH's search
     // door sends it and stageMap above routes it, hence the string compare.
     const isResighting = stage === 'applied' || (stage as string) === 'lead_parked';
+    // 2026-10-23 — an employer email with a NEW subject joins the company's open deal instead of opening one
+    // (see findOpenHiringDealByCompany). The note names the email's subject, since the deal name no longer does.
+    let joinedNote = '';
+    if (!existing && !isResighting) {
+      const byCompany = await findOpenHiringDealByCompany(input.company);
+      if (byCompany) {
+        existing = { id: byCompany.id, stage: byCompany.stage };
+        joinedNote = `📩 New employer email for this company: "${input.jobTitle}" — added here instead of opening a new deal.`
+          + (byCompany.others.length ? ` This company has ${byCompany.others.length + 1} open deals; the others: ${byCompany.others.join(' · ')}` : '');
+        console.log(`[HubSpot] Employer email joined the company deal ${byCompany.id} (${byCompany.name.slice(0, 64)}) instead of a new deal: ${dealName.slice(0, 64)}`);
+      }
+    }
     if (existing && isResighting && isDecidedHiringStage(existing.stage)) {
       // A tombstone, not a fresh lead: no note, no queue entry, no letter, no
       // association — nothing on the deal changes. Only the audit log records it.
@@ -1973,7 +2027,9 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
       // before sending") posted as the NEWEST note, on top of the real letter,
       // every 12h. An employer event always gets its note: that note is the
       // only place the reply's summary and booking link reach HubSpot.
-      if (draftedLetter?.trim() || !isResighting) await addNoteToDeal(existing.id, actionPkg);
+      if (draftedLetter?.trim() || !isResighting) {
+        await addNoteToDeal(existing.id, joinedNote ? `<p><strong>${escHs(joinedNote)}</strong></p>${actionPkg}` : actionPkg);
+      }
       else console.log(`[HubSpot] repeat with no new letter — earlier note left on top: ${dealName.slice(0, 64)}`);
       // 2026-10-06 — mirror only when this push carries a letter. The queue's
       // MERGE overwrites `draft` on any item she has not acted on, so mirroring a
