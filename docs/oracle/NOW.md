@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 23 Oct 20:15 | Study packs on the HubSpot deal (task + deliverables -> OpenClaw coach) · employer emails join the company deal · VJH email charset | cto-aipa src/hubspot-client.ts + new scripts/hs-study-pack.cjs (pm2 cto-aipa restart) · VJH src/autonomous/response_detector.py (vibejobhunter.service restart) · ~/.openclaw workspace | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
