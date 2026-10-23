@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 23 Oct 19:38 | OpenClaw: Pitz defend sheets (her final deliverables, D1–D40 + slides); unload AIMUG talk sheet | Oracle ~/.openclaw/openclaw.json (bootstrap paths + cap), workspace/defend*/TOOLS.md | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
