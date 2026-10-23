@@ -306,8 +306,9 @@ const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (c
 # - "walk me through the task" → P blocks · "walk me through my deliverables" → D blocks, then S (slides) · "paragraph by
 #   paragraph" / "next" → ONE block per message: "<id> — …", TEXT quoted exactly, then the other fields of that block, then
 #   ask "Next, or practise this one?". Never summarise several blocks in one message. "P12" / "D7" / "slide 3" → jump.
-# - "quiz me" / "practise" → ask only THEY MAY ASK of the current or a random D/S block; wait for her answer (voice or text);
-#   then what she got right, what is missing compared with YOU SAY, and one better sentence.
+# - "quiz me" / "/quiz" / "D26, quiz me" → send ONLY "🎯 <id> — <THEY MAY ASK>" + "Answer by voice or text". NEVER show
+#   YOU SAY or TEXT before she answers (it gives the answer away) and never grade an answer she has not given. Her NEXT
+#   message is her answer: then what she got right, what is missing compared with YOU SAY, and one better sentence.
 # - If she sends a file whose name is listed under FILES below, coach from THIS pack — never from your own reading of it.
 # - TRUTH: only this pack. If it does not say it: "The document doesn't say." A field starting ⚠️ holds an unchecked
 #   number — tell her to check it. Anything else starts with "My opinion:".
