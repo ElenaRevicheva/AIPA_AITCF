@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 23 Oct 19:38 | OpenClaw: Pitz defend sheets (her final deliverables, D1–D40 + slides); unload AIMUG talk sheet | Oracle ~/.openclaw/openclaw.json (bootstrap paths + cap), workspace/defend*/TOOLS.md | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 23 Oct — OpenClaw coaches Elena to DEFEND her submitted Pitz deliverables (private) · claim released
+- **DONE:** case submitted 23 Oct. New sheets `~/.openclaw/workspace/defend/TOOLS.md` + `defend2/TOOLS.md` (600) = her final document split into 40 blocks D1–D40 (TEXT verbatim from DRAFT_*.md) + plain words + likely question + her answer, slide talk track S1–S6, and a TRAPS list. Built by `aideazz-private-docs` `docs/pitz/deliverable/defend_blocks.py --build` (notes in `defend_notes.py`). AIMUG `talk/TOOLS.md` unloaded (file kept). AGENTS.md gains "DO EXACTLY WHAT ELENA ASKS" (format = her words; sheet first; say the number; say what is missing). Cap 140k → **190k** (injected 187,287 — was 142,092 > 140k, i.e. already silently truncating).
+- **VERIFIED BY:** sessions `test-defend-20261023` / `test-defend2-20261023`: D1→D2 verbatim one per message; "D28, quiz me" graded a wrong answer correctly; traps (voice = A9; agent not WhatsApp changes in minutes) answered right; her original wording starts at D1.
+- **NEXT / RISK:** after the Pitz interview, unload defend*/case paths and drop the cap (study packs, memory `project_openclaw_study_packs`). Backups `~/_session-backups/openclaw-defend-20261023/` (openclaw.json, AGENTS.md).
 
 ### ✅ 22 Oct ~20:20 UTC — OpenClaw walks Elena through the Pitz case, paragraph by paragraph (private sheet) · claim released
 - **DONE:** `aideazz-private-docs` `f25854c` `docs/pitz/OPENCLAW_CASE_WALKTHROUGH.md` — 36 paragraphs: the PDF's verbatim TEXT + plain-English explanation written only from the case; rule "the case doesn't say" when absent. Oracle: `~/.openclaw/workspace/case/TOOLS.md` (700/600) as 5th injected path (before talk); `bootstrapTotalMaxChars` 110k → **135k** (backup `~/_session-backups/openclaw-pitzcase-20261022/openclaw.json`).
