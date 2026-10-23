@@ -149,6 +149,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⚠️ 23 Oct 22:35 UTC — OpenAI credits RAN OUT · OpenClaw now Claude-first · voice needs an OpenAI top-up (Elena's call)
+- **What happened:** gpt-4.1 → "You have no credits remaining" on every message; Gemini answered (waterfall worked); the fallback alert reached Elena at 22:42. Her voice notes ("tell me this with voice") got "No response generated": voice = OpenAI tts-1 only (Edge 403), and Gemini had put the WHOLE reply inside the `[[tts:text]]` block, which is dropped when TTS fails.
+- **Fixed:** chain `anthropic/claude-sonnet-4-5 → gemini-2.5-flash → grok-3 → openai/gpt-4.1` (uses the $100 promo before 8 Nov; cached prompt → 10 uncached tokens/turn). AGENTS.md VOICE rule "TEXT FIRST" (verified: 1,010 visible chars before the voice tag). Pack rules "NATURAL DIALOGUE FIRST". `claude-sonnet-5-5` is UNKNOWN to OpenClaw 2026.2.14 → "Agent failed before reply" (not failed over; reverted within ~2 min) — use only ids the installed version knows.
+- **OPEN (Elena):** OpenAI top-up restores voice replies (tts-1 ≈ $15 per 1M characters). Until then the daily probe will alert once per 12 h.
+
 ### ✅ 23 Oct ~22:40 UTC — Pitz: 4 HubSpot deals MERGED into one · 🔗 standing rule: ONE source of truth
 - **Rule (Elena, 23 Oct): single source of truth — no duplicates wasting time, memory and money.** Before creating any deal, note, file, sheet, script or config key, find the existing one and extend it; found duplicates → merge (backup + lost-nothing check), never work around them. Agents' sheets are COPIES rebuilt from HubSpot. Both Claude and Cursor follow this.
 - **DONE:** `[HIRING-VJH-LEAD] Senior PM, AI Agents @ Pitz` = deal **66670194056** (merged: Elena Revicheva/PM 66315437748 ← Envío de caso práctico 66507684460, Boardy intro 65886656286, Developer Mid 66025927308; HubSpot gives a NEW id per merge step, old ids redirect). Kept: notes 23/23, contacts 2/2, tasks 4/4, emails 5/5, company 1/1. Backup `~/_session-backups/openclaw-studypacks-20261023/pitz-deals-before-merge.json`. Study pack, registry, deals + proof sheets repointed; `prep me for Pitz` → "✅ Loaded: Senior PM, AI Agents @ Pitz — 23 notes". New employer mail now joins this deal (findOpenHiringDealByCompany).
