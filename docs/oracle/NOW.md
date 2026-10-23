@@ -149,6 +149,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 23 Oct ~23:35 UTC — Voice notes survive OpenAI running out: Groq Whisper first in EspaLuz TG + WA and VJH
+- **Symptom:** EspaLuz Telegram "❌ No pude transcribir este mensaje de voz" — log `429 insufficient_quota` (OpenAI out of credits 22:35). Three bots transcribed with OpenAI whisper-1 ONLY; CTO AIPA and OpenClaw already had Groq first.
+- **Fixed (Groq whisper-large-v3-turbo → OpenAI whisper-1):** EspaLuzFamilybot `0858497` main.py transcribe_audio (restarted 23:31); EspaLuzWhatsApp `a531a3c` espaluz_bridge.py transcribe_audio_with_openai — deployed by patching ONLY that function into Oracle's file (Oracle lags HEAD by 61ae629/e7ce522, subscriber-identity cleanup, left undeployed for its owner) (restarted 23:34); VJH `9c…` telegram_bot_enhanced.py handle_voice, verbose_json keeps the language (restarted 23:35). Each verified on Oracle with a real audio clip via Groq.
+- **Still OpenAI-only:** Atuona voice notes (`src/atuona-creative-ai.ts` openai.audio.transcriptions) — not money-critical; same 10-line fix when wanted. Backups `~/_session-backups/espaluz-groq-20261023/`.
+
 ### ⚠️ 23 Oct 22:35 UTC — OpenAI credits RAN OUT · OpenClaw now Claude-first · voice needs an OpenAI top-up (Elena's call)
 - **What happened:** gpt-4.1 → "You have no credits remaining" on every message; Gemini answered (waterfall worked); the fallback alert reached Elena at 22:42. Her voice notes ("tell me this with voice") got "No response generated": voice = OpenAI tts-1 only (Edge 403), and Gemini had put the WHOLE reply inside the `[[tts:text]]` block, which is dropped when TTS fails.
 - **~23:05 UTC, Elena: use the most profound model while the promo lasts → chain is now `anthropic/claude-opus-4-6 → claude-sonnet-4-5 → gemini-2.5-flash → grok-3 → openai/gpt-4.1`** (opus-4-6 = newest Opus OpenClaw 2026.2.14 knows, key 200; live test answered as her). Cost: a cold turn writes ~66.5k tokens to the prompt cache ($0.42), a turn within 5 min reads it (~$0.03).
