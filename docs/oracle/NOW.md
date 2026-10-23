@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 23 Oct 20:15 | Study packs on the HubSpot deal (task + deliverables -> OpenClaw coach) · employer emails join the company deal · VJH email charset | cto-aipa src/hubspot-client.ts + new scripts/hs-study-pack.cjs (pm2 cto-aipa restart) · VJH src/autonomous/response_detector.py (vibejobhunter.service restart) · ~/.openclaw workspace | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 23 Oct ~20:45 UTC — Study packs for ANY company live on the HubSpot deal; employer emails join the company deal; VJH keeps accents · claim released
+- **DONE:** cto-aipa `49191b75`: `scripts/hs-study-pack.cjs` (--add/--import/--activate/--deactivate/--list/--refresh). Task file / submitted deliverables → uploaded to HubSpot + 🎓 STUDY PACK note on the company's open hiring deal (blocks P/D/S split by code; coaching by **claude-opus-5-5** — promo credit $83 expires 8 Nov — every number checked against the sources, unbacked → ⚠️ [check]). OpenClaw loads ONE pack: bootstrap paths `pack/..pack4/TOOLS.md` (case/defend/defend2 out; files kept), cap **270k** (injected ~205k). Skills `/pack <company>`, `/packs`, `/unpack` (workspace/skills) + IDENTITY.md "STUDY PACK COMMANDS" (captions `task for X` / `my deliverables for X` → --add --background, script messages her when ready) + menu section "CASE TASK → DEFEND IT" in HELP.md AND IDENTITY.md. Cron `15,45` --refresh (rebuild from HubSpot; unload on won/lost/30 days). Pitz imported (hand-checked sheets, round trip 395/395 lines) onto `Elena Revicheva/PM @ Pitz`. `hubspot-client.ts findOpenHiringDealByCompany`: an employer email with a new subject joins the company's open hiring deal (re-sightings unchanged); dist deployed, pm2 restarted 20:42. VJH `7e6ec1d`: subject/sender/body decoded in their own charset (Pitz Windows-1252 → "Envo de caso prctico"); service restarted 20:43.
+- **VERIFIED BY:** `/pack Pitz` 5/5 + "pack Pitz" 3/3 with fresh [proof] codes and active-pack.json switching; simulated upload `task for StudyPackTestCo` → exec ran → 48-block pack on the test deal → Telegram "ready" message arrived (Elena saw it); own slides PDF → coached from the pack; gateway restarted 20:44, Telegram + WhatsApp providers started. Test deal/notes/files deleted (204).
+- **WHY proof codes:** gpt-4.1 twice wrote "✅ loaded" with no tool call (session files show it) — acknowledgement is not completion; the code makes a fake visible.
+- **NEXT / RISK:** Pitz still has 4 deals (merge = Elena's call). Pre-existing unrelated VJH failure: `evals/test_provider_chain.py::test_chain_survives_losing_its_first_three_providers`. Backups `~/_session-backups/openclaw-studypacks-20261023/` (openclaw.json, AGENTS/IDENTITY/HELP, crontab, hubspot-client.js).
 
 ### ✅ 23 Oct — OpenClaw coaches Elena to DEFEND her submitted Pitz deliverables (private) · claim released
 - **DONE:** case submitted 23 Oct. New sheets `~/.openclaw/workspace/defend/TOOLS.md` + `defend2/TOOLS.md` (600) = her final document split into 40 blocks D1–D40 (TEXT verbatim from DRAFT_*.md) + plain words + likely question + her answer, slide talk track S1–S6, and a TRAPS list. Built by `aideazz-private-docs` `docs/pitz/deliverable/defend_blocks.py --build` (notes in `defend_notes.py`). AIMUG `talk/TOOLS.md` unloaded (file kept). AGENTS.md gains "DO EXACTLY WHAT ELENA ASKS" (format = her words; sheet first; say the number; say what is missing). Cap 140k → **190k** (injected 187,287 — was 142,092 > 140k, i.e. already silently truncating).
