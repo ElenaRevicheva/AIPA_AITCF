@@ -149,6 +149,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟡 24 Oct ~06:40 UTC — CI&T 32354: VJH's kit deal points at a PAYWALL (DailyRemote) · origin is free on Lever · Elena's move
+- **Found:** deal 66619289430 ("…Brazil at CI&T", I Act TODAY, full kit) came from `dailyremote.com` — a paid aggregator ($14.95/mo) that hides the employer and routes every Apply to its own checkout. The Google `site:` group in `serpapi_jobs_ingest.py` leaked it (Google treats `(site:a OR site:b)` as a hint; nothing post-filters the host). Same job from its origin `jobs.lever.co/ciandt/989a2fd5…` ("…Colombia", fluent **Spanish** required) was found 24 Oct and **parked** as deal 66678401330. Two deals, one job. Full trace: `docs/applications/2026-10-24_CIT_32354_dailyremote_source_check.md`.
+- **Elena decides:** (a) apply on the LEVER link or skip (Colombia + fluent Spanish); (b) repoint 66619289430 to the Lever URL + merge the parked twin; (c) VJH code fix = post-filter result hosts (needs Teach → Plan → Confirm + Oracle restart). **Never pay DailyRemote.**
+- HubSpot NOT changed by this session. No claim held.
+
 ### ✅ 23 Oct ~23:35 UTC — Voice notes survive OpenAI running out: Groq Whisper first in EspaLuz TG + WA and VJH
 - **Symptom:** EspaLuz Telegram "❌ No pude transcribir este mensaje de voz" — log `429 insufficient_quota` (OpenAI out of credits 22:35). Three bots transcribed with OpenAI whisper-1 ONLY; CTO AIPA and OpenClaw already had Groq first.
 - **Fixed (Groq whisper-large-v3-turbo → OpenAI whisper-1):** EspaLuzFamilybot `0858497` main.py transcribe_audio (restarted 23:31); EspaLuzWhatsApp `a531a3c` espaluz_bridge.py transcribe_audio_with_openai — deployed by patching ONLY that function into Oracle's file (Oracle lags HEAD by 61ae629/e7ce522, subscriber-identity cleanup, left undeployed for its owner) (restarted 23:34); VJH `dd3cfff` telegram_bot_enhanced.py handle_voice, verbose_json keeps the language (restarted 23:35). Each verified on Oracle with a real audio clip via Groq.
