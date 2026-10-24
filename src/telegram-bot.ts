@@ -11629,8 +11629,11 @@ async function edgeVoiceOpus(text: string): Promise<Buffer> {
   try {
     const txt = path.join(dir, 'in.txt'), mp3 = path.join(dir, 'out.mp3'), ogg = path.join(dir, 'out.ogg');
     fs.writeFileSync(txt, text);
-    const bin = process.env.EDGE_TTS_BIN || path.join(os.homedir(), '.openclaw', 'edge-tts-venv', 'bin', 'edge-tts');
-    await run(bin, ['--voice', process.env.CTO_EDGE_VOICE || 'en-US-AvaMultilingualNeural', '-f', txt, '--write-media', mp3, '--rate=-5%'], { timeout: 90_000 });
+    // The shared free-voice script (scripts/speak-free.py, also behind OpenClaw): Edge in sentence chunks with a retry,
+    // Google gTTS if Edge still fails — one long Edge call failed or timed out on a 1,219-char reply (24 Oct).
+    const py = process.env.EDGE_TTS_PY || path.join(os.homedir(), '.openclaw', 'edge-tts-venv', 'bin', 'python');
+    await run(py, [path.join(__dirname, '..', 'scripts', 'speak-free.py'), '--in', txt, '--out', mp3,
+      '--voice', process.env.CTO_EDGE_VOICE || 'en-US-AvaMultilingualNeural', '--rate=-5%'], { timeout: 150_000 });
     await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', mp3, '-c:a', 'libopus', '-b:a', '48k', '-ac', '1', ogg], { timeout: 60_000 });
     return fs.readFileSync(ogg);
   } finally {
