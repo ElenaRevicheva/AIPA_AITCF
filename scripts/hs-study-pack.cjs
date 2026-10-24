@@ -363,8 +363,13 @@ async function activate(deal, company) {
   // Stable order by title (TASK, then MY DELIVERABLES part A, part B…): a re-imported part must not move to the end.
   const ordered = new Map([...byTitle.entries()].sort(([a], [b]) => a.localeCompare(b)));
   byTitle.clear(); for (const [k, v] of ordered) byTitle.set(k, v);
+  // What the fact-checker caught (openclaw-fallback-alert.cjs --factcheck, 24 Oct) sits first, so it is not repeated.
+  const caught = readJson(path.join(PRIV, 'factcheck-flags.json'), []).slice(-15);
+  const flagSection = caught.length
+    ? `# ⚠️ FACT-CHECK FLAGS — you said these to Elena and they are NOT in her document. Never repeat them:\n${caught.map((f) => `#   - "${String(f.claim).slice(0, 200)}" — ${String(f.why).slice(0, 200)}${f.source_says ? ` (document: ${String(f.source_says).slice(0, 160)})` : ''}`).join('\n')}\n`
+    : '';
   const files = [...byTitle.keys()].map((h) => `#   - ${h.replace(`${MARK} · `, '')}`);
-  const sections = [`# FILES in this pack:\n${files.join('\n')}`, ...[...byTitle.entries()].map(([h, parts]) => `# ===== ${h}\n${parts.join('\n')}`)];
+  const sections = [...(flagSection ? [flagSection] : []), `# FILES in this pack:\n${files.join('\n')}`, ...[...byTitle.entries()].map(([h, parts]) => `# ===== ${h}\n${parts.join('\n')}`)];
   const r = writeSheet(company, deal.name, sections);
   // A merged deal gets a NEW id (Pitz, 23 Oct: 4 deals → 66670194056). Keep ONE id everywhere — the registry follows.
   const reg = readJson(REGISTRY, {});

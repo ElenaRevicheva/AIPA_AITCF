@@ -10,9 +10,15 @@
  * writes (its session files) and probing the keys it already holds (~/.openclaw/.env). No new channel: it sends through
  * `openclaw message send`, the same way the study-pack script says "ready".
  *
- *   --scan    (cron every 10 min)  new failed model turns in real sessions → one alert per provider + reason per 12 h
- *   --probe   (cron daily)         a 1-token call to every model in the chain → alert on billing / auth failure
- *   --dry     print instead of sending
+ *   --scan       (cron every 10 min)  new failed model turns in real sessions → one alert per provider + reason per 12 h
+ *   --probe      (cron daily)         a 1-token call to every model in the chain → alert on billing / auth failure
+ *   --factcheck  (cron every 10 min)  OpenClaw's replies about the ACTIVE STUDY PACK, checked against the pack (24 Oct):
+ *                every quoted TEXT "…" must be in the pack word for word (code), and every claim must be stated in it
+ *                (Claude as judge — it only FLAGS, Elena decides). A flag goes to her Telegram and into
+ *                private/factcheck-flags.json, which hs-study-pack.cjs prints at the top of the pack so the coach
+ *                does not repeat it. Why: 23 Oct OpenClaw told her "the goal is to reduce the 29%" and tied H2 to
+ *                bail-outs — neither is in her document; rules reduce that, nothing CHECKED it.
+ *   --dry        print instead of sending
  */
 'use strict';
 
@@ -136,10 +142,106 @@ async function probe(state) {
   console.log(`probe ${new Date().toISOString()}: ${results.join(' · ')}`);
 }
 
+// ───────────────────────────── --factcheck ─────────────────────────────
+const FLAGS = path.join(OC, 'private', 'factcheck-flags.json');
+const MAX_CHECKS = 8;                       // per run — a burst of replies is checked over the next runs
+const norm = (s) => String(s).replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+const textOf = (m) => (m.content || []).filter((x) => x.type === 'text').map((x) => x.text).join('\n');
+
+/** Replies that coach from the pack: they carry a block id, a pack field, or answer a pack request. */
+function aboutPack(reply, ask) {
+  return /\b[DSP]\d{1,2}\b|THEY MAY ASK|YOU SAY|IN SIMPLE WORDS|TEXT:/.test(reply)
+    || /deliverable|my document|my slides|quiz|practi[cs]e|\bnext\b|pitz|the task|\b[DSP]\d{1,2}\b/i.test(ask);
+}
+
+async function judge(source, reply) {
+  require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+  const key = process.env.ANTHROPIC_API_KEY;
+  const prompt = `REPLY is what an AI coach just told Elena while preparing her to defend her case study in an interview.
+SOURCE is her study pack: her submitted document, the case task, and coaching notes written for her.
+List every claim in REPLY that SOURCE does not state or directly support: an invented number, goal, target, reason,
+feature, quote, date, or a link between two things SOURCE does not link. A faithful paraphrase is supported.
+IGNORE: questions to her, encouragement, formatting, block ids (D26, S3, P12), "Next?", and any sentence starting
+"My opinion:" or saying "the document doesn't say". Be strict but fair — flag only what a careful reader of SOURCE would
+call wrong or unsupported. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
+
+REPLY:
+${reply.slice(0, 6000)}`;
+  const body = {
+    model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: 1200,
+    system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: prompt }],
+  };
+  let text = '';
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', signal: AbortSignal.timeout(120000),
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
+    text = (j.content || []).map((c) => c.text || '').join('');
+  } catch (e) {                               // the fleet's waterfall, as everywhere else
+    const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
+    text = (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, prompt, 1200, 'factcheck')).text;
+  }
+  const s = text.indexOf('{'), e2 = text.lastIndexOf('}');
+  return JSON.parse(text.slice(s, e2 + 1)).unsupported || [];
+}
+
+async function factcheck(state) {
+  const sheets = ['pack', 'pack2', 'pack3', 'pack4'].map((n) => { try { return fs.readFileSync(path.join(OC, 'workspace', n, 'TOOLS.md'), 'utf8'); } catch { return ''; } }).join('\n');
+  if (!/ACTIVE STUDY PACK —/.test(sheets)) return console.log('factcheck: no active pack');
+  const source = sheets.replace(/^# ⚠️ FACT-CHECK FLAGS[\s\S]*?\n\n/m, '');     // never judge a reply against our own flags
+  const srcNorm = norm(source);
+  const since = state.factScannedTo || Date.now() - 1800 * 1000;
+  let newest = since, checked = 0;
+  const flags = readJson(FLAGS, []);
+  for (const f of fs.readdirSync(SESS).filter((n) => n.endsWith('.jsonl') && !n.startsWith('test-'))) {
+    const full = path.join(SESS, f);
+    if (fs.statSync(full).mtimeMs < since) continue;
+    const rows = fs.readFileSync(full, 'utf8').split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    let lastAsk = '';
+    for (const d of rows) {
+      const m = d.message || {};
+      const ts = Date.parse(d.timestamp || '') || 0;
+      if (m.role === 'user') { lastAsk = textOf(m); continue; }
+      if (m.role !== 'assistant' || m.stopReason === 'error' || ts <= since) continue;
+      if (checked >= MAX_CHECKS) break;
+      newest = Math.max(newest, ts);
+      const reply = textOf(m).replace(/\[\[tts:text\]\][\s\S]*?\[\[\/tts:text\]\]/g, '').trim();
+      if (!reply || !aboutPack(reply, lastAsk)) continue;
+      checked++;
+      const problems = [];
+      // 1) Code: every quoted TEXT must exist in the pack word for word.
+      for (const q of reply.matchAll(/TEXT(?: ON THE SLIDE)?:\s*"([^"]{25,})"/g)) {
+        if (!srcNorm.includes(norm(q[1]).slice(0, 160))) problems.push({ claim: `TEXT "${q[1].slice(0, 90)}…"`, why: 'quoted as your text, but it is not in your document word for word' });
+      }
+      // 2) Claude: every claim must be stated in the pack.
+      try { problems.push(...await judge(source, reply)); } catch (e) { console.log(`factcheck judge failed: ${String(e.message).slice(0, 120)}`); }
+      if (!problems.length) continue;
+      const at = new Date(ts).toISOString().slice(11, 16);
+      for (const p of problems) flags.push({ at: new Date(ts).toISOString(), claim: p.claim, why: p.why, source_says: p.source_says || '' });
+      const lines = problems.slice(0, 4).map((p, i) => `${i + 1}) "${String(p.claim).slice(0, 160)}" — ${String(p.why).slice(0, 160)}${p.source_says ? ` Your document: ${String(p.source_says).slice(0, 160)}` : ''}`);
+      send(`🔎 Fact-check on OpenClaw's reply at ${at} UTC — not in your document:\n${lines.join('\n')}\nDon't repeat these in the interview; OpenClaw now has them on its trap list.`);
+    }
+  }
+  state.factScannedTo = newest;
+  if (!DRY) fs.writeFileSync(FLAGS, JSON.stringify(flags.slice(-40), null, 2), { mode: 0o600 });
+  // New flags reach the coach now, not at the next 30-min refresh.
+  if (!DRY && flags.length !== readJson(FLAGS + '.count', 0)) {
+    fs.writeFileSync(FLAGS + '.count', String(flags.length));
+    try { execFileSync(process.execPath, [path.join(__dirname, 'hs-study-pack.cjs'), '--refresh'], { stdio: 'ignore', timeout: 120000 }); } catch {}
+  }
+  console.log(`factcheck ${new Date().toISOString()}: ${checked} reply(s) checked`);
+}
+
 (async () => {
   const state = readJson(STATE, { alerted: {} });
   if (process.argv.includes('--scan')) scan(state);
   if (process.argv.includes('--probe')) await probe(state);
+  if (process.argv.includes('--factcheck')) await factcheck(state);
   fs.mkdirSync(path.dirname(STATE), { recursive: true });
   if (!DRY) fs.writeFileSync(STATE, JSON.stringify(state, null, 2), { mode: 0o600 });
 })().catch((e) => { console.log(`⚠️ ${e.message}`); process.exitCode = 1; });
