@@ -11615,8 +11615,31 @@ const latestVoiceNote = new Map<number, number>();
  * The voice is threaded to the note it answers, and dropped when a newer note arrived first or it took over 3 minutes.
  * Off switch: CTO_SPEAK_REPLIES=0. Never throws: the text reply has already gone out.
  */
+/**
+ * FREE Microsoft voice (24 Oct 2026, Elena: "free-first waterfall"). The SAME python edge-tts OpenClaw uses
+ * (~/.openclaw/edge-tts-venv — one copy, not a second install): Ava Multilingual speaks English and Spanish. MP3 from
+ * edge-tts → Ogg/Opus with ffmpeg, so Telegram shows a voice bubble. Used when OpenAI's voice fails (23 Oct: out of credits).
+ */
+async function edgeVoiceOpus(text: string): Promise<Buffer> {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile);
+  const os = await import('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cto-edge-'));
+  try {
+    const txt = path.join(dir, 'in.txt'), mp3 = path.join(dir, 'out.mp3'), ogg = path.join(dir, 'out.ogg');
+    fs.writeFileSync(txt, text);
+    const bin = process.env.EDGE_TTS_BIN || path.join(os.homedir(), '.openclaw', 'edge-tts-venv', 'bin', 'edge-tts');
+    await run(bin, ['--voice', process.env.CTO_EDGE_VOICE || 'en-US-AvaMultilingualNeural', '-f', txt, '--write-media', mp3, '--rate=-5%'], { timeout: 90_000 });
+    await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', mp3, '-c:a', 'libopus', '-b:a', '48k', '-ac', '1', ogg], { timeout: 60_000 });
+    return fs.readFileSync(ogg);
+  } finally {
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* temp dir */ }
+  }
+}
+
 async function speakBack(ctx: Context, heard: string, replies: string[]): Promise<void> {
-  if (process.env.CTO_SPEAK_REPLIES === '0' || !process.env.OPENAI_API_KEY?.trim()) return;
+  if (process.env.CTO_SPEAK_REPLIES === '0') return;
   const t0 = Date.now();
   try {
     // Progress lines ("🤔 Thinking...") are not answers.
@@ -11637,16 +11660,26 @@ async function speakBack(ctx: Context, heard: string, replies: string[]): Promis
       if (!broken) { text = t; lang = want; }
       else console.warn(`[Voice] ${r.provider} translation ${broken} — speaking the original`);
     }
-    const { default: OpenAI } = await import('openai');
-    // The SDK timeout stops at the response headers, not the audio body — so the whole call gets its own limit.
-    let timer: NodeJS.Timeout | undefined;
-    const audio = await Promise.race([
-      // tts-1, not gpt-4o-mini-tts (15 Oct 2026): the latter stalled 1 call in 4 for 60 s+ on Oracle and failed 7 of 15
-      // OpenClaw voice replies that day; tts-1 answered 12 of 12 in 1.7–3.5 s with the same nova voice.
-      synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
-        { model: process.env.CTO_VOICE_TTS_MODEL || 'tts-1', format: 'opus' }),
-      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('the voice took over 2 minutes')), 120_000); }),
-    ]).finally(() => clearTimeout(timer));
+    let audio: Buffer;
+    let voiceBy = 'openai';
+    try {
+      if (!process.env.OPENAI_API_KEY?.trim()) throw new Error('no OPENAI_API_KEY');
+      const { default: OpenAI } = await import('openai');
+      // The SDK timeout stops at the response headers, not the audio body — so the whole call gets its own limit.
+      let timer: NodeJS.Timeout | undefined;
+      audio = await Promise.race([
+        // tts-1, not gpt-4o-mini-tts (15 Oct 2026): the latter stalled 1 call in 4 for 60 s+ on Oracle and failed 7 of 15
+        // OpenClaw voice replies that day; tts-1 answered 12 of 12 in 1.7–3.5 s with the same nova voice.
+        synthesizeBriefingMp3(new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 }), text,
+          { model: process.env.CTO_VOICE_TTS_MODEL || 'tts-1', format: 'opus' }),
+        new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('the voice took over 2 minutes')), 120_000); }),
+      ]).finally(() => clearTimeout(timer));
+    } catch (e) {
+      // 24 Oct 2026: OpenAI's voice failing (out of credits since 23 Oct) used to mean text only — now the free voice.
+      console.warn(`[Voice] OpenAI voice failed (${String((e as Error)?.message || e).slice(0, 90)}) — free Microsoft voice instead`);
+      audio = await edgeVoiceOpus(text);
+      voiceBy = 'edge';
+    }
     const noteId = ctx.message?.message_id;
     if (ctx.chat && noteId && latestVoiceNote.get(ctx.chat.id) !== noteId) {
       console.warn('[Voice] a newer voice note arrived first — not speaking this older reply'); return;
@@ -11654,7 +11687,7 @@ async function speakBack(ctx: Context, heard: string, replies: string[]): Promis
     if (Date.now() - t0 > 180_000) { console.warn('[Voice] reply ready after 3 min — too late, text only'); return; }
     await ctx.replyWithVoice(new InputFile(audio, 'cto-aipa.ogg'),
       noteId ? { reply_parameters: { message_id: noteId, allow_sending_without_reply: true } } : undefined);
-    console.log(`[Voice] spoke the reply: ${lang}, ${text.length} chars, ${Math.round((Date.now() - t0) / 1000)} s`);
+    console.log(`[Voice] spoke the reply (${voiceBy}): ${lang}, ${text.length} chars, ${Math.round((Date.now() - t0) / 1000)} s`);
   } catch (e) {
     console.warn(`[Voice] could not speak the reply (${String((e as Error)?.message || e).slice(0, 120)}) — text only`);
   }

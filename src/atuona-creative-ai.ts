@@ -11398,13 +11398,23 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       // Create a File object for OpenAI
       const audioFile = new File([audioBuffer], 'voice.ogg', { type: 'audio/ogg' });
       
-      // Transcribe with Whisper (no language param — let Whisper auto-detect)
-      const transcription = await openai.audio.transcriptions.create({
-        file: audioFile,
-        model: 'whisper-1'
-      });
-      
-      const text = transcription.text;
+      // Transcribe with Whisper (no language param — let Whisper auto-detect).
+      // 24 Oct 2026 (free-first waterfall): Groq Whisper first — free, and the same order as CTO AIPA, EspaLuz, VJH and
+      // OpenClaw — OpenAI whisper-1 as the backup. It was OpenAI only, so every Atuona voice note failed once OpenAI ran
+      // out of credits (23 Oct).
+      let text = '';
+      try {
+        text = String((await groq.audio.transcriptions.create({ file: audioFile, model: 'whisper-large-v3-turbo' })).text || '').trim();
+      } catch (e) {
+        console.warn(`[Atuona voice] Groq Whisper failed (${String((e as Error)?.message || e).slice(0, 90)}) — OpenAI whisper-1 instead`);
+      }
+      if (!text) {
+        const transcription = await openai.audio.transcriptions.create({
+          file: audioFile,
+          model: 'whisper-1'
+        });
+        text = transcription.text;
+      }
       
       const hearYou = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'Hearing you...' : 'Слышу тебя...';
       await ctx.reply(`🎤 *"${text}"*\n\n_${hearYou}_`, { parse_mode: 'Markdown' });
