@@ -151,8 +151,9 @@ const textOf = (m) => (m.content || []).filter((x) => x.type === 'text').map((x)
 
 /** Replies that coach from the pack: they carry a block id, a pack field, or answer a pack request. */
 function aboutPack(reply, ask) {
-  return /\b[DSP]\d{1,2}\b|THEY MAY ASK|YOU SAY|IN SIMPLE WORDS|TEXT:/.test(reply)
-    || /deliverable|my document|my slides|quiz|practi[cs]e|\bnext\b|pitz|the task|\b[DSP]\d{1,2}\b/i.test(ask);
+  // 24 Oct: a free explanation ("Your solution in the deliverables…") after "explain H1" was skipped — widened.
+  const PACKISH = /deliverable|your document|my document|my slides|your slides|\bthe case\b|the task|pitz|chal[aá]n|\b[DSPHA]\d{1,2}\b|quiz|practi[cs]e|\bnext\b/i;
+  return /THEY MAY ASK|YOU SAY|IN SIMPLE WORDS|TEXT:|📍 WHERE/.test(reply) || PACKISH.test(reply) || PACKISH.test(ask);
 }
 
 async function judge(source, reply) {
@@ -164,7 +165,8 @@ List every claim in REPLY that SOURCE does not state or directly support: an inv
 feature, quote, date, or a link between two things SOURCE does not link. A faithful paraphrase is supported.
 IGNORE: questions to her, encouragement, formatting, block ids (D26, S3, P12), "Next?", and any sentence starting
 "My opinion:" or saying "the document doesn't say". Be strict but fair — flag only what a careful reader of SOURCE would
-call wrong or unsupported. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
+call wrong or unsupported. Read the WHOLE relevant block (and blocks it depends on) before flagging; if a claim
+is PARTLY supported, start "why" with "Partly true:" and say exactly what SOURCE does support. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
 
 REPLY:
 ${reply.slice(0, 6000)}`;
