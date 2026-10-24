@@ -155,6 +155,11 @@ git log keeps the record.
 - **Elena decides:** (a) apply on the LEVER link or skip (Colombia + fluent Spanish); (b) repoint 66619289430 to the Lever URL + merge the parked twin; (c) VJH code fix = post-filter result hosts (needs Teach → Plan → Confirm + Oracle restart). **Never pay DailyRemote.**
 - HubSpot NOT changed by this session. No claim held.
 
+### ✅ 24 Oct ~12:00 UTC — OpenClaw FACT-CHECKER live (Elena: "how to be sure it will not hallucinate again?")
+- `openclaw-fallback-alert.cjs --factcheck` (same cron line as --scan, every 10 min): OpenClaw replies that coach from the active study pack → (1) code: every quoted TEXT must be in the pack word for word; (2) claude-sonnet-5-5 judge, pack in the cached system prompt, lists claims the pack does not state (flags only — she decides). Flag → Telegram + `~/.openclaw/private/factcheck-flags.json` → printed at the TOP of the pack ("FACT-CHECK FLAGS — never repeat"), pack refreshed at once.
+- **VERIFIED BY:** dry run on 3 known replies: real 23 Oct bad answer → 3 flags; exact D1 → 0 (no false alarm); fake quote → caught by code AND judge. First live run: 1 real reply, 0 flags. Seeded with the 3 real mistakes from her screenshot.
+- **Limit (honest):** reduces and SURFACES errors within ~10 min; it cannot make a model never wrong. Backup `crontab.pre-factcheck`.
+
 ### ✅ 23 Oct ~23:35 UTC — Voice notes survive OpenAI running out: Groq Whisper first in EspaLuz TG + WA and VJH
 - **Symptom:** EspaLuz Telegram "❌ No pude transcribir este mensaje de voz" — log `429 insufficient_quota` (OpenAI out of credits 22:35). Three bots transcribed with OpenAI whisper-1 ONLY; CTO AIPA and OpenClaw already had Groq first.
 - **Fixed (Groq whisper-large-v3-turbo → OpenAI whisper-1):** EspaLuzFamilybot `0858497` main.py transcribe_audio (restarted 23:31); EspaLuzWhatsApp `a531a3c` espaluz_bridge.py transcribe_audio_with_openai — deployed by patching ONLY that function into Oracle's file (Oracle lags HEAD by 61ae629/e7ce522, subscriber-identity cleanup, left undeployed for its owner) (restarted 23:34); VJH `dd3cfff` telegram_bot_enhanced.py handle_voice, verbose_json keeps the language (restarted 23:35). Each verified on Oracle with a real audio clip via Groq.
