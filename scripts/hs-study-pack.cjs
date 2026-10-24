@@ -122,7 +122,7 @@ async function addNote(dealId, title, text, fileId) {
 // ───────────────────────────── reading the file ─────────────────────────────
 const PY_READ = `
 import json,sys,os
-p=sys.argv[1]; ext=os.path.splitext(p)[1].lower(); out={"pages":[],"landscape":0}
+p=sys.argv[1]; ext=os.path.splitext(p)[1].lower(); out={"pages":[],"landscape":0,"paged":True}
 if ext==".pdf":
     import PyPDF2
     r=PyPDF2.PdfReader(p)
@@ -131,6 +131,7 @@ if ext==".pdf":
         w,h=float(pg.mediabox.width),float(pg.mediabox.height)
         out["landscape"]+= 1 if w>h else 0
 elif ext==".docx":
+    out["paged"]=False
     import docx
     d=docx.Document(p)
     out["pages"].append(chr(10)+chr(10).join(x.text for x in d.paragraphs)+chr(10))
@@ -189,8 +190,40 @@ function toBlocks(doc, kind) {
   const pages = doc.pages.map((p) => p || '');
   const words = pages.reduce((n, p) => n + p.split(/\s+/).length, 0);
   const slides = kind === 'deliverables' && pages.length > 1 && (doc.landscape > pages.length / 2 || words / pages.length < 220);
-  if (slides) return { prefix: 'S', unit: 'slide', blocks: pages.map((p) => clean(p)).filter(Boolean) };
-  return { prefix: kind === 'task' ? 'P' : 'D', unit: 'paragraph', blocks: paragraphs(pages.join('\n\n')) };
+  if (slides) {
+    const kept = pages.map((p, i) => [clean(p), i + 1]).filter(([p]) => p);
+    return { prefix: 'S', unit: 'slide', blocks: kept.map(([p]) => p), where: kept.map(([, n]) => `slide ${n} of ${pages.length}`) };
+  }
+  const blocks = paragraphs(pages.join('\n\n'));
+  return { prefix: kind === 'task' ? 'P' : 'D', unit: 'paragraph', blocks, where: locate(blocks, pages, doc.paged) };
+}
+
+/**
+ * 📍 WHERE each block sits in the REAL file, so Elena can check it with her finger (24 Oct 2026: "make OpenClaw write
+ * where to find it in the real deliverable — I verify it really sits there"). PDF: page found by matching the block's
+ * own words (letters and digits only, so line breaks and table spacing do not matter) + its order on that page.
+ * Word has no pages: the paragraph number in the file.
+ */
+function locate(blocks, pages, paged) {
+  const key = (s) => s.toLowerCase().replace(/[^a-z0-9áéíóúñüç]/g, '');
+  const pk = pages.map(key);
+  const onPage = {};
+  return blocks.map((b, i) => {
+    if (paged === false) return `paragraph ${i + 1} of ${blocks.length} in the file (a Word file has no pages)`;
+    const k = key(b);
+    let page = null;
+    for (const size of [60, 40, 24]) {
+      for (let s = 0; s < Math.max(1, k.length - size) && !page; s += 15) {
+        const probe = k.slice(s, s + size);
+        const hit = pk.findIndex((p) => probe && p.includes(probe));
+        if (hit >= 0) page = hit + 1;
+      }
+      if (page) break;
+    }
+    if (!page) return 'page not found automatically — find it by its first words';
+    onPage[page] = (onPage[page] || 0) + 1;
+    return `page ${page} of ${pages.length} · paragraph ${onPage[page]} on that page`;
+  });
 }
 
 // ───────────────────────────── writing the coaching (grounded) ─────────────────────────────
@@ -289,12 +322,13 @@ ${JSON.stringify(batch)}`;
   return out;
 }
 
-function renderBlocks(kind, prefix, blocks, notesById, unit) {
+function renderBlocks(kind, prefix, blocks, notesById, unit, where = [], fileName = '') {
   const labels = FIELDS[kind];
   return blocks.map((t, i) => {
     const id = `${prefix}${i + 1}`;
     const n = notesById[id] || {};
-    const lines = [`${id} — ${unit} ${i + 1} of ${blocks.length}`, `TEXT: "${t}"`];
+    const lines = [`${id} — ${unit} ${i + 1} of ${blocks.length}`,
+      `📍 WHERE: ${where[i] || `${unit} ${i + 1}`} of ${fileName || 'the file'}`, `TEXT: "${t}"`];
     for (const [f, label] of Object.entries(labels)) lines.push(`${label}: ${n[f] || '⚠️ not generated — read TEXT only'}`);
     return lines.join('\n');
   }).join('\n\n');
@@ -306,7 +340,8 @@ const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (c
 # - NATURAL DIALOGUE FIRST: if her message is a question or a remark in her own words (not "next", an id, or "quiz me"),
 #   answer THAT directly, in plain words, from this pack — then offer to continue. Never answer a question with the next block.
 # - "walk me through the task" → P blocks · "walk me through my deliverables" → D blocks, then S (slides) · "paragraph by
-#   paragraph" / "next" → ONE block per message: "<id> — …", TEXT quoted exactly, then the other fields of that block, then
+#   paragraph" / "next" → ONE block per message: "<id> — …", the 📍 WHERE line copied exactly (she checks it in the real
+#   file), TEXT quoted exactly, then the other fields of that block, then
 #   ask "Next, or practise this one?". Never summarise several blocks in one message. "P12" / "D7" / "slide 3" → jump.
 # - "quiz me" / "/quiz" / "D26, quiz me" → send ONLY "🎯 <id> — <THEY MAY ASK>" + "Answer by voice or text". NEVER show
 #   YOU SAY or TEXT before she answers (it gives the answer away) and never grade an answer she has not given. Her NEXT
@@ -415,7 +450,7 @@ async function cmdAdd() {
   const deal = await findDeal(company, arg('role'), arg('deal'));
   if (!deal) throw new Error(`no open hiring deal for "${company}" in HubSpot — stage the job first`);
   const doc = readFile(file);
-  const { prefix, unit, blocks } = toBlocks(doc, kind);
+  const { prefix, unit, blocks, where } = toBlocks(doc, kind);
   if (!blocks.length) throw new Error('no text in the file (a scan?) — send screenshots or a PDF with text');
   const ids = blocks.map((_, i) => `${prefix}${i + 1}`);
   // Sources for grounding: this file + every other pack note on the deal (the task, when coaching deliverables).
@@ -428,7 +463,7 @@ async function cmdAdd() {
   try { fileId = (await require('./hs-files.cjs').uploadOutreachFile(path.resolve(file), name)).id; }
   catch (e) { log(`file upload skipped: ${String(e.message).slice(0, 120)}`); }
   const title = `${MARK} · ${kind === 'task' ? 'TASK' : unit === 'slide' ? 'MY SLIDES' : 'MY DOCUMENT'} · ${name}`;
-  const parts = await addNote(deal.id, title, renderBlocks(kind, prefix, blocks, coached, unit), fileId);
+  const parts = await addNote(deal.id, title, renderBlocks(kind, prefix, blocks, coached, unit, where, name), fileId);
   register(company, deal, { kind, file: name, blocks: blocks.length, prefix, warn });
   const act = await activate(deal, company);
   const msg = `✅ ${company} study pack ready: ${blocks.length} ${unit}s (${prefix}1–${prefix}${blocks.length}) from ${name}, saved on the HubSpot deal "${deal.name}"`
