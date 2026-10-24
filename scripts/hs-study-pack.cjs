@@ -360,6 +360,9 @@ async function activate(deal, company) {
     const partNo = Number((t.split('\n')[0].match(/part (\d+)\//) || [])[1] || 1);
     if (partNo === 1) byTitle.set(head, [body]); else (byTitle.get(head) || byTitle.set(head, []).get(head)).push(body);
   }
+  // Stable order by title (TASK, then MY DELIVERABLES part A, part B…): a re-imported part must not move to the end.
+  const ordered = new Map([...byTitle.entries()].sort(([a], [b]) => a.localeCompare(b)));
+  byTitle.clear(); for (const [k, v] of ordered) byTitle.set(k, v);
   const files = [...byTitle.keys()].map((h) => `#   - ${h.replace(`${MARK} · `, '')}`);
   const sections = [`# FILES in this pack:\n${files.join('\n')}`, ...[...byTitle.entries()].map(([h, parts]) => `# ===== ${h}\n${parts.join('\n')}`)];
   const r = writeSheet(company, deal.name, sections);
