@@ -32,6 +32,7 @@ const SESS = path.join(OC, 'agents', 'main', 'sessions');
 const STATE = path.join(OC, 'private', 'fallback-alert.json');
 const REALERT_MS = 12 * 3600 * 1000;
 const DRY = process.argv.includes('--dry');
+const QUIET = process.argv.includes('--quiet');   // record flags + refresh the pack, but send nothing (a backlog re-check)
 
 const TOPUP = {
   openai: 'platform.openai.com/settings/organization/billing',
@@ -55,7 +56,7 @@ function reason(msg) {
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
 
 function send(text) {
-  if (DRY) return console.log(`[dry] ${text}`);
+  if (DRY || QUIET) return console.log(`[${DRY ? 'dry' : 'quiet'}] ${text.slice(0, 120)}`);
   const main = readJson(path.join(SESS, 'sessions.json'), {})['agent:main:main'] || {};
   const to = String(main.lastTo || '').replace(/^telegram:/, '');
   if (!to) return console.log('no target');
@@ -166,31 +167,38 @@ feature, quote, date, or a link between two things SOURCE does not link. A faith
 IGNORE: questions to her, encouragement, formatting, block ids (D26, S3, P12), "Next?", and any sentence starting
 "My opinion:" or saying "the document doesn't say". Be strict but fair — flag only what a careful reader of SOURCE would
 call wrong or unsupported. Read the WHOLE relevant block (and blocks it depends on) before flagging; if a claim
-is PARTLY supported, start "why" with "Partly true:" and say exactly what SOURCE does support. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
+is PARTLY supported, start "why" with "Partly true:" and say exactly what SOURCE does support. Inside the JSON strings use
+single quotes ' — never a double quote. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
 
 REPLY:
 ${reply.slice(0, 6000)}`;
-  const body = {
-    model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: 1200,
-    system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
-    messages: [{ role: 'user', content: prompt }],
+  // 24 Oct 2026: the judge failed SILENTLY on long replies (answer cut at 1,200 tokens; double quotes inside claims broke
+  // JSON) and the reply counted as clean. Now: 3,000 tokens, one retry told what broke, and a throw the caller reports.
+  const ask = async (content) => {
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST', signal: AbortSignal.timeout(150000),
+        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: 3000,
+          system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
+          messages: [{ role: 'user', content }],
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
+      return (j.content || []).map((c) => c.text || '').join('');
+    } catch (e) {                             // the fleet's waterfall, as everywhere else
+      const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
+      return (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, content, 3000, 'factcheck')).text;
+    }
   };
-  let text = '';
-  try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', signal: AbortSignal.timeout(120000),
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const j = await r.json();
-    if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
-    text = (j.content || []).map((c) => c.text || '').join('');
-  } catch (e) {                               // the fleet's waterfall, as everywhere else
-    const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
-    text = (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, prompt, 1200, 'factcheck')).text;
+  const parse = (text) => { const s = text.indexOf('{'), e2 = text.lastIndexOf('}'); return JSON.parse(text.slice(s, e2 + 1)).unsupported || []; };
+  let text = await ask(prompt);
+  try { return parse(text); } catch (e) {
+    text = await ask(`${prompt}\n\nYOUR LAST ANSWER WAS NOT VALID JSON (${String(e.message).slice(0, 80)}). Return the same findings as valid JSON only, no double quotes inside strings.`);
+    return parse(text);                       // a second failure throws — factcheck() reports it, never a silent pass
   }
-  const s = text.indexOf('{'), e2 = text.lastIndexOf('}');
-  return JSON.parse(text.slice(s, e2 + 1)).unsupported || [];
 }
 
 async function factcheck(state) {
@@ -222,7 +230,11 @@ async function factcheck(state) {
         if (!srcNorm.includes(norm(q[1]).slice(0, 160))) problems.push({ claim: `TEXT "${q[1].slice(0, 90)}…"`, why: 'quoted as your text, but it is not in your document word for word' });
       }
       // 2) Claude: every claim must be stated in the pack.
-      try { problems.push(...await judge(source, reply)); } catch (e) { console.log(`factcheck judge failed: ${String(e.message).slice(0, 120)}`); }
+      try { problems.push(...await judge(source, reply)); } catch (e) {
+        console.log(`factcheck judge failed: ${String(e.message).slice(0, 120)}`);
+        // Never a silent pass (24 Oct): she learns this reply was NOT verified.
+        send(`⚠️ Fact-check could not verify OpenClaw's reply at ${new Date(ts).toISOString().slice(11, 16)} UTC ("${reply.slice(0, 60).replace(/\s+/g, ' ')}…"). Check it against your document's 📍 lines before you repeat it.`);
+      }
       if (!problems.length) continue;
       const at = new Date(ts).toISOString().slice(11, 16);
       for (const p of problems) flags.push({ at: new Date(ts).toISOString(), claim: p.claim, why: p.why, source_says: p.source_says || '' });

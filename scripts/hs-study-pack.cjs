@@ -404,7 +404,7 @@ async function activate(deal, company) {
   const ordered = new Map([...byTitle.entries()].sort(([a], [b]) => a.localeCompare(b)));
   byTitle.clear(); for (const [k, v] of ordered) byTitle.set(k, v);
   // What the fact-checker caught (openclaw-fallback-alert.cjs --factcheck, 24 Oct) sits first, so it is not repeated.
-  const caught = readJson(path.join(PRIV, 'factcheck-flags.json'), []).slice(-15);
+  const caught = readJson(path.join(PRIV, 'factcheck-flags.json'), []).slice(-30);
   const flagSection = caught.length
     ? `# ⚠️ FACT-CHECK FLAGS — you said these to Elena and they are NOT in her document. Never repeat them:\n${caught.map((f) => `#   - "${String(f.claim).slice(0, 200)}" — ${String(f.why).slice(0, 200)}${f.source_says ? ` (document: ${String(f.source_says).slice(0, 160)})` : ''}`).join('\n')}\n`
     : '';
