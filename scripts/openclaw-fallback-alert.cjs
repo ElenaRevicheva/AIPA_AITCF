@@ -145,7 +145,8 @@ async function probe(state) {
 // ───────────────────────────── --factcheck ─────────────────────────────
 const FLAGS = path.join(OC, 'private', 'factcheck-flags.json');
 const MAX_CHECKS = 8;                       // per run — a burst of replies is checked over the next runs
-const norm = (s) => String(s).replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+// Quote marks are dropped before comparing (24 Oct false alarm: her "Prices" quoted inside TEXT "…" as 'Prices').
+const norm = (s) => String(s).replace(/["“”'‘’`]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
 const textOf = (m) => (m.content || []).filter((x) => x.type === 'text').map((x) => x.text).join('\n');
 
 /** Replies that coach from the pack: they carry a block id, a pack field, or answer a pack request. */
@@ -215,7 +216,7 @@ async function factcheck(state) {
       checked++;
       const problems = [];
       // 1) Code: every quoted TEXT must exist in the pack word for word.
-      for (const q of reply.matchAll(/TEXT(?: ON THE SLIDE)?:\s*"([^"]{25,})"/g)) {
+      for (const q of reply.matchAll(/TEXT(?: ON THE SLIDE)?:\**\s*[*_]*["“]([^"”]{25,})["”]/g)) {
         if (!srcNorm.includes(norm(q[1]).slice(0, 160))) problems.push({ claim: `TEXT "${q[1].slice(0, 90)}…"`, why: 'quoted as your text, but it is not in your document word for word' });
       }
       // 2) Claude: every claim must be stated in the pack.
