@@ -68,9 +68,14 @@ wrong link; the Comet prompt would open the paywall.
 1. Apply or not: origin says Colombia + fluent Spanish. Her Spanish is intermediate. The letter
    and CV are ready if she wants to try anyway — on the **Lever** link, never through DailyRemote.
 2. Repoint deal 66619289430's Job URL to the Lever URL and merge/park the duplicate.
-3. Code fix in VJH (`src/search/serpapi_jobs_ingest.py`): drop any result whose host is not in
-   the allowed board list, so a leak dies in code. Not done — needs the Teach → Plan → Confirm
-   contract and an Oracle restart.
+3. ~~Code fix in VJH~~ **DONE 24 Oct 12:00 UTC** (VJH `aa3b943`, `8db8144`, `e34fa06`), on Elena's
+   rule *"dig the true initial board where the job is posted and inspect this job on the criteria
+   VJH has"*: a result from outside the four boards is resolved to its origin (remembered boards →
+   the board's public API → one paid search to learn the board), the gate and judge read the
+   origin text, the deal carries the origin URL, no origin = no deal. Verified live on Oracle: the
+   DailyRemote copy resolves to the Lever URL above. Measured on the way: Google's top 10 for the
+   `site:`-restricted query held Workday, Builtin and LinkedIn, and the same search answered
+   differently run to run, so the resolver reads the board's own API instead of trusting Google.
 
 ## Interview line
 

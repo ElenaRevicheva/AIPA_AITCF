@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 24 Oct ~07:00 | VJH: aggregator hit → resolve origin board, judge origin text | VJH `src/search/serpapi_jobs_ingest.py`, `evals/`; Oracle pm2 `serpapi-jobs` | 3f223aa1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -150,10 +149,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 24 Oct ~06:40 UTC — CI&T 32354: VJH's kit deal points at a PAYWALL (DailyRemote) · origin is free on Lever · Elena's move
-- **Found:** deal 66619289430 ("…Brazil at CI&T", I Act TODAY, full kit) came from `dailyremote.com` — a paid aggregator ($14.95/mo) that hides the employer and routes every Apply to its own checkout. The Google `site:` group in `serpapi_jobs_ingest.py` leaked it (Google treats `(site:a OR site:b)` as a hint; nothing post-filters the host). Same job from its origin `jobs.lever.co/ciandt/989a2fd5…` ("…Colombia", fluent **Spanish** required) was found 24 Oct and **parked** as deal 66678401330. Two deals, one job. Full trace: `docs/applications/2026-10-24_CIT_32354_dailyremote_source_check.md`.
-- **Elena decides:** (a) apply on the LEVER link or skip (Colombia + fluent Spanish); (b) repoint 66619289430 to the Lever URL + merge the parked twin; (c) VJH code fix = post-filter result hosts (needs Teach → Plan → Confirm + Oracle restart). **Never pay DailyRemote.**
-- HubSpot NOT changed by this session. No claim held.
+### ✅ 24 Oct ~12:00 UTC — VJH: a job on an aggregator is a POINTER — the door now digs the origin board and judges the origin · LIVE · claim released
+- **Why:** deal 66619289430 ("…Brazil at CI&T", I Act TODAY, full kit) came from `dailyremote.com` — a paid aggregator ($14.95/mo) that hides the employer and routes every Apply to its own checkout. Google ignores the `(site:a OR site:b)` group almost entirely (measured: Workday, Builtin, LinkedIn in the top 10); 13 of the 41 postings the door read 1–24 Oct came from outside the four boards. The origin `jobs.lever.co/ciandt/989a2fd5…` ("…**Colombia**", fluent **Spanish**) was found 24 Oct and **parked** as deal 66678401330. Two deals, one job. Trace: `docs/applications/2026-10-24_CIT_32354_dailyremote_source_check.md`.
+- **Elena's rule (24 Oct):** "if VJH finds a job at a paywalled aggregator he should dig the true initial board where the job is posted and inspect this job on the criteria VJH has."
+- **Built (VJH `aa3b943`, `8db8144`, `e34fa06`, `src/search/serpapi_jobs_ingest.py`):** a result from any host outside lever/greenhouse/ashby/wellfound (and not the employer's own site) is resolved first: boards this company was seen on (`src/search/origin_boards.json`, learned free from every origin-board result) → the board's public API (Lever/Greenhouse/Ashby, free) → one paid search to learn the board. The gate + judge read the ORIGIN text; the deal carries the ORIGIN url; the origin is marked seen so it is not a second deal. No origin = no deal, URL logged. Off-lane titles cost no search. 169 tests (`evals/test_origin_board.py` + the door's two files).
+- **VERIFIED:** live on Oracle `_find_origin("[Job - 32354] AI Solution Architect, Brazil at CI&T","CI&T")` → `jobs.lever.co/ciandt/989a2fd5…`; pm2 `serpapi-jobs` restarted 11:59:20 UTC, file 11:59:08, log `Ingestor started — 18 queries`. First run's `aggregator …` lines: check `~/.pm2/logs/serpapi-jobs-error.log` (Python logs to stderr; the out-log is 0 bytes).
+- **Elena's move, HubSpot untouched:** (a) CI&T 32354: apply on the LEVER link or skip (Colombia + fluent Spanish); (b) repoint 66619289430's Job URL to Lever + merge the parked twin 66678401330 (one source of truth). **Never pay DailyRemote.**
 
 ### ✅ 24 Oct ~12:00 UTC — OpenClaw FACT-CHECKER live (Elena: "how to be sure it will not hallucinate again?")
 - `openclaw-fallback-alert.cjs --factcheck` (same cron line as --scan, every 10 min): OpenClaw replies that coach from the active study pack → (1) code: every quoted TEXT must be in the pack word for word; (2) claude-sonnet-5-5 judge, pack in the cached system prompt, lists claims the pack does not state (flags only — she decides). Flag → Telegram + `~/.openclaw/private/factcheck-flags.json` → printed at the TOP of the pack ("FACT-CHECK FLAGS — never repeat"), pack refreshed at once.
