@@ -337,6 +337,9 @@ function renderBlocks(kind, prefix, blocks, notesById, unit, where = [], fileNam
 // ───────────────────────────── the OpenClaw sheet ─────────────────────────────
 const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (copy of the ${MARK} notes on the HubSpot deal "${dealName}"; refreshed every 30 min)
 # HOW TO COACH (Elena's rule: her words set the format):
+# - CROSS-REFERENCES (24 Oct: "D9 says … source tag" was false): name another block ONLY by copying THAT block's own
+#   📍 WHERE line, and quote ONLY words that appear in THAT block's TEXT. Never cite a block, page or quote from memory.
+#   Unsure which block holds it? Say "Ask me for D9 and I'll show it" — never guess.
 # - NATURAL DIALOGUE FIRST: if her message is a question or a remark in her own words (not "next", an id, or "quiz me"),
 #   answer THAT directly, in plain words, from this pack — then offer to continue. Never answer a question with the next block.
 # - "walk me through the task" → P blocks · "walk me through my deliverables" → D blocks, then S (slides) · "paragraph by
