@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 24 Oct 15:45 | CTO AIPA voice replies: free Edge fallback · Atuona voice notes: Groq first | src/telegram-bot.ts, src/atuona-creative-ai.ts (pm2 cto-aipa restart) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
