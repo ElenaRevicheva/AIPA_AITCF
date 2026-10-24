@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 24 Oct ~07:00 | VJH: aggregator hit → resolve origin board, judge origin text | VJH `src/search/serpapi_jobs_ingest.py`, `evals/`; Oracle pm2 `serpapi-jobs` | 3f223aa1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
