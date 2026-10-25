@@ -111,6 +111,14 @@ function scan(state) {
       const why = reason(m.errorMessage);
       const caught = next && next.provider && next.provider !== m.provider
         ? `${NAME[next.provider] || next.provider} answered instead — your coach still works.` : 'No backup answered that message.';
+      // 25 Oct 22:05: Claude's credit ran out mid-prep and no backup answered. Heal at once instead of waiting for the
+      // daily billing-mail check: put the models in free mode (Gemini first); model-tier.cjs messages her the switch.
+      if (caught.startsWith('No backup') && m.provider === 'anthropic' && why === 'credits ran out' && !DRY && !QUIET) {
+        try {
+          const tier = JSON.parse(fs.readFileSync(path.join(OC, 'private', 'model-tier.json'), 'utf8')).tier;
+          if (tier !== 'free') execFileSync(process.execPath, [path.join(__dirname, 'model-tier.cjs'), '--tier=free'], { stdio: 'ignore', timeout: 60000 });
+        } catch { try { execFileSync(process.execPath, [path.join(__dirname, 'model-tier.cjs'), '--tier=free'], { stdio: 'ignore', timeout: 60000 }); } catch {} }
+      }
       alertOnce(state, `scan:${m.provider}:${why}`,
         `⚠️ OpenClaw: ${NAME[m.provider] || m.provider} (${m.model}) failed — ${why}. ${caught}`
         + (why === 'credits ran out' || why === 'key rejected' ? ` Top up / check: ${TOPUP[m.provider] || m.provider}` : ''));

@@ -32,7 +32,9 @@ const TIERS = {
   claude: { env: { MODEL_TIER: 'claude', STUDY_PACK_MODEL: 'claude-sonnet-5-5', FACTCHECK_MODEL: 'claude-sonnet-5-5' },
     openclaw: { primary: 'anthropic/claude-sonnet-4-5', fallbacks: ['google/gemini-2.5-flash', 'xai/grok-3', 'openai/gpt-4.1'] } },
   free: { env: { MODEL_TIER: 'free', STUDY_PACK_MODEL: 'claude-sonnet-5-5', FACTCHECK_MODEL: 'claude-sonnet-5-5' },
-    openclaw: { primary: 'google/gemini-2.5-flash', fallbacks: ['anthropic/claude-sonnet-4-5', 'xai/grok-3', 'openai/gpt-4.1'] } },
+    // 25 Oct 22:05: with Claude second, its billing failure ended the turn ("No backup answered") — in free mode the
+    // next model after Gemini must come from another company; Claude (no credit) last, still wired.
+    openclaw: { primary: 'google/gemini-2.5-flash', fallbacks: ['xai/grok-3', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5'] } },
 };
 
 function notify(text) {
