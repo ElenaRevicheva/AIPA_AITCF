@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 25 Oct 13:20 | Sprint briefing voice: free male voice fallback (Lambda → Oracle) | src/sprint-briefing/run.ts, src/free-voice.ts, src/cto-aipa.ts, src/telegram-bot.ts, dist/, pm2 cto-aipa, Lambda sprint | b72b5ce0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
