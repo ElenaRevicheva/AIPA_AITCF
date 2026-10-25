@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 25 Oct 12:30 | OpenClaw learning loop: coaching audit, per-company traps, weekly rule proposals | scripts/hs-study-pack.cjs, scripts/openclaw-fallback-alert.cjs, OpenClaw workspace skills/IDENTITY/HELP, crontab | a253d669 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -183,6 +182,11 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
+
+### ✅ 25 Oct ~11:50 UTC — OpenClaw LEARNS: coaching audited at the source, traps per company, rules Elena approves
+- cto-aipa `c7fb62f3`. **Gap 2:** `--add` now runs `auditCoaching()` — every coaching field judged against block TEXT only (earlier notes' coaching is no longer a source), rewritten once, re-judged, ⚠️ if still unsupported; the "ready" message reports it. **Gap 3:** fact-check flags carry `company` (40 old ones backfilled Pitz); a pack shows only its own last 30; file keeps 300. **Gap 1:** `openclaw-fallback-alert.cjs --propose-rules` (cron Sun 15:00 UTC) → ≤3 mistake-TYPE rules → her Telegram; `/rules`, `approve R1`, `reject R1`, `forget L1` (skill `rules`, menu line in HELP+IDENTITY, Telegram command hot-reloaded) → `private/learned-rules.json` → printed in EVERY pack's RULES. A model never adds a rule itself.
+- **VERIFIED BY:** throwaway deal `[HIRING-TEST] … @ AuditTestCo` with isolated WS/PRIV → "audit: 1 rewritten" and an honest YOU SAY; deal, note, file deleted (204). First real proposals R1–R3 sent to her Telegram (scope inflation 7×, plan stated as fact 5×, invented interview lines 4×). `/rules` via `openclaw agent` test session → list + [proof]. approve/forget tested in isolated dirs; live learned-rules.json untouched (her call). md5 laptop = Oracle. Backups `~/_session-backups/openclaw-learning-20261025/`.
+- **NEXT (Elena):** approve or reject R1–R3. `--import` (hand-built sheets) is not audited — audit by hand as on 25 Oct.
 
 ### ✅ 25 Oct — Pitz coaching notes audited against her document + case (my wording, not hers)
 - Fact-checker flagged D16's suggested answer → audited all 46 notes (Sonnet 5.5, source = ONLY her PDF + case): 20 unsupported, 45 partly true; her document text and 📍 lines were all exact. Rewrote 10 answers (D5 D11 D13 D17 D18 D29 D31 D38 D39 S1); slide timings now "Suggested pacing (my split…)", D-ranges "Detail in this sheet (not labels in your PDF)". Private-docs `5a90b47`; re-imported A+B to deal 66670194056, one note per title; pack refreshed (118,022 chars), old phrases 0, new phrases present.
