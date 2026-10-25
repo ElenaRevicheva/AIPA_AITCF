@@ -351,6 +351,28 @@ const CHAIN_ORDER: Record<ChainProfile, ProviderName[]> = {
   bulk: ['gemini', 'groq', 'openai', 'grok', 'claude'],
 };
 
+/**
+ * 25 Oct 2026 (Elena: no budget to top up API credits). MODEL_TIER=free in .env (written by scripts/model-tier.cjs from
+ * Anthropic's billing emails) moves the paid providers to the END of every chain, so a $0 month does not make each
+ * client-facing draft fail twice (Claude, OpenAI) before free Gemini answers. Re-read every minute: no restart needed.
+ */
+const PAID: ProviderName[] = ['claude', 'openai'];
+let tierCache = { at: 0, free: false };
+function freeTier(): boolean {
+  if (Date.now() - tierCache.at < 60_000) return tierCache.free;
+  let free = (process.env.MODEL_TIER || '') === 'free';
+  try {
+    const m = require('fs').readFileSync(require('path').join(__dirname, '..', '.env'), 'utf8').match(/^MODEL_TIER=(\w+)/m);
+    if (m) free = m[1] === 'free';
+  } catch { /* no .env (Lambda): the process env decides */ }
+  tierCache = { at: Date.now(), free };
+  return free;
+}
+function chainFor(profile: ChainProfile): ProviderName[] {
+  const order = CHAIN_ORDER[profile];
+  return freeTier() ? [...order.filter((p) => !PAID.includes(p)), ...order.filter((p) => PAID.includes(p))] : order;
+}
+
 /** Reasoning models emit nothing below this. Never send a provider less. */
 const MIN_REASONING_TOKENS = 300;
 
@@ -475,7 +497,7 @@ export async function completeWithProfileDetailed(
   const budget = Math.max(maxTokens, MIN_REASONING_TOKENS);
   const reasons: string[] = [];
   const startedAt = Date.now();
-  for (const provider of CHAIN_ORDER[profile]) {
+  for (const provider of chainFor(profile)) {
     try {
       const text = await callProvider(provider, systemPrompt, userPrompt, budget, label, profile, image);
       if (text) {

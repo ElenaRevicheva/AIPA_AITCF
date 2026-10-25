@@ -69,11 +69,28 @@ function send(text) {
   console.log(`sent: ${text.slice(0, 120)}`);
 }
 
+// 25 Oct (Elena: "no daily garbage about my credits"): a billing alert ("credits ran out", "key rejected") goes ONCE per
+// outage and per provider — the 12 h re-alert sent "OpenAI credits ran out" every morning. It can fire again only after
+// the daily probe saw that provider answer (clearBilling). Other alerts keep the 12 h rhythm.
 function alertOnce(state, key, text) {
+  const [, provider, why] = key.split(':');
+  if (why === 'credits ran out' || why === 'key rejected') {
+    const b = `billing:${provider}`;
+    const old = state.alerted[`probe:${provider}:${why}`] || state.alerted[`scan:${provider}:${why}`];
+    if (state.alerted[b] || old) { state.alerted[b] = state.alerted[b] || old; return; }
+    send(text);
+    state.alerted[b] = Date.now();
+    return;
+  }
   const last = state.alerted[key] || 0;
   if (Date.now() - last < REALERT_MS) return;
   send(text);
   state.alerted[key] = Date.now();
+}
+function clearBilling(state, provider) {
+  for (const k of Object.keys(state.alerted)) {
+    if (k === `billing:${provider}` || new RegExp(`^(probe|scan):${provider}:(credits ran out|key rejected)$`).test(k)) delete state.alerted[k];
+  }
 }
 
 function scan(state) {
@@ -137,6 +154,7 @@ async function probe(state) {
     } catch (e) { status = 'ERR'; text = String(e.message); }
     const ok = status === 200;
     results.push(`${NAME[provider] || provider} ${ok ? '✅' : `❌ ${status}`}`);
+    if (ok) clearBilling(state, provider);   // it works again — a future outage may alert once more
     if (!ok) {
       const why = reason(`${status} ${text}`);
       alertOnce(state, `probe:${provider}:${why}`,

@@ -12,7 +12,7 @@
  *   free   — no grant: Gemini first (free tier), Claude only if Gemini fails
  * and tells her in Telegram which one, and why.
  *
- *   node scripts/model-tier.cjs --auto          (cron, 8th + 9th of the month)
+ *   node scripts/model-tier.cjs --auto          (cron daily; acts and messages her ONLY when the tier changes)
  *   node scripts/model-tier.cjs --tier=free|claude|opus [--dry]
  */
 'use strict';
@@ -44,13 +44,35 @@ function notify(text) {
   } catch (e) { console.log(`notify failed: ${String(e.message).slice(0, 120)}`); }
 }
 
-/** Anthropic's "$… in API credits was added" email in the last 3 days — read-only search of her mailboxes. */
-function creditEmail() {
-  const out = execFileSync('python3', [path.join(__dirname, 'reply-radar.py'), '--search', 'API credits was added', '--days', arg('days') || '3'],
+function search(words, days) {
+  const out = execFileSync('python3', [path.join(__dirname, 'reply-radar.py'), '--search', words, '--days', String(days)],
     { timeout: 180000, maxBuffer: 32 * 1024 * 1024 }).toString();
   const i = out.indexOf('[');
-  const hits = i < 0 ? [] : JSON.parse(out.slice(i));
-  return hits.find((h) => /anthropic\.com/i.test(h.from || '') && /API credits was added/i.test(h.subject || '')) || null;
+  return (i < 0 ? [] : JSON.parse(out.slice(i))).filter((h) => /anthropic\.com/i.test(h.from || ''));
+}
+
+/**
+ * The newest Anthropic BILLING event in her mail (read-only): a Max-plan grant ("API credits was added", with its own
+ * expiry date), an API top-up receipt ("One-time credit purchase" — a plan subscription receipt does not count), or
+ * "Your Claude API access is turned off". 25 Oct: she keeps only a $20 plan, so grants may never come again; she tops up
+ * when she can. Returns { tier, why } or null when nothing happened in the window (= keep the current tier).
+ */
+function billingDecision(days = Number(arg('days')) || 45) {
+  const ev = [];
+  for (const h of search('API credits was added', days)) {
+    if (!/API credits was added/i.test(h.subject || '')) continue;
+    const exp = Date.parse(((h.text || '').match(/expire on ([A-Z][a-z]+ \d{1,2}, \d{4})/) || [])[1] || '');
+    ev.push({ at: Date.parse(h.date), tier: exp && exp < Date.now() ? 'free' : 'opus',
+      why: exp && exp < Date.now() ? `your Max-plan Claude credit expired (${new Date(exp).toISOString().slice(0, 10)})` : `Max-plan Claude credit added (${String(h.date).slice(0, 10)})` });
+  }
+  for (const h of search('receipt Anthropic credit purchase', days)) {
+    if (/credit purchase/i.test(h.text || '')) ev.push({ at: Date.parse(h.date), tier: 'claude', why: `you bought Claude API credit (${String(h.date).slice(0, 10)})` });
+  }
+  for (const h of search('Claude API access is turned off', days)) {
+    if (/access is turned off/i.test(h.subject || '')) ev.push({ at: Date.parse(h.date), tier: 'free', why: `your Claude API credit ran out (${String(h.date).slice(0, 10)})` });
+  }
+  ev.sort((a, b) => b.at - a.at);
+  return ev[0] || null;
 }
 
 function apply(tier) {
@@ -73,19 +95,30 @@ function apply(tier) {
   console.log(`tier ${tier} applied (${stamp})`);
 }
 
+const STATE = path.join(HOME, '.openclaw', 'private', 'model-tier.json');
+function current() {
+  try { return JSON.parse(fs.readFileSync(STATE, 'utf8')).tier; } catch { /* first run */ }
+  const env = fs.readFileSync(ENV, 'utf8');
+  if ((env.match(/^MODEL_TIER=(\w+)/m) || [])[1] === 'free') return 'free';
+  return /^FACTCHECK_MODEL=claude-sonnet/m.test(env) ? 'claude' : 'opus';
+}
+
 (async () => {
   let tier = arg('tier'), why = 'set by hand';
   if (process.argv.includes('--auto')) {
-    const hit = creditEmail();
-    tier = hit ? 'claude' : 'free';
-    why = hit ? `Anthropic added API credit (${String(hit.date).slice(0, 10)}): "${hit.subject}"` : 'no new Anthropic API credit email in the last 3 days';
+    const d = billingDecision();
+    const now = current();
+    // 25 Oct (Elena: "no daily garbage about my credits"): daily check, but it acts and messages ONLY on a change.
+    if (!d || d.tier === now) return console.log(`${new Date().toISOString()} tier stays ${now}${d ? ` (${d.why})` : ' (no billing email in 45 days)'}`);
+    tier = d.tier; why = d.why;
   }
   if (!tier) throw new Error('use --auto or --tier=free|claude|opus');
   apply(tier);
+  if (!DRY) fs.writeFileSync(STATE, JSON.stringify({ tier, why, at: new Date().toISOString() }, null, 2));
   const say = {
     opus: 'Opus (strongest) for PrepClaw, its fact-checker and study packs.',
     claude: 'Claude Sonnet for PrepClaw, its fact-checker and study packs — paid from your Max-plan credit, no top-up needed.',
-    free: 'FREE mode: Gemini first for PrepClaw, its fact-checker and study packs (Claude only if Gemini fails and credit is left). Expect a few more 🔎 corrections.',
+    free: 'FREE mode: Gemini first for all your bots (PrepClaw, its fact-checker, study packs, CTO AIPA drafts); Claude only if Gemini fails and credit is left. Expect a few more 🔎 corrections.',
   }[tier];
   notify(`💳 Model mode: ${say}\nWhy: ${why}.`);
 })().catch((e) => { console.log(`⚠️ model-tier: ${e.message}`); process.exitCode = 1; });
