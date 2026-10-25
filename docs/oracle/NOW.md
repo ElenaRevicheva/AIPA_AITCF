@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 25 Oct 20:45 | Provider ORDER rule (free first, OpenAI wired after, Claude by money) for priority agents | cto-aipa llm-resilience/telegram-bot/sprint-briefing + Lambda, VJH llm_chain/judge/voice, OpenClaw tts, whitespace llm | ccc7d337 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
