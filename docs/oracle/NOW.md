@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 25 Oct 13:20 | Sprint briefing voice: free male voice fallback (Lambda → Oracle) | src/sprint-briefing/run.ts, src/free-voice.ts, src/cto-aipa.ts, src/telegram-bot.ts, dist/, pm2 cto-aipa, Lambda sprint | b72b5ce0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -183,6 +182,11 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
+
+### ✅ 25 Oct ~13:35 UTC — Sprint Briefing speaks again (free male voice via Oracle) + no invented advice
+- The briefing runs on **AWS Lambda** (`sprint-briefing-agent`), not Oracle — the 24 Oct free-voice fix never reached it, so OpenAI's 429 meant text only. Now `src/free-voice.ts` (Edge **Andrew**, male, per Elena; OpenAI default `onyx`) → Lambda asks Oracle `POST /voice/speak {async:true}` and polls `GET /voice/speak/:id` every 5 s (one long request died at nginx's 60 s timeout; a full briefing takes ~70 s). Prompt rules 8–9: "nothing is urgent" allowed; no "X blocks Y" unless the data says so (today it blamed a September quota issue and said merge PRs for commits already live).
+- **VERIFIED BY:** forced Lambda run 13:29 UTC → log `[sprint] free voice used (OpenAI TTS failed: 429…)`, Oracle `[voice/speak] job …: 3119 chars → 1372752 bytes`, nginx 202×3 then 200; force flag removed, 21/21 env vars kept. Oracle dist md5 = local build before the change; pm2 restarted 13:27:46 after files.
+- **Lambda bundle:** built with esbuild `--external:@aws-sdk/* --external:oracledb --external:encoding` (same externals as the 18 Sep live bundle; `deploy-sprinter-aws.sh` lacks the first two). Rollback: `dist-lambda/sprint/handler-ROLLBACK-20261025.zip` (the 18 Sep code). Oracle backups `~/_session-backups/cto-voice-20261025/`.
 
 ### ✅ 25 Oct ~13:00 UTC — rule proposals no longer wait for Sunday
 - `--factcheck` calls `proposeRules` when ≥6 new flags since the last proposal (max every 6 h); weekly cron stays. Elena approved R1–R3 herself; first triggered run proposed R4 (describe own rules/commands only from the pack) + R5 (paraphrase a mechanism without adding where/how). Pack rule LISTS added (purpose only where the document states one) after "explain each input" invented a why per item.
