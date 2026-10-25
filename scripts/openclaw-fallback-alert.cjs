@@ -170,7 +170,7 @@ async function askClaude(source, content, maxTokens = 3000, tool = null) {
       method: 'POST', signal: AbortSignal.timeout(150000),
       headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
-        model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: maxTokens,
+        model: process.env.FACTCHECK_MODEL || 'claude-opus-5-5', max_tokens: maxTokens,   // Opus while the promo credit lasts (Elena, 25 Oct)
         system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content }],
         // 25 Oct: a long reply (8 error codes) made the judge write broken JSON twice → "could not verify". A forced
