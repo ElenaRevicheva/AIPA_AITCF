@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 25 Oct 20:40 | Fleet audit priority 1: VJH chain+voice+translation, PrepClaw TTS→edge, Atlas OpenAI leg | VJH llm_chain.py, llm_judge.py, telegram_bot_enhanced.py, vibejobhunter.service; ~/.openclaw/openclaw.json; ~/whitespace | 08c629b8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -183,6 +182,11 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
+
+### ✅ 25 Oct ~20:35 UTC — fleet audit + priority 1 applied (VJH, PrepClaw voice, Atlas) · claim released
+- Audit of all 10 prod agents from 72 h of logs: `docs/oracle/FLEET_WATERFALL_AUDIT_2026-10-25.md` (verdict + smallest fix each). Elena: apply **priority 1 only** today; the rest later.
+- VJH `ae37052`/`f76117f` (OpenAI after free providers; voice reply speaks free; translation via chain) · PrepClaw TTS → edge · Atlas OpenAI key commented out. All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
+- **NOT done (her decision later):** Algom stop (X API 402, log flood), Reddit listener frequency, EspaLuz translation (WhatsApp `[TRANSLATION NEEDED]` placeholder), Atuona fallback, podcast voice.
 
 ### ✅ 25 Oct ~19:55 UTC — free mode for the whole fleet; credit messages only on CHANGE (Elena: $20 plan only, no daily garbage)
 - `llm-resilience` `db910082`: `MODEL_TIER=free` (.env, re-read each minute, no restart) moves Claude + OpenAI to the END of every chain. Verified on Oracle: free → gemini answered, claude → claude. pm2 restarted 19:51:58, server answers 401 on its public route.

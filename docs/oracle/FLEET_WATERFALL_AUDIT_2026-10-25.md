@@ -40,4 +40,19 @@ every report re-checked by hand (quoted below).
 3. **Keep the diamonds honest** — EspaLuz translation (WhatsApp placeholder first), Atuona fallback, podcast voice.
 
 Rules for every fix: existing code paths only, reorder or re-route to providers already in the fleet, back up first,
-verify from logs after, reversible in one step. Nothing in this table is applied yet unless marked in NOW.md.
+verify from logs after, reversible in one step. Nothing in this table is applied yet unless marked below.
+
+## Applied 25 Oct ~20:35 UTC — priority 1 only (Elena: "just 1 for today; the other agents later")
+
+- **VJH** `ae37052` + `f76117f`: OpenAI moved after Gemini/Groq/Grok in `llm_chain.py` (all 3 profiles) and
+  `llm_judge._call_llm`; voice reply = free `speak-free.py` (Edge Ava) first, OpenAI second; translation through
+  `llm_chain`. Proof on Oracle: live provider tests — Gemini, Groq, Grok, Claude return verdicts, chain tests pass,
+  failover test (first three broken) passes; translation "¿Qué trabajos nuevos…?" → "What new AI Operations jobs are
+  there for me this week?" in 0.6 s; free voice → 37 KB Ogg/Opus in 4.6 s. Service restarted 20:29:30, 0 restarts.
+- **PrepClaw**: `messages.tts.provider` openai → edge (Ava); gateway restarted 20:31:10, Telegram + WhatsApp up.
+- **Atlas**: `OPENAI_API_KEY` commented out in `~/whitespace/.env` (backup `~/_session-backups/model-tier-20261025/
+  whitespace.env.bak`); pm2 restarted 20:31:51. Proof: text → claude in 1.4 s (Gemini after 8 Nov), embeddings → gemini
+  in 0.2 s, no OpenAI attempt. Next run Mon 26 Oct 14:00 UTC.
+
+**Bright Data is a paid, budgeted tool (~$15/month, Elena 25 Oct) — keep it.** The Reddit listener's zero yield is a
+question of spending that budget well (her call later), not a reason to remove Bright Data.
