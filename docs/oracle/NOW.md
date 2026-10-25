@@ -183,6 +183,10 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 25 Oct — Pitz coaching notes audited against her document + case (my wording, not hers)
+- Fact-checker flagged D16's suggested answer → audited all 46 notes (Sonnet 5.5, source = ONLY her PDF + case): 20 unsupported, 45 partly true; her document text and 📍 lines were all exact. Rewrote 10 answers (D5 D11 D13 D17 D18 D29 D31 D38 D39 S1); slide timings now "Suggested pacing (my split…)", D-ranges "Detail in this sheet (not labels in your PDF)". Private-docs `5a90b47`; re-imported A+B to deal 66670194056, one note per title; pack refreshed (118,022 chars), old phrases 0, new phrases present.
+- **NEXT:** the 45 "partly true" flags are mostly harmless paraphrase; tighten only if the live fact-checker flags them in her prep.
+
 ### ✅ 24 Oct ~12:55 UTC — cross-reference rule + fact-check every 2 min
 - The fact-checker caught OpenClaw citing a quote to D9 from memory. Pack rules now: cite another block ONLY by copying its 📍 WHERE line and words from its TEXT; unsure → "ask me for D9". Cron: `*/2 … flock -n /tmp/oc-factcheck.lock … --factcheck` (scan stays 2-59/10). Test: 5 cross-references, all quotes exact in the pack.
 
