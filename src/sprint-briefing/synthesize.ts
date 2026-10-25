@@ -137,9 +137,8 @@ RAW SIGNALS (live data — use these):
 ${rawDigest.slice(0, 60000)}
 `;
 
-  // WORKING-PROVIDERS-FIRST chain: Groq (free) → OpenAI (cheap, reliable) → Claude → Gemini.
-  // The currently-dead/capped providers (Claude = Anthropic credits, Gemini) are tried LAST so they
-  // auto-rejoin the instant their credits are topped up — without wasting a call every run while down.
+  // 25 Oct 2026 ORDER RULE (Elena: no regular money to top up): free first — Groq, then Gemini — then Claude, then
+  // OpenAI. Every provider stays wired; a paid one without credit fails fast and rejoins by itself when topped up.
 
   // 1) Groq (free)
   const groqKey = process.env.GROQ_API_KEY?.trim();
@@ -159,18 +158,18 @@ ${rawDigest.slice(0, 60000)}
         return text;
       }
     } catch (err) {
-      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying OpenAI`);
+      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Gemini`);
     }
   }
 
-  // 2) OpenAI (cheap, reliable backstop)
-  const oai = await openaiText(prompt.slice(0, 120000), 4096);
-  if (oai) {
-    console.log('[sprint] OpenAI narrative succeeded');
-    return oai;
+  // 2) Gemini (free)
+  const gem = await geminiText(prompt.slice(0, 120000), 4096);
+  if (gem) {
+    console.log('[sprint] Gemini narrative succeeded');
+    return gem;
   }
 
-  // 3) Claude (premium — used automatically once Anthropic credits are topped up)
+  // 3) Claude (premium — used while there is Anthropic credit)
   try {
     const msg = await anthropic.messages.create({
       model: CLAUDE_MODEL,
@@ -186,12 +185,12 @@ ${rawDigest.slice(0, 60000)}
     console.warn(`[sprint] Claude narrative failed (${(err as { status?: number })?.status})`);
   }
 
-  // 4) Gemini (free — used automatically once its credits are topped up)
-  const gem = await geminiText(prompt.slice(0, 120000), 4096);
-  if (gem) {
-    console.log('[sprint] Gemini narrative succeeded');
-    return gem;
+  // 4) OpenAI (wired backstop — serves whenever it has credit)
+  const oai = await openaiText(prompt.slice(0, 120000), 4096);
+  if (oai) {
+    console.log('[sprint] OpenAI narrative succeeded');
+    return oai;
   }
 
-  throw new Error('All narrative providers failed (Groq capped, OpenAI failed, Claude credit-dead, Gemini empty/capped)');
+  throw new Error('All narrative providers failed (Groq, Gemini, Claude, OpenAI)');
 }

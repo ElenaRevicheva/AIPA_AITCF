@@ -63,27 +63,23 @@ export async function runSprintBriefing(
   let audioMp3: Buffer | null = null;
   let audioSkippedReason: string | undefined;
 
+  // 25 Oct 2026 ORDER RULE (Elena: no regular money for OpenAI): the free voice first (male, as she asked), OpenAI's
+  // voice as the backup — wired, never removed. Only if both fail does a reason reach her caption.
+  try {
+    const { speakFree } = await import('../free-voice');
+    audioMp3 = await speakFree(narrativeText.replace(/[*_`#]/g, '').slice(0, 6000));   // never read markdown aloud
+    console.log('[sprint] free voice used');
+  } catch (e: unknown) {
+    audioSkippedReason = `free voice failed: ${String((e as Error)?.message || e).slice(0, 160)}`;
+  }
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
-  if (openaiKey) {
+  if (!audioMp3 && openaiKey) {
     try {
       const openai = new OpenAI({ apiKey: openaiKey });
       audioMp3 = await synthesizeBriefingMp3(openai, narrativeText);
-    } catch (e: unknown) {
-      audioSkippedReason = `OpenAI TTS failed: ${String((e as Error)?.message || e).slice(0, 200)}`;
-    }
-  } else {
-    audioSkippedReason = 'OPENAI_API_KEY not set — text-only mode';
-  }
-  // 25 Oct 2026: OpenAI out of credit meant a text-only briefing every morning. The free voice (male, as Elena asked)
-  // takes over; only if it also fails does the reason reach her caption.
-  if (!audioMp3) {
-    try {
-      const { speakFree } = await import('../free-voice');
-      audioMp3 = await speakFree(narrativeText.replace(/[*_`#]/g, '').slice(0, 6000));   // never read markdown aloud
-      console.log(`[sprint] free voice used (${audioSkippedReason})`);
       audioSkippedReason = undefined;
     } catch (e: unknown) {
-      audioSkippedReason = `${audioSkippedReason}; free voice failed too: ${String((e as Error)?.message || e).slice(0, 160)}`;
+      audioSkippedReason = `${audioSkippedReason}; OpenAI TTS failed too: ${String((e as Error)?.message || e).slice(0, 160)}`;
     }
   }
 

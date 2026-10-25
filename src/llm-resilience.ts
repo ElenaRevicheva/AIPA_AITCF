@@ -345,10 +345,14 @@ export type ChainProfile = 'quality' | 'classify' | 'bulk';
 
 type ProviderName = 'claude' | 'openai' | 'gemini' | 'groq' | 'grok';
 
+// 25 Oct 2026 — ORDER RULE (Elena: no regular money to top up; agents must always work, at the best quality available):
+// free providers that work today first (Gemini, Groq), then Grok, then OpenAI — wired, never removed: with credit it
+// serves, without it refuses in ~0.1 s — and Claude by money: first in `quality` while there is Claude credit, moved
+// last by MODEL_TIER=free (scripts/model-tier.cjs reads her Anthropic billing mail).
 const CHAIN_ORDER: Record<ChainProfile, ProviderName[]> = {
-  quality: ['claude', 'openai', 'gemini', 'groq', 'grok'],
-  classify: ['gemini', 'openai', 'groq', 'grok', 'claude'],
-  bulk: ['gemini', 'groq', 'openai', 'grok', 'claude'],
+  quality: ['claude', 'gemini', 'groq', 'grok', 'openai'],
+  classify: ['gemini', 'groq', 'grok', 'openai', 'claude'],
+  bulk: ['gemini', 'groq', 'grok', 'openai', 'claude'],
 };
 
 /**
