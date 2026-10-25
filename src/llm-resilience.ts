@@ -353,10 +353,11 @@ const CHAIN_ORDER: Record<ChainProfile, ProviderName[]> = {
 
 /**
  * 25 Oct 2026 (Elena: no budget to top up API credits). MODEL_TIER=free in .env (written by scripts/model-tier.cjs from
- * Anthropic's billing emails) moves the paid providers to the END of every chain, so a $0 month does not make each
- * client-facing draft fail twice (Claude, OpenAI) before free Gemini answers. Re-read every minute: no restart needed.
+ * Anthropic's billing emails) moves Claude to the END of every chain while there is no Claude credit. OpenAI keeps its
+ * place on purpose (Elena: "wired, just skipped — when credits are topped up it should function automatically"): without
+ * credit it refuses in ~0.1 s and the next provider answers. Re-read every minute: no restart needed.
  */
-const PAID: ProviderName[] = ['claude', 'openai'];
+const PAID: ProviderName[] = ['claude'];
 let tierCache = { at: 0, free: false };
 function freeTier(): boolean {
   if (Date.now() - tierCache.at < 60_000) return tierCache.free;
