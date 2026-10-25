@@ -24,6 +24,7 @@
  *   --deactivate                                       unload ("done with <company>")
  *   --list | --refresh
  *   --rules [--approve=R1 | --reject=R1 | --forget=L1]  proposed and learned rules
+ *   --auto     (cron hourly) build packs from case-task / deliverable attachments on hiring-deal emails (25 Oct)
  *   --background  (with --add) answer at once, build in the background, message her when it is ready
  */
 'use strict';
@@ -580,22 +581,104 @@ async function cmdAdd() {
   log(`audit: ${audit.fixed} rewritten, ${audit.marked} marked ⚠️, ${audit.unaudited} unaudited`);
   const warn =Object.values(coached).filter((o) => Object.values(o).some((v) => String(v).startsWith('⚠️'))).length;
   const name = path.basename(file);
-  let fileId = '';
-  try { fileId = (await require('./hs-files.cjs').uploadOutreachFile(path.resolve(file), name)).id; }
-  catch (e) { log(`file upload skipped: ${String(e.message).slice(0, 120)}`); }
+  let fileId = arg('file-id');   // --auto: the file is already in HubSpot (the email attachment) — never a second copy
+  if (!fileId) {
+    try { fileId = (await require('./hs-files.cjs').uploadOutreachFile(path.resolve(file), name)).id; }
+    catch (e) { log(`file upload skipped: ${String(e.message).slice(0, 120)}`); }
+  }
   const title = `${MARK} · ${kind === 'task' ? 'TASK' : unit === 'slide' ? 'MY SLIDES' : 'MY DOCUMENT'} · ${name}`;
   const parts = await addNote(deal.id, title, renderBlocks(kind, prefix, blocks, coached, unit, where, name), fileId);
   register(company, deal, { kind, file: name, blocks: blocks.length, prefix, warn });
-  const act = await activate(deal, company);
-  const msg = `✅ ${company} study pack ready: ${blocks.length} ${unit}s (${prefix}1–${prefix}${blocks.length}) from ${name}, saved on the HubSpot deal "${deal.name}"`
+  // A pack built by --auto never pushes out the pack she is studying right now.
+  const busy = readJson(ACTIVE, {});
+  const keep = flag('auto-built') && busy.dealId && String(busy.dealId) !== String(deal.id);
+  const act = keep ? { chars: 0, files: 0 } : await activate(deal, company);
+  const msg = (flag('auto-built') ? `📥 Found in HubSpot: ${name} on the email "${arg('found').slice(0, 90)}". ` : '')
+    + `✅ ${company} study pack ready: ${blocks.length} ${unit}s (${prefix}1–${prefix}${blocks.length}) from ${name}, saved on the HubSpot deal "${deal.name}"`
     + `${deal.others.length ? ` (the company has ${deal.others.length + 1} open deals)` : ''}. `
     + `🔍 Every coaching answer was checked against your document: ${audit.fixed} rewritten to what it says. `
     + `${warn ? `⚠️ ${warn} block(s) carry something to check (marked ⚠️). ` : ''}`
     + `${audit.unaudited ? `⚠️ ${audit.unaudited} block(s) could NOT be checked — compare their YOU SAY with TEXT. ` : ''}`
-    + `Loaded now — say "walk me through ${kind === 'task' ? 'the task' : 'my deliverables'}" or "quiz me".`
+    + (keep ? `Your ${busy.company} pack stays loaded — say "pack ${company}" when you want this one.`
+      : `Loaded now — say "walk me through ${kind === 'task' ? 'the task' : 'my deliverables'}" or "quiz me".`)
     + (usedFallback ? ` ⚠️ Written by a backup model: ${usedFallback}.` : '');
   log(msg + ` [note parts ${parts}, sheet ${act.chars} chars in ${act.files} file(s)]`);
   if (flag('notify')) notify(msg);
+}
+
+/**
+ * 25 Oct 2026 (Elena: "the bot is designed to pick all the data from the HubSpot deal!"). The case task arrives as an
+ * attachment on the employer's email and her deliverables leave as attachments on her reply — both already sit on the
+ * deal (Pitz: Senior-PM-AI-Agents-Case-Candidate.pdf in, her PDF + slides out), yet a pack was built only when she
+ * re-sent the file in Telegram. Hourly: emails of the last 14 days with attachments on an open [HIRING…] deal → an
+ * incoming case-like file becomes the TASK pack, a file she sent in a case thread becomes MY DOCUMENT / MY SLIDES.
+ * A file whose name is already in a 🎓 note title on that deal is skipped (Pitz's hand-checked sheets) — never twice.
+ */
+const CASE_RE = /case|caso|task|tarea|assignment|challenge|desaf[ií]o|ejercicio|prueba|take.?home|exercise|homework|test/i;
+const NOT_WORK = /\b(cv|resume|r[eé]sum[eé]|curr[ií]cul\w*|cover.?letter|carta|nda|offer|oferta|contract|contrato|invite|invoice)\b/i;
+const AUTO_MAX = 3;   // builds per run (each is an Opus coaching + audit)
+
+async function cmdAuto() {
+  const seenFile = path.join(PRIV, 'auto-seen.json');
+  const seen = readJson(seenFile, {});
+  const res = await hs('POST', '/crm/v3/objects/emails/search', {
+    filterGroups: [{ filters: [
+      { propertyName: 'hs_attachment_ids', operator: 'HAS_PROPERTY' },
+      { propertyName: 'hs_timestamp', operator: 'GTE', value: String(Date.now() - 14 * 86400000) },
+    ] }],
+    properties: ['hs_email_subject', 'hs_email_direction', 'hs_attachment_ids', 'hs_timestamp'],
+    sorts: [{ propertyName: 'hs_timestamp', direction: 'ASCENDING' }], limit: 100,
+  });
+  const jobs = [];
+  for (const e of res.results || []) {
+    const subject = e.properties.hs_email_subject || '';
+    const incoming = e.properties.hs_email_direction === 'INCOMING_EMAIL';
+    const assoc = await hs('GET', `/crm/v4/objects/emails/${e.id}/associations/deals`);
+    for (const a of assoc.results || []) {
+      const d = await hs('GET', `/crm/v3/objects/deals/${a.toObjectId}?properties=dealname,dealstage`);
+      const dealName = (d.properties || {}).dealname || '';
+      if (!/^\[HIRING/i.test(dealName) || ['closedwon', 'closedlost'].includes(d.properties.dealstage) || !dealName.includes(' @ ')) continue;
+      const company = dealName.slice(dealName.lastIndexOf(' @ ') + 3).trim();
+      const titles = (await notesOf(d.id)).map((n) => htmlToText(n.properties.hs_note_body).split('\n')[0]).filter((t) => t.includes(MARK)).join('\n');
+      for (const fid of String(e.properties.hs_attachment_ids).split(';').filter(Boolean)) {
+        if ((seen[fid] || {}).done || (seen[fid] || {}).tries >= 3) continue;
+        const f = await hs('GET', `/files/v3/files/${fid}`);
+        const name = `${f.name}${f.extension ? `.${f.extension}` : ''}`;
+        const why = !/\.(pdf|docx)$/i.test(name) ? 'not a PDF/Word file'
+          : NOT_WORK.test(name.replace(/[_.-]/g, ' ')) ? 'a CV / letter / contract, not case work'
+          : !CASE_RE.test(`${subject} ${name}`) ? 'not a case-task thread'
+          : titles.includes(name) ? 'already in a study pack on this deal' : '';
+        if (why) { if (why.startsWith('already') || why.startsWith('a CV') || why.startsWith('not a PDF')) seen[fid] = { done: true, skipped: why, name }; continue; }
+        jobs.push({ fid, name, subject, company, dealId: d.id, kind: incoming ? 'task' : 'deliverables' });
+      }
+    }
+  }
+  // Task before deliverables: her coaching is grounded on the task's TEXT.
+  jobs.sort((x, y) => (x.kind === 'task' ? 0 : 1) - (y.kind === 'task' ? 0 : 1));
+  if (flag('dry')) {
+    console.log(Object.entries(seen).map(([id, s]) => `seen ${s.name}: ${s.skipped || (s.done ? 'built' : `tries ${s.tries}`)}`).join('\n'));
+    return log(`auto (dry): ${jobs.length} would be built${jobs.map((j) => `\n  ${j.kind} · ${j.company} · ${j.name}`).join('')}`);
+  }
+  const dir = path.join(HOME, 'tmp', 'study-pack-auto');
+  fs.mkdirSync(dir, { recursive: true });
+  let built = 0;
+  for (const j of jobs.slice(0, AUTO_MAX)) {
+    seen[j.fid] = { ...(seen[j.fid] || {}), tries: ((seen[j.fid] || {}).tries || 0) + 1, name: j.name };
+    writeJson(seenFile, seen);
+    try {
+      const { url } = await hs('GET', `/files/v3/files/${j.fid}/signed-url`);
+      const local = path.join(dir, j.name.replace(/[^\w. -]/g, '_'));
+      fs.writeFileSync(local, Buffer.from(await (await fetch(url)).arrayBuffer()));
+      execFileSync(process.execPath, [__filename, '--add', `--company=${j.company}`, `--deal=${j.dealId}`, `--kind=${j.kind}`,
+        `--file=${local}`, `--file-id=${j.fid}`, `--found=${j.subject}`, '--auto-built', '--notify'],
+      { stdio: 'inherit', timeout: 20 * 60000 });
+      fs.rmSync(local, { force: true });
+      seen[j.fid].done = true; built++;
+    } catch (e) { log(`auto: ${j.name} for ${j.company} failed (try ${seen[j.fid].tries}/3): ${String(e.message).split('\n')[0].slice(0, 120)}`); }
+    writeJson(seenFile, seen);
+  }
+  writeJson(seenFile, seen);
+  log(`auto: ${(res.results || []).length} email(s) with attachments in 14 days · ${jobs.length} new case file(s) · ${built} built${jobs.length > AUTO_MAX ? ` (${jobs.length - AUTO_MAX} next run)` : ''}`);
 }
 
 async function cmdImport() {
@@ -650,5 +733,6 @@ async function cmdRefresh() {
   if (flag('list')) return cmdList();
   if (flag('refresh')) return cmdRefresh();
   if (flag('rules')) return cmdRules();
-  log('usage: --add | --import | --activate | --deactivate | --list | --refresh | --rules (see the header)');
+  if (flag('auto')) return cmdAuto();
+  log('usage: --add | --import | --activate | --deactivate | --list | --refresh | --rules | --auto (see the header)');
 })().catch((e) => { log(`⚠️ ${String(e.message).split('\n')[0]}`); if (flag('notify')) notify(`⚠️ Study pack failed: ${String(e.message).split('\n')[0].slice(0, 200)}`); process.exitCode = 1; });
