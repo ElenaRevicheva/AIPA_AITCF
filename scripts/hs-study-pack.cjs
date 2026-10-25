@@ -251,7 +251,9 @@ function unbacked(field, allowed) {
 let usedFallback = '';
 async function claude(prompt, maxTokens = 8000) {
   const key = envValue('ANTHROPIC_API_KEY');
+  const free = envValue('MODEL_TIER') === 'free';   // scripts/model-tier.cjs: no Claude credit this month → free first
   try {
+    if (free) throw new Error('MODEL_TIER=free — Gemini/Groq first');
     if (!key) throw new Error('ANTHROPIC_API_KEY missing');
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -264,7 +266,7 @@ async function claude(prompt, maxTokens = 8000) {
   } catch (e) {
     require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
     const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
-    const r = await completeWithProfileDetailed('quality', 'You follow the instructions exactly and return only what is asked.', prompt, maxTokens, 'study-pack');
+    const r = await completeWithProfileDetailed(free ? 'bulk' : 'quality', 'You follow the instructions exactly and return only what is asked.', prompt, maxTokens, 'study-pack');
     usedFallback = `${MODEL} failed (${String(e.message).slice(0, 90)}) → the fleet waterfall answered${r.provider ? ` with ${r.provider}` : ''}`;
     log(`fallback: ${usedFallback}`);
     return r.text;

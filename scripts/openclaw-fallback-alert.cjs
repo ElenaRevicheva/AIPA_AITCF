@@ -165,7 +165,10 @@ function aboutPack(reply, ask) {
 async function askClaude(source, content, maxTokens = 3000, tool = null) {
   require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
   const key = process.env.ANTHROPIC_API_KEY;
+  // MODEL_TIER=free (set by scripts/model-tier.cjs when no Claude credit came this month): free providers first.
+  const free = (process.env.MODEL_TIER || '') === 'free';
   try {
+    if (free) throw new Error('MODEL_TIER=free — Gemini/Groq first');
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST', signal: AbortSignal.timeout(150000),
       headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
@@ -186,9 +189,9 @@ async function askClaude(source, content, maxTokens = 3000, tool = null) {
     if (tool && used) return JSON.stringify(used.input);
     return (j.content || []).map((c) => c.text || '').join('');
   } catch (e) {
-    console.log(`askClaude: Claude failed (${String(e.message).slice(0, 140)}) — fleet waterfall answers`);   // never silent again
+    if (!free) console.log(`askClaude: Claude failed (${String(e.message).slice(0, 140)}) — fleet waterfall answers`);   // never silent again
     const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
-    return (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, content, maxTokens, 'factcheck')).text;
+    return (await completeWithProfileDetailed(free ? 'bulk' : 'quality', `SOURCE:\n${source.slice(0, 120000)}`, content, maxTokens, 'factcheck')).text;
   }
 }
 
@@ -273,7 +276,8 @@ async function factcheck(state) {
       try {
         problems.push(...(await judge(source, reply)).filter((p) => {
           const c = norm(String(p.claim).replace(/^.*?["“']|["”']$/g, ''));
-          return !(c.length >= 20 && docNorm.includes(c)) && !/\b(matches|is supported|is correct|wording matches)\b/i.test(String(p.why));
+          const labelled = /^\W*(my opinion:|outside your document:|for example \(not in your document\)|📖)/i.test(String(p.claim));
+          return !labelled && !(c.length >= 20 && docNorm.includes(c)) && !/\b(matches|is supported|is correct|wording matches)\b/i.test(String(p.why));
         }));
       } catch (e) {
         console.log(`factcheck judge failed: ${String(e.message).slice(0, 120)}`);
