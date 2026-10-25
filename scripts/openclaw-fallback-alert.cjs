@@ -177,7 +177,9 @@ async function probe(state) {
 const FLAGS = path.join(OC, 'private', 'factcheck-flags.json');
 const MAX_CHECKS = 8;                       // per run — a burst of replies is checked over the next runs
 // Quote marks are dropped before comparing (24 Oct false alarm: her "Prices" quoted inside TEXT "…" as 'Prices').
-const norm = (s) => String(s).replace(/["“”'‘’`]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+// 25 Oct 23:20: a space before punctuation ("login : only", "WhatsApp ;" — how the model re-typed her slide) is not a
+// different quote; it made a word-for-word S2 quote look invented.
+const norm = (s) => String(s).replace(/["“”'‘’`]/g, '').replace(/\s+/g, ' ').replace(/ ([:;,.!?])/g, '$1').trim().toLowerCase();
 const textOf = (m) => (m.content || []).filter((x) => x.type === 'text').map((x) => x.text).join('\n');
 
 /** Replies that coach from the pack: they carry a block id, a pack field, or answer a pack request. */
@@ -232,6 +234,9 @@ FLAG what REPLY ADDS that DOCUMENT does not state:
 - a REASON or PURPOSE ("Why: …", "so that…", "because…", "this protects against…") that DOCUMENT does not give;
 - an example with invented details (prices, minutes, names, situations) not labelled as an example;
 - words presented as a quote, or as what "your document" says, calls or includes, that DOCUMENT does not contain.
+- a paraphrase that CHANGES THE MEANING even with similar words: who does what, a direction (to/from, into/out of), what a
+  percentage is OF, or a dropped qualifier ('logged-in', 'real', 'per month'). (25 Oct: "90% of app users who open Help
+  leave TO WhatsApp" was re-told as "90% of app users who go to WhatsApp for Help leave" — that is wrong, flag it.)
 COACHING may support a general explanation, but never something attributed to her document.
 DO NOT FLAG: a statement DOCUMENT makes, exactly or as a faithful paraphrase — a correct statement is never wrong just
 because DOCUMENT gives no reason for it (flag only a reason REPLY adds); a plain-word explanation of a term; questions,

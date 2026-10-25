@@ -34,7 +34,9 @@ const TIERS = {
   free: { env: { MODEL_TIER: 'free', STUDY_PACK_MODEL: 'claude-sonnet-5-5', FACTCHECK_MODEL: 'claude-sonnet-5-5' },
     // 25 Oct 22:05: with Claude second, its billing failure ended the turn ("No backup answered") — in free mode the
     // next model after Gemini must come from another company; Claude (no credit) last, still wired.
-    openclaw: { primary: 'google/gemini-2.5-flash', fallbacks: ['xai/grok-3', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5'] } },
+    openclaw: { primary: 'google/gemini-flash-latest', fallbacks: ['google/gemini-2.5-flash', 'xai/grok-3', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5'] } },
+    // 25 Oct 23:40: gemini-flash-latest (served as gemini-3.8-flash, free) read slide 2 correctly where 2.5-flash
+    // reversed its meaning; gemini-pro-latest is better still but not in OpenClaw 2026.2.14's model catalog.
 };
 
 function notify(text) {
