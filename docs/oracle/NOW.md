@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 25 Oct 12:10 | study packs built automatically from HubSpot deal email attachments | scripts/hs-study-pack.cjs, crontab, OpenClaw IDENTITY/HELP | 077beccf |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
