@@ -183,6 +183,12 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### 🔴→✅ 25 Oct 22:05 UTC — Claude API credit ran out (the $100 Max grant is used up before 8 Nov) · free mode ON
+- PrepClaw: Opus refused at 22:05 ("credit balance is too low"); OpenClaw raised FailoverError but tried no other model → "No backup answered". On 23 Oct OpenAI→Gemini failed over fine; the difference: the next model was Claude again (same empty account). Exact internal trigger NOT proven.
+- Fix 22:52: `model-tier --tier=free` (PrepClaw Gemini → Grok → OpenAI → Claude; fact-checker + study packs free; CTO AIPA chains Claude last). Test chat answered by gemini-2.5-flash. Self-heal added to `--scan` (Claude billing + no backup → free mode at once).
+- Re-verified with Claude at $0: CTO AIPA quality → gemini; VJH `Anthropic has no credits — skipping Claude for 6h` + 15× gemini classification; VJH research helper → Groq fallback "OK" 0.8 s (the audit's "Claude-only" claim was wrong); Atlas Claude breaker → Gemini.
+- **Elena's 22:05 PrepClaw message got no answer — she must resend it.** Claude returns by itself when credit arrives (daily billing-mail check → claude tier).
+
 ### ✅ 25 Oct ~20:35 UTC — fleet audit + priority 1 applied (VJH, PrepClaw voice, Atlas) · claim released
 - Audit of all 10 prod agents from 72 h of logs: `docs/oracle/FLEET_WATERFALL_AUDIT_2026-10-25.md` (verdict + smallest fix each). Elena: apply **priority 1 only** today; the rest later.
 - VJH (voice reply + translation now fall to free; `f2950e6`) · Atlas ready for Mon 14:00 UTC. **FINAL ORDER RULE 20:55 (Elena):** free providers first (Gemini, Groq), then Grok, then **OpenAI — wired after them, never removed**, Claude by money; voice = free first, OpenAI backup. Applied to CTO AIPA (+Lambda), VJH `ba200cf`, Atlas `305b1ac`, PrepClaw voice. **Never switch anything off unless she explicitly says so** — Atlas key restored. All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
