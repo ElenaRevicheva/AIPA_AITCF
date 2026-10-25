@@ -183,6 +183,10 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 25 Oct ~23:40 UTC — best FREE quality for PrepClaw: gemini-flash-latest (served as gemini-3.8-flash)
+- Slides check: 2.5-flash reversed S2 ("90% … leave TO WhatsApp" → "go to WhatsApp for Help leave") and labelled coaching "Your document says". Free models tested on her key: gemini-2.5-pro and 3-pro-preview retired (404); **gemini-pro-latest = 3.1 Pro works but is NOT in OpenClaw 2026.2.14's catalog**; `google/gemini-flash-latest` IS → now PrepClaw primary (test chat correct). Chain: flash-latest → 2.5-flash → grok → openai → claude. model-tier free tier updated to match.
+- Fact-checker: meaning-change rule + space-before-punctuation fix; replay catches all 3 real S1/S2 errors. `GEMINI_MODEL=gemini-flash-latest` in Oracle .env (scripts; CTO AIPA server picks it up only on its next restart).
+
 ### 🔴→✅ 25 Oct 22:05 UTC — Claude API credit ran out (the $100 Max grant is used up before 8 Nov) · free mode ON
 - PrepClaw: Opus refused at 22:05 ("credit balance is too low"); OpenClaw raised FailoverError but tried no other model → "No backup answered". On 23 Oct OpenAI→Gemini failed over fine; the difference: the next model was Claude again (same empty account). Exact internal trigger NOT proven.
 - Fix 22:52: `model-tier --tier=free` (PrepClaw Gemini → Grok → OpenAI → Claude; fact-checker + study packs free; CTO AIPA chains Claude last). Test chat answered by gemini-2.5-flash. Self-heal added to `--scan` (Claude billing + no backup → free mode at once).
