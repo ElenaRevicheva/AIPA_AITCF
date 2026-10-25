@@ -60,5 +60,15 @@ moves only Claude). Atlas's `OPENAI_API_KEY` restored, file identical to the ori
 (measured), so first place costs nothing. Proof: VJH judge `skipped: ['openai: HTTP Error 429']` → Gemini "OK" in
 0.8 s. Kept: the free safety nets (VJH voice reply → free voice after OpenAI; translation through the chain).
 
+**Final ORDER RULE 20:55 UTC (Elena: "OpenAI should not be first — put it in the correct order so the agent always
+stays functional with the best quality, since I have no regular money to top it up"; and "never switch off anything
+unless I explicitly say so"):** free providers that work today first (Gemini, Groq), then Grok, then OpenAI — wired in
+every chain, never removed — and Claude by money (first in quality chains while it has credit; last in free mode).
+Voice: free first, OpenAI's voice as backup. Applied: CTO AIPA (chains, voice replies, briefing text + voice, Lambda
+redeployed), VJH `ba200cf`, Atlas `305b1ac` (text + embeddings), PrepClaw voice `edge → openai → elevenlabs`.
+Proof (real calls, production keys): CTO AIPA quality → claude, classify/bulk → gemini; VJH judge/quality/scoring →
+gemini; Atlas text → claude, embeddings → gemini; skipped [] in every call. Nothing switched off: all processes,
+services and OpenAI keys in place.
+
 **Bright Data is a paid, budgeted tool (~$15/month, Elena 25 Oct) — keep it.** The Reddit listener's zero yield is a
 question of spending that budget well (her call later), not a reason to remove Bright Data.

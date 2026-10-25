@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 25 Oct 20:45 | Provider ORDER rule (free first, OpenAI wired after, Claude by money) for priority agents | cto-aipa llm-resilience/telegram-bot/sprint-briefing + Lambda, VJH llm_chain/judge/voice, OpenClaw tts, whitespace llm | ccc7d337 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -186,7 +185,7 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 25 Oct ~20:35 UTC — fleet audit + priority 1 applied (VJH, PrepClaw voice, Atlas) · claim released
 - Audit of all 10 prod agents from 72 h of logs: `docs/oracle/FLEET_WATERFALL_AUDIT_2026-10-25.md` (verdict + smallest fix each). Elena: apply **priority 1 only** today; the rest later.
-- VJH (voice reply + translation now fall to free; `f2950e6`) · Atlas ready for Mon 14:00 UTC. **Correction 20:37: OpenAI stays FIRST and wired everywhere (VJH chain/judge, PrepClaw voice, CTO AIPA free mode moves only Claude); Atlas key restored** — Elena: never disable a key, a dead provider is skipped fast (~0.1 s). All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
+- VJH (voice reply + translation now fall to free; `f2950e6`) · Atlas ready for Mon 14:00 UTC. **FINAL ORDER RULE 20:55 (Elena):** free providers first (Gemini, Groq), then Grok, then **OpenAI — wired after them, never removed**, Claude by money; voice = free first, OpenAI backup. Applied to CTO AIPA (+Lambda), VJH `ba200cf`, Atlas `305b1ac`, PrepClaw voice. **Never switch anything off unless she explicitly says so** — Atlas key restored. All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
 - **NOT done (her decision later):** Algom stop (X API 402, log flood), Reddit listener frequency, EspaLuz translation (WhatsApp `[TRANSLATION NEEDED]` placeholder), Atuona fallback, podcast voice.
 
 ### ✅ 25 Oct ~19:55 UTC — free mode for the whole fleet; credit messages only on CHANGE (Elena: $20 plan only, no daily garbage)
