@@ -183,6 +183,9 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 25 Oct ~13:00 UTC — rule proposals no longer wait for Sunday
+- `--factcheck` calls `proposeRules` when ≥6 new flags since the last proposal (max every 6 h); weekly cron stays. Elena approved R1–R3 herself; first triggered run proposed R4 (describe own rules/commands only from the pack) + R5 (paraphrase a mechanism without adding where/how). Pack rule LISTS added (purpose only where the document states one) after "explain each input" invented a why per item.
+
 ### ✅ 25 Oct ~13:10 UTC — OpenClaw menu rewritten short (one Telegram message) + full sync audit
 - Menu 4.6k → 2.4k chars (was over Telegram's 4,096 limit → split): job flow, mock interview, case task (auto 📥 + caption fallback), HOW TO READ MY ANSWERS (📍 / Outside your document / My opinion / 📖 story / 🔎 correction), I LEARN (/rules), one-line rest. HELP.md = IDENTITY.md (identical), mirrored to openclaw-vibejob-shortlist docs (md5 = Oracle). Verified: `/menu` in a test session returns it word for word. Backups `~/_session-backups/openclaw-learning-20261025/*.pre-menu.md`.
 - Sync audit: hs-study-pack.cjs, openclaw-fallback-alert.cjs, speak-free.py md5 laptop = GitHub = Oracle; CTO AIPA dist has the Edge voice and pm2 restarted after it.
