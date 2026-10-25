@@ -2431,6 +2431,41 @@ async function startCTOAIPA() {
     });
   }
 
+  // POST /voice/speak { text } → audio/mpeg — the free voice (src/free-voice.ts) for hosts without it (25 Oct 2026:
+  // the Sprint Briefing Lambda; OpenAI TTS out of credit since 23 Oct). Same Bearer OUTREACH_SECRET as the dedup routes.
+  // { async: true } → { id } at once, then GET /voice/speak/:id → 202 while speaking, the MP3 when ready. The first live
+  // briefing (25 Oct, 13:26) died on nginx's 60 s proxy timeout: a full briefing takes longer to speak than that.
+  const voiceJobs = new Map<string, { at: number; mp3?: Buffer; error?: string }>();
+  app.get('/voice/speak/:id', outreachAuth, (req: Request, res: Response) => {
+    const job = voiceJobs.get(String(req.params.id));
+    if (!job) return res.status(404).json({ ok: false, error: 'no such voice job' });
+    if (job.error) { voiceJobs.delete(String(req.params.id)); return res.status(502).json({ ok: false, error: job.error }); }
+    if (!job.mp3) return res.status(202).json({ ok: true, pending: true });
+    voiceJobs.delete(String(req.params.id));
+    res.set('Content-Type', 'audio/mpeg').send(job.mp3);
+  });
+  app.post('/voice/speak', outreachAuth, async (req: Request, res: Response) => {
+    const text = String(req.body?.text || '').trim();
+    if (!text || text.length > 8000) return res.status(400).json({ ok: false, error: 'text required, at most 8000 chars' });
+    if (req.body?.async) {
+      for (const [k, j] of voiceJobs) if (Date.now() - j.at > 15 * 60_000) voiceJobs.delete(k);
+      const id = require('crypto').randomBytes(8).toString('hex');
+      voiceJobs.set(id, { at: Date.now() });
+      import('./free-voice').then(({ speakFreeLocal }) => speakFreeLocal(text))
+        .then((mp3) => { voiceJobs.set(id, { at: Date.now(), mp3 }); console.log(`[voice/speak] job ${id}: ${text.length} chars → ${mp3.length} bytes`); })
+        .catch((e: unknown) => voiceJobs.set(id, { at: Date.now(), error: String((e as Error)?.message || e).slice(0, 200) }));
+      return res.status(202).json({ ok: true, id });
+    }
+    try {
+      const { speakFreeLocal } = await import('./free-voice');
+      const mp3 = await speakFreeLocal(text);
+      console.log(`[voice/speak] ${text.length} chars → ${mp3.length} bytes`);
+      res.set('Content-Type', 'audio/mpeg').send(mp3);
+    } catch (e: unknown) {
+      res.status(502).json({ ok: false, error: String((e as Error)?.message || e).slice(0, 200) });
+    }
+  });
+
   // SPRINT BRIEFING — dedup endpoints (used by Lambda Sprinter to prevent duplicate daily briefings)
   // GET /sprint-briefing/dedup-check   → { ok, alreadySent, date, lastSent }
   // POST /sprint-briefing/dedup-mark   → { ok, markedDate }
