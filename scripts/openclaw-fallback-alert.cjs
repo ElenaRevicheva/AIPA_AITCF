@@ -175,7 +175,9 @@ async function askClaude(source, content, maxTokens = 3000, tool = null) {
         messages: [{ role: 'user', content }],
         // 25 Oct: a long reply (8 error codes) made the judge write broken JSON twice → "could not verify". A forced
         // tool call returns arguments the API has already parsed — no hand-written JSON to break.
-        ...(tool ? { tools: [tool], tool_choice: { type: 'tool', name: tool.name } } : {}),
+        // tool_choice "tool"/"any" is rejected by claude-sonnet-5-5 (400, found 25 Oct 16:40 — every check from 15:30 had
+        // silently fallen to the waterfall). "auto" + the instruction to call it; a text answer is still parsed.
+        ...(tool ? { tools: [tool], tool_choice: { type: 'auto' } } : {}),
       }),
     });
     const j = await r.json();
@@ -184,6 +186,7 @@ async function askClaude(source, content, maxTokens = 3000, tool = null) {
     if (tool && used) return JSON.stringify(used.input);
     return (j.content || []).map((c) => c.text || '').join('');
   } catch (e) {
+    console.log(`askClaude: Claude failed (${String(e.message).slice(0, 140)}) — fleet waterfall answers`);   // never silent again
     const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
     return (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, content, maxTokens, 'factcheck')).text;
   }
@@ -193,24 +196,33 @@ async function askClaude(source, content, maxTokens = 3000, tool = null) {
 // JSON) and the reply counted as clean. Now: 3,000 tokens, one retry told what broke, and a throw the caller reports.
 async function judge(source, reply) {
   const prompt = `REPLY is what an AI coach just told Elena while preparing her to defend her case study in an interview.
-SOURCE has two parts. DOCUMENT = her submitted document and the case task (block TEXT, with 📍 WHERE lines). COACHING =
-notes written FOR her (plain words, likely questions, suggested answers, named concepts) — they are NOT her document.
-A claim REPLY attributes to her document ("your document says / calls / specifies", a quote presented as hers) must be
-in DOCUMENT; COACHING never supports that. Other claims may be supported by either part. "source_says" quotes DOCUMENT
-only — if only COACHING has it, write "Coaching note, not your document: …".
-List every claim in REPLY that SOURCE does not state or directly support: an invented number, goal, target, reason,
-feature, quote, date, or a link between two things SOURCE does not link. A faithful paraphrase is supported.
-IGNORE: questions to her, encouragement, formatting, block ids (D26, S3, P12), "Next?", and any sentence starting
-"My opinion:" or saying "the document doesn't say". Be strict but fair — flag only what a careful reader of SOURCE would
-call wrong or unsupported. Read the WHOLE relevant block (and blocks it depends on) before flagging; if a claim
-is PARTLY supported, start "why" with "Partly true:" and say exactly what SOURCE does support. Inside the JSON strings use
-single quotes ' — never a double quote. Return ONLY JSON: {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]} (empty list if none).
+SOURCE has two parts: DOCUMENT (her submitted document and the case task — block TEXT with 📍 lines) and COACHING
+(notes written for her — NOT her document).
+FLAG what REPLY ADDS that DOCUMENT does not state:
+- a fact, number, name, goal, or a link between two things;
+- a REASON or PURPOSE ("Why: …", "so that…", "because…", "this protects against…") that DOCUMENT does not give;
+- an example with invented details (prices, minutes, names, situations) not labelled as an example;
+- words presented as a quote, or as what "your document" says, calls or includes, that DOCUMENT does not contain.
+COACHING may support a general explanation, but never something attributed to her document.
+DO NOT FLAG: a statement DOCUMENT makes, exactly or as a faithful paraphrase — a correct statement is never wrong just
+because DOCUMENT gives no reason for it (flag only a reason REPLY adds); a plain-word explanation of a term; questions,
+encouragement, block ids, "Next?"; sentences starting "My opinion:", "Outside your document:", "For example (not in
+your document):" or "📖 Illustrative story"; saying the document doesn't say. Before you flag a statement, search
+DOCUMENT for it — if it is there, do not flag it.
+Write every finding FOR ELENA in plain English. Never use the words SOURCE, TEXT, DOCUMENT or COACHING in what you
+write — say "your document" or "the coaching notes". If something is partly right, start "why" with "Partly true:".
+Answer by calling report_unsupported. Without tools, return ONLY JSON {"unsupported":[{"claim":"…","why":"…","source_says":"…"}]},
+single quotes inside strings.
 
 REPLY:
 ${reply.slice(0, 6000)}`;
   const REPORT = { name: 'report_unsupported', description: 'Report every unsupported claim in REPLY (empty list if none).',
     input_schema: { type: 'object', required: ['unsupported'], properties: { unsupported: { type: 'array', items: {
-      type: 'object', required: ['claim', 'why'], properties: { claim: { type: 'string' }, why: { type: 'string' }, source_says: { type: 'string' } } } } } } };
+      type: 'object', required: ['claim', 'why'], properties: {
+        claim: { type: 'string', description: "the coach's words, copied exactly, at most 25 words" },
+        why: { type: 'string', description: 'ONE short plain-English sentence, at most 20 words: what is wrong' },
+        source_says: { type: 'string', description: 'what her document says on this, copied exactly, at most 30 words; empty if it says nothing' },
+      } } } } } };
   const ask = (content) => askClaude(source, content, 4000, REPORT);
   const parse = (text) => { const s = text.indexOf('{'), e2 = text.lastIndexOf('}'); return JSON.parse(text.slice(s, e2 + 1)).unsupported || []; };
   let text = await ask(prompt);
@@ -230,6 +242,7 @@ async function factcheck(state) {
   const source = `=== DOCUMENT (her submitted document + the case) ===\n${lines.filter(isDoc).join('\n')}\n\n`
     + `=== COACHING (notes written for her — not her document) ===\n${lines.filter((l) => !isDoc(l)).join('\n')}`;
   const srcNorm = norm(source);
+  const docNorm = norm(lines.filter(isDoc).join('\n'));
   const since = state.factScannedTo || Date.now() - 1800 * 1000;
   let newest = since, checked = 0;
   const flags = readJson(FLAGS, []);
@@ -255,7 +268,14 @@ async function factcheck(state) {
         if (!srcNorm.includes(norm(q[1]).slice(0, 160))) problems.push({ claim: `TEXT "${q[1].slice(0, 90)}…"`, why: 'quoted as your text, but it is not in your document word for word' });
       }
       // 2) Claude: every claim must be stated in the pack.
-      try { problems.push(...await judge(source, reply)); } catch (e) {
+      // 25 Oct 16:30: three flags were true statements ("no order or payment" IS in both samples). Code beats the
+      // model: a finding whose quoted claim is in her document word for word, or whose own "why" says it matches, is dropped.
+      try {
+        problems.push(...(await judge(source, reply)).filter((p) => {
+          const c = norm(String(p.claim).replace(/^.*?["“']|["”']$/g, ''));
+          return !(c.length >= 20 && docNorm.includes(c)) && !/\b(matches|is supported|is correct|wording matches)\b/i.test(String(p.why));
+        }));
+      } catch (e) {
         console.log(`factcheck judge failed: ${String(e.message).slice(0, 120)}`);
         // Never a silent pass (24 Oct): she learns this reply was NOT verified.
         send(`⚠️ Fact-check could not verify OpenClaw's reply at ${new Date(ts).toISOString().slice(11, 16)} UTC ("${reply.slice(0, 60).replace(/\s+/g, ' ')}…"). Check it against your document's 📍 lines before you repeat it.`);
@@ -263,8 +283,12 @@ async function factcheck(state) {
       if (!problems.length) continue;
       const at = new Date(ts).toISOString().slice(11, 16);
       for (const p of problems) flags.push({ at: new Date(ts).toISOString(), company, claim: p.claim, why: p.why, source_says: p.source_says || '' });
-      const lines = problems.slice(0, 4).map((p, i) => `${i + 1}) "${String(p.claim).slice(0, 160)}" — ${String(p.why).slice(0, 160)}${p.source_says ? ` Your document: ${String(p.source_says).slice(0, 160)}` : ''}`);
-      send(`🔎 Fact-check on OpenClaw's reply at ${at} UTC — not in your document:\n${lines.join('\n')}\nDon't repeat these in the interview; OpenClaw now has them on its trap list.`);
+      // 25 Oct: cut at a word, never mid-word ("…the COACHIN"), one finding per short block.
+      const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n))}…`; };
+      const items = problems.slice(0, 4).map((p, i) => `${i + 1}. "${clip(p.claim, 180)}"\n   ❌ ${clip(p.why, 200)}`
+        + (p.source_says ? `\n   📄 Your document: "${clip(String(p.source_says).replace(/^["“']|["”']$/g, ''), 220)}"` : ''));
+      const more = problems.length > 4 ? `\n\n…and ${problems.length - 4} more of the same kind (all on its trap list).` : '';
+      send(`🔎 Fact-check — PrepClaw's reply at ${at} UTC:\n\n${items.join('\n\n')}${more}\n\nDon't repeat these in the interview.`);
     }
   }
   state.factScannedTo = newest;
