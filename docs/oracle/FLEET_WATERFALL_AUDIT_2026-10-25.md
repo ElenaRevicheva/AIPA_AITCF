@@ -54,5 +54,11 @@ verify from logs after, reversible in one step. Nothing in this table is applied
   whitespace.env.bak`); pm2 restarted 20:31:51. Proof: text → claude in 1.4 s (Gemini after 8 Nov), embeddings → gemini
   in 0.2 s, no OpenAI attempt. Next run Mon 26 Oct 14:00 UTC.
 
+**Correction 20:37 UTC (Elena: "do not wipe OpenAI — wired, skipped, automatic when topped up"):** OpenAI is back
+FIRST everywhere I had moved it (VJH `f2950e6` chain + judge, PrepClaw voice provider `openai`, CTO AIPA free mode now
+moves only Claude). Atlas's `OPENAI_API_KEY` restored, file identical to the original. A dead OpenAI refuses in ~0.1 s
+(measured), so first place costs nothing. Proof: VJH judge `skipped: ['openai: HTTP Error 429']` → Gemini "OK" in
+0.8 s. Kept: the free safety nets (VJH voice reply → free voice after OpenAI; translation through the chain).
+
 **Bright Data is a paid, budgeted tool (~$15/month, Elena 25 Oct) — keep it.** The Reddit listener's zero yield is a
 question of spending that budget well (her call later), not a reason to remove Bright Data.

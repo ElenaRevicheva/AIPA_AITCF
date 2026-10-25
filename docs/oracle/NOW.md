@@ -185,7 +185,7 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 25 Oct ~20:35 UTC — fleet audit + priority 1 applied (VJH, PrepClaw voice, Atlas) · claim released
 - Audit of all 10 prod agents from 72 h of logs: `docs/oracle/FLEET_WATERFALL_AUDIT_2026-10-25.md` (verdict + smallest fix each). Elena: apply **priority 1 only** today; the rest later.
-- VJH `ae37052`/`f76117f` (OpenAI after free providers; voice reply speaks free; translation via chain) · PrepClaw TTS → edge · Atlas OpenAI key commented out. All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
+- VJH (voice reply + translation now fall to free; `f2950e6`) · Atlas ready for Mon 14:00 UTC. **Correction 20:37: OpenAI stays FIRST and wired everywhere (VJH chain/judge, PrepClaw voice, CTO AIPA free mode moves only Claude); Atlas key restored** — Elena: never disable a key, a dead provider is skipped fast (~0.1 s). All proven on Oracle — details in the audit file. **Bright Data = paid, ~$15/month budget — keep.**
 - **NOT done (her decision later):** Algom stop (X API 402, log flood), Reddit listener frequency, EspaLuz translation (WhatsApp `[TRANSLATION NEEDED]` placeholder), Atuona fallback, podcast voice.
 
 ### ✅ 25 Oct ~19:55 UTC — free mode for the whole fleet; credit messages only on CHANGE (Elena: $20 plan only, no daily garbage)
