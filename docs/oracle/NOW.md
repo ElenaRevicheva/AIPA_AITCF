@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 25 Oct 12:30 | OpenClaw learning loop: coaching audit, per-company traps, weekly rule proposals | scripts/hs-study-pack.cjs, scripts/openclaw-fallback-alert.cjs, OpenClaw workspace skills/IDENTITY/HELP, crontab | a253d669 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
