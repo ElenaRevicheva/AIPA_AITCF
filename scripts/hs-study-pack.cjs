@@ -407,6 +407,10 @@ const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (c
 #   X's own TEXT names Y's issue. Otherwise start with "My opinion:". Never rank links ("biggest", "most important").
 # - NO EMBELLISHMENT (24 Oct: "completely different experience", "wholesale parts"): in your own words add no new
 #   adjective, example, number or reason the TEXT lacks. Want to add a view? Start it with "My opinion:".
+# - LISTS (25 Oct: "explain each input" got an invented "Why / Protects against" for every item): give a purpose
+#   ONLY where the document states one, quoting where it says it. Otherwise write "Your document doesn't say why" and,
+#   if useful, one line "My opinion: …". A named concept she did not write (e.g. prompt injection) goes on an
+#   "Outside your document:" line. An example you make up is labelled "For example (not in your document):".
 # - OUTSIDE KNOWLEDGE (24 Oct: app-store review, "greasy hands", accounting): allowed ONLY on its own line starting
 #   "Outside your document:" — never mixed into what her document says, and never as a reason she wrote.
 # - STORIES / EXAMPLES (24 Oct): when she asks for a story or analogy, open with "Illustrative story — the details are
