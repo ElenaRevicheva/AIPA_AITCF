@@ -162,7 +162,7 @@ function aboutPack(reply, ask) {
 }
 
 /** Claude (Sonnet 5.5, SOURCE cached) — on any failure the fleet's waterfall, as everywhere else. */
-async function askClaude(source, content, maxTokens = 3000) {
+async function askClaude(source, content, maxTokens = 3000, tool = null) {
   require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
   const key = process.env.ANTHROPIC_API_KEY;
   try {
@@ -173,10 +173,15 @@ async function askClaude(source, content, maxTokens = 3000) {
         model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: maxTokens,
         system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content }],
+        // 25 Oct: a long reply (8 error codes) made the judge write broken JSON twice → "could not verify". A forced
+        // tool call returns arguments the API has already parsed — no hand-written JSON to break.
+        ...(tool ? { tools: [tool], tool_choice: { type: 'tool', name: tool.name } } : {}),
       }),
     });
     const j = await r.json();
     if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
+    const used = (j.content || []).find((c) => c.type === 'tool_use');
+    if (tool && used) return JSON.stringify(used.input);
     return (j.content || []).map((c) => c.text || '').join('');
   } catch (e) {
     const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
@@ -188,7 +193,11 @@ async function askClaude(source, content, maxTokens = 3000) {
 // JSON) and the reply counted as clean. Now: 3,000 tokens, one retry told what broke, and a throw the caller reports.
 async function judge(source, reply) {
   const prompt = `REPLY is what an AI coach just told Elena while preparing her to defend her case study in an interview.
-SOURCE is her study pack: her submitted document, the case task, and coaching notes written for her.
+SOURCE has two parts. DOCUMENT = her submitted document and the case task (block TEXT, with 📍 WHERE lines). COACHING =
+notes written FOR her (plain words, likely questions, suggested answers, named concepts) — they are NOT her document.
+A claim REPLY attributes to her document ("your document says / calls / specifies", a quote presented as hers) must be
+in DOCUMENT; COACHING never supports that. Other claims may be supported by either part. "source_says" quotes DOCUMENT
+only — if only COACHING has it, write "Coaching note, not your document: …".
 List every claim in REPLY that SOURCE does not state or directly support: an invented number, goal, target, reason,
 feature, quote, date, or a link between two things SOURCE does not link. A faithful paraphrase is supported.
 IGNORE: questions to her, encouragement, formatting, block ids (D26, S3, P12), "Next?", and any sentence starting
@@ -199,7 +208,10 @@ single quotes ' — never a double quote. Return ONLY JSON: {"unsupported":[{"cl
 
 REPLY:
 ${reply.slice(0, 6000)}`;
-  const ask = (content) => askClaude(source, content);
+  const REPORT = { name: 'report_unsupported', description: 'Report every unsupported claim in REPLY (empty list if none).',
+    input_schema: { type: 'object', required: ['unsupported'], properties: { unsupported: { type: 'array', items: {
+      type: 'object', required: ['claim', 'why'], properties: { claim: { type: 'string' }, why: { type: 'string' }, source_says: { type: 'string' } } } } } } };
+  const ask = (content) => askClaude(source, content, 4000, REPORT);
   const parse = (text) => { const s = text.indexOf('{'), e2 = text.lastIndexOf('}'); return JSON.parse(text.slice(s, e2 + 1)).unsupported || []; };
   let text = await ask(prompt);
   try { return parse(text); } catch (e) {
@@ -211,7 +223,12 @@ ${reply.slice(0, 6000)}`;
 async function factcheck(state) {
   const sheets = ['pack', 'pack2', 'pack3', 'pack4'].map((n) => { try { return fs.readFileSync(path.join(OC, 'workspace', n, 'TOOLS.md'), 'utf8'); } catch { return ''; } }).join('\n');
   if (!/ACTIVE STUDY PACK —/.test(sheets)) return console.log('factcheck: no active pack');
-  const source = sheets.replace(/^# ⚠️ FACT-CHECK FLAGS[\s\S]*?\n\n/m, '');     // never judge a reply against our own flags
+  const pack = sheets.replace(/^# ⚠️ FACT-CHECK FLAGS[\s\S]*?\n\n/m, '');     // never judge a reply against our own flags
+  // 25 Oct: the judge quoted a coaching "YOU SAY" back to her as "Your document". Her words and ours are now apart.
+  const isDoc = (l) => /^(# =====|[PDS]\d+ — |[PDS]\d+\. TEXT|📍|TEXT)/.test(l);
+  const lines = pack.split('\n');
+  const source = `=== DOCUMENT (her submitted document + the case) ===\n${lines.filter(isDoc).join('\n')}\n\n`
+    + `=== COACHING (notes written for her — not her document) ===\n${lines.filter((l) => !isDoc(l)).join('\n')}`;
   const srcNorm = norm(source);
   const since = state.factScannedTo || Date.now() - 1800 * 1000;
   let newest = since, checked = 0;
