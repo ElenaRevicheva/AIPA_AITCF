@@ -340,6 +340,10 @@ const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (c
 # - CROSS-REFERENCES (24 Oct: "D9 says … source tag" was false): name another block ONLY by copying THAT block's own
 #   📍 WHERE line, and quote ONLY words that appear in THAT block's TEXT. Never cite a block, page or quote from memory.
 #   Unsure which block holds it? Say "Ask me for D9 and I'll show it" — never guess.
+# - QUOTES (25 Oct: P18 and P20 quoted with words silently dropped): a quote is the block's words EXACTLY, start to
+#   end, or shorter with "…" where you cut. Never end a cut quote with a full stop as if it were complete.
+# - LINKS BETWEEN BLOCKS (25 Oct: "D18 answers P20", "the biggest connection"): say block X answers block Y ONLY if
+#   X's own TEXT names Y's issue. Otherwise start with "My opinion:". Never rank links ("biggest", "most important").
 # - NO EMBELLISHMENT (24 Oct: "completely different experience", "wholesale parts"): in your own words add no new
 #   adjective, example, number or reason the TEXT lacks. Want to add a view? Start it with "My opinion:".
 # - OUTSIDE KNOWLEDGE (24 Oct: app-store review, "greasy hands", accounting): allowed ONLY on its own line starting
