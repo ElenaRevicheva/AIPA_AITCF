@@ -183,6 +183,12 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 25 Oct ~19:55 UTC — free mode for the whole fleet; credit messages only on CHANGE (Elena: $20 plan only, no daily garbage)
+- `llm-resilience` `db910082`: `MODEL_TIER=free` (.env, re-read each minute, no restart) moves Claude + OpenAI to the END of every chain. Verified on Oracle: free → gemini answered, claude → claude. pm2 restarted 19:51:58, server answers 401 on its public route.
+- `model-tier.cjs --auto` now **daily** (`30 15 * * *`) from Anthropic billing mail: Max grant (+its expiry) → opus · API top-up receipt ("One-time credit purchase"; plan receipts ignored) → claude · "API access is turned off" → free. Acts + messages ONLY on a change (`~/.openclaw/private/model-tier.json`). Dry run today: "tier stays opus", nothing sent.
+- `openclaw-fallback-alert`: "credits ran out" / "key rejected" once per outage per provider (was every 12 h → the 9:05 OpenAI message each morning); re-armed when the probe sees the provider answer. Dry probe: OpenAI 429, no message.
+- (Pre-existing, unrelated: `[BD-SERP]` timeouts in cto-aipa error log — 69 yesterday.)
+
 ### ✅ 25 Oct ~17:20 UTC — models follow the money each month (Elena: no budget to top up)
 - `scripts/model-tier.cjs`: **opus** (now, until the $100 Max-plan credit expires 8 Nov) · **claude** (Sonnet, when Anthropic's "API credits was added" email arrives) · **free** (`MODEL_TIER=free`: Gemini first for PrepClaw, fact-checker and study packs; Claude only as fallback). Cron `30 15 8,9 * *` `--auto`; sets `.env` + OpenClaw model (hot reload), backs both up, messages her. Backups `~/_session-backups/model-tier-20261025/`.
 - **VERIFIED BY:** `--auto --days=10 --dry` found the real 20 Oct email → claude; `--tier=free --dry` shows the OpenClaw switch; free-mode replay of 16:27/16:31 caught the invented examples. Not yet run for real — first live run 8 Nov 15:30 UTC.
