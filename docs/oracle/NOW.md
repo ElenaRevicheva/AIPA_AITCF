@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 25 Oct 12:10 | study packs built automatically from HubSpot deal email attachments | scripts/hs-study-pack.cjs, crontab, OpenClaw IDENTITY/HELP | 077beccf |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -183,6 +182,10 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
+
+### ✅ 25 Oct ~12:40 UTC — study packs build THEMSELVES from the HubSpot deal (no re-sending files)
+- Elena: "the bot is designed to pick all the data from the HubSpot deal!" — the Pitz case PDF (incoming email) and her PDF + slides (her reply) were on the deal all along. `hs-study-pack.cjs --auto` (cron :25 hourly): case-like PDF/Word attachments on open [HIRING] deal emails (14 days) → task pack, then deliverables; reuses the HubSpot file; skips files already named in a 🎓 note (Pitz); never replaces the loaded pack (says "pack X when you want it"); 3 tries per file (`private/auto-seen.json`). Menu lines 1️⃣/2️⃣ updated in HELP + IDENTITY (mirrored).
+- **VERIFIED BY:** dry run on real data → the 3 Pitz files found and skipped, .ics skipped; throwaway `[HIRING-TEST] @ AutoTestCo` deal + incoming "Case task" email → pack built from the HubSpot file, audit 1 rewritten, 2nd run built 0; deal/email/note/file deleted (204). **Not tested:** the "keep the loaded pack" branch (simple condition). Filters are keyword-based — a task email with no case/task/challenge word in subject or filename is missed (she can still send it with a caption).
 
 ### ✅ 25 Oct ~11:50 UTC — OpenClaw LEARNS: coaching audited at the source, traps per company, rules Elena approves
 - cto-aipa `c7fb62f3`. **Gap 2:** `--add` now runs `auditCoaching()` — every coaching field judged against block TEXT only (earlier notes' coaching is no longer a source), rewritten once, re-judged, ⚠️ if still unsupported; the "ready" message reports it. **Gap 3:** fact-check flags carry `company` (40 old ones backfilled Pitz); a pack shows only its own last 30; file keeps 300. **Gap 1:** `openclaw-fallback-alert.cjs --propose-rules` (cron Sun 15:00 UTC) → ≤3 mistake-TYPE rules → her Telegram; `/rules`, `approve R1`, `reject R1`, `forget L1` (skill `rules`, menu line in HELP+IDENTITY, Telegram command hot-reloaded) → `private/learned-rules.json` → printed in EVERY pack's RULES. A model never adds a rule itself.
