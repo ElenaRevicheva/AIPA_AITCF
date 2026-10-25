@@ -183,6 +183,10 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 25 Oct ~17:20 UTC — models follow the money each month (Elena: no budget to top up)
+- `scripts/model-tier.cjs`: **opus** (now, until the $100 Max-plan credit expires 8 Nov) · **claude** (Sonnet, when Anthropic's "API credits was added" email arrives) · **free** (`MODEL_TIER=free`: Gemini first for PrepClaw, fact-checker and study packs; Claude only as fallback). Cron `30 15 8,9 * *` `--auto`; sets `.env` + OpenClaw model (hot reload), backs both up, messages her. Backups `~/_session-backups/model-tier-20261025/`.
+- **VERIFIED BY:** `--auto --days=10 --dry` found the real 20 Oct email → claude; `--tier=free --dry` shows the OpenClaw switch; free-mode replay of 16:27/16:31 caught the invented examples. Not yet run for real — first live run 8 Nov 15:30 UTC.
+
 ### ✅ 25 Oct ~16:45 UTC — fact-checker was silently on the backup chain 15:30–16:42 (my regression), fixed
 - `tool_choice: {type:'tool'}` is REJECTED by claude-sonnet-5-5 (400) → every check fell to the llm-resilience waterfall, unlogged → muddled, truncated findings that flagged TRUE statements. Now `auto` + logged failover; prompt flags only what a reply ADDS; code drops findings that are in her document verbatim; message = quote / ❌ / 📄, cut at a word. Replayed 16:22–16:31 before deploying. 10 bad-window flags removed, re-checked quietly → 14 accurate (backups `~/_session-backups/cto-voice-20261025/*pre-recheck*`).
 - **Lesson:** before deploying an API parameter, call it once against the exact model — a failover that is not logged hides a broken primary.
