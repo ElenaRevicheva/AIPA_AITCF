@@ -18,7 +18,7 @@
  *                private/factcheck-flags.json, which hs-study-pack.cjs prints at the top of the pack so the coach
  *                does not repeat it. Why: 23 Oct OpenClaw told her "the goal is to reduce the 29%" and tied H2 to
  *                bail-outs — neither is in her document; rules reduce that, nothing CHECKED it.
- *   --propose-rules (cron weekly)  repeated MISTAKE TYPES among the fact-check flags → at most 3 proposed rules, sent to
+ *   --propose-rules (weekly, and from --factcheck after 6+ new flags, max every 6 h)  repeated MISTAKE TYPES among the fact-check flags → at most 3 proposed rules, sent to
  *                Elena; she approves with "/rules approve R1" (hs-study-pack.cjs --rules) and the rule joins every future
  *                pack. 25 Oct: corrections lived only in Claude Code sessions — OpenClaw caught its mistakes but never
  *                learned from them. A model never adds a rule to itself: a wrong self-written rule would poison every prep.
@@ -258,6 +258,10 @@ async function factcheck(state) {
     try { execFileSync(process.execPath, [path.join(__dirname, 'hs-study-pack.cjs'), '--refresh'], { stdio: 'ignore', timeout: 120000 }); } catch {}
   }
   console.log(`factcheck ${new Date().toISOString()}: ${checked} reply(s) checked`);
+  // 25 Oct (Elena: "how to stop circling back to Claude to fix each response?"): a weekly proposal is too slow while
+  // she is prepping daily. Enough new flags → propose now (at most every 6 h); Sunday's cron still catches the rest.
+  const pending = flags.filter((f) => Date.parse(f.at) > (state.rulesProposedTo || 0)).length;
+  if (!DRY && pending >= 6 && Date.now() - (state.rulesProposedAt || 0) > 6 * 3600 * 1000) await proposeRules(state);
 }
 
 /**
@@ -298,9 +302,10 @@ ${fresh.map((f) => `- [${f.company || '?'}] "${String(f.claim).slice(0, 220)}" �
   let n = props.reduce((m, p) => Math.max(m, Number(String(p.id).slice(1)) || 0), 0);
   const added = found.map((r) => ({ id: `R${++n}`, rule: String(r.rule).trim(), example: String(r.example || '').slice(0, 240), count: Number(r.count), status: 'pending', at: new Date().toISOString() }));
   state.rulesProposedTo = Math.max(...fresh.map((f) => Date.parse(f.at)));
+  state.rulesProposedAt = Date.now();
   if (!added.length) return console.log(`rules: ${fresh.length} flags, no new repeated mistake type`);
   if (!DRY) fs.writeFileSync(PROPOSALS, JSON.stringify([...props, ...added], null, 2), { mode: 0o600 });
-  send(`📚 OpenClaw learned from its mistakes this week (${fresh.length} fact-check flags). Proposed rules — nothing changes until you approve:\n${added
+  send(`📚 OpenClaw learned from its last ${fresh.length} fact-check flags. Proposed rules — nothing changes until you approve:\n${added
     .map((r) => `${r.id}: ${r.rule}\n   seen ${r.count}× — e.g. ${r.example}`).join('\n')}\nReply /rules approve ${added[0].id} · /rules reject ${added[0].id} · /rules to see all.`);
 }
 
