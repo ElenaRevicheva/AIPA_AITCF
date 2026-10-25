@@ -18,6 +18,10 @@
  *                private/factcheck-flags.json, which hs-study-pack.cjs prints at the top of the pack so the coach
  *                does not repeat it. Why: 23 Oct OpenClaw told her "the goal is to reduce the 29%" and tied H2 to
  *                bail-outs — neither is in her document; rules reduce that, nothing CHECKED it.
+ *   --propose-rules (cron weekly)  repeated MISTAKE TYPES among the fact-check flags → at most 3 proposed rules, sent to
+ *                Elena; she approves with "/rules approve R1" (hs-study-pack.cjs --rules) and the rule joins every future
+ *                pack. 25 Oct: corrections lived only in Claude Code sessions — OpenClaw caught its mistakes but never
+ *                learned from them. A model never adds a rule to itself: a wrong self-written rule would poison every prep.
  *   --dry        print instead of sending
  */
 'use strict';
@@ -157,9 +161,32 @@ function aboutPack(reply, ask) {
   return /THEY MAY ASK|YOU SAY|IN SIMPLE WORDS|TEXT:|📍 WHERE/.test(reply) || PACKISH.test(reply) || PACKISH.test(ask);
 }
 
-async function judge(source, reply) {
+/** Claude (Sonnet 5.5, SOURCE cached) — on any failure the fleet's waterfall, as everywhere else. */
+async function askClaude(source, content, maxTokens = 3000) {
   require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
   const key = process.env.ANTHROPIC_API_KEY;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', signal: AbortSignal.timeout(150000),
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: maxTokens,
+        system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content }],
+      }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
+    return (j.content || []).map((c) => c.text || '').join('');
+  } catch (e) {
+    const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
+    return (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, content, maxTokens, 'factcheck')).text;
+  }
+}
+
+// 24 Oct 2026: the judge failed SILENTLY on long replies (answer cut at 1,200 tokens; double quotes inside claims broke
+// JSON) and the reply counted as clean. Now: 3,000 tokens, one retry told what broke, and a throw the caller reports.
+async function judge(source, reply) {
   const prompt = `REPLY is what an AI coach just told Elena while preparing her to defend her case study in an interview.
 SOURCE is her study pack: her submitted document, the case task, and coaching notes written for her.
 List every claim in REPLY that SOURCE does not state or directly support: an invented number, goal, target, reason,
@@ -172,27 +199,7 @@ single quotes ' — never a double quote. Return ONLY JSON: {"unsupported":[{"cl
 
 REPLY:
 ${reply.slice(0, 6000)}`;
-  // 24 Oct 2026: the judge failed SILENTLY on long replies (answer cut at 1,200 tokens; double quotes inside claims broke
-  // JSON) and the reply counted as clean. Now: 3,000 tokens, one retry told what broke, and a throw the caller reports.
-  const ask = async (content) => {
-    try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', signal: AbortSignal.timeout(150000),
-        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-        body: JSON.stringify({
-          model: process.env.FACTCHECK_MODEL || 'claude-sonnet-5-5', max_tokens: 3000,
-          system: [{ type: 'text', text: `SOURCE:\n${source}`, cache_control: { type: 'ephemeral' } }],
-          messages: [{ role: 'user', content }],
-        }),
-      });
-      const j = await r.json();
-      if (!r.ok) throw new Error(`${r.status} ${JSON.stringify(j).slice(0, 120)}`);
-      return (j.content || []).map((c) => c.text || '').join('');
-    } catch (e) {                             // the fleet's waterfall, as everywhere else
-      const { completeWithProfileDetailed } = require('../dist/llm-resilience.js');
-      return (await completeWithProfileDetailed('quality', `SOURCE:\n${source.slice(0, 120000)}`, content, 3000, 'factcheck')).text;
-    }
-  };
+  const ask = (content) => askClaude(source, content);
   const parse = (text) => { const s = text.indexOf('{'), e2 = text.lastIndexOf('}'); return JSON.parse(text.slice(s, e2 + 1)).unsupported || []; };
   let text = await ask(prompt);
   try { return parse(text); } catch (e) {
@@ -209,6 +216,7 @@ async function factcheck(state) {
   const since = state.factScannedTo || Date.now() - 1800 * 1000;
   let newest = since, checked = 0;
   const flags = readJson(FLAGS, []);
+  const company = readJson(path.join(OC, 'private', 'active-pack.json'), {}).company || '';   // traps are per company (25 Oct)
   for (const f of fs.readdirSync(SESS).filter((n) => n.endsWith('.jsonl') && !n.startsWith('test-'))) {
     const full = path.join(SESS, f);
     if (fs.statSync(full).mtimeMs < since) continue;
@@ -237,13 +245,13 @@ async function factcheck(state) {
       }
       if (!problems.length) continue;
       const at = new Date(ts).toISOString().slice(11, 16);
-      for (const p of problems) flags.push({ at: new Date(ts).toISOString(), claim: p.claim, why: p.why, source_says: p.source_says || '' });
+      for (const p of problems) flags.push({ at: new Date(ts).toISOString(), company, claim: p.claim, why: p.why, source_says: p.source_says || '' });
       const lines = problems.slice(0, 4).map((p, i) => `${i + 1}) "${String(p.claim).slice(0, 160)}" — ${String(p.why).slice(0, 160)}${p.source_says ? ` Your document: ${String(p.source_says).slice(0, 160)}` : ''}`);
       send(`🔎 Fact-check on OpenClaw's reply at ${at} UTC — not in your document:\n${lines.join('\n')}\nDon't repeat these in the interview; OpenClaw now has them on its trap list.`);
     }
   }
   state.factScannedTo = newest;
-  if (!DRY) fs.writeFileSync(FLAGS, JSON.stringify(flags.slice(-40), null, 2), { mode: 0o600 });
+  if (!DRY) fs.writeFileSync(FLAGS, JSON.stringify(flags.slice(-300), null, 2), { mode: 0o600 });   // the pack shows its company's last 30
   // New flags reach the coach now, not at the next 30-min refresh.
   if (!DRY && flags.length !== readJson(FLAGS + '.count', 0)) {
     fs.writeFileSync(FLAGS + '.count', String(flags.length));
@@ -252,11 +260,56 @@ async function factcheck(state) {
   console.log(`factcheck ${new Date().toISOString()}: ${checked} reply(s) checked`);
 }
 
+/**
+ * Weekly (25 Oct): the fact-check flags since the last proposal → mistake TYPES that repeat (≥2) and no current rule
+ * covers → at most 3 generic rules, proposed to Elena. Approval is hers ("/rules approve R1"); this only proposes.
+ */
+async function proposeRules(state) {
+  const PROPOSALS = path.join(OC, 'private', 'rule-proposals.json');
+  const LEARNED = path.join(OC, 'private', 'learned-rules.json');
+  const since = state.rulesProposedTo || 0;
+  const fresh = readJson(FLAGS, []).filter((f) => Date.parse(f.at) > since);
+  if (fresh.length < 3) return console.log(`rules: ${fresh.length} new flag(s) — too few to see a pattern`);
+  const props = readJson(PROPOSALS, []);
+  const rules = (fs.readFileSync(path.join(__dirname, 'hs-study-pack.cjs'), 'utf8').match(/const RULES = [\s\S]*?`;\r?\n/) || [''])[0];
+  const known = [...readJson(LEARNED, []).map((r) => r.rule), ...props.filter((p) => p.status !== 'approved').map((p) => `${p.rule} (${p.status})`)];
+  const content = `MISTAKES are what an AI interview coach told Elena that a fact-checker found unsupported by her own documents.
+Group them by the TYPE of mistake (how it went wrong — e.g. a quote cut without '…', a reason the document never gives,
+an unlabelled opinion), never by topic. For each TYPE seen at least 2 times that the CURRENT RULES and KNOWN RULES do not
+already cover, write ONE rule for the coach: generic for ANY company and ANY document, imperative, at most 2 sentences,
+no company names, no content from these documents. Add one short example of the mistake (may quote a flag) and how
+many flags show it. At most 3, best first; [] if nothing new. Use single quotes inside strings.
+Return ONLY a JSON array: [{"rule":"…","example":"…","count":N}]
+
+CURRENT RULES:
+${rules}
+
+KNOWN RULES (approved, pending or rejected — do not propose again):
+${known.join('\n') || '(none)'}
+
+MISTAKES:
+${fresh.map((f) => `- [${f.company || '?'}] "${String(f.claim).slice(0, 220)}" — ${String(f.why).slice(0, 220)}`).join('\n')}`;
+  let found = [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try { const s = await askClaude('(see the message)', content, 3000); found = JSON.parse(s.slice(s.indexOf('['), s.lastIndexOf(']') + 1)); break; }
+    catch (e) { console.log(`rules: unreadable answer (${String(e.message).slice(0, 80)})`); if (attempt) return; }  // state not advanced → retried next run
+  }
+  found = found.filter((r) => r && r.rule && Number(r.count) >= 2).slice(0, 3);
+  let n = props.reduce((m, p) => Math.max(m, Number(String(p.id).slice(1)) || 0), 0);
+  const added = found.map((r) => ({ id: `R${++n}`, rule: String(r.rule).trim(), example: String(r.example || '').slice(0, 240), count: Number(r.count), status: 'pending', at: new Date().toISOString() }));
+  state.rulesProposedTo = Math.max(...fresh.map((f) => Date.parse(f.at)));
+  if (!added.length) return console.log(`rules: ${fresh.length} flags, no new repeated mistake type`);
+  if (!DRY) fs.writeFileSync(PROPOSALS, JSON.stringify([...props, ...added], null, 2), { mode: 0o600 });
+  send(`📚 OpenClaw learned from its mistakes this week (${fresh.length} fact-check flags). Proposed rules — nothing changes until you approve:\n${added
+    .map((r) => `${r.id}: ${r.rule}\n   seen ${r.count}× — e.g. ${r.example}`).join('\n')}\nReply /rules approve ${added[0].id} · /rules reject ${added[0].id} · /rules to see all.`);
+}
+
 (async () => {
   const state = readJson(STATE, { alerted: {} });
   if (process.argv.includes('--scan')) scan(state);
   if (process.argv.includes('--probe')) await probe(state);
   if (process.argv.includes('--factcheck')) await factcheck(state);
+  if (process.argv.includes('--propose-rules')) await proposeRules(state);
   fs.mkdirSync(path.dirname(STATE), { recursive: true });
   if (!DRY) fs.writeFileSync(STATE, JSON.stringify(state, null, 2), { mode: 0o600 });
 })().catch((e) => { console.log(`⚠️ ${e.message}`); process.exitCode = 1; });

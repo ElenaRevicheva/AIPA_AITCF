@@ -10,14 +10,20 @@
  *   - the original file is uploaded to HubSpot and its text is split into blocks by CODE (quotes cannot be invented);
  *   - plain words, likely questions and answers are written by Claude from that company's material only, then every
  *     number in them is checked against the sources; an unbacked number is retried once, then marked ⚠️ [check];
+ *   - then every coaching sentence is AUDITED against the source TEXT only (25 Oct: 20 of 46 Pitz answers added
+ *     reasons her document never gave): rewritten once from the sources, re-checked, and marked ⚠️ if still unsupported;
  *   - the pack is a 🎓 STUDY PACK note on the deal; OpenClaw's sheet (workspace/pack*) is only a copy of those notes,
  *     rebuilt every 30 min by --refresh, which also unloads a pack whose deal is won/lost or 30 days old.
+ *   - LEARNING (25 Oct): fact-check flags are kept per company; openclaw-fallback-alert.cjs --propose-rules turns a
+ *     repeated mistake TYPE into a proposed rule; Elena approves it ("/rules approve R1") and it joins the RULES of
+ *     every future pack (private/learned-rules.json). Nothing becomes a rule without her yes.
  *
  *   --add      --company=X [--role=Y | --deal=ID] --kind=task|deliverables --file=PATH   (her caption decides kind)
  *   --import   --company=X  --deal=ID --kind=task|deliverables --sheet=PATH [--title=T]   (a ready sheet, no model)
  *   --activate --company=X [--role=Y | --deal=ID]     load that deal's pack into OpenClaw
  *   --deactivate                                       unload ("done with <company>")
  *   --list | --refresh
+ *   --rules [--approve=R1 | --reject=R1 | --forget=L1]  proposed and learned rules
  *   --background  (with --add) answer at once, build in the background, message her when it is ready
  */
 'use strict';
@@ -33,6 +39,8 @@ const PRIV = process.env.STUDY_PACK_PRIVATE || path.join(HOME, '.openclaw', 'pri
 const PY = process.env.STUDY_PACK_PY || path.join(HOME, 'VibeJobHunterAIPA_AIMCF', 'venv', 'bin', 'python');
 const ACTIVE = path.join(PRIV, 'active-pack.json');
 const REGISTRY = path.join(PRIV, 'study-packs.json');
+const PROPOSALS = path.join(PRIV, 'rule-proposals.json');   // written by openclaw-fallback-alert.cjs --propose-rules
+const LEARNED = path.join(PRIV, 'learned-rules.json');      // only what Elena approved
 const MODEL = envValue('STUDY_PACK_MODEL') || 'claude-opus-5-5';   // 23 Oct: the strongest model while the $100 promo credit (expires 8 Nov 2026) lasts
 const PACK_FILES = ['pack', 'pack2', 'pack3', 'pack4']; // each ≤ SHEET_MAX (OpenClaw bootstrapMaxChars is 40,000)
 const SHEET_MAX = 38000;
@@ -46,7 +54,7 @@ const flag = (k) => process.argv.includes(`--${k}`);
 // without running this script. A reply must copy the script's line, so a reply with no [proof …] did not run it —
 // the same READ-PROOF idea that made the mock interview reliable (hs-deal-prep.cjs, 15 Oct).
 const PROOF = `[proof ${require('crypto').randomBytes(3).toString('hex')}]`;
-const log = (...a) => console.log(...a.map((x, i) => (i === a.length - 1 && typeof x === 'string' && /^[✅⏳⚠🎓]|^No /.test(x) ? `${x} ${PROOF}` : x)));
+const log = (...a) => console.log(...a.map((x, i) => (i === a.length - 1 && typeof x === 'string' && /^[✅⏳⚠🎓📚]|^No /.test(x) ? `${x} ${PROOF}` : x)));
 
 // ───────────────────────────── HubSpot ─────────────────────────────
 async function hs(method, urlPath, body) {
@@ -322,6 +330,58 @@ ${JSON.stringify(batch)}`;
   return out;
 }
 
+/**
+ * 25 Oct 2026: the Pitz audit found 20 of 46 coaching answers adding reasons her document never gave ("waiting would
+ * hold Mexico hostage", "the CEO decides") — the number check cannot see a reason. Every field is judged against the
+ * SOURCES only (block TEXT, never other coaching notes); an unsupported field is rewritten once, the rewrite is judged
+ * again, and whatever still fails is marked ⚠️ so she checks it. A batch the judge cannot read is reported, never passed.
+ */
+async function auditCoaching(kind, coached, ids, blocks, sources) {
+  const fields = Object.keys(FIELDS[kind]);
+  const allowed = numbersIn(sources.join('\n'));
+  const res = { fixed: 0, marked: 0, unaudited: 0 };
+  const judgeBatch = async (items, rewrite) => {
+    const prompt = `Each ITEM is one block of a document (text) plus coaching notes about it (${fields.join(', ')}).
+The SOURCES below are the ONLY truth. Find every note field that states a fact, number, reason, goal, label or link between
+things that the SOURCES do not state or directly support. A faithful paraphrase is supported; a suggested answer may
+rephrase but must not add facts or reasons.${rewrite ? ' For each one, also write "fixed": the same field, same purpose, using ONLY what the SOURCES say.' : ''}
+Fields that are fine: leave out. Use single quotes inside strings. Return ONLY a JSON array (empty if all supported):
+[{"id":"…","field":"${fields.join('|')}","problem":"…"${rewrite ? ',"fixed":"…"' : ''}}]
+
+SOURCES:
+${sources.map((s, n) => `--- source ${n + 1} ---\n${s.slice(0, 60000)}`).join('\n')}
+
+ITEMS:
+${JSON.stringify(items)}`;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try { return parseJsonArray(await claude(prompt, 6000)).filter((f) => f && ids.includes(f.id) && fields.includes(f.field)); }
+      catch (e) { log(`audit: judge unreadable (${String(e.message).slice(0, 80)})${attempt ? ' — batch reported unaudited' : ', retrying'}`); }
+    }
+    return null;
+  };
+  const item = (id) => ({ id, text: blocks[ids.indexOf(id)], ...Object.fromEntries(fields.map((f) => [f, (coached[id] || {})[f] || ''])) });
+  for (let i = 0; i < ids.length; i += 10) {
+    const batchIds = ids.slice(i, i + 10).filter((id) => coached[id]);
+    const found = await judgeBatch(batchIds.map(item), true);
+    if (!found) { res.unaudited += batchIds.length; continue; }
+    const changed = new Set();
+    for (const f of found) {
+      const fix = String(f.fixed || '').trim();
+      if (fix && !unbacked(fix, allowed).length) { coached[f.id][f.field] = fix; changed.add(f.id); }
+      else { coached[f.id][f.field] = `⚠️ [check: ${String(f.problem).slice(0, 120)}] ${coached[f.id][f.field]}`; res.marked++; }
+    }
+    if (!changed.size) continue;
+    const still = await judgeBatch([...changed].map(item), false);   // the rewrite is not trusted until judged again
+    if (!still) { res.unaudited += changed.size; continue; }
+    for (const f of still) {
+      if (String(coached[f.id][f.field]).startsWith('⚠️')) continue;
+      coached[f.id][f.field] = `⚠️ [check: ${String(f.problem).slice(0, 120)}] ${coached[f.id][f.field]}`; res.marked++;
+    }
+    res.fixed += found.filter((f) => changed.has(f.id)).length - still.length;
+  }
+  return res;
+}
+
 function renderBlocks(kind, prefix, blocks, notesById, unit, where = [], fileName = '') {
   const labels = FIELDS[kind];
   return blocks.map((t, i) => {
@@ -363,7 +423,15 @@ const RULES = (company, dealName) => `# 🎓 ACTIVE STUDY PACK — ${company} (c
 # - If she sends a file whose name is listed under FILES below, coach from THIS pack — never from your own reading of it.
 # - TRUTH: only this pack. If it does not say it: "The document doesn't say." A field starting ⚠️ holds an unchecked
 #   number — tell her to check it. Anything else starts with "My opinion:".
-`;
+${learnedRulesText()}`;
+
+/** Rules Elena approved from OpenClaw's own repeated mistakes — they apply to EVERY company's pack. */
+function learnedRulesText() {
+  const learned = readJson(LEARNED, []);
+  if (!learned.length) return '';
+  return `# - LEARNED FROM YOUR OWN MISTAKES (Elena approved each one; they are as binding as the rules above):\n${learned
+    .map((r) => `#   ${r.id} (${String(r.approvedAt).slice(0, 10)}): ${r.rule}`).join('\n')}\n`;
+}
 
 function writeSheet(company, dealName, sections) {
   const full = `${RULES(company, dealName)}\n${sections.join('\n\n')}\n`;
@@ -413,7 +481,9 @@ async function activate(deal, company) {
   const ordered = new Map([...byTitle.entries()].sort(([a], [b]) => a.localeCompare(b)));
   byTitle.clear(); for (const [k, v] of ordered) byTitle.set(k, v);
   // What the fact-checker caught (openclaw-fallback-alert.cjs --factcheck, 24 Oct) sits first, so it is not repeated.
-  const caught = readJson(path.join(PRIV, 'factcheck-flags.json'), []).slice(-30);
+  // 25 Oct: per company — the next company's prep must not carry Pitz's traps (the lessons travel as learned rules).
+  const caught = readJson(path.join(PRIV, 'factcheck-flags.json'), [])
+    .filter((f) => String(f.company || '').toLowerCase() === company.toLowerCase()).slice(-30);
   const flagSection = caught.length
     ? `# ⚠️ FACT-CHECK FLAGS — you said these to Elena and they are NOT in her document. Never repeat them:\n${caught.map((f) => `#   - "${String(f.claim).slice(0, 200)}" — ${String(f.why).slice(0, 200)}${f.source_says ? ` (document: ${String(f.source_says).slice(0, 160)})` : ''}`).join('\n')}\n`
     : '';
@@ -451,6 +521,40 @@ function notify(text) {
 }
 
 // ───────────────────────────── commands ─────────────────────────────
+/** /rules — what OpenClaw proposes to learn from its repeated mistakes, and what Elena already approved. */
+async function cmdRules() {
+  const props = readJson(PROPOSALS, []);
+  const learned = readJson(LEARNED, []);
+  const pick = (k) => { const id = arg(k).toUpperCase(); const p = props.find((x) => x.id === id && x.status === 'pending'); if (!p) throw new Error(`no pending rule ${id || '(none given)'} — send /rules to see them`); return p; };
+  let done = '';
+  if (arg('approve')) {
+    const p = pick('approve');
+    const id = `L${learned.reduce((m, r) => Math.max(m, Number(String(r.id).slice(1)) || 0), 0) + 1}`;
+    learned.push({ id, rule: p.rule, from: p.id, example: p.example, approvedAt: new Date().toISOString() });
+    p.status = 'approved'; writeJson(LEARNED, learned); writeJson(PROPOSALS, props);
+    done = `✅ ${p.id} approved → learned rule ${id}. It now applies to every company's pack.`;
+  } else if (arg('reject')) {
+    const p = pick('reject'); p.status = 'rejected'; writeJson(PROPOSALS, props);
+    done = `✅ ${p.id} rejected — it will not be proposed again.`;
+  } else if (arg('forget')) {
+    const id = arg('forget').toUpperCase();
+    if (!learned.some((r) => r.id === id)) throw new Error(`no learned rule ${id}`);
+    writeJson(LEARNED, learned.filter((r) => r.id !== id));
+    done = `✅ Learned rule ${id} removed.`;
+  }
+  if (done) {
+    const a = readJson(ACTIVE, {});
+    if (a.dealId) await cmdRefresh().catch(() => {});   // the active pack carries the change now, not in 30 min
+    return log(done);
+  }
+  const pending = props.filter((p) => p.status === 'pending');
+  const now = readJson(LEARNED, []);
+  log([
+    pending.length ? `📚 Proposed rules (from OpenClaw's repeated mistakes):\n${pending.map((p) => `${p.id}: ${p.rule}\n   seen ${p.count}× — e.g. ${p.example}`).join('\n')}\nApprove: /rules approve R1 · Reject: /rules reject R1` : '📚 No proposed rules waiting.',
+    now.length ? `Learned (apply to every pack):\n${now.map((r) => `${r.id}: ${r.rule}`).join('\n')}\nRemove one: /rules forget L1` : 'No learned rules yet.',
+  ].join('\n\n'));
+}
+
 async function cmdAdd() {
   const company = arg('company'), kind = arg('kind'), file = arg('file');
   if (!company || !['task', 'deliverables'].includes(kind) || !file) throw new Error('need --company --kind=task|deliverables --file');
@@ -469,9 +573,12 @@ async function cmdAdd() {
   const ids = blocks.map((_, i) => `${prefix}${i + 1}`);
   // Sources for grounding: this file + every other pack note on the deal (the task, when coaching deliverables).
   const prior = (await notesOf(deal.id)).map((n) => htmlToText(n.properties.hs_note_body)).filter((t) => t.includes(MARK));
-  const sources = [blocks.join('\n'), ...prior];
+  // Only TEXT lines of earlier notes: their coaching fields are our words, not a source (source-of-truth drift, 25 Oct).
+  const sources = [blocks.join('\n'), ...prior.map((t) => t.split('\n').filter((l) => /^TEXT/.test(l)).join('\n')).filter(Boolean)];
   const coached = await coach(kind, company, ids, blocks, sources);
-  const warn = Object.values(coached).filter((o) => Object.values(o).some((v) => String(v).startsWith('⚠️'))).length;
+  const audit = await auditCoaching(kind, coached, ids, blocks, sources);
+  log(`audit: ${audit.fixed} rewritten, ${audit.marked} marked ⚠️, ${audit.unaudited} unaudited`);
+  const warn =Object.values(coached).filter((o) => Object.values(o).some((v) => String(v).startsWith('⚠️'))).length;
   const name = path.basename(file);
   let fileId = '';
   try { fileId = (await require('./hs-files.cjs').uploadOutreachFile(path.resolve(file), name)).id; }
@@ -481,7 +588,10 @@ async function cmdAdd() {
   register(company, deal, { kind, file: name, blocks: blocks.length, prefix, warn });
   const act = await activate(deal, company);
   const msg = `✅ ${company} study pack ready: ${blocks.length} ${unit}s (${prefix}1–${prefix}${blocks.length}) from ${name}, saved on the HubSpot deal "${deal.name}"`
-    + `${deal.others.length ? ` (the company has ${deal.others.length + 1} open deals)` : ''}. ${warn ? `⚠️ ${warn} block(s) carry a number to check. ` : ''}`
+    + `${deal.others.length ? ` (the company has ${deal.others.length + 1} open deals)` : ''}. `
+    + `🔍 Every coaching answer was checked against your document: ${audit.fixed} rewritten to what it says. `
+    + `${warn ? `⚠️ ${warn} block(s) carry something to check (marked ⚠️). ` : ''}`
+    + `${audit.unaudited ? `⚠️ ${audit.unaudited} block(s) could NOT be checked — compare their YOU SAY with TEXT. ` : ''}`
     + `Loaded now — say "walk me through ${kind === 'task' ? 'the task' : 'my deliverables'}" or "quiz me".`
     + (usedFallback ? ` ⚠️ Written by a backup model: ${usedFallback}.` : '');
   log(msg + ` [note parts ${parts}, sheet ${act.chars} chars in ${act.files} file(s)]`);
@@ -539,5 +649,6 @@ async function cmdRefresh() {
   if (flag('deactivate')) return cmdDeactivate();
   if (flag('list')) return cmdList();
   if (flag('refresh')) return cmdRefresh();
-  log('usage: --add | --import | --activate | --deactivate | --list | --refresh (see the header)');
+  if (flag('rules')) return cmdRules();
+  log('usage: --add | --import | --activate | --deactivate | --list | --refresh | --rules (see the header)');
 })().catch((e) => { log(`⚠️ ${String(e.message).split('\n')[0]}`); if (flag('notify')) notify(`⚠️ Study pack failed: ${String(e.message).split('\n')[0].slice(0, 200)}`); process.exitCode = 1; });
