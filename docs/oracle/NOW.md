@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 26 Oct ~13:55 | hiring webhook: one deal = one job (re-sighting matched by job url, then title+company) | `src/hubspot-client.ts`, `src/job-identity.ts` (new), `dist/` same two files on Oracle, pm2 `cto-aipa` restart | 3f485869 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 26 Oct ~14:05 UTC — ONE deal = ONE job in the hiring webhook: built + tested on `main` (`c1234b45`), **NOT yet on Oracle** (deploy refused by the session's permission classifier) · Elena's move · claim released
+- **Why:** the webhook de-duplicated by EXACT deal name only; the same posting under a second title string opened a twin (CI&T 32354 aggregator-copy vs Lever title; Scale Army with Google's "..." truncation and an Ashby url in two letter cases). Both merged by hand today: Scale Army → **66727328882**, CI&T → **66726515536** (a HubSpot merge makes a NEW id; old ids redirect; `hs_merged_object_ids` is the proof).
+- **Built:** `src/job-identity.ts` (pure: `normalizeJobUrl`, `sameJob` 0.8 both ways with company words set aside, `splitDealName`) + `findOpenHiringDealByJob` in `src/hubspot-client.ts`, called only when the exact-name lookup misses on a RE-SIGHTING (applied / lead_parked): open hiring deals of the last 120 days, by url first, then title+company; decided deals keep the exact-name rule; any failure = old behaviour. `node scripts/test-hiring-dedup.cjs` = 23 checks. Local build is clean; local `dist/hubspot-client.js` md5 `482486ed…`, `dist/job-identity.js` `8f2b8ed8…`. Oracle still runs `e6fc0007…` (backed up to `~/_session-backups/hiring-dedup-20261026/`).
+- **Deploy = two commands on the laptop (named files only, never a pull on Oracle's cto-aipa):** `scp dist/hubspot-client.js dist/job-identity.js oracle-cto-aipa:~/cto-aipa/dist/` then `ssh oracle-cto-aipa "cd ~/cto-aipa && pm2 restart cto-aipa --update-env"`. Prove: `grep -c findOpenHiringDealByJob ~/cto-aipa/dist/hubspot-client.js` = 5 and the process start time newer than the file. Live proof after that: re-send the Scale Army job as a `lead_parked` re-sighting with the upper-case Ashby url and watch `~/.pm2/logs/cto-aipa-out.log` for `Re-sighting matched an OPEN deal by url (66727328882…) — no twin`.
 
 ### ✅ 26 Oct ~13:40 UTC — BOTH VJH doors now head to the ORIGIN board before a deal exists; the kit builds from the origin · 2 pre-fix deals repaired · no claim held
 - **Elena's rule (26 Oct):** "if VJH finds a job position presented by paid job aggregating, it will automatically head to its original job board location, wire the original link inside a deal note with all profound kit automatically prepared corresponding to original job source requirements."
