@@ -49,6 +49,13 @@ export function companyKey(company: string): string {
   return String(company || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+/** The same employer under two spellings: "Won" / "WON" / "Won.Ai", "Scale Army" / "Scale Army Careers",
+ *  "CI&T" / "Ciandt" is NOT ("cit" vs "ciandt" — the url catches that one). One key contains the other. */
+export function sameCompany(a: string, b: string): boolean {
+  const x = companyKey(a), y = companyKey(b);
+  return !!x && !!y && (x.includes(y) || y.includes(x));
+}
+
 /** True when the incoming (title, company) names the job an existing deal is about: the companies are the same
  *  (one key contains the other: "scalearmy" ⊂ "scalearmycareers") and the two titles share 0.8 of their words
  *  BOTH ways, company words set aside ("… @ Scale Army ..." left in a title by Google's truncation does not
@@ -56,7 +63,7 @@ export function companyKey(company: string): string {
  *  "[Job - 29399] AI Solutions Architect" is not "[Job - 32354] AI Solution Architect" (3 of 5). */
 export function sameJob(incomingTitle: string, incomingCompany: string, dealTitle: string, dealCompany: string): boolean {
   const a = companyKey(incomingCompany), b = companyKey(dealCompany);
-  if (!a || !b || !(a.includes(b) || b.includes(a))) return false;
+  if (!sameCompany(incomingCompany, dealCompany)) return false;
   const longer = a.length >= b.length ? a : b;
   const strip = (words: Set<string>) => new Set([...words].filter((w) => !longer.includes(w)));
   const want = strip(titleWords(incomingTitle)), have = strip(titleWords(dealTitle));

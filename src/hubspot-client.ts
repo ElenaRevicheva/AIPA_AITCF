@@ -774,10 +774,14 @@ export async function findOpenHiringDealByCompany(
         limit: 50,
       },
     );
-    const tail = ` @ ${c}`.toLowerCase();
+    // 2026-10-26 — the deal's company and the email's company are two spellings of one employer more often
+    // than not: WON.ai's video-screen mail said "Won", the job deal ends "@ Won.Ai", and the exact-tail test
+    // sent the reply to a NEW deal (66731118499, merged by hand). Same rule as the re-sighting dedup
+    // (src/job-identity.ts sameCompany): one key contains the other.
+    const { sameCompany, splitDealName } = await import('./job-identity');
     const open = (data?.results ?? []).filter((d) => {
       const n = (d.properties.dealname || '').trim().toLowerCase();
-      return n.startsWith('[hiring') && n.endsWith(tail)
+      return n.startsWith('[hiring') && sameCompany(splitDealName(d.properties.dealname).company, c)
         && d.properties.dealstage !== HS_STAGES.won && d.properties.dealstage !== HS_STAGES.lost;
     });
     const hit = open[0];

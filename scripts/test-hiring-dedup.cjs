@@ -5,7 +5,7 @@
  */
 'use strict';
 const assert = require('assert');
-const { normalizeJobUrl, sameJob, splitDealName, jobUrlOfDescription, titleWords } = require('../dist/job-identity.js');
+const { normalizeJobUrl, sameJob, splitDealName, jobUrlOfDescription, titleWords, sameCompany } = require('../dist/job-identity.js');
 
 let n = 0;
 const ok = (cond, what) => { assert.ok(cond, what); n++; };
@@ -52,5 +52,14 @@ eq([...titleWords('[Job - 32354] AI Solution Architect, Brazil at CI&T')].join('
 eq(jobUrlOfDescription('Category: hiring\nStage: applied\nJob URL: https://jobs.lever.co/ciandt/989a2fd5\nAggregator copy: https://x\nSource: serpapi_jobs'),
   'https://jobs.lever.co/ciandt/989a2fd5', 'Job URL line');
 eq(jobUrlOfDescription('Category: hiring\nSource: vjh_review'), '', 'no Job URL line');
+
+// ── the same employer, two spellings (an employer email joins the job deal, 26 Oct: WON.ai) ──
+ok(sameCompany('Won', 'Won.Ai'), 'Won / Won.Ai');
+ok(sameCompany('WON', 'Won.Ai'), 'case');
+ok(sameCompany('Scale Army', 'Scale Army Careers'), 'suffix');
+ok(sameCompany('Turing', 'Turing'), 'same');
+ok(!sameCompany('CI&T', 'Ciandt'), 'CI&T vs Ciandt is for the url rule');
+ok(!sameCompany('Won', 'Wonderschool') === false, 'Won is inside Wonderschool — known cost of containment (newest open deal wins; names are checked by title too)');
+ok(!sameCompany('', 'Won.Ai') && !sameCompany('Won', ''), 'empty');
 
 console.log(`✓ test-hiring-dedup: ${n} checks passed`);
