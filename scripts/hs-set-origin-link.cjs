@@ -96,12 +96,7 @@ async function notesOf(dealId) {
   // while this script's Bash run was refused); only the twin is left to merge.
   if (MERGE_ONLY || copyUrl === ORIGIN) {
     if (!MERGE) { console.log('nothing to do: the description already carries the origin and no --merge given'); return; }
-    const merged = await hs('POST', '/crm/v3/objects/deals/merge', { primaryObjectId: DEAL, objectIdToMerge: MERGE });
-    console.log(`  ✓ merged ${MERGE} into ${merged.id || DEAL}`);
-    const after = await hs('GET', `/crm/v3/objects/deals/${DEAL}?properties=dealname,description,num_notes`);
-    console.log(`\nREAD BACK deal ${DEAL}: ${after.properties.dealname}\n${after.properties.description}\n  notes: ${after.properties.num_notes}`);
-    try { await hs('GET', `/crm/v3/objects/deals/${MERGE}`); console.log(`  twin ${MERGE} STILL EXISTS — merge did not take`); }
-    catch (e) { console.log(`  twin ${MERGE}: gone (${/HTTP \d+/.exec(String(e))?.[0] || 'not found'})`); }
+    await mergeAndReadBack();
     return;
   }
 
@@ -136,16 +131,25 @@ async function notesOf(dealId) {
   console.log('  ✓ 🔗 ORIGIN POSTING note');
 
   // 5. merge the twin
-  if (MERGE) {
-    const merged = await hs('POST', '/crm/v3/objects/deals/merge', { primaryObjectId: DEAL, objectIdToMerge: MERGE });
-    console.log(`  ✓ merged ${MERGE} into ${merged.id || DEAL}`);
-  }
-
-  // read back
-  const after = await hs('GET', `/crm/v3/objects/deals/${DEAL}?properties=dealname,description,num_notes`);
-  console.log(`\nREAD BACK deal ${DEAL}: ${after.properties.dealname}\n${after.properties.description}\n  notes: ${after.properties.num_notes}`);
-  if (MERGE) {
-    try { await hs('GET', `/crm/v3/objects/deals/${MERGE}`); console.log(`  twin ${MERGE} STILL EXISTS — merge did not take`); }
-    catch (e) { console.log(`  twin ${MERGE}: gone (${/HTTP \d+/.exec(String(e))?.[0] || 'not found'})`); }
+  if (MERGE) await mergeAndReadBack();
+  else {
+    const after = await hs('GET', `/crm/v3/objects/deals/${DEAL}?properties=dealname,description,num_notes`);
+    console.log(`\nREAD BACK deal ${DEAL}: ${after.properties.dealname}\n${after.properties.description}\n  notes: ${after.properties.num_notes}`);
   }
 })().catch((e) => { console.error('FAILED:', e.message); process.exit(1); });
+
+/**
+ * A HubSpot merge makes a NEW deal id and redirects both old ids to it (Scale Army, 26 Oct 2026: 65888440491 +
+ * 66542482950 → 66727328882). So "GET the twin" answers 200 with the merged deal and is no proof of anything;
+ * the proof is `hs_merged_object_ids` on the merged deal naming both. The deal id changes — tell the user.
+ */
+async function mergeAndReadBack() {
+  const merged = await hs('POST', '/crm/v3/objects/deals/merge', { primaryObjectId: DEAL, objectIdToMerge: MERGE });
+  const newId = String(merged.id || DEAL);
+  const after = await hs('GET', `/crm/v3/objects/deals/${newId}?properties=dealname,description,num_notes,hs_merged_object_ids`);
+  const absorbed = String(after.properties.hs_merged_object_ids || '').split(';').filter(Boolean);
+  console.log(`  ✓ merged ${MERGE} into ${DEAL} → merged deal id ${newId}${newId !== DEAL ? ' (NEW id — the old ids redirect to it)' : ''}`);
+  console.log(`\nREAD BACK deal ${newId}: ${after.properties.dealname}\n${after.properties.description}\n  notes: ${after.properties.num_notes}`);
+  console.log(absorbed.includes(String(MERGE)) ? `  ✓ hs_merged_object_ids names the twin: ${absorbed.join(', ')}`
+    : `  ✖ hs_merged_object_ids does NOT name ${MERGE} (${absorbed.join(', ') || 'empty'}) — merge did not take`);
+}
