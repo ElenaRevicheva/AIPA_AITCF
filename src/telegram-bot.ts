@@ -763,15 +763,18 @@ async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> 
           temperature: 0.7
         });
         
-        return groqResponse.choices[0]?.message?.content || 'Could not generate response.';
+        const groqText = groqResponse.choices[0]?.message?.content;
+        if (groqText) return groqText;
       } catch (groqError) {
         console.error('Groq fallback error:', groqError);
-        throw groqError;
       }
     }
-    
-    // Re-throw other errors
-    throw claudeError;
+    // 26 Oct 2026 (Elena: all five providers wired, nothing dead-ends): when Claude and Groq both fail — or Claude
+    // fails for any other reason — hand over to the shared chain (Gemini, Groq, Grok, OpenAI, Claude; free first,
+    // money-aware via MODEL_TIER) instead of giving up.
+    console.warn(`⚠️ askAI: Claude${errorMessage ? ` (${String(errorMessage).slice(0, 80)})` : ''} / Groq unavailable — shared chain answers`);
+    const r = await completeWithProfileDetailed('quality', null, prompt, maxTokens, 'telegram/askAI');
+    return r.text;
   }
 }
 

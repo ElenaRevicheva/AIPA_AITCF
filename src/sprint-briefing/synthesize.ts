@@ -168,7 +168,21 @@ ${rawDigest.slice(0, 60000)}
         return text;
       }
     } catch (err) {
-      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Claude`);
+      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Grok`);
+    }
+  }
+
+  // 2b) Grok (xAI) — 26 Oct 2026: all five providers wired (Elena). Skipped quietly when XAI_API_KEY is not set.
+  if (process.env.XAI_API_KEY?.trim()) {
+    try {
+      const { grokComplete } = await import('../llm-resilience');
+      const gk = await grokComplete(null, prompt.slice(0, 120000), 4096, 'sprint/narrative');
+      if (gk && gk.trim()) {
+        console.log('[sprint] Grok narrative succeeded');
+        return gk;
+      }
+    } catch (err) {
+      console.warn(`[sprint] Grok narrative failed (${err instanceof Error ? err.message.slice(0, 120) : ''}) — trying Claude`);
     }
   }
 

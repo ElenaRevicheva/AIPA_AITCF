@@ -9,7 +9,7 @@ import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
-import { grokComplete, groqModel, deepseekComplete, deepseekConfigured } from './llm-resilience';
+import { grokComplete, groqModel, deepseekComplete, deepseekConfigured, completeWithProfileDetailed } from './llm-resilience';
 import {
   parseVideoProvider,
   providerGrade,
@@ -4409,7 +4409,7 @@ async function createContent(
         } catch (grokError: any) {
           console.error('Atuona Grok fallback error:', grokError?.message || grokError);
         }
-        throw groqError;
+        return atuonaLastResort(prompt, fbTokens, groqError);
       }
       try {
         const grokText = await grokComplete(null, prompt, fbTokens, 'atuona/generate');
@@ -4417,10 +4417,26 @@ async function createContent(
       } catch (grokError: any) {
         console.error('Atuona Grok last-resort error:', grokError?.message || grokError);
       }
-      return 'Could not generate content.';
+      return atuonaLastResort(prompt, fbTokens, null);
     }
-    throw claudeError;
+    return atuonaLastResort(prompt, Math.max(maxTokens * 4, 2000), claudeError);
   }
+}
+
+/**
+ * 26 Oct 2026 (Elena: all five providers wired, nothing dead-ends). Atuona's own chain is Claude → DeepSeek → Groq →
+ * Grok and used to end in "Could not generate content." or a thrown error (also for a Claude 401/500, which never
+ * reached the fallbacks). The shared chain (Gemini, Groq, Grok, OpenAI, Claude — free first) answers instead.
+ */
+async function atuonaLastResort(prompt: string, maxTokens: number, cause: any): Promise<string> {
+  console.warn(`⚠️ Atuona: own chain exhausted (${String(cause?.message || cause || 'no answer').slice(0, 90)}) — shared chain answers`);
+  try {
+    const r = await completeWithProfileDetailed('quality', null, prompt, maxTokens, 'atuona/generate');
+    if (r.text && r.text.trim()) return r.text;
+  } catch (e: any) {
+    console.error('Atuona shared-chain error:', e?.message || e);
+  }
+  return 'Could not generate content.';
 }
 
 const VALID_KNOWLEDGE_KEYS = new Set<KnowledgeCategory>([

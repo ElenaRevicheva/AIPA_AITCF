@@ -17,7 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
-import { claudeWithGroqFallback, geminiComplete, groqModel } from "./llm-resilience";
+import { claudeWithGroqFallback, geminiComplete, groqModel, completeWithProfileDetailed } from "./llm-resilience";
 import { SITEMAP_COMMIT_MESSAGE, devtoCanonicalPreface } from "./blog-github-commit";
 import {
   MIN_FACTS,
@@ -47,7 +47,30 @@ import {
  *
  * Non-credit errors re-throw normally so retry logic upstream still works.
  */
+/**
+ * 26 Oct 2026 (Elena: all five providers wired, nothing dead-ends). The blog's own chain (Gemini → Anthropic → Groq
+ * → Grok) threw on a non-credit Anthropic error and when Groq + Grok were both down, and never reached OpenAI. It runs
+ * unchanged; if it throws or returns nothing, the shared chain (Gemini, Groq, Grok, OpenAI, Claude) writes instead.
+ */
 async function generateTextWithGroqFallback(
+  anthropic: Anthropic,
+  model: string,
+  maxTokens: number,
+  system: string | null,
+  userPrompt: string,
+): Promise<string> {
+  try {
+    const own = await blogOwnChain(anthropic, model, maxTokens, system, userPrompt);
+    if (own && own.trim()) return own;
+    console.warn("📰 Blog's own chain returned nothing — shared chain writes");
+  } catch (e: any) {
+    console.warn(`📰 Blog's own chain failed (${String(e?.message || e).slice(0, 100)}) — shared chain writes`);
+  }
+  const r = await completeWithProfileDetailed("quality", system, userPrompt, maxTokens, "blog/article");
+  return r.text;
+}
+
+async function blogOwnChain(
   anthropic: Anthropic,
   model: string,
   maxTokens: number,
