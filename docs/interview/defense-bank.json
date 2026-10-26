@@ -414,6 +414,36 @@
       "q": "How do you align stakeholders and compliance?",
       "a": "Seven years as Deputy CEO and Chief Legal Officer of a regional e-government operator: I owned the board process for stakeholders drawn mainly from the regional government, drove its decisions through to implementation, and made sure every public service we moved online was lawful under existing legislation. That taught me to treat constraints as product inputs. In my AI systems it means hard rules in code, fail-closed defaults, a human approval before anything irreversible, and no number shown unless it traces back to a record.",
       "push": "Have you done it with a U.S. enterprise client? — Not yet. I ran delivery at board level for seven years in regulated e-government: vendor coordination, operational delivery, cost and performance reporting; the client-facing part of this role is where I would lean on that."
+    },
+    {
+      "id": "wrong-problem",
+      "tags": [
+        "client",
+        "customer",
+        "stakeholder",
+        "consult",
+        "strategist",
+        "strategy",
+        "discovery",
+        "scope",
+        "scoping",
+        "business case",
+        "p&l",
+        "profit",
+        "growth",
+        "marketing",
+        "agency",
+        "program",
+        "adoption",
+        "executive",
+        "ceo",
+        "account",
+        "advisory",
+        "roi"
+      ],
+      "q": "Tell me about a client who asked for the wrong thing.",
+      "a": "A Panamanian CEO of a US-owned yacht and boat company was paying a marketing agency and asked me: if I drop them and move the budget to you, can you crucially raise my profits? I told him no. I don't create miracles, and swapping one vendor for another does not change where his buyers are. I asked where a person who can afford a boat decides who to call today: in a question typed into ChatGPT or Perplexity, whose answer names three companies. If his brand is not one of the three, the agency, the site and the ads compete for a visitor who already decided elsewhere. So I scoped what I can actually do: measure first, with an audit of thirty-four checks in four weighted categories that returns a grade and, for every failed check, the fix and the reason, and stop there if his brand already scores high. Only if there is a gap, the engine I run daily for my own brand, with an AI growth operator working inside the tools his team already uses, scoped to one number he tracks: whether his brand appears when a buyer asks. Adoption is designed in: every change goes through an owner-approval gate, nothing lives on a new platform, and every claim comes with a real AI answer he can click, or it does not count.",
+      "push": "What if he insisted on the profit promise? — Then he would be buying a number nobody can guarantee, and I would rather lose the engagement than start it on a claim I cannot measure. (True conversation, Oct 2026. Never name the company, a price, or a result for his brand: none are on record.)"
     }
   ]
 }
