@@ -55,3 +55,24 @@ so a piece must be rewritten in Elena's own voice from the verified incident fie
 
 Rule for all of them (same as Medium in the 17 Oct plan): field notes only, the strongest and most different from each
 other; never the daily article; never the ~50 near-duplicates; disclose the AI method where asked.
+
+## Which one serves GEO / AEO / Tech-SEO (measured 26 Oct 2026, robots.txt + one live article each)
+For AI citations the outlet's reputation matters less than three mechanical facts: AI search crawlers may read it,
+the article names the author as a schema.org Person with a profile URL (entity signal), and outbound links are followed.
+
+| Outlet | AI search crawlers (robots.txt) | Article schema | Links |
+|---|---|---|---|
+| **InfoQ** | all allowed: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended | NewsArticle + author Person with `/profile/<name>/` URL | 0 of 210 links nofollow on the sample article |
+| **The Decoder** | all allowed | NewsArticle + Person with `sameAs` (Yoast) | 0 of 65 nofollow |
+| Hugging Face blog | all allowed | SocialMediaPosting + author = HF profile | 15 nofollow on the sample (externals) |
+| VentureBeat | allowed (GPTBot, ClaudeBot, PerplexityBot, Google-Extended with path rules; CCBot blocked) | not sampled (category page fetch failed) | — |
+| Towards Data Science | **blocks GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, CCBot**; allows Googlebot, Bingbot, Google-Extended, Claude-SearchBot | — | — |
+| HackerNoon | blocks GPTBot, ClaudeBot, Google-Extended; allows OAI-SearchBot, ChatGPT-User, PerplexityBot | — | canonical only on paid tiers |
+| AIwire | blocks GPTBot, ClaudeBot, Google-Extended; allows OAI-SearchBot, PerplexityBot | — | — |
+
+**Verdict: InfoQ.** Fully crawlable by every AI answer engine, a Person entity with its own profile page, followed
+links, and an editorial brief ("production problems… incidents… lessons learned") that matches the wiki. One InfoQ
+article = a citable source ChatGPT/Perplexity/Claude can quote with her name on it, plus a followed link from a
+high-authority domain to aideazz.xyz. The Decoder is the same mechanically but is news, not practitioner deep dives.
+TDS is strong for Google but invisible to ChatGPT search and Perplexity by its own robots.txt, so it serves SEO, not
+AEO/GEO. Not verified: whether InfoQ profile bios carry a website link (check on the profile form when she applies).
