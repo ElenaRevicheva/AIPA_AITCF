@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 26 Oct 2026 | sop-ai-ops own imagery (6 Seedream stills) | Oracle `~/sop-art/` (new) · aideazz `public/media/sop/`, `scripts/sop-optimise-images.mjs`, `public/sop-ai-ops.html` img tags | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
