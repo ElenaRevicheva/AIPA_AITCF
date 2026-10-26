@@ -2453,7 +2453,11 @@ async function startCTOAIPA() {
       voiceJobs.set(id, { at: Date.now() });
       import('./free-voice').then(({ speakFreeLocal }) => speakFreeLocal(text))
         .then((mp3) => { voiceJobs.set(id, { at: Date.now(), mp3 }); console.log(`[voice/speak] job ${id}: ${text.length} chars → ${mp3.length} bytes`); })
-        .catch((e: unknown) => voiceJobs.set(id, { at: Date.now(), error: String((e as Error)?.message || e).slice(0, 200) }));
+        .catch((e: unknown) => {
+          const error = String((e as Error)?.message || e).slice(0, 200);
+          console.warn(`[voice/speak] job ${id} FAILED (${text.length} chars): ${error}`);   // 26 Oct: a failure left no trace
+          voiceJobs.set(id, { at: Date.now(), error });
+        });
       return res.status(202).json({ ok: true, id });
     }
     try {

@@ -124,6 +124,7 @@ HARD RULES — violating any of these is a critical failure:
 7. HER BUILDING WORK IS THE HEART OF THIS BRIEFING. She is an AI product builder: report what actually moved in the code — repo by repo, named commits, what shipped, what is open, what broke. Then call out anything urgent in that work: a failing deploy, a stale credential, an unmerged branch, an agent that stopped reporting. Engineering reality outranks admin chores.
 8. End with ONE concrete action she can take in the next 2 hours based on what actually happened — and prefer a building or shipping action over an errand, unless something is genuinely broken in production. If nothing in the signals needs action, SAY "nothing is urgent this morning" — never invent a reason to act.
 9. LINKS MUST BE IN THE DATA (25 Oct 2026: a September quota issue was called the blocker of that week's new work, and she was told to merge pull requests to "unblock" commits that were already live). Never say one item blocks, unblocks, stalls or depends on another unless the signals state that link. A commit listed under a repo is already pushed — never tell her to merge it. An open PR or issue is just open: name it, do not guess what it holds up.
+10. A COMMIT MESSAGE DESCRIBES WORK SHE FINISHED (26 Oct 2026: a commit adding a test that breaks providers ON PURPOSE was reported as a "failing failover test" risk, and she was told to build credit monitoring that already existed). Never turn a commit into a new problem or a to-do; a test, fix, guard or monitor named in a commit EXISTS.
 
 FORMAT:
 - Conversational, direct. Spoken out loud. No markdown in output — plain sentences only.
@@ -137,10 +138,19 @@ RAW SIGNALS (live data — use these):
 ${rawDigest.slice(0, 60000)}
 `;
 
-  // 25 Oct 2026 ORDER RULE (Elena: no regular money to top up): free first — Groq, then Gemini — then Claude, then
-  // OpenAI. Every provider stays wired; a paid one without credit fails fast and rejoins by itself when topped up.
+  // 25 Oct 2026 ORDER RULE (Elena: no regular money to top up): free first, then Claude, then OpenAI. Every provider
+  // stays wired; a paid one without credit fails fast and rejoins by itself when topped up.
+  // 26 Oct: Gemini before Groq — Groq sees only the first 28k chars of the signals and misread a deliberate failover
+  // TEST in a commit message as a "failing test" risk; Gemini reads 120k and is the stronger free reader.
 
-  // 1) Groq (free)
+  // 1) Gemini (free)
+  const gem = await geminiText(prompt.slice(0, 120000), 4096);
+  if (gem) {
+    console.log('[sprint] Gemini narrative succeeded');
+    return gem;
+  }
+
+  // 2) Groq (free)
   const groqKey = process.env.GROQ_API_KEY?.trim();
   if (groqKey) {
     try {
@@ -158,15 +168,8 @@ ${rawDigest.slice(0, 60000)}
         return text;
       }
     } catch (err) {
-      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Gemini`);
+      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Claude`);
     }
-  }
-
-  // 2) Gemini (free)
-  const gem = await geminiText(prompt.slice(0, 120000), 4096);
-  if (gem) {
-    console.log('[sprint] Gemini narrative succeeded');
-    return gem;
   }
 
   // 3) Claude (premium — used while there is Anthropic credit)

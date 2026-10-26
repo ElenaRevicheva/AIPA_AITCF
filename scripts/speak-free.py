@@ -35,28 +35,36 @@ def chunks(text: str):
     return out
 
 
+# 26 Oct 2026: chunks were spoken ONE AFTER ANOTHER — the 3,783-char morning briefing took 2 min 32 s and was killed at
+# the caller's 2 min 30 s limit, so Elena got text only. Now up to PARALLEL chunks at once, results kept in order.
+PARALLEL = 3
+
+
 async def edge(text: str, voice: str, rate: str) -> bytes:
     import edge_tts
-    audio = b""
-    for part in chunks(text):
-        for attempt in range(2):
-            try:
-                buf = b""
-                comm = edge_tts.Communicate(part, voice, rate=rate)
-                async def collect():
-                    nonlocal buf
-                    async for ev in comm.stream():
-                        if ev["type"] == "audio":
-                            buf += ev["data"]
-                await asyncio.wait_for(collect(), timeout=25)
-                if len(buf) > 500:
-                    break
-                raise RuntimeError("no audio")
-            except Exception as e:                  # one retry, then give the whole text to gTTS
-                if attempt == 1:
-                    raise RuntimeError(f"edge chunk failed twice: {e}")
-        audio += buf                                 # Edge MP3 frames share one format, so bytes concatenate
-    return audio
+    gate = asyncio.Semaphore(PARALLEL)
+
+    async def one(part: str) -> bytes:
+        async with gate:
+            for attempt in range(2):
+                try:
+                    buf = b""
+                    comm = edge_tts.Communicate(part, voice, rate=rate)
+                    async def collect():
+                        nonlocal buf
+                        async for ev in comm.stream():
+                            if ev["type"] == "audio":
+                                buf += ev["data"]
+                    await asyncio.wait_for(collect(), timeout=25)
+                    if len(buf) > 500:
+                        return buf
+                    raise RuntimeError("no audio")
+                except Exception as e:              # one retry, then give the whole text to gTTS
+                    if attempt == 1:
+                        raise RuntimeError(f"edge chunk failed twice: {e}")
+
+    parts = await asyncio.gather(*(one(p) for p in chunks(text)))
+    return b"".join(parts)                           # Edge MP3 frames share one format, so bytes concatenate
 
 
 def gtts(text: str, out: str):

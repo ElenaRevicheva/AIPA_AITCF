@@ -24,7 +24,8 @@ export async function speakFreeLocal(text: string, voice = CTO_FREE_VOICE): Prom
     const txt = path.join(dir, 'in.txt'), mp3 = path.join(dir, 'out.mp3');
     fs.writeFileSync(txt, text);
     const py = process.env.EDGE_TTS_PY || path.join(os.homedir(), '.openclaw', 'edge-tts-venv', 'bin', 'python');
-    await run(py, [SCRIPT, '--in', txt, '--out', mp3, '--voice', voice, '--rate=-5%'], { timeout: 150_000 });
+    // 240 s (26 Oct: Microsoft was slow, 2 min 32 s for one briefing, and 150 s killed it) — still inside Lambda's 300 s.
+    await run(py, [SCRIPT, '--in', txt, '--out', mp3, '--voice', voice, '--rate=-5%'], { timeout: 240_000 });
     return fs.readFileSync(mp3);
   } finally {
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* temp dir */ }
@@ -56,7 +57,7 @@ function oracleCall(method: 'GET' | 'POST', urlPath: string, body?: object): Pro
  * MP3 from Oracle — for hosts without the script (the Sprint Briefing Lambda). Start a job, then ask every 5 s:
  * one long request died at nginx's 60 s proxy timeout (25 Oct) because a full briefing takes longer to speak.
  */
-export async function speakFreeViaOracle(text: string, maxWaitMs = 200_000): Promise<Buffer> {
+export async function speakFreeViaOracle(text: string, maxWaitMs = 245_000): Promise<Buffer> {
   const start = await oracleCall('POST', '/voice/speak', { text, async: true });
   const id = start.status === 202 ? JSON.parse(start.buf.toString('utf8')).id : '';
   if (!id) throw new Error(`Oracle /voice/speak ${start.status}: ${start.buf.toString('utf8').slice(0, 120)}`);
