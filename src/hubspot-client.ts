@@ -701,6 +701,55 @@ export async function findDealByName(name: string): Promise<{ id: string; stage:
 }
 
 /**
+ * 2026-10-26 — ONE deal means ONE job (Elena: "one deal means one job with one true-facts profound kit prepared
+ * according to the original job source requirements"). The re-sighting lookup is by EXACT deal name, so the same
+ * posting under a second title string opened a twin every time, merged by hand on 26 Oct: CI&T 32354 ("…Brazil at
+ * CI&T @ CI&T" from an aggregator copy vs "CI&T - …Colombia @ Ciandt" from Lever, one url) and Scale Army ("… @
+ * Scale Army ... @ Scale Army Careers", Google's truncation, vs "… @ Scale Army Careers", one url in two letter
+ * cases). A re-sighting that misses by name is now matched against the OPEN hiring deals of the last 120 days:
+ * by the posting url first (src/job-identity.ts normalizeJobUrl), then by company + title words (sameJob: 0.8 of
+ * the incoming title's words, numbers included, so two CI&T job ids stay two jobs). Decided deals are left to the
+ * exact-name rule: a tombstone must not swallow a genuinely new posting. Any failure answers null — the old
+ * behaviour exactly.
+ */
+export async function findOpenHiringDealByJob(
+  jobUrl: string, jobTitle: string, company: string,
+): Promise<{ id: string; stage: string; name: string; how: 'url' | 'title' } | null> {
+  const { normalizeJobUrl, sameJob, splitDealName, jobUrlOfDescription } = await import('./job-identity');
+  const wantUrl = normalizeJobUrl(jobUrl);
+  if (!wantUrl && !(jobTitle || '').trim()) return null;
+  try {
+    const since = String(Date.now() - 120 * 24 * 3600 * 1000);
+    const data = await hsPost<{ results?: Array<{ id: string; properties: { dealname: string; dealstage: string; description?: string } }> }>(
+      '/crm/v3/objects/deals/search',
+      {
+        filterGroups: [{ filters: [
+          { propertyName: 'description', operator: 'CONTAINS_TOKEN', value: 'hiring' },
+          { propertyName: 'createdate', operator: 'GTE', value: since },
+        ] }],
+        properties: ['dealname', 'dealstage', 'description'],
+        sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+        limit: 200,
+      },
+    );
+    const open = (data?.results || []).filter((d) => d.properties?.dealname && !isDecidedHiringStage(d.properties.dealstage));
+    if (wantUrl) {
+      const byUrl = open.find((d) => normalizeJobUrl(jobUrlOfDescription(d.properties.description || '')) === wantUrl);
+      if (byUrl) return { id: byUrl.id, stage: byUrl.properties.dealstage, name: byUrl.properties.dealname, how: 'url' };
+    }
+    const byTitle = open.find((d) => {
+      const { title, company: c } = splitDealName(d.properties.dealname);
+      return sameJob(jobTitle, company, title, c);
+    });
+    if (byTitle) return { id: byTitle.id, stage: byTitle.properties.dealstage, name: byTitle.properties.dealname, how: 'title' };
+    return null;
+  } catch (e) {
+    console.warn('[HubSpot] findOpenHiringDealByJob error:', (e as Error).message?.slice(0, 80));
+    return null;
+  }
+}
+
+/**
  * The company's open hiring deal, for an EMPLOYER email whose subject matches no deal name (23 Oct 2026).
  *
  * response_detector.py names the deal after the email subject, so every new thread from one employer opened a
@@ -1884,6 +1933,16 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<H
     // vanish. 'lead_parked' is not in the HiringStage type, but VJH's search
     // door sends it and stageMap above routes it, hence the string compare.
     const isResighting = stage === 'applied' || (stage as string) === 'lead_parked';
+    // 2026-10-26 — one deal means one job: a re-sighting under another title string (an aggregator copy, a
+    // Google-truncated title, another letter case in the url) joins the open deal it already has. See
+    // findOpenHiringDealByJob. The deal keeps its name; the sighting lands as it always did on a re-sighting.
+    if (!existing && isResighting) {
+      const byJob = await findOpenHiringDealByJob(input.jobUrl || '', input.jobTitle, input.company);
+      if (byJob) {
+        existing = { id: byJob.id, stage: byJob.stage };
+        console.log(`[HubSpot] Re-sighting matched an OPEN deal by ${byJob.how} (${byJob.id}, ${byJob.name.slice(0, 64)}) — no twin for: ${dealName.slice(0, 64)}`);
+      }
+    }
     // 2026-10-23 — an employer email with a NEW subject joins the company's open deal instead of opening one
     // (see findOpenHiringDealByCompany). The note names the email's subject, since the deal name no longer does.
     let joinedNote = '';
