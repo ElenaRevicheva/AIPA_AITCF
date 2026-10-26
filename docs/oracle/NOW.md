@@ -189,6 +189,11 @@ When a tool fails: (1) say WHY from the exact error; (2) RE-TEST old "doesn't wo
 ### ✅ 24 Oct ~12:52 UTC — fact-checker FALSE ALARM fixed (quote-mark style)
 - D5 was flagged because OpenClaw wrote her "Prices" as 'Prices' inside TEXT "…". Exact-text check now ignores quote characters; her real D5 reply re-checked → 0 flags; false flag removed; Telegram correction sent to Elena. A checker can be wrong too — every flag type gets the same real-reply test.
 
+### ✅ 26 Oct ~13:40 UTC — briefing speaks (Lambda deployed + test sent) · ALL FIVE providers wired in every agent
+- Test briefing 13:2x: `Gemini (gemini-flash-latest) returned 3616 chars` → `free voice used` → Oracle job 1.67 MB. Lambda env: +GEMINI_MODEL, +XAI_API_KEY.
+- Five-provider map + proof per agent: `docs/oracle/FLEET_WATERFALL_AUDIT_2026-10-25.md` (26 Oct section). PrepClaw +Groq; askAI/Atuona/blog → shared chain when their own chain ends; briefing +Grok; VJH quality +Claude; EspaLuz ×3 and Algom: OpenAI moved behind the free ones. Commits: cto-aipa (this), VJH 041231f, EspaLuz baf888c/d3c0880/f14f40e, dragontrade 89d4125.
+- **Algom Oracle checkout:** local commit 3ad5d5a (= 89d4125) and 4 commits behind GitHub + someone's uncommitted `alerts.mjs` — do NOT blind-pull.
+
 ### 🟡 26 Oct ~13:15 UTC — briefing had no voice again: Microsoft slow, 150 s limit — Oracle fixed, Lambda pending
 - Cause (reproduced): the 3,783-char briefing took **2 min 32 s** on Edge this morning; `speakFreeLocal` killed it at 150 s → "Oracle voice job 502" → OpenAI 429 → text only. Not Russian text (tested).
 - Fixed on Oracle: `speak-free.py` 3 chunks in parallel (same 1.6 MB audio; 4.9 s vs 10.9 s sequential today), 240 s limit, failed jobs logged. pm2 restarted 13:15:47. Tomorrow's briefing should speak even on the old Lambda (it polls 200 s).

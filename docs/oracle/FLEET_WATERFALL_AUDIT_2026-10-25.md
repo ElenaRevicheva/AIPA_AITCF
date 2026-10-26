@@ -72,3 +72,22 @@ services and OpenAI keys in place.
 
 **Bright Data is a paid, budgeted tool (~$15/month, Elena 25 Oct) — keep it.** The Reddit listener's zero yield is a
 question of spending that budget well (her call later), not a reason to remove Bright Data.
+
+## 26 Oct 2026 — every agent wires ALL FIVE providers (Elena: "not switched off, just wired in a waterfall")
+
+| Agent | Chain now (first → last) | Proof |
+|---|---|---|
+| PrepClaw (OpenClaw) | gemini-flash-latest → gemini-2.5-flash → **groq gpt-oss-120b (added)** → grok → openai → claude (free mode; all three money modes wire all five) | test chat answered |
+| CTO AIPA shared chain | quality: claude → gemini → groq → grok → openai (MODEL_TIER=free moves claude last) · classify/bulk: gemini → groq → grok → openai → claude | quality/classify/bulk → gemini, skipped [] |
+| CTO AIPA main brain (askAI) | Opus → Groq → **shared chain (added)** | build + deploy |
+| Atuona | Claude → DeepSeek → Groq → Grok → **shared chain (added)** | build + deploy |
+| Daily blog | Gemini → Claude → Groq → Grok → **shared chain (added, brings OpenAI)** | build + deploy |
+| Sprint briefing (Lambda) | Gemini → Groq → **Grok (added, XAI key set)** → Claude → OpenAI; voice free → OpenAI | test briefing: Gemini wrote it, free voice 1.67 MB |
+| VJH | quality: gemini → groq → grok → openai → **claude (added)** · classify/scoring/judge: gemini → groq → grok → openai → claude; voice free → OpenAI | judge/chain → gemini, skipped [] |
+| Atlas | claude → gemini → groq → grok → openai; embeddings gemini → openai | text → claude/gemini, embed → gemini |
+| EspaLuz Family + WhatsApp | quality: claude → gemini → groq → grok → openai (**OpenAI moved behind the free ones**) · fallback: gemini → groq → grok → openai | Family → gemini, skipped [], 0.7 s |
+| EspaLuz Influencer | gemini → groq → grok → openai → claude (OpenAI moved behind Grok) | → gemini, skipped [], 0.6 s |
+| Algom | gemini → groq → grok → openai → claude (OpenAI moved behind Grok) — Oracle local commit 3ad5d5a, GitHub 89d4125; Oracle checkout 4 behind, NOT pulled | node --check, pm2 online |
+
+Nothing switched off: all OpenAI/Claude/Grok/Groq/Gemini keys and every process in place. Briefing voice: Edge reads 3
+chunks at once (2:32 → ~5 s), 240 s limit.
