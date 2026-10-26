@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 26 Oct ~13:55 | hiring webhook: one deal = one job (re-sighting matched by job url, then title+company) | `src/hubspot-client.ts`, `src/job-identity.ts` (new), `dist/` same two files on Oracle, pm2 `cto-aipa` restart | 3f485869 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
