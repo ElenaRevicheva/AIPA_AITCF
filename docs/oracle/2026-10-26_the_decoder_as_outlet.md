@@ -36,3 +36,22 @@ complexity alone" (Matthias Bastian, 25 Oct 2026). Nothing was signed up, submit
   with its own context: the case where the article says subagents still earn their place.
 - Fleet risk to watch: 10 agents with 10 prompts is the "Conway's Law for agents" shape. Shared state already goes
   through HubSpot and NOW.md (team wiring, 15 Oct), not through prompt duplication.
+
+## Other high-reputation AI outlets that take contributed pieces (checked 26 Oct 2026, each from its own page)
+None has an auto-posting API. All are hand-pitched, human-reviewed, and most reject text that reads as AI-written,
+so a piece must be rewritten in Elena's own voice from the verified incident fields, not pasted from the generator.
+
+| Outlet | Audience | Free? | Rules that matter | Fit for Elena |
+|---|---|---|---|---|
+| **InfoQ** (C4Media) | senior engineers; claims 1.5M monthly readers | yes; authors keep copyright, unpaid | "Deep dives on production problems, technical decisions, migrations, and incidents, and the lessons learned." Proposal form, 5–7 working days. AI for research/grammar only; "We reject primarily AI-generated work." | **#1** — the AI Ops Wiki incidents are exactly this format; byline is a senior-engineering credential |
+| **Towards Data Science** (Insight Media, self-hosted since 2025) | data/ML practitioners | free to submit; TDS Author Payment Program pays | original work only; no AI-generated text; up to 3 stories at a time; editors do not substantively edit | **#2** — practitioner essays on evals, grounding gates, agent reliability |
+| **VentureBeat guest posts** | enterprise AI decision-makers | free | individuals only; original, never published anywhere; 800–1,200 words; Google Doc with comments open; reply within 14 business days; AI-written text rejected | #3 — one strong opinion piece on agents in production (not a republished incident) |
+| **The Decoder** (heise) | AI industry news readers | editorial free; sponsored paid | form, 24–48 h feedback; republishing allowed with proof of authorship; sources required | #4 — see above |
+| **AIwire** (TCI Media / HPCwire) | enterprise AI / HPC | free | email an abstract first; 800–1,500 words | #5 — niche, but low effort |
+| **Hugging Face community blog** | ML engineers, very high trust | needs PRO (paid) or Team/Enterprise org | no moderation gate; scope = "AI science or engineering concept" or an open-source release; LLM-generated posts hidden | #6 — only if she holds HF PRO; good home for an open-source release (e.g. the visibility audit engine) |
+| **HackerNoon** | broad tech | free tier, mandatory editorial review | canonical link-back only on paid tiers; republishing elsewhere allowed | #7 — reach without canonical = SEO loss for aideazz.xyz |
+| The New Stack | cloud-native devs | general contributor page not found (only sponsored guidelines); points practitioners to sister site TDS | — | use TDS instead |
+| DZone, KDnuggets, The Gradient, TechTalks | — | pages returned 403/404 on 26 Oct; not verified | — | re-check by hand if needed |
+
+Rule for all of them (same as Medium in the 17 Oct plan): field notes only, the strongest and most different from each
+other; never the daily article; never the ~50 near-duplicates; disclose the AI method where asked.
