@@ -73,5 +73,21 @@ elif [ "$LEVEL" -lt "$PREV" ] && [ "$LEVEL" -gt 0 ]; then
   echo "$LEVEL $LAST_AT" > "$STATE"   # went down a band but not below 80%: re-arm the higher bands quietly
 fi
 
+# ---- Mail watch heartbeat (27 Oct 2026) --------------------------------------------------------------------------------
+# The VJH detector reads Gmail + Zoho aipa@ for employer/client replies about hourly. A crashed service is restarted by
+# check_oracle_health.sh, but a process that is alive and no longer SCANNING would be silent. So: no "Scanning
+# gmail/INBOX" line in the last 3 h -> tell Elena (again every 6 h while it lasts), and say so when it is back.
+MSTATE=/home/ubuntu/.mail_watch_alert
+MSCANS=$(journalctl -u vibejobhunter --since "-3h" --no-pager -q 2>/dev/null | grep -c "Scanning gmail/INBOX")
+read -r MDOWN MLAST 2>/dev/null < "$MSTATE"; MDOWN=${MDOWN:-0}; MLAST=${MLAST:-0}
+if [ "${MSCANS:-0}" -eq 0 ]; then
+  if [ "$MDOWN" -eq 0 ] || [ $((NOW - MLAST)) -ge 21600 ]; then
+    tg "⚠️ <b>Mail watch silent for 3 h+</b> — no Gmail/Zoho scan logged, so employer/client replies are NOT being checked. Check: <code>journalctl -u vibejobhunter --since -3h | grep Scanning</code>" \
+      && echo "1 $NOW" > "$MSTATE"
+  fi
+elif [ "$MDOWN" -eq 1 ]; then
+  tg "✅ Mail watch is scanning again (Gmail + Zoho)." && echo "0 $NOW" > "$MSTATE"
+fi
+
 # Keep only last 1000 lines
 tail -1000 $LOG_FILE > $LOG_FILE.tmp && mv $LOG_FILE.tmp $LOG_FILE
