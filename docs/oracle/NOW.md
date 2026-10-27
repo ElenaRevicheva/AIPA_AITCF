@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (desktop, Elena on phone) | 27 Oct 14:05 | sop-ai-ops: stronger living-still motion, boardwalk-style glow orbs, Atlas-style structure for GEO/AEO | aideazz `public/sop-ai-ops.html` | cto-aipa 5700a165 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
