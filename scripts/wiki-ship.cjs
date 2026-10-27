@@ -92,7 +92,7 @@ function syncSiteRepo() {
       alertTelegram('⚠️ wiki-ship cleared a stale in-progress rebase in the site repo. Recovered automatically; worth knowing it happened.');
     }
   }
-  git(['fetch', '-q', 'origin']);
+  fetchMain();
   const ahead = git(['rev-list', 'origin/main..HEAD']).split('\n').filter(Boolean);
   if (!ahead.length) {
     if (!DRY) git(['merge', '--ff-only', '-q', 'origin/main']);
@@ -117,6 +117,14 @@ function run(cmd, args, opts = {}) {
 }
 function git(args, cwd = SITE) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: 'pipe' }).trim();
+}
+// prod-truth-sheet.cjs fetches this same clone every 30 min, 21:30 included; a fetch
+// that loses the ref lock to it is retried rather than failing the night's run.
+function fetchMain() {
+  for (let attempt = 1; ; attempt++) {
+    try { return git(['fetch', '-q', 'origin', 'main']); }
+    catch (e) { if (attempt >= 3) throw e; Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5000); }
+  }
 }
 
 function main() {
@@ -191,8 +199,14 @@ function main() {
     // A failed rebase is NOT "nothing upstream". Swallowing it here is what wedged the
     // repo from 4 to 19 Sep. Abort it cleanly and fail loudly; the next run's
     // syncSiteRepo() realigns and regenerates, so nothing is lost.
+    // Never `git pull`: it rebases onto FETCH_HEAD, a scratch file every fetch in this
+    // repo rewrites. prod-truth-sheet.cjs fetches this same clone every 30 min, so at
+    // 21:30:02 on 26 and 27 Oct both fetches landed together, FETCH_HEAD held two
+    // "main" lines, and pull died "Cannot rebase onto multiple branches". Rebasing onto
+    // the named ref origin/main reads no shared scratch state.
     try {
-      execSync('git pull --rebase -q origin main', { cwd: SITE, stdio: 'pipe' });
+      fetchMain();
+      git(['rebase', '-q', 'origin/main']);
     } catch (e) {
       try { execSync('git rebase --abort', { cwd: SITE, stdio: 'pipe' }); } catch { /* no rebase to abort */ }
       die(`rebase onto origin/main failed: ${String(e.stderr || e.message || e).slice(0, 400)}`);
