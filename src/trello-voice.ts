@@ -140,6 +140,7 @@ export interface TrelloCard {
   idList?: string;
   closed?: boolean;
   desc?: string;
+  idLabels?: string[];
 }
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -1612,11 +1613,35 @@ interface _RawAction {
   newTitle?: string | null;     // update: only when she renames the card
   newDescription?: string | null; // update: the corrected description, in her words (replaces the old one)
   appendDescription?: string | null; // update: a link or note to ADD below the existing description (12 Oct 2026)
+  newSphere?: string | null;    // update: change the card's COLOUR = life sphere (27 Oct 2026)
   description?: string;
   cardQuery?: string;
   sourceBoardHint?: string;
   targetBoard?: string;
   targetList?: string;   // the column/list the user named for a move (e.g. "Cita", "dated", "just_for_today")
+}
+
+/**
+ * The sphere a colour change names (27 Oct 2026): the model's newSphere first; if it left it out, her own words —
+ * a colour or sphere said in English, Spanish or Russian next to "colour/color/цвет". Null when none is named.
+ */
+export function resolveSphere(modelSphere: string | null | undefined, transcript: string): CardCategory | null {
+  const valid: CardCategory[] = ['family', 'business', 'spiritual', 'health', 'hobby'];
+  const m = (modelSphere ?? '').toLowerCase().trim();
+  if ((valid as string[]).includes(m)) return m as CardCategory;
+  const t = transcript.toLowerCase();
+  if (!/(colou?r|цвет|сфер|sphere|esfera|make it|paint it|ponlo|hazlo|сделай)/.test(t)) return null;
+  const words: Array<[CardCategory, RegExp]> = [
+    ['business', /(orange|naranja|оранж|business|negocio|бизнес|работ)/],
+    ['family', /(red|rojo|красн|family|familia|семь)/],
+    ['spiritual', /(purple|violet|morado|púrpura|фиолет|spiritual|mindful|creativ|духов)/],
+    ['health', /(green|verde|зелен|health|salud|здоров)/],
+    ['hobby', /(lime|lima|лайм|салат|hobby|хобби)/],
+  ];
+  // "lime green" must be hobby, not health: lime is checked before green wins.
+  if (/(lime|lima|лайм|салат)/.test(t)) return 'hobby';
+  for (const [k, rx] of words) if (rx.test(t)) return k;
+  return null;
 }
 
 /** Search Trello cards by text, optionally restricted to a board. */
@@ -1662,8 +1687,13 @@ Action schema:
   {"type":"create","description":"full task description to create as a new card"},
   {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY or exact board name","targetList":"the column the user named, or null"},
   {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"},
-  {"type":"update","cardQuery":"search term or __recent__","sourceBoardHint":"board name or null","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null","newDescription":"corrected description or null","appendDescription":"text or link to ADD below the existing description, or null"}
+  {"type":"update","cardQuery":"search term or __recent__","sourceBoardHint":"board name or null","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null","newDescription":"corrected description or null","appendDescription":"text or link to ADD below the existing description, or null","newSphere":"family|business|spiritual|health|hobby or null"}
 ]
+
+COLOUR = SPHERE ("change the color of this card to business orange", "make it green", "it's health, not family",
+"поменяй цвет на оранжевый", "это бизнес", "cambia el color a naranja"): an UPDATE with newSphere —
+red→"family", orange→"business", purple→"spiritual" (mindfulness/creative), green→"health", lime→"hobby".
+Right after a card was created, "this card" is "__recent__". Never a "create" for a colour change.
 
 ADDING to a card ("add / attach / wire this link to the task", "conecta / agrega este enlace", "добавь / прикрепи
 ссылку к задаче"): this is an UPDATE with appendDescription = the link (copied character for character) plus any
@@ -1857,7 +1887,7 @@ export async function processMultiAction(
         }
         const card = cards[0]!;
         // __recent__ comes from the bot's own memory, which does not know if she archived the card since.
-        const live = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'closed,due,name,desc' });
+        const live = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'closed,due,name,desc,idBoard,idLabels' });
         if (live.closed) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
             error: `"${card.name}" is archived — say the name of the card to edit` });
@@ -1894,21 +1924,39 @@ export async function processMultiAction(
           body.desc = mergeDescription(body.desc ?? live.desc ?? '', add);
           added = add;
         }
+        // COLOUR = life sphere (27 Oct 2026). "Change color of this card to business orange color" was refused with
+        // "No new date, time, name or description" — the update path had no colour field. Only her five sphere
+        // colours are swapped; any other label on the card stays.
+        const sphere = resolveSphere(action.newSphere, transcript);
+        let sphereLabelId = '';
+        if (sphere && live.idBoard) {
+          const color = CATEGORY_COLOR_MAP[sphere];
+          sphereLabelId = (await resolveOrCreateLabel(live.idBoard, color, sphere)) ?? '';
+          if (sphereLabelId) {
+            const boardLabels = await getBoardLabels(live.idBoard);
+            const sphereColors = new Set<string>(Object.values(CATEGORY_COLOR_MAP));
+            const sphereIds = new Set(boardLabels.filter((l) => sphereColors.has(l.color)).map((l) => l.id));
+            const keep = (live.idLabels ?? []).filter((id) => !sphereIds.has(id));
+            body.idLabels = [...keep, sphereLabelId].join(',');
+          }
+        }
         if (!Object.keys(body).length) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
-            error: 'No new date, time, name or description was understood — nothing changed' });
+            error: 'No new date, time, name, description or colour was understood — nothing changed' });
           continue;
         }
         await trelloPut<TrelloCard>(`/cards/${card.id}`, body);
-        const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due,desc' });
+        const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due,desc,idLabels' });
         const dueOk = !body.due || (back.due ? new Date(back.due).toISOString() === body.due : false);
         const descOk = body.desc === undefined || (back.desc ?? '').trim() === body.desc.trim();
-        const ok = dueOk && descOk;
+        const colorOk = !body.idLabels || (back.idLabels ?? []).includes(sphereLabelId);
+        const ok = dueOk && descOk && colorOk;
         results.push({ type: 'update', success: ok, cardQuery: action.cardQuery, cards: [back],
           detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`,
+            body.idLabels && sphere && `🎨 ${COLOR_EMOJI[CATEGORY_COLOR_MAP[sphere]]} ${COLOR_LABEL[CATEGORY_COLOR_MAP[sphere]]}`,
             added ? `🔗 added to the description` : body.desc && `📝 "${stripUrls(body.desc).slice(0, 120)}"`]
             .filter(Boolean).join(' · '),
-          ...(ok ? {} : { error: dueOk ? 'Trello saved a different description' : `Trello saved a different date (${back.due ?? 'none'})` }) });
+          ...(ok ? {} : { error: !colorOk ? 'Trello did not keep the new colour' : dueOk ? 'Trello saved a different description' : `Trello saved a different date (${back.due ?? 'none'})` }) });
       } catch (err: unknown) {
         results.push({ type: 'update', success: false, error: err instanceof Error ? err.message : String(err) });
       }
