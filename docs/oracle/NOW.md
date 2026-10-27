@@ -149,6 +149,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 27 Oct ~16:00 UTC — AGENT INVENTORY (truth) + runbook rewritten from it · backups tagged
+- **Inventory:** `docs/AGENT_INVENTORY_2026-10-27.md` — every agent checked against live Oracle OUTPUT (not uptime), code handoffs (3 read-only code sweeps) and all **3,220** HubSpot deals by agent tag. Use it as the source for any "what does agent X do / did it work" answer.
+- **Runbook** (aideazz `cc6f8be`): agent rows corrected in place (Atlas = weekly Monday, OpenClaw = interview coach, CTO AIPA = CRM hub), "How the agents hand work to each other" note + HubSpot outcomes table (existing components), status table to 27 Oct. Every section/script/JSON-LD/effect/counter/menu counted before = after. Live, audit **100 A+** all categories.
+- **Backups (restore any time):** git tags `sop-ai-ops-before-redesign-20261026` (old dark page) and `sop-ai-ops-live-20261027`; files in laptop `D:/aideazz/aideazz/backups/sop-ai-ops/`.
+- **⚠️ Algom Alpha is NOT working:** X API "credits depleted" since at least 17 Oct — 0 posts/replies/likes/follows; runbook shows it "Paused · X credits". Elena's call: top up X credits or leave paused. Also `algom-stream` shows 55,193 PM2 restarts since 16 Aug — investigate before topping up.
+- **Also fixed today (VJH `1233eb0`):** LinkedIn/Workable "X messaged you" notices alert on Telegram but never create/move a HubSpot deal (an existing deal named "Linkedin" was moved to "They replied" at 13:30 UTC — Elena may want to close it).
+- **Open (Elena deciding):** business-owner offer block / outcome CTA / "revenue effectively zero" wording; ES page port (on hold).
+
 ### ✅ 27 Oct ~14:40 UTC — runbook: Atlas-style header/menu, stronger living stills, laptop photos un-blanked (aideazz `7237988`) · claim released
 - **Structure (Elena: "like the Atlas page, to maximum contribute to GEO/AEO/Tech SEO"):** sticky brand bar ("Operations Runbook" lab line) + "This runbook" (Plain language / Engineering proof) and "AIdeazz tools" (Ad intelligence / For your business — Atlas's own wording and links) menus, icon + title + one line per entry; one ☰ panel <1100px with EN/ES + CTA. Replaces the hero nav row and the Jump strip (scroll-spy kept on `.toc-inner`). `SiteNavigationElement` JSON-LD (13) mirrors the menu.
 - **Motion:** camera ~2x (12 s, 1.05→1.17, ±0.6°), hand-held ~5 px, faster mist/leak/streak; every photo uses the boardwalk's `lamp` orbs (74), which now drift.
