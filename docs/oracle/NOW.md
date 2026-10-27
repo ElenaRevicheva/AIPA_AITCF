@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (desktop, Elena on phone) | 27 Oct 14:05 | sop-ai-ops: stronger living-still motion, boardwalk-style glow orbs, Atlas-style structure for GEO/AEO | aideazz `public/sop-ai-ops.html` | cto-aipa 5700a165 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 27 Oct ~14:40 UTC — runbook: Atlas-style header/menu, stronger living stills, laptop photos un-blanked (aideazz `7237988`) · claim released
+- **Structure (Elena: "like the Atlas page, to maximum contribute to GEO/AEO/Tech SEO"):** sticky brand bar ("Operations Runbook" lab line) + "This runbook" (Plain language / Engineering proof) and "AIdeazz tools" (Ad intelligence / For your business — Atlas's own wording and links) menus, icon + title + one line per entry; one ☰ panel <1100px with EN/ES + CTA. Replaces the hero nav row and the Jump strip (scroll-spy kept on `.toc-inner`). `SiteNavigationElement` JSON-LD (13) mirrors the menu.
+- **Motion:** camera ~2x (12 s, 1.05→1.17, ±0.6°), hand-held ~5 px, faster mist/leak/streak; every photo uses the boardwalk's `lamp` orbs (74), which now drift.
+- **Bug found + fixed:** ≥861px `.photo` mask had `-webkit-mask-composite:source-in` → Chrome rendered the river photo (and others) BLANK on laptops since `f11c2dc`. Never re-add a `-webkit-mask-composite` to a multi-layer mask; `mask-composite:intersect` alone is correct.
+- **Verified:** local 1440/375/360 — no h-scroll, no console errors, menu open/close, photos visible. ES page still on hold (Elena's "go").
 
 ### ✅ 27 Oct 13:27 UTC — VJH mail detector no longer marks her mail read · Gmail "Important" marks it caused removed · DEPLOYED + proven
 - **Was:** `response_detector.py` `select("INBOX")` + `fetch(RFC822)` hourly → every Gmail + Zoho `aipa@aideazz.xyz` mail `\Seen` within the hour (Gmail read rate 55-68% → **100% from 23 Aug**, the day Gmail was added). Gmail then learned "she opens everything": its auto "Important" (blue chevron) rate went 33% → **88%**. Also: sequence-number dedupe (archive renumbers → a new mail can inherit a processed number), processed ids loaded as bytes (never matched after restart), 50-mail cap, Spam never scanned, LinkedIn person-messages dropped by the noreply skip + blocklist.
