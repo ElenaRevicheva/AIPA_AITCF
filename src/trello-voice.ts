@@ -1644,15 +1644,59 @@ export function resolveSphere(modelSphere: string | null | undefined, transcript
   return null;
 }
 
+/** Lowercase, no accents, no silent Spanish "h" at a word start: "Hipódromo" and "Ipodromo" read the same. */
+function spokenForm(s: string): string {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9а-яё\s]/g, ' ').split(/\s+/).filter(Boolean)
+    .map((w) => (w.length > 3 && w.startsWith('h') ? w.slice(1) : w)).join(' ');
+}
+
+/** Letter-pair (Dice) similarity 0–1 of two spoken forms — tolerant of one or two misheard letters. */
+function spokenSimilarity(a: string, b: string): number {
+  const pairs = (s: string) => {
+    const t = s.replace(/\s+/g, ' ');
+    const out: string[] = [];
+    for (let i = 0; i < t.length - 1; i++) out.push(t.slice(i, i + 2));
+    return out;
+  };
+  const pa = pairs(spokenForm(a));
+  const pb = pairs(spokenForm(b));
+  if (!pa.length || !pb.length) return 0;
+  const pool = [...pb];
+  let hit = 0;
+  for (const p of pa) { const i = pool.indexOf(p); if (i >= 0) { hit++; pool.splice(i, 1); } }
+  return (2 * hit) / (pa.length + pb.length);
+}
+
 /** Search Trello cards by text, optionally restricted to a board. */
 export async function searchTrelloCards(query: string, boardHint?: string): Promise<TrelloCard[]> {
-  const data = await trelloGet<{ cards?: TrelloCard[] }>('/search', {
-    query,
+  const search = async (q: string) => (await trelloGet<{ cards?: TrelloCard[] }>('/search', {
+    query: q,
     modelTypes: 'cards',
     card_fields: 'name,id,shortUrl,idList,idBoard,due,closed',
     cards_limit: '15',
-  });
-  const cards = data?.cards ?? [];
+  }))?.cards ?? [];
+  let cards = await search(query);
+  // 27 Oct 2026: "explore the Ipodromo" found nothing — the card is "Explore the hipodromo" and voice transcription
+  // drops the silent Spanish h. Trello matches exact words only, so on a miss: search each word and its h/accent
+  // variants, then keep the card whose whole name is clearly closest to what she said.
+  if (cards.length === 0) {
+    const words = [...new Set(query.split(/\s+/).filter((w) => w.length > 3))];
+    const variants = new Set<string>();
+    for (const w of words) {
+      const plain = w.normalize('NFD').replace(/[̀-ͯ]/g, '');
+      variants.add(plain);
+      variants.add(/^h/i.test(plain) ? plain.slice(1) : `h${plain}`);
+    }
+    const seen = new Map<string, TrelloCard>();
+    for (const v of variants) for (const c of await search(v)) seen.set(c.id, c);
+    const ranked = [...seen.values()]
+      .map((c) => ({ c, s: spokenSimilarity(query, c.name) }))
+      .sort((a, b) => b.s - a.s);
+    const best = ranked[0];
+    // A clear winner only; two near-equal names go back to her as "say which one".
+    if (best && best.s >= 0.6) cards = ranked.filter((r) => best.s - r.s < 0.08).map((r) => r.c);
+  }
   if (!boardHint || cards.length === 0) return cards;
 
   const boards = await getAllBoards();
@@ -1789,8 +1833,17 @@ export async function processMultiAction(
   // A link request that names a card ("add this link to the dentist card …") must reach the classifier too.
   if (!MGMT_RE.test(transcript) && !isLinkAttachRequest(transcript)) return { handled: false, results: [] };
 
-  const rawActions = await classifyMultiAction(transcript);
-  if (!rawActions.length) return { handled: false, results: [] };
+  const classified = await classifyMultiAction(transcript);
+  if (!classified.length) return { handled: false, results: [] };
+  // 27 Oct 2026: "Change the color in the card Prepare for Spanish exam … to family" came back as TWO updates —
+  // the named card plus "__recent__" — so the card made just before ("Explore the hipodromo") turned red too.
+  // When the message names a card, a "__recent__" update beside it is the model guessing, not her.
+  const namesACard = classified.some((a) => a.type === 'update' && a.cardQuery && a.cardQuery !== '__recent__');
+  const rawActions = namesACard
+    ? classified.filter((a) => !(a.type === 'update' && a.cardQuery === '__recent__'))
+    : classified;
+  console.log(`[TrelloVoice] actions: ${classified.map((a) => `${a.type}(${a.cardQuery ?? a.description?.slice(0, 40) ?? ''})`).join(', ')}` +
+    (rawActions.length < classified.length ? ` — dropped ${classified.length - rawActions.length} __recent__ guess` : ''));
 
   const results: MultiActionItem[] = [];
 
