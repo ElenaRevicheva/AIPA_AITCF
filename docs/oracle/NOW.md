@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 27 Oct 2026 ~21:30 | runbook laptop pass: brand lockup, wider layout, agents + FAQ as fold-outs, ticker, status tables, menu height | aideazz `public/sop-ai-ops.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
