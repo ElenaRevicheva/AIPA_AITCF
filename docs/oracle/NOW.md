@@ -149,6 +149,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 27 Oct — "wiki stuck on 16 Oct" = no chapter written, not a broken publisher · new chapter live (aideazz `e6c2653`)
+- `wiki-ship` (21:30 UTC) ran clean every night (26 Oct recovered). A chapter exists only when a session writes `content/ai-ops-wiki/incidents/*.md`; none was written 17–26 Oct although the 26 Oct WON.ai/Turing post-filter fix qualified (it shipped as a blog post only, `99d58d1`). **Standing rule (feedback_auto_publish_wiki_blog): a qualifying session writes its chapter before it ends.**
+- New: *The watcher opened every letter* + concept `the-read-that-writes` (30 chapters / 24 entries, `blog: yes` → tonight's wiki-ship cross-posts it). Leak-scanned.
+
 ### ✅ 27 Oct ~16:00 UTC — AGENT INVENTORY (truth) + runbook rewritten from it · backups tagged
 - **Inventory:** `docs/AGENT_INVENTORY_2026-10-27.md` — every agent checked against live Oracle OUTPUT (not uptime), code handoffs (3 read-only code sweeps) and all **3,220** HubSpot deals by agent tag. Use it as the source for any "what does agent X do / did it work" answer.
 - **Runbook** (aideazz `cc6f8be`): agent rows corrected in place (Atlas = weekly Monday, OpenClaw = interview coach, CTO AIPA = CRM hub), "How the agents hand work to each other" note + HubSpot outcomes table (existing components), status table to 27 Oct. Every section/script/JSON-LD/effect/counter/menu counted before = after. Live, audit **100 A+** all categories.
