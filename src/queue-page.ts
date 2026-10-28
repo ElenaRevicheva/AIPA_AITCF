@@ -14,7 +14,37 @@
  * The timeline is assembled from our own database (crm_event_log, outreach_log,
  * daily_queue). The page still issues NO HubSpot call of any kind.
  */
-export const QUEUE_PAGE = `<!doctype html>
+export interface QueuePageOptions {
+  /** Where `api/today`, `api/record/:id`, `api/act` live. Relative on Oracle; absolute for the aideazz.xyz face. */
+  apiBase: string;
+  /**
+   * true = the page is served from another origin (aideazz.xyz/ops) and must carry its own
+   * sign-in: the browser will not prompt for HTTP basic auth on a cross-origin fetch, so the
+   * page asks once, keeps `Authorization` in localStorage, sends it on every call and goes
+   * back to the sign-in box on 401. false = same origin as the API, nginx's own prompt does it.
+   */
+  remote: boolean;
+}
+
+/**
+ * 28 Oct 2026 (Elena: "aideazz.xyz/ops is the face of my CRM"): one page, two homes.
+ * webhook.aideazz.xyz/queue/ (Oracle, same origin as the data) and aideazz.xyz/ops/
+ * (static, built by scripts/build-ops-face.cjs). Same markup, same data, same buttons.
+ */
+export function renderQueuePage(opts: QueuePageOptions): string {
+  const remote = opts.remote;
+  const loginBox = remote ? `
+<div id="login" class="login" hidden>
+  <div class="sec">Sign in</div>
+  <div class="quiet">Same password as webhook.aideazz.xyz/ops/ (reset from Telegram with /opspw). Kept in this browser only.</div>
+  <form onsubmit="signIn();return false" class="row">
+    <input id="pw" type="password" autocomplete="current-password" placeholder="password" aria-label="password">
+    <button type="submit" class="primary">Open</button>
+  </form>
+  <div id="loginmsg" class="quiet"></div>
+</div>` : '';
+  const signOut = remote ? ' <a href="#" id="out" onclick="signOut();return false" hidden>Sign out</a>' : '';
+  return `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Income ops — Today</title>
@@ -86,10 +116,15 @@ export const QUEUE_PAGE = `<!doctype html>
   .quiet{color:var(--mut);font-size:13px;padding:2px 0 10px}
   footer{max-width:1120px;margin:24px auto 0;color:var(--mut);font-size:12px;
     border-top:1px solid var(--line);padding-top:12px}
+  .login{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:22px;max-width:480px}
+  .login input{font:15px/1 inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);min-width:200px}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  #out{color:var(--mut);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--mut)}
   @media(max-width:760px){.hideS{display:none}h1{font-size:24px}}
 </style></head><body><div class="wrap">
 <h1>Income ops</h1>
-<div class="sub" id="sub">loading…</div>
+<div class="sub"><span id="sub">loading…</span>${signOut}</div>
+${loginBox}
 <div class="tiles" id="tiles"></div>
 <div class="tabs" id="tabs"></div>
 <table><thead><tr>
@@ -102,12 +137,52 @@ export const QUEUE_PAGE = `<!doctype html>
 var E=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 var DATA={hiring:[],client:[],counts:{}}, TAB='all', OPEN=null, RECORD=null;
+var API=${JSON.stringify(opts.apiBase)}, REMOTE=${remote ? 'true' : 'false'}, KEY='ops.auth';
+
+function auth(){ try{ return REMOTE ? (localStorage.getItem(KEY)||'') : ''; }catch(e){ return ''; } }
+function showLogin(bad){
+  if(!REMOTE){ return; }
+  var box=document.getElementById('login'); if(!box){ return; }
+  box.hidden=false; document.getElementById('out').hidden=true;
+  document.getElementById('loginmsg').textContent = bad ? 'That password was not accepted.' : '';
+  document.getElementById('sub').textContent='sign in to see the queue for today';
+  var pw=document.getElementById('pw'); if(pw){ pw.value=''; pw.focus(); }
+}
+function signIn(){
+  var pw=document.getElementById('pw').value||'';
+  if(!pw){ return; }
+  try{ localStorage.setItem(KEY,'Basic '+btoa('elena:'+pw)); }catch(e){}
+  document.getElementById('login').hidden=true;
+  load();
+}
+function signOut(){
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  DATA={hiring:[],client:[],counts:{}}; OPEN=null; RECORD=null;
+  document.getElementById('tiles').innerHTML=''; document.getElementById('tabs').innerHTML='';
+  document.getElementById('rows').innerHTML='';
+  showLogin(false);
+}
+// Every call to the data goes through here. Same origin: the browser's own auth.
+// Cross origin: the stored header; a 401 means the password changed — ask again.
+function q(path,init){
+  init=init||{}; init.headers=Object.assign({},init.headers||{});
+  if(REMOTE){
+    var a=auth(); if(!a){ showLogin(false); return Promise.reject(new Error('sign in')); }
+    init.headers['Authorization']=a; init.credentials='omit';
+  } else { init.credentials='same-origin'; }
+  return fetch(API+path,init).then(function(r){
+    if(REMOTE&&r.status===401){ try{ localStorage.removeItem(KEY); }catch(e){} showLogin(true); throw new Error('401'); }
+    if(REMOTE){ var o=document.getElementById('out'); if(o){ o.hidden=false; } }
+    return r;
+  });
+}
 
 function load(){
-  fetch('api/today',{credentials:'same-origin'}).then(function(r){
+  q('api/today').then(function(r){
     if(!r.ok){document.getElementById('sub').textContent='could not load ('+r.status+')';return null;}
     return r.json();
-  }).then(function(d){ if(d){ DATA=d; render(); } });
+  }).then(function(d){ if(d){ DATA=d; render(); } })
+    .catch(function(e){ if(String(e.message)!=='sign in'&&String(e.message)!=='401'){ document.getElementById('sub').textContent='could not reach the queue ('+e.message+')'; } });
 }
 
 function items(){
@@ -194,8 +269,8 @@ function row(lane,x){
 function tog(id){
   if(OPEN===id){ OPEN=null; RECORD=null; render(); return; }
   OPEN=id; RECORD=null; render();
-  fetch('api/record/'+id,{credentials:'same-origin'})
-    .then(function(r){ return r.ok?r.json():null; })
+  q('api/record/'+id)
+    .then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; })
     .then(function(d){ if(d && OPEN===id){ RECORD=d; render(); } });
 }
 function setTab(t){ TAB=t; OPEN=null; RECORD=null; render(); }
@@ -204,9 +279,13 @@ function cp(id){
   if(el&&navigator.clipboard){ navigator.clipboard.writeText(el.textContent); }
 }
 function act(id,status){
-  fetch('api/act',{method:'POST',credentials:'same-origin',
+  q('api/act',{method:'POST',
     headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; RECORD=null; load(); });
+    body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; RECORD=null; load(); }).catch(function(){});
 }
 load();
 </script></body></html>`;
+}
+
+/** The Oracle page, exactly as before: relative API, nginx's own basic-auth prompt. */
+export const QUEUE_PAGE = renderQueuePage({ apiBase: 'api/', remote: false });

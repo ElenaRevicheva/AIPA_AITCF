@@ -133,6 +133,18 @@
         "8080"
       ],
       "port": 8080
+    },
+    {
+      "name": "ops-face-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--directory",
+        "D:/aideazz/aideazz/public"
+      ],
+      "port": 8765
     }
   ]
 }
