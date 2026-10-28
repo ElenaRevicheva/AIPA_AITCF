@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-28 | sop-ai-ops: audit of 886e441 vs Elena's list + fixes (Atlas lockup, wider, lavender caption off photo, engineer note, agents/FAQ 2-col index, pipeline nodes) | aideazz `public/sop-ai-ops.html`, `public/media/az-mark.png` | d9baf6c1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 28 Oct — sop-ai-ops second laptop pass LIVE (aideazz `febd5c0` + `4de0413`) · claim released
+- **Audit of `886e441` (Elena: "make sure he really did"):** every item was in the code and live — but judged at her 1536px screen, half fell short: lockup at ~60% of Atlas size with a pink square behind the AZ mark (PNG background 4–6% opaque); engineer note still glass on the photo's dark band; lavender still narrow with caption + badge ON the photo; agents = 12 full rows + 3 folds + callout (not wiki-like); FAQ folds in a 1000px column (⅓ of screen empty); Status table beside a taller roadmap = empty hole; the "numbers chain" (pipeline 1–7 gradient balls) untouched — he restyled the ticker instead.
+- **DONE:** Atlas lockup (AI OPS RUNBOOK / — AIdeazz AI Lab —, 60/35px; `media/az-mark.png` background zeroed — Atlas shares it, backup in laptop `aideazz/backups/sop-ai-ops/`), ticker under the bar, solid engineer card, 1520px sections (64px gutters ≥1100 so text clears the WhatsApp bubble), lavender 1.7fr with caption under the photo, tables stacked, agents = 2-col wiki-style index (one open at a time), FAQ 2-col (one open), pipeline = mono 01–07 on a signal line, photo "lamp" orbs → faint dust motes, breathing glow capped at 42%.
+- **VERIFIED BY:** live page serves `class="tbn">AI Ops <b>Runbook` + 12 `name="agent"`; Playwright at 360–1920px: no horizontal overflow, bar on one row; 3 JSON-LD blocks parse.
+- **RISK / NEXT:** `sop-ai-ops-es.html` is still the old dark design (unchanged open item). HubSpot's chat welcome card still covers the right edge on every page — site-wide, not this page.
 
 ### 💸 28 Oct — Algom: the $8 X Premium plan does NOT fund the X API · Elena's move · no claim held
 - **DONE:** Elena asked to "make maximum of the $8 X subscription for Algom". Finding, from X's own pricing/billing pages: Premium (checkmark, larger reply boost, long posts) and the API (pay-per-use credits) are separately billed; no Premium tier includes API access, so Algom stays at 402 until API credits exist. Cost model from the code: keep-all ≈ **$200–800/mo** (search poll + stream + home-timeline reposts), read-light ≈ **$5–10/mo**; the $20 starter credit covers months of read-light. Full brief: `docs/oracle/ALGOM_X_PREMIUM_VS_API_2026-10-28.md`. Shipped to dragontrade-agent `main`: own-id cached per process (was a billed lookup every 45 min), `ALGOM_POLL_MINUTES` dial (default 30, unchanged).
