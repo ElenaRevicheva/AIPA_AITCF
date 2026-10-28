@@ -4,14 +4,135 @@
     {
       "name": "aideazz-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "-s", "D:/aideazz/aideazz/dist", "-l", "4173"],
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "-s",
+        "D:/aideazz/aideazz/dist",
+        "-l",
+        "4173"
+      ],
       "port": 4173
     },
     {
       "name": "atuona-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "D:/aideazz/atuona", "-l", "4174"],
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "D:/aideazz/atuona",
+        "-l",
+        "4174"
+      ],
       "port": 4174
+    },
+    {
+      "name": "atuona-dist-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "D:/aideazz/atuona/dist",
+        "-l",
+        "4175"
+      ],
+      "port": 4175
+    },
+    {
+      "name": "atuona-lan-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "D:/aideazz/atuona/dist",
+        "-l",
+        "tcp://0.0.0.0:4176"
+      ],
+      "port": 4176
+    },
+    {
+      "name": "whitespace-static-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "D:/aideazz/whitespace/public",
+        "-l",
+        "4177"
+      ],
+      "port": 4177
+    },
+    {
+      "name": "aideazz-dist-plain",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4178",
+        "--directory",
+        "D:/aideazz/aideazz/dist"
+      ],
+      "port": 4178
+    },
+    {
+      "name": "whitespace-test-copy",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4179",
+        "--directory",
+        "C:/Users/kirav/AppData/Local/Temp/claude/D--aideazz-ai-cofounders-cto-aipa/1ce5a889-b339-4863-a5d3-72fc4a140f45/scratchpad/wstest/public"
+      ],
+      "port": 4179
+    },
+    {
+      "name": "whitespace-struct-check",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/kirav/AppData/Local/Temp/claude/D--aideazz-ai-cofounders-cto-aipa/1ce5a889-b339-4863-a5d3-72fc4a140f45/scratchpad/struct/check/serve.cjs"
+      ],
+      "port": 4185
+    },
+    {
+      "name": "globe-compare",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4180",
+        "--directory",
+        "C:/Users/kirav/AppData/Local/Temp/claude/D--aideazz-ai-cofounders-cto-aipa/1ce5a889-b339-4863-a5d3-72fc4a140f45/scratchpad/globe"
+      ],
+      "port": 4180
+    },
+    {
+      "name": "aideazz-public-plain",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4192",
+        "--directory",
+        "D:/aideazz/aideazz/public"
+      ],
+      "port": 4192
+    },
+    {
+      "name": "ascent-classroom-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "D:/aideazz/ascent-saas-builder",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8080"
+      ],
+      "port": 8080
     }
   ]
 }
