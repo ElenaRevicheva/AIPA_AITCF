@@ -167,6 +167,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟡 28 Oct ~22:10 UTC — daily blog BUYER-QUESTION MODE built + tested, NOT yet on Oracle · 18 fabricated-Redis pages corrected LIVE (aideazz `7ad493e`) · Oracle cache correction waits with the deploy · no claim held
+- **Deploy is one command Elena runs (Claude's scp/remote-write is blocked by the auto-mode classifier):**
+  `bash scripts/oracle-deploy-blog-buyer-mode.sh` — scp 2 named dist files, apply `blog-redis-correction.cjs` to `data/blog-posts-cache.json`
+  (backup `.bak-20261028`), move the 12 Spanish bundles to `data/blog-es-cache.bak-20261028/`, `pm2 restart cto-aipa --update-env`, print md5 + uptime +
+  a live run of the new collector + the next buyer question. Expected CR-stripped md5: publisher `3865d236…`, evidence `3b3db29f…`.
+- **What changed (cto-aipa `8da5da13`, surgical):** `DAILY_BLOG_BUYER_QUESTIONS` (10, no digits) + `pickBuyerQuestion()` taken BEFORE the evidence
+  angle while the list lasts; state `data/daily-blog-buyer-questions.json`; prompt rule 5 swapped for a business-owner rule (free audit + $100
+  diagnostic linked once each); new evidence collector `collectAuditCatalog` = live run of the audit engine on aideazz.xyz (groups, checks, today's
+  score) + the $100 offer from `aideazz-service-catalog.ts`. Grounding gate, duplicate gate, fallback article, cadence: untouched.
+  Off switch: `DAILY_BLOG_BUYER_MODE=false`. Tests: `node scripts/test-blog-buyer-mode.cjs` (collector check needs network — passes on Oracle only).
+- **Verify tomorrow (14:30 Panama / 19:30 UTC):** pm2 log `[daily-blog] Buyer question (dental): …`, Telegram card carries `🎯 buyer question · dental`,
+  the article links `/api` and `/pay/analisis-tecnico` once each, and the ES toggle on the page shows Spanish. If the gate rejects 4 times, the
+  measured-notes fallback still ships — read the Telegram card, do not re-investigate the grounding gate (§6 DELIBERATE).
+- **Redis correction, live half:** 18 pages in aideazz `public/blog/*/index.html` — 274 lines of affirmative Redis removed, dated note after the first
+  paragraph, FAQ JSON-LD aligned; backups in aideazz `backups/blog-redis-correction-20261028/` (untracked). Dry-run/re-run:
+  `node scripts/blog-redis-correction.cjs --html /d/aideazz/aideazz [--cache <json>] [--apply]`. Kept on purpose: the 2 incident field notes,
+  "no Redis/RabbitMQ", "misconfigured Redis instance" (client story), "how to use Redis cache" (example query).
+
 ### ✅ 28 Oct ~21:05 UTC — voice → Trello LEARNS from her corrections (VJH + OpenClaw patterns) · LIVE · claim released
 - **DONE:** corrections captured by voice (update action) and from her own Trello edits (nightly read-only sweep,
   23:40 Panama); her latest 12 + approved rules go into the classifier prompt; Sunday 10:00 Panama 2+ corrections of one
