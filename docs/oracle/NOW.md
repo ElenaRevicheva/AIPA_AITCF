@@ -43,6 +43,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-28 20:35 | trello-voice: multi-card voice tasks all got the FIRST date (Bronchovoxone cycles 2+3) — fix per-card due + fix the 2 cards | cto-aipa trello-voice source + `dist/`, PM2 `cto-aipa` restart, 2 Trello cards | 3ba8033a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
