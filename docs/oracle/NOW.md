@@ -166,6 +166,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 28 Oct ~19:00 UTC — YouTube: 7 films now carry WhatsApp + $100 diagnostic + free audit links WITH UTM · Make "Daily YouTube Upload" 6263197 switched OFF (Elena's go) · no claim held
+- **Why:** Ahrefs Web Analytics: 21,936 YouTube visitors in 30 d landed on `/api` untagged (campaign "Direct / None"), 81.5% bounce, 46 outbound
+  clicks, 0 inquiries. YouTube Studio: the 7 ORIGINAL uploads (1–3 Oct + an 11 Sep cut) hold ~470K views; the daily Make re-uploads got
+  0–16 views each and the channel carries an active **Community Guidelines warning**. Full read-out: `docs/aideazz/AHREFS_FINDINGS_2026-10-28.md`.
+- **Done (Elena's Chrome, each edit verified after reload):** block at the top of 7 descriptions, originals kept underneath; the 11 Sep video
+  got a real title. IDs, campaigns, the exact block: `docs/selling/video/YOUTUBE_CTA_UTM_2026-10-28.md`.
+- **Make 6263197 = `isActive:false`** (API `POST /scenarios/6263197/stop` → 200, re-read confirmed). Thumbnail scenario 6518503 left as is.
+- **Scoreboard from here:** Ahrefs Web Analytics → Campaigns `aigo-*`; HubSpot `[CLIENT-SERVICE-PAID]`; WhatsApp openings "vi el video de …".
+- **Do NOT** spend sessions on the Ahrefs issue list (titles/meta/schema): proxy work, see the findings file. Decision still Elena's: the ~25
+  duplicate uploads (leave / unlist), and whether to answer the Community Guidelines warning training prompt.
+
 ### 📬 28 Oct — Anthropic Partner Network: the full thread found (Zoho), no reply missed · Elena's move · no claim held
 - **Searched read-only** (readonly + PEEK) every folder of Zoho `aipa@` and Gmail since 1 Jan 2026, Spam/Trash
   included (`~/_scratch/anthropic-mail-search.py`, `anthropic-mail-read.py` on Oracle).
