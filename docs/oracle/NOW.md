@@ -166,6 +166,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📬 28 Oct — Anthropic Partner Network: the full thread found (Zoho), no reply missed · Elena's move · no claim held
+- **Searched read-only** (readonly + PEEK) every folder of Zoho `aipa@` and Gmail since 1 Jan 2026, Spam/Trash
+  included (`~/_scratch/anthropic-mail-search.py`, `anthropic-mail-read.py` on Oracle).
+- **Thread:** 15 Apr Partner Team said no for now (the Network is for partners who *bring Claude to market for clients*;
+  suggested *Powered by Claude* + "connect with your account team") → 10 Jun Elena asked for a re-evaluation as an
+  implementation/consulting partner → same day only the Intercom bot "Fin" auto-ack ("typically within 3 business days").
+  **Nothing since, in any folder.** No agent ignored a reply; a human answer never came (4.5 months).
+- No HubSpot deal tracks the application (only VJH hiring deals @ Anthropic), so the radar could never route a reply.
+- Also: in April Elena REGISTERED on Skilljar (with `aipa@`) for Claude Code in Action, Intro to MCP, MCP Advanced,
+  Building with the Claude API, Intro to agent skills; 22 Jul Claude Code in Action was refreshed (new lessons + quiz).
+  Completion status unknown until she logs in.
+- **NEXT (Elena):** follow up on the 10 Jun thread (draft on request, nothing sent) · decide whether to stage a PARTNER
+  deal for `partner-support@anthropic.com` so a reply is routed · log in to Skilljar and check progress.
+
 ### ✅ 28 Oct ~16:10 UTC — sop-ai-ops: "© 2026 AIdeazz AI Lab · Panama · All rights reserved" close (aideazz `44613fc`) · claim released
 - Same block as the /api footer (`LabApi.tsx`), light palette, Instrument Serif added to the fonts link; `#legal` at the end of `<footer class="close">`. Rendered headless 1440 + 390: under the foot line, nothing else moved. Backup `backups/sop-ai-ops.html.bak-20261028-legal` (laptop). Year: HTML holds `2026`, a one-line script refreshes it on load (`1617da6`, Elena's ask) — never remove the real value from the markup. ES page untouched (still on hold).
 
