@@ -13,6 +13,8 @@ destroying each other's work.
 
 # PART 1 — THE PROTOCOL
 
+**💳 28 Oct — video credits for more Pere/Titi shots (verified from the API, not the console):** Runway org `creditBalance` = **1229** ($0.01/credit; key in Oracle `whitespace/.env`, probe = `GET api.dev.runwayml.com/v1/organization`). At Runway list prices a 5 s clip costs gen4.5 **60**, kling3.0_pro **60** (85 with audio), seedance2_5 720p **150**, seedance2_fast 720p **120** → roughly 20 Gen-4.5 clips or 8 Seedance 2.5 clips. Seedance is on the SAME Runway credits (`seedance2_5` listed in the org tier); the one earlier Seedance clip (`clip-sloth-hello__seedance-2-5…`) was bought via Venice.ai, whose balance is **unverified** today (SSH read of `cto-aipa/.env` denied by the Claude auto-mode classifier). Generation = one-off `rw1.py` on Oracle; the bot itself only plays stored `heroes/` clips.
+
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
 **22 Oct (2) — fixed after Elena's test:** /kids greeting now voiced (`heroes/kids-greeting.mp4`, cached; delete it to rebuild); unlabeled video scripts no longer give every line to Pere (the reply's Pere:/Titi: lines are used); each turn plays a mix of all 14 approved shots (+ titi-cheer-2, titi-dance). Voices pinned: Pere A Rudolph, Titi A Anime. Commit EspaLuzFamilybot `44869f8`.
