@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-28 | sop-ai-ops: audit of 886e441 vs Elena's list + fixes (Atlas lockup, wider, lavender caption off photo, engineer note, agents/FAQ 2-col index, pipeline nodes) | aideazz `public/sop-ai-ops.html`, `public/media/az-mark.png` | d9baf6c1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
