@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 28 Oct 15:55 | sop-ai-ops: © AIdeazz AI Lab close (as /api footer) | aideazz `public/sop-ai-ops.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
