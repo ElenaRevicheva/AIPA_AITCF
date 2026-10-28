@@ -207,6 +207,17 @@ So end substantive sessions with: **what broke → why → what it is called.**
 - Tie it to her lanes: AI-augmented builder / GEO-AEO-Tech-SEO /
   AI-automation solutions architect. Not ML researcher.
 
+### The closing message keeps its proven shape (Elena, 28 Oct 2026: "it works well, do not wipe it")
+Every substantive session ends in this order, in plain words, addressed to her:
+1. **The verdict in one paragraph** — what was true, what was not, what is live now and how she sees it
+   (e.g. "Elena, the other agent did make every change he listed… A hard refresh (Ctrl+F5) will show it.").
+2. **What went wrong** — short bullets, each with its concrete cause.
+3. **What's live now** — short bullets of what changed, each in words she can check on screen.
+4. **Concept for interviews** — "what happened is called *…*", why, and the fix's name.
+5. **The interview line** — one ready-to-say sentence, verified numbers only.
+
+The lesson additions below come **after** these five, never instead of them.
+
 ### Every work session is also a lesson (Elena, 28 Oct 2026)
 Her private course (`aideazz-private-docs/docs/08-guides-howtos/claude-architect-course/`, METHOD.md →
 *Learning on the job*) now runs inside ordinary work. In every substantive session:
@@ -217,9 +228,10 @@ Her private course (`aideazz-private-docs/docs/08-guides-howtos/claude-architect
   would really help — the exact screen path (what to click, where, what she will see) and why a pro uses it
   here. Prefer features still ⬜. Mouse path first; the official desktop docs are the source, nothing guessed.
   The goal: she grows from prompt chat into a seasoned Claude Code user.
-- **Lesson receipt at the close:** the concept's course module + exam domain, one check question (answer
-  hidden), and — with her OK — a short "on the job" entry at the top of `LESSONS_PERFORMED.md` (template in
-  METHOD.md; commit from a clean worktree of the private repo's `origin/main`, named files only).
+- **Lesson receipt, appended after the interview line:** the concept's course module + exam domain, the
+  session's UI move ("Today's UI move: …"), one check question (answer hidden), and — with her OK — a short
+  "on the job" entry at the top of `LESSONS_PERFORMED.md` (template in METHOD.md; commit from a clean worktree
+  of the private repo's `origin/main`, named files only).
 - **"teach as we go"** from her → also one 30-second "predict, then see" card at a real moment (before a push
   or deploy). `/learn this` replays the session as a full lesson; `/learn ui` practises the next feature.
 - Never at the cost of the work, and never OpenClaw's job (spoken interview practice stays with OpenClaw).
