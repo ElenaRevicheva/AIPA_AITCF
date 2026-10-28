@@ -43,6 +43,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-28 21:00 | voice→Trello learning loop (plan `docs/oracle/2026-10-28_TRELLO_VOICE_LEARNING_PLAN.md`, Elena: go) | cto-aipa `src/trello-voice.ts` + its scheduler/Telegram hooks, `data/trello-*.json` on Oracle, PM2 `cto-aipa` | a22c6c80 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
