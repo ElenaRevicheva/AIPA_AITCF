@@ -44,7 +44,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-28 21:00 | voice→Trello learning loop (plan `docs/oracle/2026-10-28_TRELLO_VOICE_LEARNING_PLAN.md`, Elena: go) | cto-aipa `src/trello-voice.ts` + its scheduler/Telegram hooks, `data/trello-*.json` on Oracle, PM2 `cto-aipa` | a22c6c80 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -167,6 +166,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 28 Oct ~21:05 UTC — voice → Trello LEARNS from her corrections (VJH + OpenClaw patterns) · LIVE · claim released
+- **DONE:** corrections captured by voice (update action) and from her own Trello edits (nightly read-only sweep,
+  23:40 Panama); her latest 12 + approved rules go into the classifier prompt; Sunday 10:00 Panama 2+ corrections of one
+  kind → ONE rule with ✅/❌ buttons. Files `~/cto-aipa/data/trello-{created,corrections,rules}.json` (gitignored).
+- **VERIFIED BY:** real sweep on today's 3 cards found her 2 date corrections (second run 0); lesson renders in the
+  prompt; tests 103/103 laptop + Oracle; `cto-aipa` restarted 20:59:30 after the files landed.
+- **⚠️ Her decision pending:** first proposal (`Rmvsljlw4d`, "audio cuts off mid-word…") came from examples cut at 140
+  chars — she tapped ✅ at 3:59 PM, and seconds later my cleanup marked it superseded, so it is NOT active. Told her; if
+  she wants it, set `status: approved` back. Corrected proposal `Rmvslls8md` sent ("extract each cycle's own start date").
+- **RISK:** a correction she makes because she changed her mind (not the bot's error) is also logged — the approval
+  gate is the filter. New writers of card name/due/colour must not run on bot-made cards, or the sweep learns them.
 
 ### ✅ 28 Oct ~20:37 UTC — voice → Trello: each card of a series gets its OWN date · LIVE · claim released
 - **DONE:** a voice note describing a repeating cycle made 3 cards that all showed the first date (subtask cards reused
