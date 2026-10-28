@@ -43,7 +43,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-28 20:35 | trello-voice: multi-card voice tasks all got the FIRST date (Bronchovoxone cycles 2+3) — fix per-card due + fix the 2 cards | cto-aipa trello-voice source + `dist/`, PM2 `cto-aipa` restart, 2 Trello cards | 3ba8033a |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -166,6 +165,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 28 Oct ~20:37 UTC — voice → Trello: each card of a series gets its OWN date · LIVE · claim released
+- **DONE:** a voice note describing a repeating cycle made 3 cards that all showed the first date (subtask cards reused
+  the note's one `dueDate`). Now: model `subtaskDueDates[i]` → else the date in the card's own title → else `dueDate`;
+  the reply lists each card's saved date. The 2 wrong cards were corrected on Trello (read back: Nov 28 / Dec 28,
+  12:00 PM Panama). cto-aipa `b27dd7e5`.
+- **VERIFIED BY:** `node scripts/test-trello-voice-dates.cjs` → 86 passed (14 new) on laptop AND Oracle; Oracle src
+  md5 matched GitHub before the copy; `dist/trello-voice.js` 20:37:00 < `cto-aipa` start 20:37:05; clean boot log.
+- **RISK:** the title fallback reads the FIRST month-day in a title ("cycle 3 (Dec 28 - Jan 6)" → Dec 28). A series whose
+  titles carry no date and a model that omits `subtaskDueDates` still falls back to the shared date. Backups:
+  Oracle `~/_session-backups/trello-voice-20261028-*`. Public repo: keep family/health detail out of code and commits.
 
 ### 📊 28 Oct ~20:40 UTC — AI-citation baseline done: 22 answers (Perplexity 10, ChatGPT 6, Google AI Mode 6), aideazz.xyz cited in 1 · nothing changed · no claim held
 - **Result:** cited once — Perplexity, Spanish, "¿quién hace auditorías de visibilidad en IA en Panamá?", via `aideazz.xyz/portfolio` (listed 4th after
