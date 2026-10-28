@@ -13,7 +13,16 @@ destroying each other's work.
 
 # PART 1 — THE PROTOCOL
 
-**💳 28 Oct — video credits for more Pere/Titi shots (verified from the API, not the console):** Runway org `creditBalance` = **1229** ($0.01/credit; key in Oracle `whitespace/.env`, probe = `GET api.dev.runwayml.com/v1/organization`). At Runway list prices a 5 s clip costs gen4.5 **60**, kling3.0_pro **60** (85 with audio), seedance2_5 720p **150**, seedance2_fast 720p **120** → roughly 20 Gen-4.5 clips or 8 Seedance 2.5 clips. Seedance is on the SAME Runway credits (`seedance2_5` listed in the org tier); the one earlier Seedance clip (`clip-sloth-hello__seedance-2-5…`) was bought via Venice.ai, whose balance is **unverified** today (SSH read of `cto-aipa/.env` denied by the Claude auto-mode classifier). Generation = one-off `rw1.py` on Oracle; the bot itself only plays stored `heroes/` clips.
+**💳 28 Oct — video wallets, read from each vendor API (Elena: no top-ups, use what is there). Probe = `scripts/_tmp-atuona-balances.cjs` pattern (dotenv from `~/cto-aipa`, prints balances only):**
+| Wallet | Atuona lanes it bills | Balance 28 Oct | Buys (list price) |
+|---|---|---|---|
+| **Runway** (`whitespace/.env`, `GET /v1/organization`) | `/visualize runway`; Pere/Titi `rw1.py` incl. `kling3.0_pro`, `seedance2_5` | **1229 credits** ($0.01 each) | ~20 Gen-4.5 5 s clips (60) · ~8 Seedance 2.5 720p (150) |
+| **Luma platform** (`agents.lumalabs.ai/v1/credits`) | `/visualize luma`, Director's Cut, `/imagine luma` | **350 credits** (credit→USD rate not published; Ray 3.2 list: 720p 5 s $0.30, 10 s $0.90, 1080p 5 s $1.20) | unverified count — treat as a few 720p clips |
+| **DeepSeek** (`/user/balance`) | `/visualize deepseek` is a text DIRECTOR only (writes the motion line, then the chain renders) | **$11.87** | text only, no video |
+| **Venice** (`/api_keys/rate_limits`) | `/visualize venice`, `venice18`, `/imagine venice*` | **$0.05, `accessPermitted:false`** | 🔴 DEAD — nothing renders |
+| **Replicate** (PREPAID, no balance API; token valid, user `elenarevicheva`) | `kling` `seedance` `wan` `grok` `sora` `pixverse` `happyhorse` `hailuo` + Luma-Replicate fallback, all `/imagine` stills, MiniMax hero voices | **unverified** — replicate.com/account/billing needs Elena's GitHub sign-in | below $5 Replicate throttles to 6 creates/min |
+| **Google** (Gemini key valid, postpay to the Cloud card) | `/visualize omni`, `/visualize veo`, `/imagine omni|nanopro|imagen4` | not prepaid — every clip is a card charge | ⚠️ costs money with "no top-ups" |
+Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new shots = one-off `rw1.py` on Oracle. Oracle log greps for provider output lines were denied by the Claude auto-mode classifier today, so the table is API-verified, not log-verified.
 
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
