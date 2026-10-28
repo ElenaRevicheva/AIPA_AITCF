@@ -37,6 +37,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (kids) | 28 Oct 17:05 | New Pere/Titi action shots on Runway Gen-4.5 (no duplicates of the 15 live clips) | Oracle `~/_scratch/heroes-20261028/`, Runway credits; later `EspaLuzFamilybot/main.py` HERO_SHOTS + `heroes/` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
