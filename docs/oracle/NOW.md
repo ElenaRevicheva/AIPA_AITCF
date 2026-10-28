@@ -168,6 +168,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏸️ 28 Oct ~23:20 UTC — Encora deal staged ✓ · apply-kit "no startup in employer docs" fix on GitHub, NOT on Oracle · Elena's move
+- **DONE:** `[HIRING-MANUAL] Junior Applied AI Engineer (LLM Systems) @ Encora` (deal 67022434067, I act TODAY): all 6
+  kit notes read back from HubSpot; audit ✓ every column. Fix committed `7d198a28`: letter prompt rule + `employerSafe()`
+  (no "AIdeazz", sign-off → LinkedIn), Comet email from `APPLY_EMAIL` (Oracle .env), headline without the startup.
+- **NOT DONE:** the deploy to Oracle was blocked by the permission classifier — Oracle still runs the OLD letter/Comet
+  code, and Encora's ✅ letter + 📋 Comet notes still say "At AIdeazz AI Lab" / aipa@aideazz.xyz.
+- **NEXT (needs Elena's OK):** add `APPLY_EMAIL=<her personal email>` to Oracle `~/cto-aipa/.env`; copy `src/cover-letter.ts`,
+  `dist/cover-letter.js`, `scripts/lib/comet-prompt.cjs`, `scripts/test-cover-letter-model.cjs` (Oracle copies matched GitHub
+  before the change); test 24/24; restart; then regenerate Encora's ✅ + 📋 notes.
+- **RISK:** until then every new kit letter keeps the startup branding. Never put her personal email in this public repo.
+
 ### ✅ 28 Oct 22:54 UTC — daily blog BUYER-QUESTION MODE LIVE on Oracle · 18 fabricated-Redis pages corrected LIVE on the site AND in the publisher cache · claim released
 - **Deployed by Claude on Elena's "full right to build and deploy" (third attempt passed the classifier).** Proof from Oracle: dist md5
   `3865d236…` (publisher) / `3b3db29f…` (evidence) = local build; pm2 `cto-aipa online started 2026-10-28T22:54:08Z`; live collector
