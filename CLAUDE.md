@@ -207,6 +207,23 @@ So end substantive sessions with: **what broke → why → what it is called.**
 - Tie it to her lanes: AI-augmented builder / GEO-AEO-Tech-SEO /
   AI-automation solutions architect. Not ML researcher.
 
+### Every work session is also a lesson (Elena, 28 Oct 2026)
+Her private course (`aideazz-private-docs/docs/08-guides-howtos/claude-architect-course/`, METHOD.md →
+*Learning on the job*) now runs inside ordinary work. In every substantive session:
+
+- **Narrate in plain words while working,** and name each term the moment it happens in the real task
+  ("this is a diff", "this is a deploy check", "this step is fail-closed").
+- **One UI move per session.** Show ONE Claude Code app feature from `UI.md` (that folder) at the moment it
+  would really help — the exact screen path (what to click, where, what she will see) and why a pro uses it
+  here. Prefer features still ⬜. Mouse path first; the official desktop docs are the source, nothing guessed.
+  The goal: she grows from prompt chat into a seasoned Claude Code user.
+- **Lesson receipt at the close:** the concept's course module + exam domain, one check question (answer
+  hidden), and — with her OK — a short "on the job" entry at the top of `LESSONS_PERFORMED.md` (template in
+  METHOD.md; commit from a clean worktree of the private repo's `origin/main`, named files only).
+- **"teach as we go"** from her → also one 30-second "predict, then see" card at a real moment (before a push
+  or deploy). `/learn this` replays the session as a full lesson; `/learn ui` practises the next feature.
+- Never at the cost of the work, and never OpenClaw's job (spoken interview practice stays with OpenClaw).
+
 ## 2. Publish the ones that earn it
 
 Two destinations, both selective. **Routine work earns neither.**
