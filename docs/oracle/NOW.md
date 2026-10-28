@@ -26,6 +26,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-28 | sop-ai-ops: every long list/table → wiki-style two-level folds (area → list → item) | aideazz `public/sop-ai-ops.html` | da2910a4 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
