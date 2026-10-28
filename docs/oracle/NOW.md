@@ -24,6 +24,12 @@ destroying each other's work.
 | **Google** (Gemini key valid, postpay to the Cloud card) | `/visualize omni`, `/visualize veo`, `/imagine omni|nanopro|imagen4` | not prepaid — every clip is a card charge | ⚠️ costs money with "no top-ups" |
 Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new shots = one-off `rw1.py` on Oracle. Oracle log greps for provider output lines were denied by the Claude auto-mode classifier today, so the table is API-verified, not log-verified.
 
+**🎬 28 Oct — ten NEW Pere/Titi shots rendered on Runway Gen-4.5 (Elena: "we continue"; the 22 Oct pause is lifted for clips).** pere-counting · pere-thinking · pere-clap · pere-listening · titi-counting-jumps · titi-freeze · titi-oops · titi-listening · duo-highfive · duo-peekaboo. 600 credits spent, 1229 → **629** (`batch-20261028.log`). Masters + bot encodes + frame sheets on the laptop: `creatives/pere-titi-20261021/` (`clip-*__runway-gen4.5.mp4`, `bot-720-20261028/`, `sheets-20261028/`, md5 ✓), album of 10 sent to Elena's Telegram.
+- **DONE:** clips are in Oracle `~/EspaLuzFamilybot/heroes/` (25 files, `cp -n`, nothing overwritten); EspaLuzFamilybot `main` `a1980e2` adds them to `HERO_SHOTS` + lesson-word leads (muy bien → high five/clap, cuenta → counting, congela → freeze, ups → oops, dónde está → peekaboo, repite/escucha → listening, adivina → thinking).
+- **NEXT (Elena, one line on Oracle):** `cp ~/_scratch/heroes-20261028/main.py.new ~/EspaLuzFamilybot/main.py && sudo systemctl restart espaluz-familybot` — the Claude auto-mode classifier refused the deploy+restart. Until then the live bot (main.py md5 `a22e870b…` = `baf888c`) plays only the old 15; the new files are inert.
+- **VERIFIED BY:** `md5sum ~/_scratch/heroes-20261028/main.py.new` = `b1c1cdb5…` = `git show a1980e2:main.py`; `ls heroes | wc -l` = 25; Runway `creditBalance` 629 after the batch.
+- **RISK:** Oracle's EspaLuzFamilybot checkout sits at `58cdb4b`, 14 commits behind origin/main, with 105 dirty entries left by someone — it deploys by **copying main.py**, never `git pull` there. Backup of the live file is the `baf888c` commit itself.
+
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
 **22 Oct (2) — fixed after Elena's test:** /kids greeting now voiced (`heroes/kids-greeting.mp4`, cached; delete it to rebuild); unlabeled video scripts no longer give every line to Pere (the reply's Pere:/Titi: lines are used); each turn plays a mix of all 14 approved shots (+ titi-cheer-2, titi-dance). Voices pinned: Pere A Rudolph, Titi A Anime. Commit EspaLuzFamilybot `44869f8`.
@@ -37,7 +43,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (kids) | 28 Oct 17:05 | New Pere/Titi action shots on Runway Gen-4.5 (no duplicates of the 15 live clips) | Oracle `~/_scratch/heroes-20261028/`, Runway credits; later `EspaLuzFamilybot/main.py` HERO_SHOTS + `heroes/` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
