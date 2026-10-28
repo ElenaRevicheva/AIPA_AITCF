@@ -43,6 +43,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (kids) | 28 Oct 18:05 | Pere/Titi: one shot per line, the model picks the shot (bot + classroom) | `EspaLuzFamilybot/main.py`, Oracle `espaluz-familybot`; ascent `classroom-pere-titi` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
