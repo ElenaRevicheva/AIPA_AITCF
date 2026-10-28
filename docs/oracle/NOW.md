@@ -44,6 +44,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (kids) | 28 Oct 20:20 | EspaLuz SaaS: classroom in the site structure (nav/dashboard/roadmap) + Pere/Titi voices on the web | ascent `main` (`src/pages/*`, `supabase/functions/generate-voice`), Supabase fn deploy | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
