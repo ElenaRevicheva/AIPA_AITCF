@@ -28,7 +28,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 28 Oct 15:55 | sop-ai-ops: © AIdeazz AI Lab close (as /api footer) | aideazz `public/sop-ai-ops.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -151,6 +150,9 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 28 Oct ~16:10 UTC — sop-ai-ops: "© 2026 AIdeazz AI Lab · Panama · All rights reserved" close (aideazz `44613fc`) · claim released
+- Same block as the /api footer (`LabApi.tsx`), light palette, Instrument Serif added to the fonts link; `#legal` at the end of `<footer class="close">`. Rendered headless 1440 + 390: under the foot line, nothing else moved. Backup `backups/sop-ai-ops.html.bak-20261028-legal` (laptop). Year is static `2026` (static page) — bump with the January date stamp. ES page untouched (still on hold).
 
 ### ✅ 28 Oct (later) — sop-ai-ops: two levels everywhere, as the wiki (aideazz `8a8b031` + phone follow-up) · claim released
 - **DONE:** Elena (phone): "full list of agents in several places". Now 15 CLOSED named areas → one line per item → details: lab pieces, visibility scores, engine, status, roadmap, verify, agents (+ capabilities, handoffs, HubSpot results), health checks, pipeline steps, release rules, incidents, stack. Tables became rows (nothing cut off on phones). Laptop page 14,866 → 8,806px; phone agent line ~300 → ~70px. Photo "lamp" orbs → faint dust motes (`4de0413`).
