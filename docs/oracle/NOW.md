@@ -24,12 +24,11 @@ destroying each other's work.
 | **Google** (Gemini key valid, postpay to the Cloud card) | `/visualize omni`, `/visualize veo`, `/imagine omni|nanopro|imagen4` | not prepaid — every clip is a card charge | ⚠️ costs money with "no top-ups" |
 Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new shots = one-off `rw1.py` on Oracle. Oracle log greps for provider output lines were denied by the Claude auto-mode classifier today, so the table is API-verified, not log-verified.
 
-**🎬 28 Oct — Pere/Titi one-picture-per-line LIVE everywhere; all codebases synced (Elena: "update all the codebases… give me a link to test").** The tutor tags each script line (`Pere [counting]: …`), one clip per line, slow-down ≤1.5× + forward-backward fit, tags hidden; 25 clips (10 new Runway shots, 600 credits, 629 left).
-- **DONE:** bot EspaLuzFamilybot `main` `1c8b222` = Oracle live (`md5 ddef1027…`, restarted 17:35 UTC, 0 tracebacks; Oracle checkout re-pointed to origin/main with `git reset --mixed`, working tree untouched). SaaS ascent-saas-builder: `classroom-pere-titi` fast-forwarded into **`main` `fb5825a`** (Elena asked for a test link); Supabase `espaluz-chat` **v191** live. cto-aipa `main` (NOW.md + launch config). Creatives: laptop `creatives/pere-titi-20261021/` + OneDrive mirror, **185/185 md5 ✓**; Oracle scratch holds only scripts/logs (988 K). Private kids plan updated.
-- **TEST (Elena):** Telegram EspaLuz → /kids or "Soy Alisa" → ask anything; expect one picture per hero line. SaaS → https://espaluz-ai-language-tutor.lovable.app/classroom (parent sign-in) — Lovable builds from `main`; if the page is the old one, open the Lovable project and press Publish → Update.
-- **VERIFIED BY:** Oracle `🎬 hero line … -> <clip> (Xs voice / 5.0s clip)` lines in the dry run; `git log origin/main -1` = `fb5825a` (ascent) / `1c8b222` (bot); Supabase `list_edge_functions` → espaluz-chat v191 ACTIVE.
-- **RISK:** Oracle `~/EspaLuzFamilybot` disk still has **16 tracked files differing from git** (espaluz_paguelofacil.py, espaluz_menu.py, paypal_webhook_server.py, wiring_emitter.py, …) — someone's uncommitted work; never overwrite them, whoever owns them should commit. Deploy that bot by copying `main.py` only.
-- **NEXT (journey step 2):** classroom voice → Pere/Titi MiniMax voices (Replicate $3.56); then exact lip-sync (deferred).
+**🎬 28 Oct (late) — EspaLuz SaaS: classroom in the site structure + Pere/Titi voices on the web (ascent `main` `47e83d1`).** Elena: "site has no structure", "give voices to Pere and Titi like Telegram". Added (all lead to `/classroom`): dashboard header button 🦥🐒 Kids classroom, landing nav link, roadmap step "Pere and Titi's Classroom (kids 5-7)", third Learning Option card. `generate-voice` now takes `hero` (pere|titi) → MiniMax Speech 2.6 HD on Replicate with the bot's pinned voices; `Classroom.tsx` voices each line by its hero (fetched together, played in order, picture per line); any miss → the old single OpenAI voice.
+- **NEEDS ELENA (2 clicks):** (1) Lovable → Publish → Update (main moved again, the published site is still `fb5825a`); (2) Supabase → Project Settings → Edge Functions → Secrets → add `REPLICATE_API_TOKEN` (same token as the bot's `.env` on Oracle) — without it the heroes fall back to OpenAI nova, and **OpenAI has been out of credits since 23 Oct**, so the web voice may be silent until the secret exists. `generate-voice` deploy (v195): see below.
+- **VERIFIED BY:** tsc 0 / eslint 0 on `Classroom.tsx`; the two eslint `any` errors in LearningOptions/LearningRoadmap are pre-existing lines. Published-site check after Publish: bundle must contain "Kids classroom".
+- **RISK:** Replicate balance $3.56 (MiniMax ≈ $0.10 / 1k chars ≈ 1-2 ¢ per classroom turn). Oracle `~/EspaLuzFamilybot` disk: 16 tracked files differ from git (others' work) — copy `main.py` only.
+- Earlier today (all live): 10 new Runway shots (629 credits left), one picture per line in bot `1c8b222` + `espaluz-chat` v191; creatives on laptop + OneDrive 185/185 md5.
 
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
@@ -44,7 +43,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (kids) | 28 Oct 20:20 | EspaLuz SaaS: classroom in the site structure (nav/dashboard/roadmap) + Pere/Titi voices on the web | ascent `main` (`src/pages/*`, `supabase/functions/generate-voice`), Supabase fn deploy | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
