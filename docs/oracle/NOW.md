@@ -170,6 +170,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🧭 28 Oct 23:55 UTC — Elena refocuses on HER OWN CRM (not HubSpot): what exists, read from git + live probes · no claim held
+- **`webhook.aideazz.xyz/queue/` = her own CRM** (31 Aug, cto-aipa `20e5b4a2` → `96507dbd` → `7e1909d2` → `90acbf3a`, 1 Sep `6d408de6`). Reads table `daily_queue` in the Oracle Postgres, her states `new/working/done/skipped`, **zero HubSpot calls**; a deal id is only a deep link. Two lanes: **hiring** (every `pushHiringDealToHubSpot` mirrors the job + tailored letter into the queue, `hubspot-client.ts` ~2050) and **client** (`client-lane.ts`: best unsent draft from `docs/selling/outreach-registry.json`, excludes anything in `data/resend-ledger.json`, card links to the CONFIRM page, never a send). `queue-feedback.ts` (1 Sep) closes rows she already judged in HubSpot notes (negatives → skipped, positives → done). Page buttons: Copy draft · Did it · Skip; record page shows history first. Behind nginx basic auth, user `elena`, password reset via Telegram `/opspw`. Probed 28 Oct: `/queue/`, `/ops/`, `/crm/webhook/ops` all **401** (lock on, service up). **Untouched since 1 Sep.** Table counts not read (classifier denied the Oracle read).
+- **`aideazz.xyz/ops/` = the older income ops dashboard** (repo `aideazz-ops-dashboard`, 18 May `b0cf758`; 13 Aug `743254f` made it read a live n8n feed at `/crm/webhook/ops`). ⚠️ The public copy on aideazz.xyz is still the **May 18 mock-data build** (`index-2NxC7_PK.js`, "SAMPLE DATA" rows); the Aug 13 live-feed build (`dist/index-BlvaWJxs.js`) was only ever meant for `webhook.aideazz.xyz/ops/` (same origin as the feed; cannot be verified without the password). The public `/ops/` page is a demo, not a cockpit.
+- **Whose move:** Elena's — say what "work on my own CRM" means next: (a) make `/queue/` the daily cockpit (verify lanes from the table, add the EspaLuz lane, surface it in Telegram), (b) retire or redirect the stale public `/ops/` demo, (c) something new. Nothing changed by this entry.
+
+
 ### ✅ 28 Oct ~23:30 UTC — apply-kit employer-safe fix LIVE on Oracle (Elena: "do it", email = aipa@aideazz.xyz)
 - Oracle: 4 files copied (backups `~/_session-backups/employer-safe-*`), `APPLY_EMAIL=aipa@aideazz.xyz` added to `.env`,
   tests 24/24 + 103/103, `cto-aipa` restarted 23:18:47 after the files landed. Applies to every NEW kit letter/Comet.
