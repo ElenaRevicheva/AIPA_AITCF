@@ -185,6 +185,10 @@ git log keeps the record.
   paragraph, FAQ JSON-LD aligned; backups in aideazz `backups/blog-redis-correction-20261028/` (untracked). Dry-run/re-run:
   `node scripts/blog-redis-correction.cjs --html /d/aideazz/aideazz [--cache <json>] [--apply]`. Kept on purpose: the 2 incident field notes,
   "no Redis/RabbitMQ", "misconfigured Redis instance" (client story), "how to use Redis cache" (example query).
+- **⚠️ Live check 22:35 UTC — NOT yet confirmed on the site.** Pushed 21:06 UTC without `[skip ci]`; 90 min later curl still gets the OLD page
+  (HTTP 200, `RedisSaver` ×10, no note) while the browser pane gets 502/504 from the 4everland edge on every path, even `/geo-manifest.json`.
+  Looks like a build/pin swap or an edge incident, not a content problem. Verify before claiming it:
+  `curl -s https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-before-it-clicked/ | grep -c "Correction (28 October 2026)"` → must be 1.
 
 ### ✅ 28 Oct ~21:05 UTC — voice → Trello LEARNS from her corrections (VJH + OpenClaw patterns) · LIVE · claim released
 - **DONE:** corrections captured by voice (update action) and from her own Trello edits (nightly read-only sweep,
