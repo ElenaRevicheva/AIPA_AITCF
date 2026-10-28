@@ -167,6 +167,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📊 28 Oct ~20:40 UTC — AI-citation baseline done: 22 answers (Perplexity 10, ChatGPT 6, Google AI Mode 6), aideazz.xyz cited in 1 · nothing changed · no claim held
+- **Result:** cited once — Perplexity, Spanish, "¿quién hace auditorías de visibilidad en IA en Panamá?", via `aideazz.xyz/portfolio` (listed 4th after
+  Synergy, Centria, Eurekarank, with the free audit + WhatsApp). Zero for every buyer-industry question (dental, plastic, immigration, yacht/villa) on all engines.
+- **Who owns the slots:** istmodigital.net, optimizedpaginasweb.com, thecentriagroup.com (8 each), orbis.agency, marketingmedico.com.pa, synergy.pa,
+  elementoweb.com ($490 audit, launched Oct 2026, no cases). ChatGPT: "no agency in Panama has a published verifiable case." Slot is open.
+- **File:** `docs/aideazz/AI_CITATION_BASELINE_2026-10-28.md` — the 5 questions, the grid, the domain table. Re-run monthly, append a row.
+- **Next (Elena decides, Teach→Plan→Confirm first):** (1) re-aim the daily publisher at the 5 buyer questions, Spanish first, facts from the audit
+  tool; (2) correct the 21 fabricated-Redis posts; (3) the first paid diagnostic → a published before/after with client OK. Not: Ahrefs issue list.
+
 ### ✅ 28 Oct ~19:00 UTC — YouTube: 7 films now carry WhatsApp + $100 diagnostic + free audit links WITH UTM · Make "Daily YouTube Upload" 6263197 switched OFF (Elena's go) · no claim held
 - **Why:** Ahrefs Web Analytics: 21,936 YouTube visitors in 30 d landed on `/api` untagged (campaign "Direct / None"), 81.5% bounce, 46 outbound
   clicks, 0 inquiries. YouTube Studio: the 7 ORIGINAL uploads (1–3 Oct + an 11 Sep cut) hold ~470K views; the daily Make re-uploads got
