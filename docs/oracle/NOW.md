@@ -168,7 +168,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⏸️ 28 Oct ~23:20 UTC — Encora deal staged ✓ · apply-kit "no startup in employer docs" fix on GitHub, NOT on Oracle · Elena's move
+### ✅ 28 Oct ~23:30 UTC — apply-kit employer-safe fix LIVE on Oracle (Elena: "do it", email = aipa@aideazz.xyz)
+- Oracle: 4 files copied (backups `~/_session-backups/employer-safe-*`), `APPLY_EMAIL=aipa@aideazz.xyz` added to `.env`,
+  tests 24/24 + 103/103, `cto-aipa` restarted 23:18:47 after the files landed. Applies to every NEW kit letter/Comet.
+- Encora: the deal was already ⏳ Sent (23:19:37, she applied) when I removed its ✅/📋 notes to regenerate them — wrong
+  on a sent deal. Restored byte-identical (new ids 119882733361 letter + CV attachment, 119885638703 Comet; original
+  timestamps). Encora keeps the letter as it was when she applied. Lesson: check the deal stage before re-generating.
+
+### ⏸️ (superseded above) 28 Oct ~23:20 UTC — Encora deal staged ✓ · apply-kit fix on GitHub, NOT on Oracle
 - **DONE:** `[HIRING-MANUAL] Junior Applied AI Engineer (LLM Systems) @ Encora` (deal 67022434067, I act TODAY): all 6
   kit notes read back from HubSpot; audit ✓ every column. Fix committed `7d198a28`: letter prompt rule + `employerSafe()`
   (no "AIdeazz", sign-off → LinkedIn), Comet email from `APPLY_EMAIL` (Oracle .env), headline without the startup.
