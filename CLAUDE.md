@@ -312,3 +312,8 @@ preference. Never let a model re-tell an incident.
   authorisation to deploy.
 - Wire it *and* fire it. She is a single mother working on the go — do not end a
   turn with steps for her to run herself.
+- **End every session synced everywhere, and prove it** (Elena, 28 Oct 2026): every touched repo
+  pushed and `ahead=0 behind=0`; every Oracle service with live-file md5 = commit, start time newer than
+  the file, and a *result* line; hosted deploys (Lovable publish, Supabase function version) verified by a
+  live call; creatives mirrored and `md5sum -c` clean; NOW.md, the private plan and memory updated. The
+  closing message names each place and its proof. A change that lives in one place is a private note.
