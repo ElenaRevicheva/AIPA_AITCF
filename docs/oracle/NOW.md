@@ -26,7 +26,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-28 | sop-ai-ops: every long list/table → wiki-style two-level folds (area → list → item) | aideazz `public/sop-ai-ops.html` | da2910a4 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -149,6 +148,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 28 Oct (later) — sop-ai-ops: two levels everywhere, as the wiki (aideazz `8a8b031` + phone follow-up) · claim released
+- **DONE:** Elena (phone): "full list of agents in several places". Now 15 CLOSED named areas → one line per item → details: lab pieces, visibility scores, engine, status, roadmap, verify, agents (+ capabilities, handoffs, HubSpot results), health checks, pipeline steps, release rules, incidents, stack. Tables became rows (nothing cut off on phones). Laptop page 14,866 → 8,806px; phone agent line ~300 → ~70px. Photo "lamp" orbs → faint dust motes (`4de0413`).
+- **VERIFIED BY:** live serves `Every agent, one line each`; Playwright live at 412 and 1536px: 15 parts, 0 open, no overflow; word diff vs `4de0413` — only old table column headings dropped; 3 JSON-LD blocks parse.
+- **RISK:** the conversion was a one-off script (`parts` markup is now hand-maintained in the HTML). To add an agent/row, copy an existing `<details class="item">` / `.agent` block. Backup of the pre-conversion page: laptop `aideazz/backups/sop-ai-ops/sop-ai-ops.LIVE-28oct.4de0413.html`. ES page still the old design.
 
 ### ✅ 28 Oct — sop-ai-ops second laptop pass LIVE (aideazz `febd5c0` + `4de0413`) · claim released
 - **Audit of `886e441` (Elena: "make sure he really did"):** every item was in the code and live — but judged at her 1536px screen, half fell short: lockup at ~60% of Atlas size with a pink square behind the AZ mark (PNG background 4–6% opaque); engineer note still glass on the photo's dark band; lavender still narrow with caption + badge ON the photo; agents = 12 full rows + 3 folds + callout (not wiki-like); FAQ folds in a 1000px column (⅓ of screen empty); Status table beside a taller roadmap = empty hole; the "numbers chain" (pipeline 1–7 gradient balls) untouched — he restyled the ticker instead.
