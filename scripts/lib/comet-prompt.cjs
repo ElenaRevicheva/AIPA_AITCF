@@ -24,7 +24,10 @@ const COMET_PROFILE = {
   name: 'Elena Revicheva',
   location: 'Panama City, Panama (UTC-5)',
   remote: 'Remote worldwide; legally resident in Panama, no sponsorship needed for remote work',
-  email: 'aipa@aideazz.xyz',
+  // 28 Oct 2026: a personal address and no startup in the headline — Elena's rule since 23 Oct (Pitz): an employer reads
+  // aipa@aideazz.xyz / "Founder … AIdeazz" as "she will leave for her startup". The CV keeps her real history.
+  // The address lives in Oracle's .env (APPLY_EMAIL), never in this public repo.
+  email: (process.env.APPLY_EMAIL || '').trim() || '(leave empty — ask me which email to use)',
   phone: '+507 616 66 716',
   linkedin: 'https://linkedin.com/in/elenarevicheva',
   github: 'https://github.com/ElenaRevicheva',
@@ -32,7 +35,7 @@ const COMET_PROFILE = {
   // 28 Sep 2026: "2 years building … hands-on" was wrong (git dates the first AI repo to May 2025)
   // and sold her solo; the title is now her real one and the experience line carries her approved
   // positioning — Elena + her AI environment as one operating unit.
-  headline: 'Founder & AI Product and Solutions Lead, AIdeazz.xyz',
+  headline: 'AI Product and Solutions Lead — production AI systems: evaluation, guardrails, multi-provider LLM',
   experience: '7 years as Deputy CEO and Chief Legal Officer (board-level digital transformation in '
     + 'regulated e-government) + production AI systems since May 2025, built through my AI-native '
     + 'development environment: specialized agents handle much of the implementation, I own '

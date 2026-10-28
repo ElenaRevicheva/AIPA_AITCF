@@ -61,5 +61,23 @@ const lanes = JSON.parse(fs.readFileSync(
 check('lane CVs carry the identical operating-model sentence', lanes.operating_model === OPERATING_MODEL);
 check('lane CVs carry the through-line', /^I design intelligent systems/.test(lanes.through_line || ''));
 
+// 8. Employer letters never foreground her startup (28 Oct 2026 — the Encora letter opened "At AIdeazz AI Lab, …").
+const { employerSafe } = require(dist);
+const enc = 'At AIdeazz AI Lab, I manage evaluation frameworks across 15 production services.\n\nBest regards,\nElena Revicheva\nhttps://aideazz.xyz';
+const safe = employerSafe(enc);
+check('"At AIdeazz AI Lab, …" → "In the production AI systems I run, …"', safe.startsWith('In the production AI systems I run, I manage evaluation frameworks'));
+check('no AIdeazz left anywhere in the letter', !/aideazz/i.test(safe));
+check('the aideazz.xyz sign-off becomes her LinkedIn', /Elena Revicheva\nhttps:\/\/linkedin\.com\/in\/elenarevicheva$/.test(safe));
+check('"…I built at AIdeazz." keeps the sentence', employerSafe('A tool I built at AIdeazz.') === 'A tool I built in the production AI systems I run.');
+const plain = [opening, OPERATING_MODEL, 'I run a five-provider LLM fallback chain.', close].join('\n\n');
+check('a letter without the brand is unchanged', employerSafe(plain) === plain);
+check('the letter prompt itself no longer asks for the aideazz.xyz sign-off', !/Elena Revicheva\\\\nhttps:\/\/aideazz\.xyz/.test(src));
+process.env.APPLY_EMAIL = 'personal.test@example.com';  // the real one lives only in Oracle's .env
+const comet = require(path.join(__dirname, 'lib', 'comet-prompt.cjs'));
+const cp = comet.cometPrompt ? String(comet.cometPrompt({ title: 'Role', company: 'Co', url: 'https://x.example/job', letter: 'L' }) || '') : '';
+check('the Comet prompt gives the APPLY_EMAIL address, not aipa@aideazz.xyz', /personal\.test@example\.com/.test(cp) && !/aipa@aideazz/.test(cp));
+check('no personal address is written in this public repo', !/gmail\.com/.test(fs.readFileSync(path.join(__dirname, 'lib', 'comet-prompt.cjs'), 'utf8')));
+check('the Comet headline carries no startup name', !/headline:[^\n]*aideazz/i.test(cp));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

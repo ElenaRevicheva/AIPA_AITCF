@@ -332,6 +332,20 @@ async function reviewLetterSentences(draft: string): Promise<{ letter: string; r
   return { letter: [...keptParas, ...sign].join('\n\n'), reviewer: rv.provider, dropped };
 }
 
+/**
+ * Employer letters never foreground her startup (Elena, 23 Oct 2026, after the Pitz case: a hiring panel reads
+ * "AIdeazz" / "founder" as "she will earn and leave for her company"). The prompt asks; this guarantees it, because
+ * the 28 Oct Encora letter still opened its evidence with "At AIdeazz AI Lab, …" and signed off with aideazz.xyz.
+ * Her work stays fully described — only the brand and the startup framing go.
+ */
+export function employerSafe(letter: string): string {
+  return letter
+    .replace(/\bAt AIdeazz(?: AI Lab)?,\s*/g, 'In the production AI systems I run, ')
+    .replace(/\b(?:at|in) AIdeazz(?: AI Lab)?\b/g, 'in the production AI systems I run')
+    .replace(/\bAIdeazz(?: AI Lab)?\b/g, 'my own production AI work')
+    .replace(/^https?:\/\/(?:www\.)?aideazz\.xyz\/?\s*$/gm, 'https://linkedin.com/in/elenarevicheva');
+}
+
 export async function generateCoverLetter(input: {
   jobTitle: string;
   company: string;
@@ -373,7 +387,10 @@ export async function generateCoverLetter(input: {
     'Open with the role. Then the two or three things from the verified facts that most directly match THIS posting, said concretely. Close with a short availability line.',
     '- After the opening sentence, every sentence carries one concrete verified fact chosen for the duties THIS posting names: a number, a named system, a named incident or a dated result, in the words of the facts. Never write filler such as "this experience has helped me understand", "positions me to" or "I am confident that".',
     '- State each fact in the wording the facts use: "designed the rubric" stays "designed", "led strategic planning" stays "led", "15 production services and 20 scheduled jobs carry out operations" stays as written. A paraphrase that changes the verb ("built", "developed", "managed") or adds a result the facts do not state is removed by the reviewer and shortens the letter.',
-    'Sign off exactly as: Best regards,\\nElena Revicheva\\nhttps://aideazz.xyz',
+    // 28 Oct 2026 (Elena's rule since 23 Oct, Pitz): an employer reads startup branding as "she will leave for her
+    // startup". Asked here, and enforced in code by employerSafe() below.
+    '- Never name AIdeazz or "AIdeazz AI Lab", never call her a founder or co-founder of a company. Say "in the production AI systems I run" or "in my own production work". Her own products are "a tool I built".',
+    'Sign off exactly as: Best regards,\\nElena Revicheva\\nhttps://linkedin.com/in/elenarevicheva',
   ].join('\n');
 
   const userPrompt = [
@@ -414,7 +431,7 @@ export async function generateCoverLetter(input: {
     // weeks" on the SPACE44 deal); the sign-off and the operating-model sentence are kept. If the review itself cannot
     // run, the mechanically gated draft ships — logged, never silent.
     const reviewed = await reviewLetterSentences(draft);
-    return { letter: ensureOperatingModel(reviewed.letter), tailored: true,
+    return { letter: employerSafe(ensureOperatingModel(reviewed.letter)), tailored: true,
       provider: reviewed.reviewer ? `${provider} + review ${reviewed.reviewer}` : provider, jdChars };
   } catch (e) {
     return {
