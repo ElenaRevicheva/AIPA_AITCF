@@ -368,6 +368,45 @@ async function collectNowMd(facts: EvidenceFact[]): Promise<void> {
  * Collect everything. Individual collectors may fail — a thin bundle is a valid
  * outcome that the caller turns into "no article today", never into a guess.
  */
+/**
+ * 28 Oct 2026 — buyer-question mode. The method a buyer-facing article may describe is the
+ * audit engine's own check catalogue, measured by running the engine against this site: real
+ * check names, real group weights, today's real score. The price comes from the service
+ * catalogue, not from a brief. Nothing here is a claim about any client.
+ */
+export async function collectAuditCatalog(facts: EvidenceFact[]): Promise<void> {
+  const { runVisibilityAudit, ENGINE_VERSION } = await import('./visibility-audit.js');
+  const { SERVICE_PRODUCTS } = await import('./aideazz-service-catalog.js');
+  const site = (process.env.AIDEAZZ_SITE_URL || 'https://aideazz.xyz').replace(/\/$/, '');
+  const r = await runVisibilityAudit(site);
+  const src = `runVisibilityAudit("${site}") — visibility-audit.ts engine ${ENGINE_VERSION}`;
+  facts.push(
+    fact(
+      'audit-checks',
+      'Free AI visibility audit (https://aideazz.xyz/api): checks run on one page',
+      `${r.checks.length} checks in ${r.categories.length} groups, scored 0–100`,
+      src,
+    ),
+  );
+  for (const c of r.categories) {
+    const names = r.checks.filter((k) => k.category === c.id).map((k) => k.label).join('; ');
+    facts.push(fact(`audit-group-${c.id}`, `Audit group "${c.label}" (weight ${c.weight}% of the score) checks`, names, src));
+  }
+  const passed = r.checks.filter((k) => k.status === 'pass').length;
+  facts.push(fact('audit-self', `${site} audit result today`, `${r.score}/100, grade ${r.grade}, ${passed} of ${r.checks.length} checks passed`, src));
+  const fails = r.checks.filter((k) => k.status !== 'pass').map((k) => k.label);
+  if (fails.length) facts.push(fact('audit-self-fails', `${site} checks not passed today`, fails.join('; '), src));
+  const d = SERVICE_PRODUCTS.diagnostic_call;
+  facts.push(
+    fact(
+      'offer-diagnostic',
+      `Paid entry offer: ${d.titleEn} (https://aideazz.xyz/pay/analisis-tecnico)`,
+      `$${d.amountUsd}, credited if the client continues; results in writing plus a 45-minute video call`,
+      'aideazz-service-catalog.ts SERVICE_PRODUCTS.diagnostic_call',
+    ),
+  );
+}
+
 export async function collectProductionEvidence(): Promise<EvidenceBundle> {
   const facts: EvidenceFact[] = [];
   const stack: string[] = [];
@@ -380,6 +419,7 @@ export async function collectProductionEvidence(): Promise<EvidenceBundle> {
     ['hubspot', () => collectHubSpot(facts, failures)],
     ['wiki', () => collectWikiIncidents(facts, failures)],
     ['now', () => collectNowMd(facts)],
+    ['audit', () => collectAuditCatalog(facts)],
     ['stack', () => collectStack(stack, failures)],
   ];
   for (const [name, fn] of collectors) {

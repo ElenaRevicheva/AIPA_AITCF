@@ -451,6 +451,96 @@ export const DAILY_BLOG_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> 
   },
 ];
 
+/**
+ * BUYER-QUESTION MODE (28 Oct 2026). A 22-prompt baseline across Perplexity, ChatGPT and
+ * Google AI Mode found aideazz.xyz cited once — for the category question, from /portfolio —
+ * and never for a buyer's own question (dental, plastic surgery, immigration, yacht/villa).
+ * The agencies that ARE cited own plain pages answering those questions for one sector; the
+ * 201 posts here answer "what broke in my pipeline today". So, until this list is spent, the
+ * daily article answers one buyer question. The evidence-angle path stays as the fallback.
+ * Briefs carry no digits on purpose: every number comes from the evidence bundle.
+ * Baseline: docs/aideazz/AI_CITATION_BASELINE_2026-10-28.md
+ */
+export const DAILY_BLOG_BUYER_QUESTIONS: Array<{ lane: string; keyword: string; brief: string }> = [
+  {
+    lane: "dental",
+    keyword: "how to get ChatGPT to recommend a dental clinic in Panama to international patients",
+    brief: "A dental clinic owner in Panama asks how ChatGPT decides which clinic to recommend to a patient abroad, what the clinic itself controls, and which audit checks decide it.",
+  },
+  {
+    lane: "plastic-surgery",
+    keyword: "plastic surgery clinic Panama appear in ChatGPT and Google AI answers",
+    brief: "A plastic surgery clinic in Panama wants to appear when a patient in the US asks an AI assistant where to go: what the assistants read, what a clinic page must contain, and how to measure it monthly.",
+  },
+  {
+    lane: "immigration",
+    keyword: "immigration lawyer Panama recommended by ChatGPT and Perplexity to expats",
+    brief: "An immigration lawyer in Panama asks why AI assistants name some firms to relocating expats and not others, and what to change on the firm's own site first.",
+  },
+  {
+    lane: "yacht-villa",
+    keyword: "yacht charter or luxury villa in Panama recommended by AI assistants",
+    brief: "A yacht charter or villa owner in Panama asks how ChatGPT and Gemini pick what to recommend to a tourist, why listing sites win today, and what an owner-run site needs to be cited.",
+  },
+  {
+    lane: "category",
+    keyword: "AI visibility audit for a service business in Panama GEO AEO",
+    brief: "What an AI visibility audit actually checks for a service business in Panama, group by group, and how to read the score before paying anyone for GEO or AEO work.",
+  },
+  {
+    lane: "dental",
+    keyword: "dental tourism clinic Panama cited by AI search engines",
+    brief: "Why a dental tourism clinic with good reviews can still be invisible to AI search: the difference between being readable by a crawler and being quotable in an answer.",
+  },
+  {
+    lane: "medical-tourism",
+    keyword: "medical tourism clinic Panama ChatGPT recommendation signals",
+    brief: "The signals an AI assistant uses to describe a medical tourism clinic to a foreign patient, which ones a clinic can fix in a week, and which take months.",
+  },
+  {
+    lane: "relocation",
+    keyword: "relocation services Panama how AI assistants recommend providers",
+    brief: "A relocation agency asks how to become the provider an AI assistant names to a family moving to Panama, and how to check monthly whether it is happening.",
+  },
+  {
+    lane: "yacht-villa",
+    keyword: "luxury villa rental Panama City AI search visibility checklist",
+    brief: "A checklist for a luxury villa or boutique resort page so an AI assistant can quote it: identity, answers, structure, and the technical floor.",
+  },
+  {
+    lane: "category",
+    keyword: "measure share of voice in ChatGPT Perplexity and Google AI Mode for a local business",
+    brief: "How to run a monthly share-of-voice check for a local service business across three AI engines, with a fixed prompt set, and what to record each month.",
+  },
+];
+
+function buyerStatePath(): string {
+  return path.join(path.dirname(statePath()), "daily-blog-buyer-questions.json");
+}
+function readBuyerDone(): Record<string, string> {
+  try {
+    return JSON.parse(fs.readFileSync(buyerStatePath(), "utf8")) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+export function markBuyerQuestionDone(keyword: string, slug: string): void {
+  const done = readBuyerDone();
+  done[keyword] = slug;
+  fs.writeFileSync(buyerStatePath(), JSON.stringify(done, null, 2), "utf8");
+}
+/** Next buyer question not yet answered on this blog; null when the list is spent or the mode is off. */
+export function pickBuyerQuestion(): { lane: string; keyword: string; brief: string } | null {
+  if ((process.env.DAILY_BLOG_BUYER_MODE ?? "true") !== "true") return null;
+  const done = readBuyerDone();
+  for (const q of DAILY_BLOG_BUYER_QUESTIONS) {
+    if (done[q.keyword]) continue;
+    if (findNearDuplicate(q.keyword, titleToSlug(q.keyword))) continue;
+    return q;
+  }
+  return null;
+}
+
 const BANNED_PHRASES = [
   /game[- ]changer/i,
   /revolutionary/i,
@@ -1059,6 +1149,23 @@ A: [answer]
 ... full markdown ...
 </MARKDOWN>`;
 
+const SYSTEM_RULE_5 = `5. Write in first person about THIS system only, using the facts above as the
+   spine. The reader should be able to trace every claim to a measurement.
+   Prefer today's git, wiki incidents, and operator queue over a generic brief.`;
+
+// 28 Oct 2026 — buyer-question mode. The article answers a business owner, not a practitioner,
+// and its only "method" facts are the audit catalogue collected into the evidence bundle.
+const BUYER_RULE_5 = `5. This article answers a BUSINESS OWNER's question — the angle above. Write as the
+   consultant who runs the audit: explain in plain words how AI assistants (ChatGPT,
+   Perplexity, Google AI Mode) decide whom to recommend for that kind of business, using
+   the audit groups and checks in the evidence as the method — name the groups and the
+   checks that matter most for this business type. Do not invent client stories, case
+   studies, competitor names, or results. Where the evidence has this site's own audit
+   result, you may use it as the worked example. Link the free audit exactly once as
+   https://aideazz.xyz/api and the paid diagnostic exactly once as
+   https://aideazz.xyz/pay/analisis-tecnico, each as a plain next step, not a pitch.
+   Keep the FAQ to questions this owner would actually ask.`;
+
 const GROUNDED_SYSTEM_ADDENDUM = `
 Grounded-mode extra rules (these override any urge to sound specific):
 - A number that is not on the licensed list is a rejected article, not a flourish.
@@ -1268,6 +1375,7 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
    */
   const grounded = (process.env.DAILY_BLOG_GROUNDED ?? "true") === "true";
   let evidence: EvidenceBundle | null = null;
+  let buyer: ReturnType<typeof pickBuyerQuestion> = null;
   let baseUserPrompt: string;
 
   if (grounded) {
@@ -1287,7 +1395,9 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
     // work is not finite. Prefer an angle from today's evidence so the post
     // is about what actually happened; keep the rotation keyword only as SEO
     // fallback, with every digit stripped so the model cannot copy it.
-    let derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
+    // 28 Oct 2026: a buyer question, while the list lasts, beats an angle about this system.
+    buyer = pickBuyerQuestion();
+    let derived = buyer ? null : await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
     // 15 Oct 2026: the model only sees the last 30 titles, so it proposed "GA4 sync zero rows" — published 6 Sep —
     // and every retry rewrote that same article. Check the angle against the WHOLE corpus and re-derive once.
     const angleDup = derived ? findNearDuplicate(derived.keyword, titleToSlug(derived.keyword)) : null;
@@ -1296,7 +1406,12 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
       derived = await deriveAngleFromEvidence(deps.anthropic, evidence, [angleDup.slug, ...recentTitles]);
       if (derived && findNearDuplicate(derived.keyword, titleToSlug(derived.keyword))) derived = null;
     }
-    if (derived) {
+    if (buyer) {
+      keyword = buyer.keyword;
+      brief = buyer.brief;
+      index = -1;
+      console.log(`[daily-blog] Buyer question (${buyer.lane}): ${buyer.keyword}`);
+    } else if (derived) {
       keyword = derived.keyword;
       brief = derived.brief;
       index = -1;
@@ -1326,12 +1441,11 @@ ABSOLUTE RULES — the article is rejected automatically if any is broken:
 4. Where the evidence is silent, say so plainly or leave it out. "I do not
    have that measured" is an acceptable sentence, including in the FAQ; a
    plausible guess is not.
-5. Write in first person about THIS system only, using the facts above as the
-   spine. The reader should be able to trace every claim to a measurement.
-   Prefer today's git, wiki incidents, and operator queue over a generic brief.
+${buyer ? BUYER_RULE_5 : SYSTEM_RULE_5}
 
-Write for developers and technical founders, and keep it readable for a
-non-engineer business owner: name the concept, then explain it plainly.`;
+${buyer
+  ? "Write for the business owner who asked the question; a developer may read it too, so name each concept once and explain it plainly."
+  : "Write for developers and technical founders, and keep it readable for a\nnon-engineer business owner: name the concept, then explain it plainly."}`;
   } else {
     baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
@@ -1495,6 +1609,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   // Own site FIRST (13 Oct 2026): the article is recorded and shipped to aideazz.xyz before Dev.to
   // is tried. Until then a Dev.to failure threw here and silenced the site for 11–13 Oct.
   if (index >= 0) writeTopicIndex(index);
+  if (buyer) markBuyerQuestionDone(buyer.keyword, slug);
   saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl: "", aideazzBlogUrl });
 
   // Canonical GEO page first, then sitemap, then Telegram. Fire-and-forget bulk
@@ -1539,6 +1654,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     "📰 Article published.",
     "",
     parsed.title,
+    ...(buyer ? [`🎯 buyer question · ${buyer.lane}`] : []),
     "",
     "1) aideazz /blog (canonical):",
     aideazzBlogUrl,
