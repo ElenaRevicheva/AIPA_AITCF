@@ -13,6 +13,9 @@
 const path = require('path');
 // The module builds a Groq client at import; these pure functions never call it.
 process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'offline-test-not-used';
+// The learning files go to a throwaway folder — a test must never write into her real data/ (28 Oct 2026).
+const LEARN_TMP = require('fs').mkdtempSync(path.join(require('os').tmpdir(), 'tv-learn-'));
+process.env.TRELLO_LEARN_DIR = LEARN_TMP;
 const v = require(path.join(__dirname, '..', 'dist', 'trello-voice.js'));
 
 let pass = 0, fail = 0;
@@ -138,6 +141,33 @@ const sr = v.formatVoiceTrelloReply(series);
 check('the reply shows each card\'s own date', /— 📅 October 28/.test(sr) && /— 📅 November 28/.test(sr) && /— 📅 December 28/.test(sr) && /Each card has its own date/.test(sr));
 const same = { ...series, cards: series.cards.map((c) => ({ ...c, due: v.toTrelloDue('2026-10-30') })) };
 check('cards sharing one date keep the single "Due" line', /📅 Due: October 28/.test(v.formatVoiceTrelloReply(same)) && !/— 📅/.test(v.formatVoiceTrelloReply(same)));
+
+// ── 28 Oct 2026 — the learning loop: capture her corrections → lessons in the prompt → rules only after approval ──
+const fsx = require('fs');
+const snap = { id: 'c1', name: 'Start medication cycle 2', due: v.toTrelloDue('2026-10-28'), colour: 'red', heard: 'next cycle from 28 Nov', ts: new Date().toISOString() };
+check('dueKey is what she sees in Trello (Panama)', v.dueKey(v.toTrelloDue('2026-11-28')) === '2026-11-28 12:00');
+check('a moved date is a correction', JSON.stringify(v.diffSnapshot(snap, { due: v.toTrelloDue('2026-11-28') })) === JSON.stringify([{ field: 'date', bot: '2026-10-28 12:00', her: '2026-11-28 12:00' }]));
+check('the same instant written differently is NOT a correction', v.diffSnapshot(snap, { due: '2026-10-28T17:00:00Z' }).length === 0);
+check('a renamed card is a title correction', v.diffSnapshot(snap, { name: 'Medication cycle 2 starts' })[0]?.field === 'title');
+check('a re-coloured card is a colour correction', v.diffSnapshot(snap, { colour: 'orange' })[0]?.her === 'orange');
+check('fields the live card did not report are not corrections', v.diffSnapshot(snap, {}).length === 0);
+
+v.rememberCreated([{ id: 'c1', name: snap.name, due: snap.due, url: '', shortUrl: '' }], 'next cycle from 28 Nov', 'red');
+check('a card the bot did NOT make teaches nothing', v.recordCorrections('someone-elses-card', { due: v.toTrelloDue('2026-11-28') }, 'trello') === 0);
+check('her Trello edit of a bot card is recorded', v.recordCorrections('c1', { due: v.toTrelloDue('2026-11-28'), name: snap.name, colour: 'red' }, 'trello') === 1);
+check('the same edit is never counted twice (snapshot moved forward)', v.recordCorrections('c1', { due: v.toTrelloDue('2026-11-28'), name: snap.name, colour: 'red' }, 'trello') === 0);
+const corrs = JSON.parse(fsx.readFileSync(path.join(LEARN_TMP, 'trello-corrections.json'), 'utf8'));
+const lb = v.learnedBlock(corrs, []);
+check('the lesson reaches the prompt with what was heard, set and changed', /heard "next cycle from 28 Nov" → you set date "2026-10-28 12:00" → she changed it to "2026-11-28 12:00"/.test(lb));
+check('the lesson names the card the bot made (its title carries the pattern)', /card "Start medication cycle 2", heard/.test(lb));
+check('a PROPOSED rule never reaches the prompt', !/Never guess/.test(v.learnedBlock([], [{ id: 'R1', text: 'Never guess', field: 'date', status: 'proposed', examples: 2, ts: '' }])));
+check('an APPROVED rule does', /Rules she approved:\n- Each cycle card is due/.test(v.learnedBlock([], [{ id: 'R2', text: 'Each cycle card is due on its own start date.', field: 'date', status: 'approved', examples: 2, ts: '' }])));
+check('no lessons → nothing added to the prompt', v.learnedBlock([], []) === '');
+fsx.writeFileSync(path.join(LEARN_TMP, 'trello-rules.json'), JSON.stringify([{ id: 'R9', text: 'x', field: 'date', status: 'proposed', examples: 2, ts: '' }]));
+check('approve: a proposed rule becomes approved', v.decideRule('R9', true)?.status === 'approved');
+check('an answered rule cannot be flipped by a second tap', v.decideRule('R9', false)?.status === 'approved');
+check('unknown rule id → null, nothing written', v.decideRule('nope', true) === null);
+fsx.rmSync(LEARN_TMP, { recursive: true, force: true });
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

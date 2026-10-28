@@ -454,6 +454,155 @@ export function subtaskDue(c: Pick<CardClassification, 'dueDate' | 'subtaskDueDa
   return dateFromTitle(title, c.dueDate ?? panamaToday()) ?? c.dueDate ?? null;
 }
 
+// ─── Learning from her corrections (28 Oct 2026, Elena: "each agent learning and evolving on the go") ─────────────
+// No new machinery: VJH's pattern (her decisions → few-shot lessons in the prompt, judge_feedback_sync) + OpenClaw's
+// (repeated mistakes → a rule she approves before it applies). Two doors capture a correction: the `update` action
+// below (she corrects by voice/text) and a nightly read-only sweep (she fixed the card by hand in Trello). The files
+// live in data/ (gitignored, Oracle only), so her family detail never reaches the public repo.
+// Only date, title and colour are learned: moving a card between lists or boards is her workflow, not a correction.
+const LEARN_DIR = process.env.TRELLO_LEARN_DIR || path.join(__dirname, '..', 'data');  // tests point it at a temp dir
+const CREATED_PATH = path.join(LEARN_DIR, 'trello-created.json');   // what the bot set on each card it made
+const CORR_PATH = path.join(LEARN_DIR, 'trello-corrections.json');  // what she changed it to
+const RULES_PATH = path.join(LEARN_DIR, 'trello-rules.json');       // rules she approved or rejected
+
+export interface CardSnapshot { id: string; name: string; due: string | null; colour: string | null; heard: string; ts: string }
+export interface Correction {
+  ts: string; cardId: string; field: 'date' | 'title' | 'colour'; bot: string; her: string; heard: string;
+  door: 'voice' | 'trello'; ruled?: string;
+  card?: string;  // the card's title when the bot made it — it often carries the pattern ("cycle 2 (Nov 28 - Dec 7)")
+}
+export interface LearnedRule { id: string; text: string; field: string; status: 'proposed' | 'approved' | 'rejected'; examples: number; ts: string }
+type LiveCard = { name?: string; due?: string | null; colour?: string | null };
+
+function readJson<T>(p: string, fallback: T): T {
+  try { return JSON.parse(fs.readFileSync(p, 'utf8')) as T; } catch { return fallback; }
+}
+function writeJson(p: string, v: unknown): void {
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p + '.tmp', JSON.stringify(v, null, 1));
+  fs.renameSync(p + '.tmp', p);  // atomic: the classifier never reads a half-written file
+}
+
+/** A due as she sees it in Trello: "2026-11-28 12:00" in Panama. */
+export function dueKey(due: string | null | undefined): string {
+  if (!due) return '';
+  const d = new Date(due);
+  return `${panamaToday(d)} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Panama' })}`;
+}
+
+/** What she changed on a card the bot made: date, title, colour. A field the live card does not report is unchanged. */
+export function diffSnapshot(s: CardSnapshot, live: LiveCard): { field: Correction['field']; bot: string; her: string }[] {
+  const out: { field: Correction['field']; bot: string; her: string }[] = [];
+  if (live.due !== undefined && dueKey(live.due) !== dueKey(s.due)) out.push({ field: 'date', bot: dueKey(s.due) || 'none', her: dueKey(live.due) || 'none' });
+  if (live.name !== undefined && live.name.trim() !== s.name.trim()) out.push({ field: 'title', bot: s.name, her: live.name });
+  if (live.colour !== undefined && (live.colour ?? '') !== (s.colour ?? '')) out.push({ field: 'colour', bot: s.colour || 'none', her: live.colour || 'none' });
+  return out;
+}
+
+/** Remember what the bot set on the cards it just made (the "bot" side of every later correction). */
+export function rememberCreated(cards: TrelloCard[], heard: string, colour: string | null): void {
+  try {
+    const all = readJson<CardSnapshot[]>(CREATED_PATH, []);
+    const ts = new Date().toISOString();
+    for (const c of cards) all.push({ id: c.id, name: c.name, due: c.due ?? null, colour, heard: heard.slice(0, 240), ts });
+    writeJson(CREATED_PATH, all.slice(-400));
+  } catch (e) { console.warn('[TrelloVoice/learn] remember failed:', (e as Error).message); }
+}
+
+/** Log her changes to a card the bot made, then move the snapshot forward so the same change is never counted twice. */
+export function recordCorrections(cardId: string, live: LiveCard, door: Correction['door']): number {
+  try {
+    const snaps = readJson<CardSnapshot[]>(CREATED_PATH, []);
+    const s = snaps.find((x) => x.id === cardId);
+    if (!s) return 0;  // not a card the bot made: nothing of the bot's to learn from
+    const diffs = diffSnapshot(s, live);
+    if (!diffs.length) return 0;
+    const corr = readJson<Correction[]>(CORR_PATH, []);
+    const ts = new Date().toISOString();
+    for (const d of diffs) corr.push({ ts, cardId, ...d, heard: s.heard, door, card: s.name });
+    writeJson(CORR_PATH, corr.slice(-500));
+    if (live.name !== undefined) s.name = live.name;
+    if (live.due !== undefined) s.due = live.due ?? null;
+    if (live.colour !== undefined) s.colour = live.colour ?? null;
+    writeJson(CREATED_PATH, snaps);
+    console.log(`[TrelloVoice/learn] ${diffs.length} correction(s) via ${door}: ${diffs.map((d) => d.field).join(', ')}`);
+    return diffs.length;
+  } catch (e) { console.warn('[TrelloVoice/learn] record failed:', (e as Error).message); return 0; }
+}
+
+/** Nightly, read-only: cards the bot made in the last 21 days that she changed by hand in Trello. */
+export async function sweepManualEdits(): Promise<number> {
+  const since = Date.now() - 21 * 86_400_000;
+  const sphere = new Set<string>(Object.values(CATEGORY_COLOR_MAP));
+  let n = 0;
+  for (const s of readJson<CardSnapshot[]>(CREATED_PATH, []).filter((x) => Date.parse(x.ts) >= since)) {
+    try {
+      const c = await trelloGet<{ name: string; due: string | null; closed: boolean; labels?: { color: string }[] }>(
+        `/cards/${s.id}`, { fields: 'name,due,closed,labels' });
+      if (c.closed) continue;  // archiving is not a correction
+      const colour = (c.labels ?? []).map((l) => l.color).find((x) => sphere.has(x)) ?? null;
+      n += recordCorrections(s.id, { name: c.name, due: c.due, colour }, 'trello');
+    } catch { /* deleted card or a network blip: skip, the next night tries again */ }
+  }
+  return n;
+}
+
+/** The lessons the classifier reads: her approved rules, then her latest corrections (VJH's few-shot pattern). */
+export function learnedBlock(corrections: Correction[], rules: LearnedRule[]): string {
+  const approved = rules.filter((r) => r.status === 'approved').map((r) => `- ${r.text}`);
+  const recent = corrections.slice(-12).map((c) =>
+    `- ${c.card ? `card "${c.card.slice(0, 80)}", ` : ''}heard "${c.heard.slice(0, 200)}" → you set ${c.field} "${c.bot}" → she changed it to "${c.her}"`);
+  if (!approved.length && !recent.length) return '';
+  return `\n═══ LEARNED FROM ELENA'S OWN CORRECTIONS (follow these) ═══\n`
+    + (approved.length ? `Rules she approved:\n${approved.join('\n')}\n` : '')
+    + (recent.length ? `Her latest corrections to cards you made (avoid repeating these mistakes):\n${recent.join('\n')}\n` : '');
+}
+function learnedBlockFromDisk(): string {
+  return learnedBlock(readJson<Correction[]>(CORR_PATH, []), readJson<LearnedRule[]>(RULES_PATH, []));
+}
+
+/** Weekly (OpenClaw's pattern): 2+ unruled corrections of one kind → ONE proposed rule. Nothing applies until she approves. */
+export async function proposeRules(): Promise<LearnedRule[]> {
+  const corr = readJson<Correction[]>(CORR_PATH, []);
+  const rules = readJson<LearnedRule[]>(RULES_PATH, []);
+  const { completeWithProfileDetailed } = await import('./llm-resilience');
+  const proposed: LearnedRule[] = [];
+  for (const field of ['date', 'title', 'colour'] as const) {
+    const group = corr.filter((c) => c.field === field && !c.ruled);
+    if (group.length < 2) continue;
+    // Whole heard text + the card's title (28 Oct 2026): cut at 140 chars, "…the next mon" made the model invent a rule
+    // about audio cut off mid-word instead of the real pattern visible in the titles.
+    const examples = group.slice(-8).map((c) => `${c.card ? `card "${c.card}": ` : ''}heard "${c.heard}" → assistant set "${c.bot}" → she changed it to "${c.her}"`).join('\n');
+    try {
+      const r = await completeWithProfileDetailed('classify', null,
+        `A voice assistant turns Elena's voice notes into Trello cards. She corrected the card ${field} like this:\n${examples}\n\n`
+        + `Write ONE short general instruction (max 30 words) that would have got these right. Describe the pattern, not `
+        + `these cards: no people's names, no medicines or diagnoses. If there is no common pattern, answer exactly NONE.`,
+        120, 'trello-voice/rule');
+      const text = r.text.trim().replace(/^["'-\s]+|["'\s]+$/g, '');
+      const id = `R${Date.now().toString(36)}${field[0]}`;
+      for (const c of group) c.ruled = id;  // used either way: a NONE or a rejected rule is never re-proposed from them
+      if (!text || /^none\b/i.test(text)) continue;
+      const rule: LearnedRule = { id, text: text.slice(0, 240), field, status: 'proposed', examples: group.length, ts: new Date().toISOString() };
+      rules.push(rule);
+      proposed.push(rule);
+    } catch (e) { console.warn(`[TrelloVoice/learn] rule for ${field} failed:`, (e as Error).message); }
+  }
+  writeJson(CORR_PATH, corr);
+  writeJson(RULES_PATH, rules);
+  return proposed;
+}
+
+/** Her answer to a proposed rule. Only an approved rule reaches the classifier. */
+export function decideRule(id: string, approve: boolean): LearnedRule | null {
+  const rules = readJson<LearnedRule[]>(RULES_PATH, []);
+  const r = rules.find((x) => x.id === id);
+  if (!r || r.status !== 'proposed') return r ?? null;
+  r.status = approve ? 'approved' : 'rejected';
+  writeJson(RULES_PATH, rules);
+  return r;
+}
+
 async function createCard(
   listId: string,
   name: string,
@@ -866,7 +1015,7 @@ List routing logic:
 "${cleanedText}"
 
 Today's date: ${today} (Panama timezone, America/Panama).
-
+${learnedBlockFromDisk()}
 First decide: is this an actionable to-do item that belongs on a Kanban board?
 - isTask: true  → it describes something that needs to be done (task, errand, appointment, goal, reminder, project step)
 - isTask: false → it's a question TO the bot, a command ("show my tasks"), casual chat, or a statement with no action
@@ -1184,6 +1333,7 @@ export async function handleVoiceToTrello(
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
+  rememberCreated([card], transcript, labelId ? labelColor : null);  // the bot's side of any later correction
 
   console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}`);
 
@@ -1324,6 +1474,7 @@ export async function createTrelloCardFromTranscript(
     if (createdCards.length === 0) {
       return { success: false, transcript, classification, error: 'All subtask card creations failed' };
     }
+    rememberCreated(createdCards, transcript, labels.length ? classification.labelColor : null);
     return {
       success: true,
       transcript,
@@ -1341,6 +1492,7 @@ export async function createTrelloCardFromTranscript(
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
+  rememberCreated([card], transcript, labels.length ? classification.labelColor : null);
 
   console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}${classification.dueDate ? ` (due: ${classification.dueDate})` : ''}`);
 
@@ -2051,6 +2203,9 @@ export async function processMultiAction(
         const descOk = body.desc === undefined || (back.desc ?? '').trim() === body.desc.trim();
         const colorOk = !body.idLabels || (back.idLabels ?? []).includes(sphereLabelId);
         const ok = dueOk && descOk && colorOk;
+        // Her correction by voice/text is a lesson (28 Oct 2026) — only what Trello confirmed it kept.
+        if (ok) recordCorrections(card.id, { name: back.name, due: back.due ?? null,
+          ...(body.idLabels && sphere ? { colour: CATEGORY_COLOR_MAP[sphere] } : {}) }, 'voice');
         results.push({ type: 'update', success: ok, cardQuery: action.cardQuery, cards: [back],
           detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`,
             body.idLabels && sphere && `🎨 ${COLOR_EMOJI[CATEGORY_COLOR_MAP[sphere]]} ${COLOR_LABEL[CATEGORY_COLOR_MAP[sphere]]}`,

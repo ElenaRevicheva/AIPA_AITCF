@@ -96,6 +96,9 @@ import {
   appendToCardDescription,
   panamaToday,
   repairNames,
+  sweepManualEdits,
+  proposeRules,
+  decideRule,
 } from './trello-voice';
 import { synthesizeBriefingMp3 } from './sprint-briefing/tts-openai';
 import {
@@ -1275,6 +1278,15 @@ Or just ask me anything - I understand natural language!`;
     saveRadarProposal(resolved.proposal);
     return resolved.proposal;
   };
+
+  // Voice → Trello learning (28 Oct 2026): her answer to a proposed rule. Only an approved rule reaches the classifier.
+  bot.callbackQuery(/^tvrule:(ok|no):/, async (ctx) => {
+    const [, verdict, id] = (ctx.callbackQuery?.data || '').split(':');
+    const r = decideRule(id || '', verdict === 'ok');
+    await ctx.answerCallbackQuery({ text: !r ? 'That rule no longer exists.' : r.status === 'approved' ? 'Learned ✅' : 'Dropped' });
+    await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    if (r) await ctx.reply(r.status === 'approved' ? `✅ Learned. From now on: ${r.text}` : '❌ Dropped — it will not be proposed again.');
+  });
 
   bot.callbackQuery(/^rdrall:/, async (ctx) => {
     const pid = (ctx.callbackQuery?.data || '').split(':')[1] || '';
@@ -12332,6 +12344,30 @@ function startScheduledTasks(bot: Bot): void {
   }, { timezone: 'America/Panama' });
 
   cronJobs.push(weeklyDigest);
+
+  // Voice → Trello learning (28 Oct 2026), VJH + OpenClaw patterns. Nightly, read-only: the cards she fixed by hand in
+  // Trello become corrections (silent — a log line, nothing for her to do). Sunday: 2+ corrections of one kind become
+  // ONE proposed rule with ✅/❌ buttons; nothing changes the classifier until she approves.
+  const trelloLearnNightly = cron.schedule('40 23 * * *', async () => {
+    try { console.log(`[TrelloVoice/learn] nightly sweep: ${await sweepManualEdits()} correction(s) from her Trello edits`); }
+    catch (e) { console.error('[TrelloVoice/learn] nightly sweep failed:', (e as Error).message); }
+  }, { timezone: 'America/Panama' });
+  cronJobs.push(trelloLearnNightly);
+  const trelloLearnWeekly = cron.schedule('0 10 * * 0', async () => {
+    try {
+      const rules = await proposeRules();
+      console.log(`[TrelloVoice/learn] weekly: ${rules.length} rule(s) proposed`);
+      for (const r of rules) {
+        for (const chatId of alertChatIds) {
+          await bot.api.sendMessage(chatId,
+            `🧠 Voice → Trello learned something from ${r.examples} of your corrections (${r.field}).\n\nProposed rule:\n"${r.text}"\n\nUse it from now on?`,
+            { reply_markup: { inline_keyboard: [[{ text: '✅ Use this rule', callback_data: `tvrule:ok:${r.id}` }, { text: '❌ No', callback_data: `tvrule:no:${r.id}` }]] } },
+          ).catch((e) => console.error(`[TrelloVoice/learn] send to ${chatId} failed:`, (e as Error).message));
+        }
+      }
+    } catch (e) { console.error('[TrelloVoice/learn] weekly rules failed:', (e as Error).message); }
+  }, { timezone: 'America/Panama' });
+  cronJobs.push(trelloLearnWeekly);
 
   // Health check every 4 hours
   const healthCheck = cron.schedule('0 */4 * * *', () => {
