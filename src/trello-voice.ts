@@ -49,6 +49,9 @@ interface CardClassification {
   dueDate: string | null;  // ISO date YYYY-MM-DD extracted from speech ("by Friday", "end of May") or null
   dueTime?: string | null; // 24h "HH:MM" in Panama time when a time was spoken ("3 y 30 pm" → "15:30"), else null
   subtasks: string[] | null; // 2-5 subtask titles if task naturally decomposes; null for single-step tasks
+  // 28 Oct 2026: one YYYY-MM-DD per subtask (same order) when the steps happen on DIFFERENT dates
+  // ("cycle 1 from 28 Oct, next from 28 Nov…"). Before this every card got dueDate — the first date.
+  subtaskDueDates?: (string | null)[] | null;
   confidence: number;      // 0-1, how certain the AI is
   reasoning: string;       // AI explanation for routing decision
   titleGuessed?: boolean;  // set by guardTitle: she said where/when but no subject (12 Oct 2026, "CETA")
@@ -418,6 +421,37 @@ export function formatDueForReply(date: string, time?: string | null): string {
   return normTime(time)
     ? `${day}, ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Panama' })}`
     : day;
+}
+
+// 28 Oct 2026: a series of cards from one voice note ("medication cycle 1 from 28 Oct, cycle 2 from 28 Nov…") all got
+// the FIRST date, because each subtask card was created with the note's single dueDate. Each card now gets its own:
+// 1) the model's subtaskDueDates[i], 2) else the first "Nov 28" / "28 nov" written in the card's own title,
+// 3) else the note's dueDate. Layer 2 is deterministic, so a model that forgets layer 1 still cannot repeat the bug.
+const TITLE_MONTH: [RegExp, number][] = [
+  [/^(jan|ene)/, 1], [/^feb/, 2], [/^mar/, 3], [/^(apr|abr)/, 4], [/^may/, 5], [/^jun/, 6], [/^jul/, 7],
+  [/^(aug|ago)/, 8], [/^(sep|set)/, 9], [/^oct/, 10], [/^nov/, 11], [/^(dec|dic)/, 12],
+];
+const MONTH_WORD = '(jan|ene|feb|mar|apr|abr|may|jun|jul|aug|ago|sep|set|oct|nov|dec|dic)[a-zé]*\\.?';
+
+/** The first month-day date written in a title ("cycle 2 (Nov 28 - Dec 7)" → Nov 28), as YYYY-MM-DD on or after `from`. */
+export function dateFromTitle(title: string, from: string): string | null {
+  const t = title.toLowerCase();
+  const m = t.match(new RegExp(`\\b${MONTH_WORD}\\s+(\\d{1,2})\\b`)) ?? t.match(new RegExp(`\\b(\\d{1,2})\\s+(?:de\\s+)?${MONTH_WORD}`));
+  if (!m) return null;
+  const [mon, day] = /^\d/.test(m[1]!) ? [m[2]!, Number(m[1])] : [m[1]!, Number(m[2])];
+  const month = TITLE_MONTH.find(([re]) => re.test(mon))?.[1];
+  if (!month || day < 1 || day > 31) return null;
+  let year = Number(from.slice(0, 4));
+  const iso = (y: number) => `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  if (iso(year) < from) year += 1;  // "Jan 6" in a series that starts in October is next year
+  return iso(year);
+}
+
+/** The due date for subtask card i — see the three layers above. */
+export function subtaskDue(c: Pick<CardClassification, 'dueDate' | 'subtaskDueDates'>, i: number, title: string): string | null {
+  const own = Array.isArray(c.subtaskDueDates) ? c.subtaskDueDates[i] : null;
+  if (own && /^\d{4}-\d{2}-\d{2}$/.test(own)) return own;
+  return dateFromTitle(title, c.dueDate ?? panamaToday()) ?? c.dueDate ?? null;
 }
 
 async function createCard(
@@ -857,6 +891,11 @@ For subtasks: does this voice note describe a MULTI-STEP task with 2-5 clearly d
 - NO → "subtasks": null
 Only decompose when steps are explicitly enumerated OR naturally distinct (not just one task rephrased). Atomic tasks like "call the doctor" or "buy groceries" → null.
 
+For subtaskDueDates: when the subtasks happen on DIFFERENT dates (a repeating cycle, a series of appointments,
+"first on the 28th of October, the next on the 28th of November…"), return one YYYY-MM-DD per subtask, in the SAME
+order as "subtasks" — the date that step STARTS or is due. "dueDate" stays the first one. A repeat said only as
+"repeat it next month" means the same day of the following month. Steps that share one date → "subtaskDueDates": null.
+
 Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 {
   "isTask": true,
@@ -877,6 +916,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "dueDate": "2026-05-31",
   "dueTime": "15:30",
   "subtasks": null,
+  "subtaskDueDates": null,
   "confidence": 0.90,
   "reasoning": "One sentence: why this board + list + color"
 }
@@ -1269,11 +1309,12 @@ export async function createTrelloCardFromTranscript(
     : null;
 
   if (subtasks) {
-    // Create one card per subtask — same board/list/label/due date
+    // Create one card per subtask — same board/list/label; each its OWN due date (subtaskDue, 28 Oct 2026)
     const createdCards: TrelloCard[] = [];
-    for (const subtaskTitle of subtasks) {
+    for (const [i, subtaskTitle] of subtasks.entries()) {
       try {
-        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate, 'bottom', classification.dueTime);
+        const due = subtaskDue(classification, i, subtaskTitle);
+        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, due, 'bottom', classification.dueTime);
         createdCards.push(c);
         console.log(`[TrelloVoice] ✅ Subtask card: "${c.name}"`);
       } catch (err) {
@@ -1378,7 +1419,13 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
 
   // Multiple cards (subtask decomposition)
   if (result.cards && result.cards.length > 0) {
-    const cardLines = result.cards.map((c, i) => `${i + 1}. [${c.name}](${c.shortUrl})`);
+    // each card's date as Trello SAVED it (its `due`), not the note's first date — 28 Oct 2026
+    const shownDay = (c: TrelloCard) => c.due
+      ? new Date(c.due).toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'America/Panama' })
+      : '';
+    const days = result.cards.map(shownDay);
+    const ownDates = new Set(days).size > 1;
+    const cardLines = result.cards.map((c, i) => `${i + 1}. [${c.name}](${c.shortUrl})${ownDates && days[i] ? ` — 📅 ${days[i]}` : ''}`);
     return [
       `✅ *${result.cards.length} Trello cards created!*`,
       ``,
@@ -1387,7 +1434,7 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
       `📋 Board: ${boardName}`,
       `📌 List: ${listName}`,
       `🎨 Sphere: ${colorSphere}`,
-      dueLine,
+      ownDates ? `📅 Each card has its own date (below)` : dueLine,
       ``,
       ...cardLines,
       ``,

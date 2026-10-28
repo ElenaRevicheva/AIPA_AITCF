@@ -115,5 +115,29 @@ check('the reply echo never cuts an emoji in half', !/[\uD800-\uDBFF](?![\uDC00-
 const src = require('fs').readFileSync(path.join(__dirname, '..', 'src', 'trello-voice.ts'), 'utf8');
 check('the colour prompt no longer says "Kira=daughter"', !/Kira\s*=\s*daughter/i.test(src) && /daughter Alisa/.test(src));
 
+// ── 28 Oct 2026 — a series from one voice note: every card got the FIRST date ─────────────────────────────────────
+// "Starting today, 28 Oct, a 10-day medication cycle… repeat next month… next cycle from 28 Nov…" → 3 cards, all due Oct 28.
+const B = ['Start medication cycle 1 (Oct 28 - Nov 6)', 'Start medication cycle 2 (Nov 28 - Dec 7)', 'Start medication cycle 3 (Dec 28 - Jan 6)'];
+const bron = { dueDate: '2026-10-28', subtaskDueDates: null };
+check('her 28 Oct note: the model gave no per-card dates → cycle 1 still Oct 28', v.subtaskDue(bron, 0, B[0]) === '2026-10-28');
+check('…cycle 2 reads Nov 28 from its own title', v.subtaskDue(bron, 1, B[1]) === '2026-11-28');
+check('…cycle 3 reads Dec 28 from its own title (not Jan 6)', v.subtaskDue(bron, 2, B[2]) === '2026-12-28');
+check('the model\'s own per-card date wins', v.subtaskDue({ dueDate: '2026-10-28', subtaskDueDates: ['2026-10-28', '2026-11-29', null] }, 1, B[1]) === '2026-11-29');
+check('a missing slot falls back to the title', v.subtaskDue({ dueDate: '2026-10-28', subtaskDueDates: ['2026-10-28', null] }, 1, B[1]) === '2026-11-28');
+check('a malformed slot is ignored', v.subtaskDue({ dueDate: '2026-10-28', subtaskDueDates: ['', 'Nov 28th'] }, 1, B[1]) === '2026-11-28');
+check('plain steps keep the shared date', v.subtaskDue({ dueDate: '2026-10-30', subtaskDueDates: null }, 1, 'Send invites') === '2026-10-30');
+check('no date anywhere → no date', v.subtaskDue({ dueDate: null, subtaskDueDates: null }, 0, 'Design slides') === null);
+check('Spanish "28 de noviembre" in a title', v.dateFromTitle('Ciclo 2 desde el 28 de noviembre', '2026-10-28') === '2026-11-28');
+check('"Jan 6" after an October start is next year', v.dateFromTitle('Dose (Jan 6)', '2026-10-28') === '2027-01-06');
+check('"Q4 report" is not a date', v.dateFromTitle('Prepare the Q4 report', '2026-10-28') === null);
+check('"May the deck be ready" is not a date', v.dateFromTitle('May the deck be ready', '2026-10-28') === null);
+const series = { success: true, transcript: 'x', classification: { ...base, title: 'Medication cycles', dueDate: '2026-10-28' },
+  cards: B.map((n, i) => ({ id: String(i), name: n, url: '', shortUrl: 'https://trello.com/c/' + i, due: v.toTrelloDue(['2026-10-28', '2026-11-28', '2026-12-28'][i]) })),
+  boardName: 'Kira Octubre 2026', listName: 'Cita' };
+const sr = v.formatVoiceTrelloReply(series);
+check('the reply shows each card\'s own date', /— 📅 October 28/.test(sr) && /— 📅 November 28/.test(sr) && /— 📅 December 28/.test(sr) && /Each card has its own date/.test(sr));
+const same = { ...series, cards: series.cards.map((c) => ({ ...c, due: v.toTrelloDue('2026-10-30') })) };
+check('cards sharing one date keep the single "Due" line', /📅 Due: October 28/.test(v.formatVoiceTrelloReply(same)) && !/— 📅/.test(v.formatVoiceTrelloReply(same)));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
