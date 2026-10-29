@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 29 Oct ~17:30 | EspaLuz lane on her CRM (aideazz.xyz/ops) from truth_people | `src/queue-page.ts`, `src/queue-routes.ts`, `scripts/espaluz-truth-sync.py`, pm2 cto-aipa restart, aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -183,7 +184,7 @@ git log keeps the record.
 ### ✅ 29 Oct ~14:30 UTC — EspaLuz single source of truth LIVE: `truth_people` in `espaluz_unified` (hourly :53) · nightly DB dumps · claim released
 - **DONE:** `scripts/espaluz-truth-sync.py` (run with `~/EspaLuzWhatsApp/venv/bin/python`) READS every store (unified, legacy telegram/whatsapp DBs, 6 bot JSON files, PF payments file), merges identities (phone/Telegram/email, normalised), verifies paid with **PayPal's live API** and **PagueloFácil CodOper** (sandbox + manual grants never count), WRITES only `truth_people` + `truth_runs`. Excluded rows keep a written reason. Legacy row counts unchanged. Nightly `~/backups/espaluz-pg/dump.sh` 07:23 UTC, 14 days, `pg_restore -l` checked.
 - **Result 29 Oct:** 51 identities → **37 real people, 37 trials ever, 0 trial active** (the 3 labelled "active" ended 27 Sep–6 Oct — stale label), **2 active in 30 days, 0 paid customers.**
-- ⚠️ **Money leak for Elena:** every PayPal subscription that charges ($7.77/mo; 3 ACTIVE, oldest since Aug 2025) is paid by an owner/admin account (payer initials E.R./M.K.) — her own tests still billing. Her call to cancel in PayPal; nothing touched.
+- **Family subscriptions:** the PayPal subscriptions that charge ($7.77/mo) are paid by Elena and her mom **on purpose** (Elena, 29 Oct: keep them). Counted as internal, never as customers. Do not suggest cancelling.
 - **Web SaaS plumbed 29 Oct ~17:20 UTC:** `ESPALUZ_SUPABASE_SERVICE_KEY` (Elena added; in Oracle `cto-aipa/.env`, chmod 600) → the sync reads Supabase auth users, learning_sessions, user_subscriptions (read only). Now **40 real people** (3 web), 13 PayPal ids checked — all paying ones are owner accounts. 0 warnings. CRM EspaLuz lane + HubSpot reading `truth_people` = next step. No Telegram alert on a failed run yet (exit 2 + `truth_runs.warnings` only).
 
 ### ✅ 29 Oct ~14:00 UTC — Scale Army: 3 deals staged with full kits · VJH watches their Ashby board, LIVE and output-verified · no claim held
