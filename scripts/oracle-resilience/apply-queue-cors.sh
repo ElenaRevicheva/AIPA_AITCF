@@ -16,7 +16,9 @@
 set -euo pipefail
 fail(){ echo "✗ $*" >&2; exit 1; }
 
-F=$(sudo -n grep -rlE 'location[[:space:]]+/queue/[[:space:]]*\{' /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null | head -1 || true)
+# -R, not -r: sites-enabled/ holds symlinks, and -r skips symlinks inside a directory (29 Oct: found nothing).
+F=$(sudo -n grep -RlE 'location[[:space:]]+/queue/[[:space:]]*\{' /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null | head -1 || true)
+F=$(readlink -f "$F")
 [ -n "$F" ] || fail "no nginx file has 'location /queue/'"
 if sudo -n grep -q 'location /queue/api/' "$F"; then echo "already applied in $F"; exit 0; fi
 
@@ -27,8 +29,13 @@ INDENT=$(printf '%s\n' "$BLOCK" | head -1 | sed -E 's/^([[:space:]]*).*/\1/')
 PROXY=$(printf '%s\n' "$BLOCK" | grep -E '^[[:space:]]*proxy_' || true)
 AUTH=$(printf '%s\n' "$BLOCK" | grep -E '^[[:space:]]*auth_basic' || true)
 printf '%s\n' "$PROXY" | grep -q 'proxy_pass' || fail "the /queue/ block has no proxy_pass; apply by hand"
-# A proxy_pass with a URI part rewrites the matched prefix — only a bare host is safe to reuse.
-printf '%s\n' "$PROXY" | grep -E 'proxy_pass[[:space:]]+https?://[^/;[:space:]]+/[^;[:space:]]' && fail "proxy_pass carries a URI; apply by hand"
+# A proxy_pass with a URI part rewrites the matched prefix. Safe cases: a bare host, or the
+# 1:1 mapping `…/queue/` (live since 31 Aug), which becomes `…/queue/api/` for the new prefix.
+if printf '%s\n' "$PROXY" | grep -qE 'proxy_pass[[:space:]]+https?://[^/;[:space:]]+/queue/;'; then
+  PROXY=$(printf '%s\n' "$PROXY" | sed -E 's#(proxy_pass[[:space:]]+https?://[^/;[:space:]]+)/queue/;#\1/queue/api/;#')
+elif printf '%s\n' "$PROXY" | grep -qE 'proxy_pass[[:space:]]+https?://[^/;[:space:]]+/[^;[:space:]]'; then
+  fail "proxy_pass carries a URI; apply by hand"
+fi
 
 NEW=$(cat <<EOF
 ${INDENT}# 28 Oct 2026 — aideazz.xyz/ops/ is the face of the CRM; the data stays here (apply-queue-cors.sh).
@@ -56,13 +63,16 @@ BK=/home/ubuntu/_session-backups/nginx-queue-cors-$TS
 mkdir -p "$BK" && sudo -n cp "$F" "$BK/$(basename "$F")" && echo "backup → $BK"
 
 TMP=$(mktemp)
-sudo -n awk -v block="$NEW" '/location[[:space:]]+\/queue\/[[:space:]]*\{/ && !done {print block; done=1} {print}' "$F" > "$TMP"
+# ENVIRON, not -v: -v processes backslash escapes and would turn aideazz\.xyz into aideazz.xyz.
+sudo -n env BLOCK="$NEW" awk '/location[[:space:]]+\/queue\/[[:space:]]*\{/ && !done {print ENVIRON["BLOCK"]; done=1} {print}' "$F" > "$TMP"
 grep -q 'location /queue/api/' "$TMP" || fail "insertion produced no block"
 sudo -n cp "$TMP" "$F"; rm -f "$TMP"
 
 rollback(){ echo "↩ rolling back"; sudo -n cp "$BK/$(basename "$F")" "$F"; sudo -n nginx -t && sudo -n systemctl reload nginx; }
 sudo -n nginx -t || { rollback; fail "nginx -t rejected the new block"; }
 sudo -n systemctl reload nginx
+# reload returns before the workers switch config; checking at once reads the OLD config (29 Oct: rolled back a good change).
+sleep 3
 
 H=https://webhook.aideazz.xyz/queue
 c1=$(curl -s -o /dev/null -w '%{http_code}' -X OPTIONS -H 'Origin: https://aideazz.xyz' -H 'Access-Control-Request-Method: GET' -H 'Access-Control-Request-Headers: authorization' "$H/api/today")
