@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 29 Oct 15:05 | voice→Trello: "find the card … add there" must UPDATE the existing card, not create a duplicate (SOP AI Ops card, Kira Noviembre) | `src/trello-voice.ts`, `scripts/test-trello-voice-dates.cjs`, Oracle `cto-aipa` restart | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -170,6 +169,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏸️ 29 Oct ~15:45 UTC — voice → Trello: "find the card about X and add there Y" now EDITS that card (fix on `main`, NOT yet on Oracle) · claim released
+- **What happened (Elena's screenshot, Kira Noviembre):** her voice note "Find the task in the card, Kira noviembre, the card about my sub HTML, and add there … finishing the Spanish version …" produced a NEW card "Complete Spanish version of sub HTML and add to portfolio" beside the card she meant, "Update SOAP AI Ops HTML with agent descriptions". Cause, from the code: the edit path is gated on move/change/archive words or a link; her sentence had neither, so it fell straight to CREATE. Not a transcription problem — the words were enough; the gate was too narrow. Same shape as 28 Sep (date corrections → new cards) and 12 Oct (description edits → new cards): each time one phrasing of "edit" was missing.
+- **DONE (cto-aipa `da87383d`, tests 121/121 locally):** `isAddToCardRequest()` (find-verb + card noun, or add-verb + "there / to the card", EN/ES/RU; "add a task…" stays a create) gates `processMultiAction` and the typed-text edit path; the action classifier has a FIND+ADD = one `update` with `appendDescription` rule, a misheard-acronym rule ("SOAP"→"sub": use the stable words), and now reads her approved rules too; `searchTrelloCards` ranks the NAMED board's open cards by her words/sound when Trello's exact-word search finds nothing (`rankCardsForQuery`, pure; two equal fits → "say which one"). Her exact transcript and the 4 Noviembre cards are in the test file.
+- **NEXT (Elena, two commands — the auto-mode classifier refused both for Claude: "Production Deploy", "External System Writes"):**
+  1. `bash scripts/oracle-deploy-trello-voice-20261029.sh` — backs up, checks Oracle's src md5 = the git version this was built on (`211bbcb4…` / `65074953…`), copies the 5 named files, runs the tests on Oracle, `pm2 restart cto-aipa --update-env`, prints md5 + start time + `grep -c isAddToCardRequest dist/trello-voice.js`.
+  2. `ssh oracle-cto-aipa 'cd ~/cto-aipa && node scripts/trello-merge-sop-card-20261029.cjs --apply'` — appends her 2-step note (verify/clean the SOP AI Ops HTML → then the Spanish version → it becomes the portfolio) to the SOAP card and ARCHIVES the duplicate (restorable). Dry run already passed on Oracle 15:40 UTC: exactly one target `3Jm6hFkj`, one duplicate `wSLcfQKC`.
+  Then say the same voice note again — the reply must be "📝 added to the description" on the SOAP card, not a new card.
+- **VERIFIED BY:** `node scripts/test-trello-voice-dates.cjs` → `121 passed, 0 failed` (laptop, dist built from `da87383d`); dry run output above. NOT verified: the live bot (still runs the pre-change code until step 1).
+- **RISK:** until step 1 runs, the same phrasing makes another duplicate. `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
 
 ### ✅ 29 Oct ~14:00 UTC — Scale Army: 3 deals staged with full kits · VJH watches their Ashby board, LIVE and output-verified · no claim held
 - **DONE (HubSpot, 🔥 I act TODAY, Elena's move = apply):** **67072175032** AI Native Senior SEO & GEO Operator (found by her on the careers page) · **67072925590** AI Enablement Facilitator · **67073159333** Head of Growth (both from the 29 Oct Scale Army newsletter; the two sales roles in it — Technical Sales Manager, Senior AE AI Implementation Pods — NOT staged, not her lane; one word stages them). Each: 6 notes read back (📌 🔎 🎯 🛡️+CV pdf ✅ 📋); audit `15 job deals · complete 15 · gaps 0`. ⚠️ CV reviewer notes on the 🛡️ notes: SEO & GEO → *reads as backend/AI automation engineer, lacking hands-on client SEO/GEO*; Facilitator → *not shaped, too few lines survived* (tailored fallback CV) — say the gap before they find it.
