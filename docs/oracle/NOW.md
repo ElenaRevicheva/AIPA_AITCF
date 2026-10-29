@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 29 Oct 19:05 | podcast.aideazz.xyz redesign: Atuona-generated naturalistic hero/cover + AIdeazz AI Lab brand | `src/podcast-feed.ts`, `src/podcast-publish.ts`, repo `aideazz-podcast` (index.html, cover.png, hero image); no PM2 restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
