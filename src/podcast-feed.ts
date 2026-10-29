@@ -333,6 +333,11 @@ export function heroImageUrl(meta: PodcastMeta): string {
   return meta.heroUrl || meta.coverUrl;
 }
 
+/** Where the radio mast's beacon sits in hero.jpg, as fractions of the IMAGE (measured on the 29 Oct 2026 Luma still:
+ *  the mast tip at 80.7% across, 5.3% down). The page maps it through object-fit:cover at runtime, so the rings start
+ *  on the beacon at every viewport. Override with PODCAST_HERO_BEACON_X / _Y when the still changes. */
+export const HERO_BEACON = { x: process.env.PODCAST_HERO_BEACON_X?.trim() || '0.807', y: process.env.PODCAST_HERO_BEACON_Y?.trim() || '0.053' };
+
 export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const sorted = episodes.slice().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
   const total = sorted.length;
@@ -406,11 +411,32 @@ ${brandCss()}
   .topin{max-width:1080px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   /* hero: the Atuona still, full-bleed, under a dither veil that fades into the page */
   .hero{position:relative;min-height:min(86vh,820px);display:flex;align-items:flex-end;isolation:isolate;overflow:hidden}
-  .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:-3;filter:saturate(.82) contrast(1.04)}
-  .hero-dither{position:absolute;inset:0;z-index:-2;opacity:.28;mix-blend-mode:multiply;pointer-events:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='.9' fill='%23000'/%3E%3Ccircle cx='3' cy='3' r='.9' fill='%23000'/%3E%3C/svg%3E")}
-  .hero-grain{position:absolute;inset:0;z-index:-2;opacity:.14;mix-blend-mode:overlay;pointer-events:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  /* The still is alive (Elena, 29 Oct): it breathes, the halftone glow beats like a heart, a band of light flows
+     through the dots and radio rings pulse from the mast beacon. The pointer only adds a drift on top. */
+  .hero-par{position:absolute;inset:-4%;z-index:-3;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .45s cubic-bezier(.2,.7,.2,1);will-change:transform}
+  .hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);animation:breathe 11s ease-in-out infinite;transform-origin:80% 8%}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+  .hero-glow{position:absolute;inset:-4%;z-index:-2;pointer-events:none;mix-blend-mode:screen;opacity:var(--glow,.6);
+    background:radial-gradient(560px circle at var(--mx,62%) var(--my,46%),rgba(253,230,138,.95),rgba(250,204,21,.38) 32%,rgba(124,58,237,.18) 58%,transparent 72%);
+    -webkit-mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);
+    -webkit-mask-size:4px 4px;mask-size:4px 4px;
+    transform:translate3d(calc(var(--px,0px) * 1.6),calc(var(--py,0px) * 1.6),0);transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .6s;
+    animation:heartbeat 2.4s ease-in-out infinite}
+  @keyframes heartbeat{0%,100%{filter:brightness(.9)}10%{filter:brightness(1.45)}20%{filter:brightness(1)}30%{filter:brightness(1.35)}55%{filter:brightness(.9)}}
+  .hero-flow{position:absolute;inset:-4%;z-index:-2;pointer-events:none;mix-blend-mode:screen;opacity:.5;
+    background:linear-gradient(104deg,transparent 34%,rgba(253,230,138,.42) 47%,rgba(168,85,247,.22) 53%,transparent 66%);background-size:260% 100%;
+    -webkit-mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);
+    -webkit-mask-size:4px 4px;mask-size:4px 4px;animation:flow 13s linear infinite}
+  @keyframes flow{0%{background-position:130% 0}100%{background-position:-130% 0}}
+  .hero-rings{position:absolute;left:66%;top:30%;width:0;height:0;z-index:-1;pointer-events:none;overflow:visible;opacity:0;transition:opacity 1.2s}
+  .hero-rings.on{opacity:1}
+  .hero-rings svg{position:absolute;left:-180px;top:-180px;width:360px;height:360px;overflow:visible}
+  .hero-rings circle{fill:none;stroke:#fde68a;stroke-width:1.2;opacity:0;transform-origin:180px 180px;animation:ring-out 4.8s cubic-bezier(.2,.6,.3,1) infinite}
+  .hero-rings circle:nth-child(2){animation-delay:1.6s}.hero-rings circle:nth-child(3){animation-delay:3.2s}
+  .hero-rings .beacon{fill:#fde68a;stroke:none;opacity:1;animation:beacon 2.4s ease-in-out infinite;filter:drop-shadow(0 0 6px #fde68a) drop-shadow(0 0 14px rgba(250,204,21,.8))}
+  @keyframes ring-out{0%{transform:scale(.05);opacity:.9}70%{opacity:.18}100%{transform:scale(1);opacity:0}}
+  @keyframes beacon{0%,100%{opacity:.55}10%{opacity:1}20%{opacity:.7}30%{opacity:1}55%{opacity:.55}}
+  @media(prefers-reduced-motion:reduce){.hero-par,.hero-glow{transform:none;transition:none}.hero-img,.hero-glow,.hero-flow,.hero-rings circle,.hero-rings .beacon{animation:none}.hero-rings{display:none}}
   .hero-veil{position:absolute;inset:0;z-index:-1;pointer-events:none;
     background:linear-gradient(180deg,rgba(var(--veil),.55) 0%,rgba(var(--veil),.05) 26%,rgba(var(--veil),.1) 55%,rgba(var(--veil),.92) 88%,var(--bg) 100%)}
   .hero-in{position:relative;width:100%;max-width:1080px;margin:0 auto;padding:150px 24px 54px}
@@ -494,12 +520,14 @@ ${brandCss()}
   <header class="top">
     <div class="topin">
       ${brandLockup(meta)}
-      <a class="btn ghost" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
     </div>
   </header>
   <section class="hero">
-    <img class="hero-img" src="${esc(hero)}" alt="A lone ceiba tree on a hill above the Pacific coast of Panamá at dusk — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/>
+    <div class="hero-par"><img class="hero-img" src="${esc(hero)}" alt="A 1930s Art Deco broadcasting house with a radio mast at dusk, on film — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/></div>
     <div class="hero-dither" aria-hidden="true"></div>
+    <div class="hero-flow" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-rings" aria-hidden="true" data-bx="${HERO_BEACON.x}" data-by="${HERO_BEACON.y}"><svg viewBox="0 0 360 360"><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle class="beacon" cx="180" cy="180" r="3"/></svg></div>
     <div class="hero-grain" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-in">
@@ -564,6 +592,32 @@ ${rows}
   <span class="big">Built in public, <em>on the go</em> — one person, a fleet of agents, and the honest notes.</span>
   © ${new Date().getFullYear()} ${esc(meta.author)} &middot; AIdeazz AI Lab &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span>
 </footer>
+<script>
+  // Pointer parallax + glow (as on hud.ai / Perplexity hero art): the still drifts a few px against the cursor and the
+  // halftone glow follows it. Pointer only — touch and reduced-motion get the still image.
+  (function(){
+    var h=document.querySelector('.hero');if(!h)return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    var raf=0,px=0,py=0,mx=62,my=46,glow=.55;
+    function paint(){raf=0;h.style.setProperty('--px',px.toFixed(1)+'px');h.style.setProperty('--py',py.toFixed(1)+'px');
+      h.style.setProperty('--mx',mx.toFixed(1)+'%');h.style.setProperty('--my',my.toFixed(1)+'%');h.style.setProperty('--glow',glow);}
+    h.addEventListener('pointermove',function(e){if(e.pointerType==='touch')return;var r=h.getBoundingClientRect();
+      var x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;px=(0.5-x)*22;py=(0.5-y)*14;mx=x*100;my=y*100;glow=.85;
+      if(!raf)raf=requestAnimationFrame(paint);},{passive:true});
+    h.addEventListener('pointerleave',function(){px=0;py=0;glow=.55;if(!raf)raf=requestAnimationFrame(paint);});
+  })();
+  (function(){
+    // Rings start on the mast beacon: image-space fractions → page pixels through object-fit:cover (center top).
+    var hero=document.querySelector('.hero'),par=document.querySelector('.hero-par'),img=document.querySelector('.hero-img'),rings=document.querySelector('.hero-rings');
+    if(!hero||!par||!img||!rings)return;
+    var bx=parseFloat(rings.getAttribute('data-bx')),by=parseFloat(rings.getAttribute('data-by'));
+    function place(){var iw=img.naturalWidth,ih=img.naturalHeight;if(!iw||!ih)return;
+      var pr=par.getBoundingClientRect(),hr=hero.getBoundingClientRect(),s=Math.max(pr.width/iw,pr.height/ih),w=iw*s,hh=ih*s;
+      var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=0+by*hh+(pr.top-hr.top);
+      rings.style.left=x.toFixed(1)+'px';rings.style.top=y.toFixed(1)+'px';rings.classList.add('on');}
+    if(img.complete)place();img.addEventListener('load',place);window.addEventListener('resize',place,{passive:true});
+  })();
+</script>
 </body>
 </html>
 `;
