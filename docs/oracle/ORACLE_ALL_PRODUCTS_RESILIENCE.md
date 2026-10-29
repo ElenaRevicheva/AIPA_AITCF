@@ -263,6 +263,47 @@ removed only if the .gz unpacks to the same bytes). Lists and logs: `docs/oracle
 decision; resizing the boot volume (VM.Standard.E5.Flex, cost unverified). **Before any write to Oracle: `df -h /`** (19 Oct: 53 %, 21 GB free).
 **Log retention (Elena, 11 Oct; added 15 Oct 2026):** Oracle keeps short log windows on purpose: pm2-logrotate `retain 10`, journald 1 GB, app logs `rotate 4`. PM2 history is short: the running cto-aipa's rotated logs reach back only to 10 Oct (checked 19 Oct). Its Audit-API lines from before 1 Oct were deleted by `retain 10`, and the only pre-October files left are leftovers (old process-id logs from Mar–Apr, a few late-Sep rotations of quiet apps, the paused DragonTrade bots' May logs kept on purpose). To keep history, run `scripts/oracle-resilience/archive-to-laptop.sh` on the rotated logs **at least every 10 days**, or they rotate out. The repo copy of the film #9 generator is `scripts/atuona-film9-gen.mjs`.
 
+## 🟢 4everland free allowance exhausted — every site 403 "Insufficient data volume" (October 29 2026)
+
+At ~20:40 UTC aideazz.xyz, podcast.aideazz.xyz and atuona.xyz all answered
+`403 Insufficient data volume, unable to access temporarily!` (`Server: BunnyCDN`,
+pull zone 5088105, `CDN-RequestPullCode: 403`). 4everland's status page was all green:
+the message is the **account's** allowance, not an outage. Resolved by Elena topping up
+the 4everland wallet at ~21:10 UTC; all three sites 200 again within minutes.
+
+**The symptom that came first was silent:** the podcast project built one push
+(`d7c2841`, 19:15 UTC) and then created *no* deployment record for the next four
+pushes — no failure status, nothing. Serving died ~85 minutes later. Five commits
+(a README nudge, a full-width wave, a pin stamp) were spent chasing a "stuck host"
+before the 403 named the cause.
+
+| Fact | Value (pricing page, read 29 Oct) |
+| --- | --- |
+| Free allowance | 100 GB bandwidth + 250 build minutes per month |
+| Beyond | $10 per 100 GB · $3 per 100 build minutes, from a wallet balance (Polygon / Ethereum / BSC / Arbitrum) |
+| 22 Aug reading in this doc | build time 800.02 min — the warning nobody could compare to a cap |
+
+**Redeploy replays the pin, again:** the dashboard Redeploy Elena clicked after the
+top-up created a deployment for `d7c2841` (21:14 UTC) and republished build 1. A
+tagged stamp commit (`bbaa44f`, 21:19 UTC) built in 10 seconds and moved the CID.
+
+**One more layer:** the edge caches images with `Cache-Control: public, max-age=180`
+and the HTML with `no-cache`, so for up to three minutes after a deploy the new page
+can show the *old* images under the same filenames (`CDN-Cache: HIT`,
+`CDN-CachedAt` from the previous build). Wait 180 s before calling an image stale.
+
+> **Rule:** a host that builds nothing *and reports nothing* is not stuck — read the
+> allowance first: `curl -sI https://aideazz.xyz` and the body of `/`. If the body is
+> the "Insufficient data volume" line, stop pushing; the fix is the 4everland wallet.
+
+```bash
+gh api repos/ElenaRevicheva/aideazz-podcast/deployments --jq '.[] | "\(.created_at)  \(.sha[0:7])"' | head -3
+curl -s https://podcast.aideazz.xyz/ | head -c 80          # the 403 body names the cause
+curl -sI https://podcast.aideazz.xyz/hero.jpg | grep -iE 'cdn-cache|cdn-cachedat|cache-control'
+```
+
+---
+
 ## 🟢 4everland pin + the sitemap's second writer (August 21-22 2026)
 
 The 21 August daily post published to Dev.to, announced itself on Telegram, and its
