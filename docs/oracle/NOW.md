@@ -174,6 +174,11 @@ git log keeps the record.
 ### 🧭 29 Oct — "Client OS" = NO BUILD (Elena: "not reinvent bicycles") · `docs/selling/CLIENT_OS_STEP_BY_STEP.md` · no claim held
 - From Elena's X reply to a "one platform for agency client management" post. A six-step build plan was written and **withdrawn the same hour**: every piece already exists (HubSpot deal/tasks/files/chat, PagueloFacil, Resend, trello-voice). **Do not build a clients/projects/portal/invoice module.** The angle is selling *wiring* of an agency's existing tools. **Whose move:** Elena's — the 3-question reply to the poster; go on step 0 (the aideazz.xyz/ops face below).
 
+### ✅ 29 Oct ~13:30 UTC — hiring lane of her CRM = "I Act TODAY" only · 731 rows skipped (not deleted) · HubSpot read only
+- **DONE:** `scripts/queue-hiring-keep-act-today.cjs --apply` on Oracle: HubSpot search (read only, the VJH sweep's filter) → 13 hiring deals in I Act TODAY; daily_queue hiring/new 740 → **9**; 731 → `skipped`. Undo file in Oracle `~/_session-backups/queue-hiring-cleanup-2026-10-29T13-27-39-958Z.json` (`--undo=<file>`).
+- **Gap (not fixed, needs go):** 4 of the 13 are not in the queue — 3 `[HIRING-MANUAL]` (stage-manual-job never mirrors to the queue) + 1 SERP lead. **Refill leak:** the VJH sweep moves jobs out of I Act TODAY in HubSpot only; re-run the script until the sweep also updates the queue.
+- **Postgres reality:** her CRM tables are in **Oracle Autonomous DB**. Postgres = Supabase (EspaLuz web) + a local Postgres 16 on the Oracle box (dragontrade, espaluz_unified, espaluz_telegram, espaluz_whatsapp, aela; 0 connections when checked). EspaLuz users sit in 5 kinds of store already — **do not add a sixth.**
+
 ### 🧭 29 Oct ~13:40 UTC — EspaLuz trial→paid in her CRM: what exists, measured · proposal, nothing built · needs Elena's go
 - **Queue lanes live:** hiring 740 new (newest 28 Oct) / 17 done / 23 skipped · client 55 new (newest 26 Oct) / 9 done. No EspaLuz lane.
 - **Tracking already exists:** Oracle DB table `espaluz_funnel` (trial→paid→churned; `upsertEspaluzUser`, `getEspaluzFunnelSummary`) fed by `/wiring/event` from both bots (`wiring_emitter.py`: user_signup, trial_started, subscription_activated, payment_received, subscription_cancelled). **Holds 6 rows**, all `trial`, newest trial 19 Jul. Last 10 days of logs: 30 lesson_sent, 1 user_signup.
