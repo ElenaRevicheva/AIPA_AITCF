@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 29 Oct ~18:15 | n8n "My workflow" reads her CRM (queue + EspaLuz) instead of HubSpot | n8n workflow uOo9i6L2D3h0GdLC, pm2 n8n restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -180,6 +179,11 @@ git log keeps the record.
 - **NEXT (acceptance, whoever is next):** the first real voice note through the new path is the test — e.g. "find the card about SOAP HTML in Kira noviembre and add there …" → reply "📝 added to the description", no new card; grep `[TrelloVoice] actions: update(` and `matched on the named board by sound` in `~/.pm2/logs/cto-aipa-out-9.log`. A note saying "Claude" must come back spelled Claude.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
+
+### ✅ 29 Oct ~18:30 UTC — n8n "My workflow" now reads HER CRM, not HubSpot → the Aug ops dashboard shows the same truth · claim released
+- **Flow:** Webhook `/crm/webhook/ops` → `CRM queue (today)` (GET 127.0.0.1:3000/queue/api/today) → `CRM EspaLuz (verified)` (…/queue/api/espaluz, continue-on-error) → Code (same 9 fields as August, so `webhook.aideazz.xyz/ops/` needs no change) → Respond. The August HubSpot node is kept, renamed "(Aug 2026, unused)", disconnected. Workflow JSON (new + August) in `docs/n8n/`.
+- **VERIFIED BY:** n8n log `Activated workflow "My workflow"`; local webhook → 81 items (HIRING 18 / CLIENT 25 / ESPALUZ 38) = CRM api exactly, same job ids, every item carries the 9 dashboard fields, no `api.hubapi.com` in the path.
+- **Trap (n8n 2.34, regular mode):** `import:workflow --activeState=fromJson` is refused; plain import deactivates → `n8n publish:workflow --id=…` → `pm2 restart n8n`. **Rollback:** `n8n import:workflow --input=<backup>/my-workflow.json` + publish + restart; full DB copy in `~/_session-backups/n8n-before-crm-repoint-20261029-182040/`.
 
 ### 💬 29 Oct ~17:45 UTC — EspaLuz: her own ids marked internal (38 real users, 1 active this month) · one warm lead · Elena's move
 - Telegram `@kiravelerevich` (id confirmed by username in espaluz_telegram) + her personal WhatsApp added to `ESPALUZ_OWNER_TG` / `ESPALUZ_OWNER_WA` in Oracle `cto-aipa/.env` (values only there; public repo holds names only).
