@@ -170,6 +170,9 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🧭 29 Oct — Client OS plan (own lab first): `docs/selling/CLIENT_OS_STEP_BY_STEP.md` · plan only, nothing built · no claim held
+- From Elena's X reply to a "one platform for agency client management" post. Six steps on top of `/queue/` + PagueloFacil + Resend + trello-voice; step 0 = the aideazz.xyz/ops face below. **Whose move:** Elena's — go on step 0, then step 1 (clients + projects table, created by a paid order).
+
 ### 🏗️ 29 Oct ~00:20 UTC — aideazz.xyz/ops/ becomes the FACE of Elena's CRM (the /queue/ stream, same data) · built, NOT yet live · needs Elena's go
 - **Elena:** "put the stream from webhook.aideazz.xyz/queue/ to aideazz.xyz/ops — aideazz.xyz/ops is the source of truth, the face of my CRM."
 - **Built (cto-aipa `68f56b6d`, `a332c35a`, pushed):** `src/queue-page.ts` → `renderQueuePage({apiBase, remote})`; Oracle's `/queue/` keeps the same page (QUEUE_PAGE, relative API, nginx prompt). `remote=true` adds a sign-in box (user `elena`, the `/ops/` password; `Authorization` kept in localStorage, re-asked on 401, Sign out link) and routes `api/today` / `api/record/:id` / `api/act` through one fetch helper to `https://webhook.aideazz.xyz/queue/`. `scripts/build-ops-face.cjs` writes `aideazz/public/ops/index.html` (refuses a page carrying a credential). **Generated locally, uncommitted in aideazz** (`git status` shows `M public/ops/index.html`) — regenerate any time with `npm run build && node scripts/build-ops-face.cjs`.
