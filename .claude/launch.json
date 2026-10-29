@@ -145,6 +145,18 @@
         "D:/aideazz/aideazz/public"
       ],
       "port": 8765
+    },
+    {
+      "name": "podcast-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "D:/aideazz/aideazz-podcast",
+        "-l",
+        "4176"
+      ],
+      "port": 4176
     }
   ]
 }

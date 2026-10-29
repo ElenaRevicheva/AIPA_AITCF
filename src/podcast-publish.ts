@@ -8,7 +8,7 @@
  * Gated by the caller (PODCAST_PUBLISH_ENABLED). Uses the same GITHUB_TOKEN as the blog pipeline.
  */
 
-import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, brandCss, brandLockup, BRAND_FONTS_HREF, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
 
 /** URL of the real AIdeazz brand icon (the gradient "A" mark in the aideazz.xyz address bar). */
 const BRAND_ICON_URL = process.env.PODCAST_ICON_URL?.trim() || 'https://aideazz.xyz/faviconnew.png';
@@ -29,9 +29,12 @@ export function podcastMeta(): PodcastMeta {
     title: process.env.PODCAST_TITLE?.trim() || 'AIdeazz — Building in Public On The Go',
     description: process.env.PODCAST_DESC?.trim() || 'Building in public, on the go — AI-augmented, agentic, from A to Z. Honest lessons on building a company with AI agents, marketing engines, and shipping in production. By Elena Revicheva.',
     author: process.env.PODCAST_AUTHOR?.trim() || 'Elena Revicheva',
-    email: process.env.PODCAST_EMAIL?.trim() || process.env.MARKETING_INQUIRY_TO || 'elena.revicheva2016@gmail.com',
+    // The owner address (itunes:email) comes from PODCAST_EMAIL / MARKETING_INQUIRY_TO in .env (set on Oracle 29 Oct 2026);
+    // no personal address lives in source. The derived fallback only exists so a fresh checkout still emits a valid feed.
+    email: process.env.PODCAST_EMAIL?.trim() || process.env.MARKETING_INQUIRY_TO?.trim() || `podcast@${new URL(site).hostname.replace(/^podcast\./, '')}`,
     siteUrl: site,
     coverUrl: `${site}/cover.png`,
+    heroUrl: `${site}/hero.jpg`,            // 29 Oct 2026: Atuona still (Luma) behind the landing hero
     language: process.env.PODCAST_LANG?.trim() || 'en',
     category: process.env.PODCAST_CATEGORY?.trim() || 'Technology',
   };
@@ -84,10 +87,59 @@ async function repoExists(): Promise<boolean> {
   return r.ok;
 }
 
-/** Generate the AIdeazz-branded 1500x1500 cover PNG: real "A" icon on purple+yellow, like aideazz.xyz. */
-async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
+/** The Atuona square the cover is built on (committed to the podcast repo as cover-source.jpg). */
+export async function fetchCoverSource(meta: PodcastMeta): Promise<Buffer | null> {
+  try {
+    const r = await fetch(`${meta.siteUrl}/cover-source.jpg`);
+    if (!r.ok) return null;
+    return Buffer.from(await r.arrayBuffer());
+  } catch { return null; }
+}
+
+/**
+ * Generate the 1500x1500 cover PNG.
+ * 29 Oct 2026: when an Atuona still is available (`baseJpeg`, or `${site}/cover-source.jpg`) the cover is that
+ * photograph under a dark veil with the AI Lab lockup — the AZ mark, AIDEAZZ·FM, the title line. Without one it
+ * falls back to the older purple card with the "A" icon so a fresh repo still gets a cover.
+ */
+export async function generateCoverPng(meta: PodcastMeta, baseJpeg?: Buffer | null): Promise<Buffer> {
   const sharp = (await import('sharp')).default;
   const W = 1500;
+  const base = baseJpeg ?? (await fetchCoverSource(meta));
+  if (base) {
+    const photo = await sharp(base).resize(W, W, { fit: 'cover', position: 'centre' }).modulate({ saturation: 0.85 }).png().toBuffer();
+    // Text lives in the upper half — the still keeps its "generous empty sky" there and the tree stays visible below.
+    const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}">
+      <defs>
+        <linearGradient id="veil" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#020617" stop-opacity=".66"/><stop offset=".42" stop-color="#020617" stop-opacity=".46"/>
+          <stop offset=".72" stop-color="#020617" stop-opacity=".06"/><stop offset="1" stop-color="#020617" stop-opacity=".22"/>
+        </linearGradient>
+        <linearGradient id="ramp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset=".5" stop-color="#facc15"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+        <pattern id="dither" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#000"/><circle cx="4.5" cy="4.5" r="1" fill="#000"/></pattern>
+      </defs>
+      <rect width="${W}" height="${W}" fill="url(#dither)" opacity=".07"/>
+      <rect width="${W}" height="${W}" fill="url(#veil)"/>
+      <text x="150" y="470" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="104" letter-spacing="2" fill="#ffffff">AIDEAZZ<tspan fill="url(#ramp)">·FM</tspan></text>
+      <line x1="150" y1="517" x2="214" y2="517" stroke="#edb867" stroke-width="3"/>
+      <text x="236" y="528" font-family="Arial, Helvetica, sans-serif" font-weight="300" font-size="30" letter-spacing="12" fill="#ffffffdd">AIDEAZZ AI LAB · PODCAST</text>
+      <text x="150" y="650" font-family="Georgia, 'Times New Roman', serif" font-size="78" fill="#ffffff">Building in public, <tspan font-style="italic" fill="#fde68a">on the go.</tspan></text>
+    </svg>`;
+    const layers: Array<{ input: Buffer; top: number; left: number }> = [{ input: Buffer.from(overlay), top: 0, left: 0 }];
+    try {
+      // The AZ mark (aideazz.xyz/media/az-mark.png) painted in the purple→gold ramp, top-left, as on aideazz.xyz/atlas:
+      // the ramp is clipped by the mark's own alpha (dest-in), the same trick the fallback card uses for its icon.
+      const mk = await fetch('https://aideazz.xyz/media/az-mark.png');
+      if (mk.ok) {
+        const markH = 206, markW = Math.round(markH * 176 / 202);
+        const shape = await sharp(Buffer.from(await mk.arrayBuffer())).resize(markW, markH).ensureAlpha().png().toBuffer();
+        const rampSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${markW}" height="${markH}"><defs><linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset=".55" stop-color="#facc15"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="${markW}" height="${markH}" fill="url(#r)"/></svg>`;
+        const mark = await sharp(Buffer.from(rampSvg)).png().composite([{ input: shape, blend: 'dest-in' }]).png().toBuffer();
+        layers.push({ input: mark, top: 150, left: 150 });
+      }
+    } catch { /* cover still carries the wordmark */ }
+    return sharp(photo).composite(layers).png().toBuffer();
+  }
   const bgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}">
     <defs>
       <radialGradient id="bg" cx="50%" cy="33%" r="85%">
@@ -158,11 +210,12 @@ async function readManifest(): Promise<PodcastEpisode[]> {
   try { return JSON.parse(Buffer.from(f.contentB64, 'base64').toString('utf8')); } catch { return []; }
 }
 
-function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
+export function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const chapters = e.chapters?.length
     ? '<div class="chapters"><h3>Chapters</h3><ul>' + e.chapters.map((c) => `<li><span class="t">${esc(c.time)}</span> ${esc(c.title)}</li>`).join('') + '</ul></div>'
     : '';
+  const hero = meta.heroUrl || meta.coverUrl;
   return `<!DOCTYPE html>
 <html lang="${meta.language}"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -170,45 +223,50 @@ function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
 <meta name="description" content="${esc(e.description).slice(0, 160)}"/>
 <meta property="og:title" content="${esc(e.title)}"/>
 <meta property="og:image" content="${meta.coverUrl}"/>
-<meta name="theme-color" content="#05060a"/>
+<meta name="theme-color" content="#020617"/>
+<link rel="icon" type="image/png" href="https://aideazz.xyz/faviconnew.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="${BRAND_FONTS_HREF}" rel="stylesheet"/>
 <style>
-  :root{--bg:#0a0712;--txt:#f3f0fa;--mut:#b3a9c9;--line:rgba(255,255,255,.09);--a1:#a855f7;--a2:#facc15;--a3:#7c3aed;
-    --disp:'Figtree',-apple-system,Segoe UI,sans-serif;--body:'Figtree',-apple-system,Segoe UI,sans-serif;--mono:'Figtree',-apple-system,Segoe UI,sans-serif}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
-  .aurora{position:fixed;inset:0;z-index:-1;filter:blur(70px);opacity:.4;overflow:hidden}
-  .aurora span{position:absolute;border-radius:50%;mix-blend-mode:screen}
-  .aurora .b1{width:50vw;height:50vw;left:-12vw;top:-14vw;background:radial-gradient(circle,#a855f788,transparent 60%)}
-  .aurora .b2{width:46vw;height:46vw;right:-12vw;top:0;background:radial-gradient(circle,#d946ef88,transparent 60%)}
-  .wrap{max-width:720px;margin:0 auto;padding:34px 22px 80px}
-  .back{font-family:var(--mono);font-size:12px;color:var(--mut);text-decoration:none;display:inline-flex;gap:7px;align-items:center}
-  .back:hover{color:var(--a2)}
-  .num{font-family:var(--mono);font-size:12px;color:var(--a2);letter-spacing:.05em;margin:34px 0 10px;display:block}
-  h1{font-family:var(--disp);font-weight:700;font-size:clamp(28px,5vw,42px);line-height:1.1;letter-spacing:-.02em;margin-bottom:12px}
-  .meta{font-family:var(--mono);font-size:12px;color:var(--mut);margin-bottom:24px}
-  .player{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:28px}
+${brandCss()}
+  body{line-height:1.7}
+  .band{position:relative;isolation:isolate;overflow:hidden;min-height:300px;display:flex;align-items:flex-end}
+  .band img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;z-index:-2;filter:saturate(.8)}
+  .band::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(var(--veil),.45),rgba(var(--veil),.2) 40%,var(--bg) 100%)}
+  .topin{max-width:760px;margin:0 auto;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
+  .top{position:absolute;top:0;left:0;right:0;z-index:5}
+  .bandin{max-width:760px;margin:0 auto;padding:120px 22px 26px;width:100%}
+  .wrap{max-width:760px;margin:0 auto;padding:10px 22px 80px}
+  h1{font:400 clamp(34px,5vw,56px)/1.04 var(--serif);letter-spacing:-.02em;margin:10px 0 12px;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 24px rgba(var(--veil),.75)}
+  .meta{font:300 11px var(--lab);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);margin-bottom:8px}
+  .player{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin:18px 0 28px}
   audio{width:100%;display:block}
-  .desc{color:var(--mut);font-size:16px;white-space:pre-wrap}
+  .desc{color:var(--ink-80);font-size:16px;white-space:pre-wrap}
   .chapters{margin-top:34px;border-top:1px solid var(--line);padding-top:24px}
-  .chapters h3{font-family:var(--disp);font-size:18px;margin-bottom:14px}
-  .chapters ul{list-style:none} .chapters li{padding:9px 0;border-bottom:1px solid var(--line);color:var(--mut)}
-  .chapters .t{font-family:var(--mono);font-size:12px;color:var(--a1);margin-right:12px}
-  .cta{display:inline-flex;align-items:center;gap:7px;margin-top:30px;font-family:var(--disp);font-weight:600;color:var(--a2);text-decoration:none}
+  .chapters h3{font:400 26px var(--serif);margin-bottom:14px}
+  .chapters ul{list-style:none} .chapters li{padding:9px 0;border-bottom:1px solid var(--line);color:var(--ink-60)}
+  .chapters .t{font:300 12px var(--lab);letter-spacing:.08em;color:var(--amber);margin-right:12px}
+  .cta{display:inline-flex;align-items:center;gap:7px;margin-top:30px;font:600 14px var(--sans);color:var(--amber-hi);text-decoration:none}
   .cta:hover{gap:11px}
+  .back{display:inline-block;margin-top:36px;font:300 11px var(--lab);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-45);text-decoration:none}
+  .back:hover{color:var(--amber)}
 </style></head>
 <body>
-<div class="aurora"><span class="b1"></span><span class="b2"></span></div>
+<section class="band">
+  <img src="${hero}" alt="" aria-hidden="true"/>
+  <header class="top"><div class="topin">${brandLockup(meta)}<a class="btn ghost" href="${meta.siteUrl}/">All episodes</a></div></header>
+  <div class="bandin">
+    <span class="eyebrow">${e.source === 'ai' ? 'AI-narrated episode' : 'Episode'}</span>
+    <h1>${esc(e.title)}</h1>
+    <div class="meta">${new Date(e.pubDate).toDateString()} &middot; ${Math.round((e.durationSec || 0) / 60)} min &middot; ${esc(meta.author)}</div>
+  </div>
+</section>
 <div class="wrap">
-  <a class="back" href="${meta.siteUrl}">&larr; ${esc(meta.title)}</a>
-  <span class="num">${e.source === 'ai' ? 'AI-NARRATED EPISODE' : 'EPISODE'}</span>
-  <h1>${esc(e.title)}</h1>
-  <div class="meta">${new Date(e.pubDate).toDateString()} &middot; ${Math.round((e.durationSec || 0) / 60)} min</div>
   <div class="player"><audio controls preload="none" src="${e.audioUrl}"></audio></div>
   <p class="desc">${esc(e.description)}</p>
   ${chapters}
   ${e.blogUrl ? `<a class="cta" href="${e.blogUrl}">Read the full write-up &rarr;</a>` : ''}
+  <br/><a class="back" href="${meta.siteUrl}/">&larr; ${esc(meta.title)}</a>
 </div>
 </body></html>`;
 }

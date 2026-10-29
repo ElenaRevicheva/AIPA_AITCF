@@ -30,6 +30,7 @@ export interface PodcastMeta {
   coverUrl: string;      // absolute URL to 1400x1400+ cover art
   language: string;      // e.g. "en"
   category: string;      // Apple category, e.g. "Technology"
+  heroUrl?: string;      // 29 Oct 2026: the naturalistic Atuona still behind the landing-page hero (16:9)
 }
 
 function xmlEscape(s: string): string {
@@ -272,6 +273,66 @@ ${items}
 }
 
 /** Generate the branded landing page — bold, motion-rich "live AI radio" aesthetic + full SEO/GEO/AEO. */
+// ─── Brand (29 Oct 2026): the AIdeazz AI Lab lockup, as on aideazz.xyz/atlas ─────
+// Same AZ mark (masked PNG under the purple→gold ramp), Syne wordmark, Sora lab line,
+// Instrument Serif display, Manrope body. The hero is a naturalistic Atuona still
+// (Luma, see scripts/podcast-hero-atuona.cjs) under a dither veil — no more card.
+
+export const BRAND_FONTS_HREF =
+  'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@700;800&family=Sora:wght@200;300;400&family=Manrope:wght@400;500;600;700&display=swap';
+
+/** Tokens + lockup + buttons shared by the landing page and every episode page. */
+export function brandCss(): string {
+  return `
+  :root{
+    --bg:#020617; --veil:2,6,23; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.1);
+    --ink:#fff; --ink-80:rgba(255,255,255,.8); --ink-60:rgba(255,255,255,.6); --ink-45:rgba(255,255,255,.45);
+    --purple:#7c3aed; --gold:#facc15; --amber:#edb867; --amber-hi:#fde68a;
+    --ramp-fb:linear-gradient(115deg,#7c3aed,#facc15 50%,#7c3aed);
+    --ramp:linear-gradient(115deg in oklab,#7c3aed,#facc15 50%,#7c3aed);
+    --serif:'Instrument Serif',Georgia,serif;
+    --sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --display:'Syne',var(--sans);
+    --lab:'Sora',var(--sans);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+  a{color:inherit}
+  @keyframes az-flow{100%{background-position:220% center}}
+  .brandlink{display:inline-flex;gap:10px;align-items:center;text-decoration:none;color:#fff;min-width:0}
+  .mark{flex:none;display:inline-block;aspect-ratio:176/202;height:clamp(34px,9vw,46px);background-image:var(--ramp-fb);background-image:var(--ramp);background-size:220%;animation:az-flow 5s linear infinite;
+    -webkit-mask:url(https://aideazz.xyz/media/az-mark.png) center/contain no-repeat;mask:url(https://aideazz.xyz/media/az-mark.png) center/contain no-repeat}
+  .wordmark{display:flex;flex-direction:column;line-height:1;min-width:0}
+  .wordmark .w{font:800 clamp(17px,4.6vw,26px)/1 var(--display);letter-spacing:.015em;text-transform:uppercase;white-space:nowrap}
+  .wordmark .w b{font-weight:800;background-image:var(--ramp-fb);background-image:var(--ramp);background-size:220%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:az-flow 5s linear infinite}
+  .wordmark .lab{margin-top:6px;display:flex;align-items:center;gap:8px;font:200 clamp(9.5px,2.6vw,12px)/1 var(--lab);letter-spacing:.3em;color:var(--ink-80);text-transform:uppercase;white-space:nowrap}
+  .wordmark .lab i{display:inline-block;width:18px;height:1px;background:var(--amber);opacity:.9}
+  @media(min-width:640px){.brandlink{gap:12px}.mark{height:54px}.wordmark .w{font-size:28px}.wordmark .lab{font-size:12px;letter-spacing:.42em}}
+  @media(max-width:520px){.wordmark .lab{letter-spacing:.16em;font-size:9.5px}.wordmark .lab i:last-child{display:none}.top .btn{display:none}}
+  .btn{display:inline-flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);letter-spacing:.02em;text-decoration:none;padding:12px 22px;border-radius:999px;transition:transform .2s,border-color .2s,background .2s}
+  .btn.ghost{color:#fff;border:1px solid rgba(255,255,255,.5);background:rgba(var(--veil),.35);backdrop-filter:blur(6px)}
+  .btn.ghost:hover{border-color:#fff;transform:translateY(-1px)}
+  .btn.solid{color:#0b0716;background:var(--amber-hi);border:1px solid transparent}
+  .btn.solid:hover{background:#fff;transform:translateY(-1px)}
+  .eyebrow{display:block;font:400 11px var(--lab);letter-spacing:.24em;text-transform:uppercase;color:var(--amber)}
+  @media(prefers-reduced-motion:reduce){.mark,.wordmark .w b,.ticker .track,.ticker .tk,.wave span,.play{animation:none}}
+  `;
+}
+
+/** The lockup: AZ mark · AIDEAZZ·FM · "AIdeazz AI Lab · Podcast". */
+export function brandLockup(meta: PodcastMeta, sub = 'AIdeazz AI Lab · Podcast'): string {
+  return `<a class="brandlink" href="${xmlEscape(meta.siteUrl)}/" aria-label="${xmlEscape(meta.title)} — AIdeazz AI Lab">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="wordmark"><span class="w">AIDEAZZ<b>·FM</b></span><span class="lab"><i></i>${xmlEscape(sub)}<i></i></span></span>
+    </a>`;
+}
+
+/** Hero still: the Atuona render if the meta carries one, else the cover. */
+export function heroImageUrl(meta: PodcastMeta): string {
+  return meta.heroUrl || meta.coverUrl;
+}
+
 export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const sorted = episodes.slice().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
   const total = sorted.length;
@@ -302,6 +363,9 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   const jsonLd = generatePodcastJsonLd(meta, sorted);
   const faqJsonLd = generatePodcastFaqJsonLd(meta, sorted);
   const seoDesc = seoDescription(meta);
+  const hero = heroImageUrl(meta);
+  const tickerItems = ['AI-augmented', 'Agentic', 'From A to Z', countLabel, 'Recorded in Panamá, on the go', 'Honest field notes', 'AIdeazz AI Lab'];
+  const ticker = tickerItems.concat(tickerItems).map((t) => `<span class="tk">${esc(t)}</span><span class="dot" aria-hidden="true">&#9679;</span>`).join('');
 
   return `<!DOCTYPE html>
 <html lang="${xmlEscape(meta.language)}">
@@ -315,7 +379,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <meta name="keywords" content="AI podcast, AI-augmented, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, AIdeazz, Elena Revicheva"/>
 <meta name="author" content="${xmlEscape(meta.author)}"/>
 <link rel="canonical" href="${xmlEscape(meta.siteUrl)}/"/>
-<meta name="theme-color" content="#05060a"/>
+<meta name="theme-color" content="#020617"/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="${xmlEscape(meta.title)}"/>
 <meta property="og:url" content="${xmlEscape(meta.siteUrl)}/"/>
@@ -330,179 +394,144 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <link rel="sitemap" type="application/xml" href="${xmlEscape(meta.siteUrl)}/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="preload" as="image" href="${esc(hero)}"/>
+<link href="${BRAND_FONTS_HREF}" rel="stylesheet"/>
 <script type="application/ld+json">${jsonLd}</script>
 <script type="application/ld+json">${faqJsonLd}</script>
 <style>
-  :root{
-    --bg:#0a0712; --bg2:#0f0a18; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.09);
-    --txt:#f3f0fa; --mut:#b3a9c9; --mut2:#857a9c;
-    --a1:#a855f7; --a2:#facc15; --a3:#7c3aed;
-    --grad:linear-gradient(115deg,#7c3aed,#a855f7 42%,#facc15);
-    --disp:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-    --brandf:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-    --body:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-    --mono:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.6;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
-  /* ambient flowing color palette (dark / purple / yellow) */
-  .aurora{position:fixed;inset:0;z-index:-3;overflow:hidden;filter:blur(72px);opacity:.5}
-  .aurora span{position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;animation:drift 24s ease-in-out infinite}
-  .aurora .b1{width:46vw;height:46vw;left:-8vw;top:6vh;background:radial-gradient(circle,#a855f7aa,transparent 60%)}
-  .aurora .b2{width:42vw;height:42vw;right:-10vw;top:32vh;background:radial-gradient(circle,#7c3aedaa,transparent 60%);animation-delay:-7s}
-  .aurora .b3{width:48vw;height:48vw;left:30vw;top:62vh;background:radial-gradient(circle,#facc1577,transparent 60%);animation-delay:-14s}
-  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6vw,4vh) scale(1.1)}66%{transform:translate(-5vw,-3vh) scale(.94)}}
-  /* cursor spotlight — reveals a purple→yellow palette as you move */
-  #spot{position:fixed;width:680px;height:680px;border-radius:50%;pointer-events:none;z-index:0;left:50%;top:28%;
-    transform:translate(-50%,-50%);opacity:0;transition:opacity .5s;
-    background:radial-gradient(circle,rgba(168,85,247,.16),rgba(250,204,21,.06) 42%,transparent 70%)}
-  /* Spotify-style color wash that fades into the dark base (sits over the aurora at the top) */
-  .wash{position:fixed;top:0;left:0;right:0;height:560px;z-index:-2;
-    background:linear-gradient(180deg,#5b21b6 0%,#3b1769 32%,rgba(20,12,38,.4) 70%,transparent 100%)}
-  .wash::after{content:"";position:absolute;inset:0;opacity:.06;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
-  /* nav */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;position:sticky;top:0;z-index:20;
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-  .brand{font-family:var(--brandf);font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
-  .mark{width:38px;height:38px;border-radius:11px;overflow:hidden;display:inline-block;box-shadow:0 4px 20px rgba(168,85,247,.5)}
-  .mark img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);display:block}
-  .wm i{font-style:normal;color:var(--a1)} .wm b{color:var(--a2);font-weight:700}
-  .nav-cta{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--txt);text-decoration:none;border:1px solid rgba(255,255,255,.55);padding:8px 18px;border-radius:999px;transition:.2s}
-  .nav-cta:hover{border-color:#fff;transform:scale(1.04)}
-  /* hero (Spotify show header) */
-  .hero{display:flex;gap:30px;align-items:flex-end;padding:30px 0 8px}
-  .cover{width:228px;height:228px;border-radius:14px;object-fit:cover;box-shadow:0 16px 50px rgba(0,0,0,.55);flex-shrink:0}
-  .hero-info{min-width:0;padding-bottom:6px}
-  .kind{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--txt)}
-  .hero-info h1{font-family:var(--brandf);font-weight:700;font-size:clamp(34px,6.5vw,76px);line-height:1.02;letter-spacing:-.03em;margin:14px 0 16px}
-  .hero-info h1 .g{background:var(--grad);background-size:220% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shift 5s linear infinite}
-  @keyframes shift{to{background-position:220% center}}
-  @media(prefers-reduced-motion:reduce){.hero-info h1 .g{animation:none}}
-  .tagline{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--a2);margin:0 0 16px}
-  .hero-meta{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--mut);flex-wrap:wrap}
-  .hero-meta .mk{width:22px;height:22px;border-radius:6px;overflow:hidden;display:inline-block}
-  .hero-meta .mk img{width:100%;height:100%;object-fit:cover;transform:scale(1.18)}
-  .hero-meta b{color:var(--txt);font-weight:600}
-  .hero-meta .dotsep{color:var(--mut2)}
-  /* action bar */
-  .actions{display:flex;align-items:center;gap:24px;padding:24px 0 6px}
-  .play{width:58px;height:58px;border-radius:50%;background:var(--grad);display:grid;place-items:center;text-decoration:none;
-    box-shadow:0 10px 30px rgba(168,85,247,.5);transition:.2s}
-  .play:hover{transform:scale(1.07)}
-  .play svg{width:26px;height:26px;color:#0a0712;margin-left:3px}
-  .follow{font-family:var(--disp);font-weight:700;font-size:14px;color:var(--txt);text-decoration:none;border:1px solid rgba(255,255,255,.5);padding:11px 24px;border-radius:999px;transition:.2s}
-  .follow:hover{border-color:#fff;transform:scale(1.04)}
+${brandCss()}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+  /* top bar over the photo */
+  .top{position:absolute;top:0;left:0;right:0;z-index:20}
+  .topin{max-width:1080px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  /* hero: the Atuona still, full-bleed, under a dither veil that fades into the page */
+  .hero{position:relative;min-height:min(86vh,820px);display:flex;align-items:flex-end;isolation:isolate;overflow:hidden}
+  .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:-3;filter:saturate(.82) contrast(1.04)}
+  .hero-dither{position:absolute;inset:0;z-index:-2;opacity:.28;mix-blend-mode:multiply;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='.9' fill='%23000'/%3E%3Ccircle cx='3' cy='3' r='.9' fill='%23000'/%3E%3C/svg%3E")}
+  .hero-grain{position:absolute;inset:0;z-index:-2;opacity:.14;mix-blend-mode:overlay;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .hero-veil{position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(var(--veil),.55) 0%,rgba(var(--veil),.05) 26%,rgba(var(--veil),.1) 55%,rgba(var(--veil),.92) 88%,var(--bg) 100%)}
+  .hero-in{position:relative;width:100%;max-width:1080px;margin:0 auto;padding:150px 24px 54px}
+  .display{margin:16px 0 0;max-width:12ch;font:400 clamp(44px,3.4vw + 24px,84px)/1 var(--serif);letter-spacing:-.025em;
+    text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 24px rgba(var(--veil),.75)}
+  .display em{font-style:italic;color:var(--amber-hi)}
+  .lede{margin:22px 0 0;max-width:52ch;font:400 clamp(15px,1.6vw,18px)/1.6 var(--sans);color:var(--ink-80);text-shadow:0 1px 12px rgba(var(--veil),.8)}
+  .hero-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;font:300 12px var(--lab);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60)}
+  .hero-meta .dotsep{color:var(--amber)}
+  .actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+  .play{width:58px;height:58px;border-radius:50%;background:var(--ramp-fb);background:var(--ramp);background-size:220%;animation:az-flow 5s linear infinite;display:grid;place-items:center;text-decoration:none;box-shadow:0 10px 30px rgba(124,58,237,.45);transition:transform .2s}
+  .play:hover{transform:scale(1.06)}
+  .play svg{width:26px;height:26px;color:#0b0716;margin-left:3px}
   .iconlinks{display:flex;gap:18px;margin-left:4px}
-  .iconlinks a{color:var(--mut2);transition:.2s}
-  .iconlinks a:hover{color:var(--txt);transform:scale(1.12)}
+  .iconlinks a{color:var(--ink-60);transition:.2s}
+  .iconlinks a:hover{color:#fff;transform:scale(1.1)}
   .iconlinks svg{width:23px;height:23px;display:block}
-  /* flowing equalizer wave */
-  .wave{display:flex;align-items:center;justify-content:center;gap:4px;height:48px;margin:26px 0 4px;opacity:.9;
-    -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-  .wave span{flex:1;max-width:5px;height:100%;border-radius:4px;background:var(--grad);transform:scaleY(.16);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
+  /* ticker, as on Atlas */
+  .ticker{overflow:hidden;border-block:1px solid rgba(255,255,255,.1);padding:12px 0;background:rgba(var(--veil),.3)}
+  .ticker .track{display:flex;align-items:center;gap:22px;width:max-content;animation:az-ticker 40s linear infinite}
+  .ticker .tk{flex:none;font:400 12px var(--lab);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;background-image:var(--ramp-fb);background-image:var(--ramp);background-size:220%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:az-flow 5s linear infinite}
+  .ticker .dot{flex:none;font-size:6px;color:var(--ink-45)}
+  @keyframes az-ticker{to{transform:translateX(-50%)}}
+  /* equalizer — the audio signature, kept */
+  .wave{display:flex;align-items:center;justify-content:center;gap:4px;height:40px;margin:30px 0 0;opacity:.75;
+    -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+  .wave span{flex:1;max-width:4px;height:100%;border-radius:4px;background:var(--ramp-fb);transform:scaleY(.16);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
   @keyframes eq{0%,100%{transform:scaleY(.16)}50%{transform:scaleY(1)}}
-  @media(prefers-reduced-motion:reduce){.wave span{animation:none;transform:scaleY(.5)}}
-  /* section heads */
-  .sec-head{display:flex;align-items:baseline;gap:12px;margin:48px 0 8px}
-  .sec-head h2{font-family:var(--brandf);font-size:24px;font-weight:700;letter-spacing:-.01em}
-  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--mut2)}
-  .list-cols{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:6px 12px;border-bottom:1px solid var(--line);
-    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut2)}
-  /* episode rows (Spotify list) */
-  .erow{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:16px 12px;border-radius:8px;transition:background .2s;align-items:start}
-  .erow:hover{background:rgba(255,255,255,.05)}
-  .erow-num{font-family:var(--mono);font-size:15px;color:var(--mut2);padding-top:2px}
-  .erow-title{font-family:var(--disp);font-size:17px;font-weight:600;line-height:1.3}
-  .erow-meta{font-family:var(--mono);font-size:12px;color:var(--mut2);margin:5px 0 8px}
-  .erow-desc{color:var(--mut);font-size:14px;margin-bottom:12px}
+  @media(prefers-reduced-motion:reduce){.wave span{transform:scaleY(.5)}}
+  /* sections */
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin:54px 0 10px}
+  .sec-head h2{font:400 clamp(28px,1.2vw + 22px,36px)/1.08 var(--serif);letter-spacing:-.015em}
+  .sec-head .count{font:300 11px var(--lab);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-45)}
+  .list-cols{display:grid;grid-template-columns:40px 1fr;gap:16px;padding:6px 12px;border-bottom:1px solid var(--line);font:300 10.5px var(--lab);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-45)}
+  .erow{display:grid;grid-template-columns:40px 1fr;gap:16px;padding:18px 12px;border-bottom:1px solid var(--line);transition:background .2s;align-items:start}
+  .erow:hover{background:rgba(255,255,255,.04)}
+  .erow-num{font:400 15px var(--serif);color:var(--amber);padding-top:3px}
+  .erow-title{font:600 17px/1.3 var(--sans)}
+  .erow-meta{font:300 11px var(--lab);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);margin:6px 0 9px}
+  .erow-desc{color:var(--ink-60);font-size:14px;margin-bottom:12px}
   audio{width:100%;max-width:560px;height:36px;display:block}
-  .readmore{display:inline-block;margin-top:12px;font-family:var(--disp);font-weight:600;font-size:13px;color:var(--a2);text-decoration:none}
+  .readmore{display:inline-block;margin-top:12px;font:600 13px var(--sans);color:var(--amber-hi);text-decoration:none}
   .readmore:hover{text-decoration:underline}
-  /* empty state (row-like banner) */
   .empty{display:flex;align-items:center;gap:20px;padding:30px 24px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-top:8px}
-  .empty h3{font-family:var(--disp);font-size:20px;font-weight:600;margin-bottom:5px}
-  .empty p{color:var(--mut);font-size:14px}
-  .pulse{flex-shrink:0;width:14px;height:14px;border-radius:50%;background:var(--a1);box-shadow:0 0 0 0 rgba(192,132,252,.5);animation:ring 2s infinite}
+  .empty h3{font:400 24px var(--serif);margin-bottom:5px}
+  .empty p{color:var(--ink-60);font-size:14px}
+  .pulse{flex-shrink:0;width:14px;height:14px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 0 rgba(192,132,252,.5);animation:ring 2s infinite}
   @keyframes ring{0%{box-shadow:0 0 0 0 rgba(192,132,252,.5)}70%{box-shadow:0 0 0 18px rgba(192,132,252,0)}100%{box-shadow:0 0 0 0 rgba(192,132,252,0)}}
-  /* what you'll hear */
   .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:10px 0}
   .cardb{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.25s}
   .cardb:hover{background:rgba(255,255,255,.07)}
-  .cardb .kbar{display:block;width:30px;height:3px;border-radius:3px;background:var(--grad);margin-bottom:16px}
-  .cardb h4{font-family:var(--disp);font-size:16px;font-weight:600;margin-bottom:6px}
-  .cardb p{color:var(--mut);font-size:13.5px;line-height:1.5}
-  /* about */
-  .about{display:flex;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin:10px 0}
-  .about img{width:84px;height:84px;border-radius:14px;object-fit:cover;flex-shrink:0}
-  .about h4{font-family:var(--disp);font-size:18px;font-weight:600;margin-bottom:6px}
-  .about p{color:var(--mut);font-size:14.5px}
-  .about a{color:var(--a2);text-decoration:none}
-  .slogan{margin-top:12px;font-family:var(--disp);font-size:14px;color:var(--mut2)}
-  .slogan b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
-  /* show facts — a real list, because answer engines lift structured facts verbatim */
+  .cardb .kbar{display:block;width:30px;height:2px;border-radius:3px;background:var(--amber);margin-bottom:16px}
+  .cardb h4{font:400 22px/1.15 var(--serif);margin-bottom:8px}
+  .cardb p{color:var(--ink-60);font-size:13.5px;line-height:1.5}
+  .about{display:flex;gap:24px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin:10px 0}
+  .about img{width:112px;height:112px;border-radius:12px;object-fit:cover;flex-shrink:0;filter:saturate(.85)}
+  .about h4{font:400 24px var(--serif);margin-bottom:6px}
+  .about p{color:var(--ink-60);font-size:14.5px}
+  .about a{color:var(--amber-hi);text-decoration:none}
+  .slogan{margin-top:12px;font-size:14px;color:var(--ink-45)}
+  .slogan b{font-weight:700;background-image:var(--ramp-fb);-webkit-background-clip:text;background-clip:text;color:transparent}
   .facts{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
   .facts li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;display:flex;gap:12px;align-items:baseline}
-  .facts .k{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut2);min-width:104px;flex-shrink:0}
-  .facts .v{font-size:14px;color:var(--txt)}
-  .facts a{color:var(--a2);text-decoration:none}
-  /* faq — mirrors the FAQPage JSON-LD in <head>; keep both in sync */
+  .facts .k{font:300 10.5px var(--lab);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-45);min-width:104px;flex-shrink:0}
+  .facts .v{font-size:14px;color:var(--ink)}
+  .facts a{color:var(--amber-hi);text-decoration:none}
   .faq{display:flex;flex-direction:column;gap:10px;margin:10px 0}
   .faq-i{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;transition:.25s}
   .faq-i:hover{background:rgba(255,255,255,.07)}
-  .faq-i h3{font-family:var(--disp);font-size:16px;font-weight:600;margin-bottom:7px}
-  .faq-i p{color:var(--mut);font-size:14px;line-height:1.6}
-  footer{text-align:center;padding:54px 20px 50px;color:var(--mut2);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line);margin-top:48px}
-  footer .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  @media(max-width:680px){.hero{flex-direction:column;align-items:flex-start}.cover{width:180px;height:180px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}}
+  .faq-i h3{font:400 21px/1.2 var(--serif);margin-bottom:7px}
+  .faq-i p{color:var(--ink-60);font-size:14px;line-height:1.6}
+  .faq-i a{color:var(--amber-hi)}
+  footer{text-align:center;padding:54px 20px 50px;color:var(--ink-45);font:300 11px var(--lab);letter-spacing:.14em;text-transform:uppercase;border-top:1px solid var(--line);margin-top:54px}
+  footer .big{display:block;margin:0 auto 22px;max-width:30ch;font:400 clamp(1.3rem,3vw,2.2rem)/1.15 var(--serif);letter-spacing:0;text-transform:none;color:var(--ink-60)}
+  footer .big em{font-style:italic;color:var(--amber)}
+  footer .g{background-image:var(--ramp-fb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(max-width:680px){.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}.hero-in{padding-top:120px}.display{max-width:none}}
 </style>
 </head>
 <body>
-<div class="aurora"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
-<div id="spot"></div>
-<div class="wash"></div>
-<div class="wrap">
-  <nav>
-    <span class="brand"><span class="mark"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span><span class="wm">AI<i>deazz</i><b>·FM</b></span></span>
-    <a class="nav-cta" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
-  </nav>
-  <header class="hero">
-    <img class="cover" src="${esc(meta.coverUrl)}" alt="${esc(meta.title)} cover"/>
-    <div class="hero-info">
-      <span class="kind">Podcast</span>
-      <h1>Building in Public<br/><span class="g">On The Go.</span></h1>
-      <p class="tagline">AI-Augmented. Agentic. From A to Z.</p>
-      <p class="lede" style="color:var(--mut);max-width:580px;margin-bottom:14px">Honest lessons on AI-augmented building, marketing engines, and shipping in production. By ${esc(meta.author)}.</p>
-      <div class="hero-meta">
-        <span class="mk"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span>
-        <b>AIdeazz</b><span class="dotsep">&middot;</span>
-        <span>${esc(meta.author)}</span><span class="dotsep">&middot;</span>
-        <span>From &ldquo;A&rdquo; to &ldquo;Z&rdquo; of AI-Augmented Workflows</span><span class="dotsep">&middot;</span>
-        <span>${countLabel}</span>
-      </div>
+  <header class="top">
+    <div class="topin">
+      ${brandLockup(meta)}
+      <a class="btn ghost" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
     </div>
   </header>
-  <div class="actions" id="listen">
-    <a class="play" href="https://open.spotify.com/" aria-label="Play on Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
-    <a class="follow" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
-    <div class="iconlinks">
-      <a href="https://open.spotify.com/" aria-label="Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3a.75.75 0 01-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.5-.59 11.66 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.68 13.49 1.6.44.27.58.85.31 1.29zm.13-3.4C15.13 8.28 8.6 8.07 4.85 9.21a1.12 1.12 0 11-.65-2.15C8.5 5.75 15.71 6 20.06 8.58a1.12 1.12 0 11-1.16 1.92z"/></svg></a>
-      <a href="https://www.youtube.com/@AIdeazz" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
-      <a href="${esc(meta.siteUrl)}/feed.xml" aria-label="RSS"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11a9 9 0 019 9h-2.5A6.5 6.5 0 004 13.5V11zm0-5a14 14 0 0114 14h-2.5A11.5 11.5 0 004 8.5V6zm2.5 10.5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></a>
+  <section class="hero">
+    <img class="hero-img" src="${esc(hero)}" alt="A lone ceiba tree on a hill above the Pacific coast of Panamá at dusk — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/>
+    <div class="hero-dither" aria-hidden="true"></div>
+    <div class="hero-grain" aria-hidden="true"></div>
+    <div class="hero-veil" aria-hidden="true"></div>
+    <div class="hero-in">
+      <span class="eyebrow">Podcast &middot; AIdeazz AI Lab</span>
+      <h1 class="display">Building in public, <em>on the go.</em></h1>
+      <p class="lede">Honest lessons on AI-augmented building, marketing engines, and shipping in production. By ${esc(meta.author)} — one person and a fleet of agents, from Panamá.</p>
+      <div class="hero-meta">
+        <span>${esc(meta.author)}</span><span class="dotsep">&#9679;</span>
+        <span>From &ldquo;A&rdquo; to &ldquo;Z&rdquo; of AI-augmented workflows</span><span class="dotsep">&#9679;</span>
+        <span>${countLabel}</span>
+      </div>
+      <div class="actions" id="listen">
+        <a class="play" href="#episodes" aria-label="Listen to the latest episode"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+        <a class="btn solid" href="${esc(meta.siteUrl)}/feed.xml">Follow the feed</a>
+        <div class="iconlinks">
+          <a href="https://open.spotify.com/" aria-label="Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3a.75.75 0 01-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.5-.59 11.66 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.68 13.49 1.6.44.27.58.85.31 1.29zm.13-3.4C15.13 8.28 8.6 8.07 4.85 9.21a1.12 1.12 0 11-.65-2.15C8.5 5.75 15.71 6 20.06 8.58a1.12 1.12 0 11-1.16 1.92z"/></svg></a>
+          <a href="https://www.youtube.com/@AIdeazz" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+          <a href="${esc(meta.siteUrl)}/feed.xml" aria-label="RSS"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11a9 9 0 019 9h-2.5A6.5 6.5 0 004 13.5V11zm0-5a14 14 0 0114 14h-2.5A11.5 11.5 0 004 8.5V6zm2.5 10.5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></a>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="wave">${waveBars}</div>
+  </section>
+  <div class="ticker" aria-hidden="true"><div class="track">${ticker}</div></div>
+<div class="wrap">
+  <div class="wave" aria-hidden="true">${waveBars}</div>
   <div class="sec-head" id="episodes"><h2>All episodes</h2><span class="count">${countLabel}</span></div>
   ${total ? '<div class="list-cols"><span>#</span><span>Episode</span></div>' : ''}
 ${rows}
-  <div class="sec-head"><h2>What you'll hear</h2></div>
+  <div class="sec-head"><h2>What you&rsquo;ll hear</h2></div>
   <div class="bento">
     <div class="cardb"><span class="kbar"></span><h4>Real multi-agent systems</h4><p>Nine production AI agents, what broke, and what actually held up.</p></div>
-    <div class="cardb"><span class="kbar"></span><h4>Marketing that's measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
+    <div class="cardb"><span class="kbar"></span><h4>Marketing that&rsquo;s measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
     <div class="cardb"><span class="kbar"></span><h4>Shipping as a solo founder</h4><p>AI-augmented building, honest constraints, no hype — just what ships.</p></div>
   </div>
   <div class="sec-head"><h2>Show facts</h2></div>
@@ -526,17 +555,15 @@ ${rows}
   </div>
   <div class="sec-head"><h2>About</h2></div>
   <div class="about">
-    <img src="${esc(meta.coverUrl)}" alt="${esc(meta.author)}"/>
+    <img src="${esc(meta.coverUrl)}" alt="${esc(meta.title)} cover art"/>
     <div><h4>${esc(meta.author)}</h4><p>Solo founder of <a href="https://aideazz.xyz">AIdeazz</a> — building a company with AI agents from Panama. Former board-level operator, now an AI-augmented builder shipping multi-agent systems in production. This is the honest, unedited version.</p>
     <p class="slogan">Your AI companion who remembers your journey — from struggle to success. The <b>A&#8209;to&#8209;Z</b> of your private AI space. <a href="https://aideazz.xyz">aideazz.xyz &rarr;</a></p></div>
   </div>
 </div>
-<footer>© ${new Date().getFullYear()} ${esc(meta.author)} &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span></footer>
-<script>
-  (function(){var s=document.getElementById('spot');if(!s)return;
-   window.addEventListener('pointermove',function(e){s.style.opacity=1;s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';},{passive:true});
-   window.addEventListener('pointerleave',function(){s.style.opacity=0;});})();
-</script>
+<footer>
+  <span class="big">Built in public, <em>on the go</em> — one person, a fleet of agents, and the honest notes.</span>
+  © ${new Date().getFullYear()} ${esc(meta.author)} &middot; AIdeazz AI Lab &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span>
+</footer>
 </body>
 </html>
 `;
