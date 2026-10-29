@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 29 Oct ~14:20 | EspaLuz unified layer: backup + verified people table (read-only on all sources) | Oracle Postgres `espaluz_unified` (new tables only), cron | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
