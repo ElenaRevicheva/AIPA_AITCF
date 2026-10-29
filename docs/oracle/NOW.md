@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 29 Oct ~14:30 | Step 0: aideazz.xyz/ops live as the CRM face (Elena's go) | Oracle nginx `/queue/api/` CORS · aideazz `public/ops/index.html` | 009a0f62 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
