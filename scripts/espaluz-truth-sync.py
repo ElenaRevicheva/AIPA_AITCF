@@ -280,6 +280,42 @@ for uid, u in (pf.get('users') or {}).items():
     P.add(k, 'paguelofacil_payments.json')
 
 
+# ── web SaaS (Supabase), read only with the service key ──────────────────────
+SB_URL, SB_KEY = CTO_ENV.get('ESPALUZ_SUPABASE_URL'), CTO_ENV.get('ESPALUZ_SUPABASE_SERVICE_KEY')
+
+
+def sb(path):
+    r = requests.get(f'{SB_URL}{path}', headers={'apikey': SB_KEY, 'Authorization': f'Bearer {SB_KEY}'}, timeout=30)
+    r.raise_for_status()
+    return r.json()
+
+
+if not (SB_URL and SB_KEY):
+    warnings.append('saas: ESPALUZ_SUPABASE_URL / ESPALUZ_SUPABASE_SERVICE_KEY missing in cto-aipa/.env')
+else:
+    try:
+        web_users = sb('/auth/v1/admin/users?per_page=1000').get('users', [])
+        email_of = {u['id']: (u.get('email') or '').lower() for u in web_users}
+        for u in web_users:
+            P.add(key_em(u.get('email')), 'saas.auth', platform='web', first_seen=ts(u.get('created_at')),
+                  last_active=ts(u.get('last_sign_in_at')),
+                  name=(u.get('user_metadata') or {}).get('full_name'))
+        sessions = {}
+        for s in sb('/rest/v1/learning_sessions?select=user_id,created_at'):
+            n, last = sessions.get(s['user_id'], (0, None))
+            sessions[s['user_id']] = (n + 1, max([d for d in (last, ts(s['created_at'])) if d], default=None))
+        for uid, (n, last) in sessions.items():
+            P.add(key_em(email_of.get(uid)), 'saas.learning_sessions', platform='web', messages=n, last_active=last)
+        for s in sb('/rest/v1/user_subscriptions?select=user_id,status,paypal_subscription_id,trial_end,created_at'):
+            k = key_em(email_of.get(s['user_id']))
+            if s.get('paypal_subscription_id'):
+                pp_ids.setdefault(s['paypal_subscription_id'].strip(), set()).add(k)
+            P.add(k, 'saas.user_subscriptions', platform='web', claimed_status=s.get('status'),
+                  trial_start=ts(s.get('created_at')) if s.get('trial_end') else None, trial_end=ts(s.get('trial_end')))
+    except Exception as e:
+        warnings.append(f'saas: {str(e)[:120]}')
+
+
 # ── verify PayPal with PayPal ────────────────────────────────────────────────
 def paypal_token():
     for env in (WA_ENV, FB_ENV):

@@ -29,4 +29,4 @@ Payments: PayPal webhooks run inside each bot (`paypal_webhook.py`, `paypal_webh
 - `truth_people` / `truth_runs` in `espaluz_unified`, rebuilt hourly by `scripts/espaluz-truth-sync.py` — reads every
   store above, writes nothing else. First result: 37 real people, 37 trials, 0 active trials, 2 active in 30 days,
   0 paid customers; all PayPal charges come from owner/admin payer accounts.
-- Still to plumb: web SaaS (needs Supabase service-role key on Oracle); CRM lane + HubSpot read from `truth_people`.
+- Web SaaS plumbed 29 Oct (service key on Oracle): 40 real people incl. 3 web users. Still to do: CRM lane + HubSpot read from `truth_people`.
