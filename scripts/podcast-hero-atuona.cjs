@@ -26,16 +26,20 @@ const { imagePinModel, imagePinGrade } = require(path.join(HOME, 'cto-aipa', 'di
 const prefer = (process.argv.find((a) => a.startsWith('--prefer=')) || '--prefer=luma').split('=')[1];
 const only = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1];
 
+// v2, 29 Oct 2026 (Elena): no lone tree — too close to hud.ai's sign-in art. The subject is OURS: a 1930s broadcasting
+// house, the kind of building Ayn Rand would have put on a plaza, shot with a 2026 eye (restraint, grain, dither).
 const SCENE =
   'Analog 35mm film photograph, heavy visible film grain, soft dithered halftone texture, faded muted palette: ' +
   'cream and sepia haze with a soft violet-lilac dusk sky and a thin band of warm gold light on the horizon. ' +
-  'A single solitary ceiba tree on a quiet grassy hill above the Pacific coast of Panama at golden hour, ' +
-  'hazy sea far below, gentle wind, nostalgic, calm, minimal, generous empty sky. ' +
-  'No text, no letters, no logos, no people, no buildings, no watermark.';
+  'A monumental 1930s Art Deco radio broadcasting house on a wide empty plaza: streamlined limestone facade, tall ' +
+  'vertical fluted pillars, stepped setbacks, a great round clock, a slender steel radio mast rising from the roof ' +
+  'with one small warm beacon glowing at its tip, long shadows across the stone, heroic low angle, the spirit of ' +
+  'Atlas Shrugged rendered with quiet 2026 restraint, nostalgic, calm, minimal, generous empty sky. ' +
+  'No text, no letters, no signage, no logos, no people, no cars, no watermark.';
 
 const SHOTS = [
-  { stem: 'hero-wide', aspectRatio: '16:9', prompt: SCENE + ' Wide cinematic composition, tree placed on the right third, horizon in the lower third.' },
-  { stem: 'cover-square', aspectRatio: '1:1', prompt: SCENE + ' Square composition, tree centered low, lots of sky above it.' },
+  { stem: 'hero-wide', aspectRatio: '16:9', prompt: SCENE + ' Wide cinematic composition, the building on the right third, plaza and horizon in the lower third, open sky left.' },
+  { stem: 'cover-square', aspectRatio: '1:1', prompt: SCENE + ' Square composition, the building centered low, the mast rising into generous empty sky above it.' },
 ];
 
 const LUMA_URL = (process.env.LUMA_API_BASE || 'https://agents.lumalabs.ai/v1').trim().replace(/\/$/, '');

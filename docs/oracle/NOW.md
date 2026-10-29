@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 29 Oct 19:30 | podcast hero v2: Art Deco radio house (Elena: tree too close to hud.ai) + mouse parallax/glowing dither | `src/podcast-feed.ts`, `scripts/podcast-hero-atuona.cjs`, repo `aideazz-podcast`, Oracle dist podcast-*.js | 85ce57cd |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
