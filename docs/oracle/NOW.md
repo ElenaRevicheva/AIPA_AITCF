@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-29 13:30 | Scale Army Ashby board into the VJH ATS sweep; SEO & GEO Operator deal 67072175032 staged + kit complete | `VibeJobHunterAIPA_AIMCF/src/scrapers/ats_scraper.py`, `src/core/fit_gate.py` (measure first), Oracle `vibejobhunter` restart | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
