@@ -23,6 +23,14 @@ withdrawn. Nothing was built.
 
 The only open item is the one already queued: **step 0, aideazz.xyz/ops live.**
 
+## Elena's rule (29 Oct 2026, her words, the positioning)
+
+"I'm not going to reinvent bicycles for my own needs, and I'm not going to reinvent bicycles
+for clients' needs." Her own CRM is **not for sale** (the all-in-one market is flooded). It
+serves her own lab, and future clients only as part of the **AI Growth Operator** service. That
+service works **inside the tools the client already uses**: additive, surgical fixes and
+enhancements, each one justified only if it moves outcome — income, leads, money.
+
 ## For agencies like the poster — sell the wiring, not a platform
 
 His real pain is *juggling* Trello, Notion, Slack, email and invoicing — not missing software.
