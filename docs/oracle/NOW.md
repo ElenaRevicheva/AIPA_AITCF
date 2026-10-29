@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 29 Oct 15:05 | voice→Trello: "find the card … add there" must UPDATE the existing card, not create a duplicate (SOP AI Ops card, Kira Noviembre) | `src/trello-voice.ts`, `scripts/test-trello-voice-dates.cjs`, Oracle `cto-aipa` restart | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
