@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 29 Oct ~17:30 | EspaLuz lane on her CRM (aideazz.xyz/ops) from truth_people | `src/queue-page.ts`, `src/queue-routes.ts`, `scripts/espaluz-truth-sync.py`, pm2 cto-aipa restart, aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -180,6 +179,10 @@ git log keeps the record.
 - **NEXT (acceptance, whoever is next):** the first real voice note through the new path is the test — e.g. "find the card about SOAP HTML in Kira noviembre and add there …" → reply "📝 added to the description", no new card; grep `[TrelloVoice] actions: update(` and `matched on the named board by sound` in `~/.pm2/logs/cto-aipa-out-9.log`. A note saying "Claude" must come back spelled Claude.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
+
+### ✅ 29 Oct ~17:30 UTC — EspaLuz tab LIVE on her CRM (aideazz.xyz/ops) · claim released
+- **DONE:** `espaluz-truth-sync.py` (hourly :53) also writes `~/cto-aipa/data/espaluz-truth.json` (atomic); new read-only route `GET /queue/api/espaluz` (`src/queue-routes.ts`) serves it with `ageMin`; `src/queue-page.ts` adds the **EspaLuz** tab: tiles Real users / Trials / Paying customers (PayPal·PF proof) / Conversion / Active 30d / You & family (internal subscriptions, not counted), one row per verified person with trial, proof pill, contact link; sub line says "EspaLuz checked N min ago" and "⚠ sync late" after 120 min. aideazz `8c8dbab`.
+- **VERIFIED BY:** dist md5 laptop = Oracle (queue-page `bc1fc4e8…`, queue-routes `842aa1ca…`), `pm2 restart cto-aipa --update-env`, local `api/espaluz` → 40 people age 1 min; nginx anonymous → 401; both page variants pass `node --check`; aideazz.xyz/ops 200 with the new script ~150 s after push. Backup of the old dist files: `~/_session-backups/cto-aipa-espaluz-lane-20261029-172523/`. Not verified: the signed-in view (Elena's refresh).
 
 ### ✅ 29 Oct ~14:30 UTC — EspaLuz single source of truth LIVE: `truth_people` in `espaluz_unified` (hourly :53) · nightly DB dumps · claim released
 - **DONE:** `scripts/espaluz-truth-sync.py` (run with `~/EspaLuzWhatsApp/venv/bin/python`) READS every store (unified, legacy telegram/whatsapp DBs, 6 bot JSON files, PF payments file), merges identities (phone/Telegram/email, normalised), verifies paid with **PayPal's live API** and **PagueloFácil CodOper** (sandbox + manual grants never count), WRITES only `truth_people` + `truth_runs`. Excluded rows keep a written reason. Legacy row counts unchanged. Nightly `~/backups/espaluz-pg/dump.sh` 07:23 UTC, 14 days, `pg_restore -l` checked.

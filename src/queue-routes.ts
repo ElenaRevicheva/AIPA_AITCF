@@ -13,12 +13,15 @@
  * the pattern already documented for the ops dashboard: a static page cannot
  * hold a secret, so same-origin plus browser auth is the honest option.
  */
+import fs from 'fs';
+import path from 'path';
 import type { Express, Request, Response } from 'express';
 import { getQueue, setQueueStatus, getQueueCounts, getQueueItemById, type QueueStatus } from './daily-queue';
 import { getRecordTimeline } from './record-timeline';
 import { QUEUE_PAGE } from './queue-page';
 
 const ALLOWED: QueueStatus[] = ['new', 'working', 'done', 'skipped'];
+const ESPALUZ_SNAPSHOT = path.resolve(__dirname, '..', 'data', 'espaluz-truth.json');
 
 function esc(s: string): string {
   return s
@@ -48,6 +51,19 @@ export function registerQueueRoutes(app: Express): void {
     } catch (e) {
       console.error('[queue] today failed:', e);
       res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
+    }
+  });
+
+  // 29 Oct 2026: the EspaLuz lane. scripts/espaluz-truth-sync.py (hourly) writes this snapshot
+  // from truth_people in espaluz_unified; this route only reads it. Age is returned so the page
+  // can say when the numbers were last proven, and warn when the sync has gone quiet.
+  app.get('/queue/api/espaluz', (_req: Request, res: Response) => {
+    try {
+      const snap = JSON.parse(fs.readFileSync(ESPALUZ_SNAPSHOT, 'utf8'));
+      const ageMin = Math.round((Date.now() - Date.parse(snap.checked_at)) / 60000);
+      res.set('cache-control', 'no-store').json({ ...snap, ageMin });
+    } catch (e) {
+      res.status(503).json({ error: 'EspaLuz snapshot not available', detail: (e as Error).message?.slice(0, 120) });
     }
   });
 

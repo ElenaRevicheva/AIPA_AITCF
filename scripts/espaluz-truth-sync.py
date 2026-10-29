@@ -330,6 +330,7 @@ def paypal_token():
 
 
 pp_verdict = {}  # identity key -> (state, evidence)
+sid_state = {}   # PayPal id -> (state, identity keys)
 if pp_ids:
     tok = paypal_token()
     for sid, keys in pp_ids.items():
@@ -354,6 +355,7 @@ if pp_ids:
                          else 'paid_expired' if paid else 'never_charged')
                 ev = (f'PayPal {sid}: {j.get("status")}'
                       + (f', last payment {last["time"][:10]} {last.get("amount", {}).get("value")} {last.get("amount", {}).get("currency_code")}' if paid else ', no payment ever collected'))
+        sid_state[sid] = (state, set(keys))
         for k in keys:
             pp_verdict[k] = (state, ev)
 
@@ -449,4 +451,26 @@ with psycopg2.connect(DB['unified']) as c, c.cursor() as cur:
     cur.execute('INSERT INTO truth_runs (summary, warnings) VALUES (%s, %s)',
                 (json.dumps(summary), json.dumps(warnings)))
 print('written:', len(people), 'rows to truth_people')
+
+# Snapshot for her CRM page (src/queue-routes.ts serves it at /queue/api/espaluz, behind the same auth).
+# Written atomically so the page never reads half a file.
+iso = lambda d: d.isoformat() if d else None
+counted_by_key = {k: p['counted'] for p in people for k in p['all_ids']}
+snap = dict(
+    checked_at=NOW.isoformat(), summary=summary, warnings=warnings,
+    # Active PayPal subscriptions whose every payer identity is internal (Elena + family, on purpose).
+    internal_paying=sum(1 for st, ks in sid_state.values() if st == 'paid_active'
+                        and ks and all(not counted_by_key.get(k, True) for k in ks)),
+    people=[dict(name=p['display_name'], contact=p['person_key'], channels=p['channels'],
+                 first_seen=iso(p['first_seen']), last_active=iso(p['last_active']), alive=p['alive'],
+                 messages=p['messages'], trial_state=p['trial_state'], trial_end=iso(p['trial_end']),
+                 paid_state=p['paid_state'], paid_evidence=p['paid_evidence'])
+            for p in sorted(real, key=lambda p: (p['paid_state'] == 'not_paid', not p['alive'],
+                                                 -(p['last_active'] or NOW.replace(year=2000)).timestamp()))],
+)
+out = f'{HOME}/cto-aipa/data/espaluz-truth.json'
+with open(out + '.tmp', 'w') as f:
+    json.dump(snap, f, ensure_ascii=False)
+os.replace(out + '.tmp', out)
+print('snapshot:', out)
 sys.exit(2 if warnings else 0)

@@ -87,6 +87,7 @@ export function renderQueuePage(opts: QueuePageOptions): string {
   .badge{display:inline-block;font-size:11px;font-weight:650;letter-spacing:.04em;padding:3px 9px;border-radius:6px}
   .badge.hire{background:var(--hire-soft);color:var(--hire)}
   .badge.client{background:var(--client-soft);color:var(--client)}
+  .badge.espaluz{background:var(--accent-soft);color:var(--accent)}
   .t{font-weight:600}
   .c{color:var(--mut);font-size:13px}
   .pill{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
@@ -127,16 +128,15 @@ export function renderQueuePage(opts: QueuePageOptions): string {
 ${loginBox}
 <div class="tiles" id="tiles"></div>
 <div class="tabs" id="tabs"></div>
-<table><thead><tr>
-  <th>Lane</th><th>What</th><th class="hideS">Who</th><th>Score</th>
-  <th class="hideS">Draft</th><th class="hideS">Added</th>
-</tr></thead><tbody id="rows"></tbody></table>
+<table><thead id="head"></thead><tbody id="rows"></tbody></table>
 <footer>Reads the AIdeazz operational database only. HubSpot is never written to, or read from, by this page.</footer>
 </div>
 <script>
 var E=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
-var DATA={hiring:[],client:[],counts:{}}, TAB='all', OPEN=null, RECORD=null;
+var DATA={hiring:[],client:[],counts:{}}, TAB='all', OPEN=null, RECORD=null, ESP=null;
+var HEAD_QUEUE='<tr><th>Lane</th><th>What</th><th class="hideS">Who</th><th>Score</th><th class="hideS">Draft</th><th class="hideS">Added</th></tr>';
+var HEAD_ESP='<tr><th>Lane</th><th>Person</th><th class="hideS">Contact</th><th>Trial</th><th class="hideS">Paid (proof)</th><th class="hideS">Last active</th></tr>';
 var API=${JSON.stringify(opts.apiBase)}, REMOTE=${remote ? 'true' : 'false'}, KEY='ops.auth';
 
 function auth(){ try{ return REMOTE ? (localStorage.getItem(KEY)||'') : ''; }catch(e){ return ''; } }
@@ -153,11 +153,11 @@ function signIn(){
   if(!pw){ return; }
   try{ localStorage.setItem(KEY,'Basic '+btoa('elena:'+pw)); }catch(e){}
   document.getElementById('login').hidden=true;
-  load();
+  load(); loadEspaluz();
 }
 function signOut(){
   try{ localStorage.removeItem(KEY); }catch(e){}
-  DATA={hiring:[],client:[],counts:{}}; OPEN=null; RECORD=null;
+  DATA={hiring:[],client:[],counts:{}}; OPEN=null; RECORD=null; ESP=null;
   document.getElementById('tiles').innerHTML=''; document.getElementById('tabs').innerHTML='';
   document.getElementById('rows').innerHTML='';
   showLogin(false);
@@ -185,6 +185,56 @@ function load(){
     .catch(function(e){ if(String(e.message)!=='sign in'&&String(e.message)!=='401'){ document.getElementById('sub').textContent='could not reach the queue ('+e.message+')'; var o=document.getElementById('out'); if(o){ o.hidden=false; } } });
 }
 
+// 29 Oct 2026: EspaLuz lane, from truth_people (verified hourly). A failure here never hides the queue.
+function loadEspaluz(){
+  q('api/espaluz').then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){ ESP=d; render(); }).catch(function(){ ESP=null; });
+}
+function day(s){ return s?String(s).slice(0,10):'—'; }
+function contact(k){
+  k=String(k||'');
+  if(k.indexOf('wa:')===0){ return '<a target="_blank" rel="noopener" href="https://wa.me/'+E(k.slice(3))+'">WhatsApp +'+E(k.slice(3))+'</a>'; }
+  if(k.indexOf('tg:')===0){ return 'Telegram id '+E(k.slice(3)); }
+  if(k.indexOf('em:')===0){ return '<a href="mailto:'+E(k.slice(3))+'">'+E(k.slice(3))+'</a>'; }
+  return E(k);
+}
+var PAID={paid_active:['ok','paying now'],paid_expired:['','paid before'],not_paid:['','not paid'],
+  unverified_claim:['warn','claim, no proof'],never_charged:['','never charged'],not_found:['warn','not at PayPal'],
+  manual_grant:['','manual grant'],sandbox_test:['','test order']};
+function espRow(p){
+  var pd=PAID[p.paid_state]||['',p.paid_state];
+  var trial=p.trial_state==='active'?'<span class="pill ok">active to '+E(day(p.trial_end))+'</span>'
+    : p.trial_state==='expired'?'<span class="pill">ended '+E(day(p.trial_end))+'</span>'
+    : '<span class="pill">'+E(p.trial_state)+'</span>';
+  return '<tr><td><span class="badge espaluz">ESPALUZ</span></td>'+
+    '<td><div class="t">'+E(p.name||'(no name)')+'</div><div class="c">'+E((p.channels||[]).join(' · ')||'—')+
+      (p.messages?' · '+E(p.messages)+' messages':'')+(p.alive?' · <b>active this month</b>':'')+'</div></td>'+
+    '<td class="hideS c">'+contact(p.contact)+'</td>'+
+    '<td>'+trial+'</td>'+
+    '<td class="hideS"><span class="pill '+pd[0]+'" title="'+E(p.paid_evidence||'')+'">'+E(pd[1])+'</span></td>'+
+    '<td class="hideS c">'+E(day(p.last_active))+'</td></tr>';
+}
+function renderEspaluz(){
+  document.getElementById('head').innerHTML=HEAD_ESP;
+  if(!ESP){
+    document.getElementById('tiles').innerHTML='';
+    document.getElementById('rows').innerHTML='<tr><td colspan="6" class="empty">EspaLuz numbers are not available right now.</td></tr>';
+    return;
+  }
+  var s=ESP.summary||{};
+  document.getElementById('tiles').innerHTML=
+    tile('Real users',s.real_people,'Telegram · WhatsApp · web')+
+    tile('Trials',s.trials_ever,(s.trials_active||0)+' running now')+
+    tile('Paying customers',s.paid_active,'proof from PayPal / PagueloFácil',true)+
+    tile('Conversion',(s.conversion_pct||0)+'%','trial → paid, ever')+
+    tile('Active 30 days',s.alive_30d,'used EspaLuz this month')+
+    tile('You & family',ESP.internal_paying||0,'subscriptions paying, not counted');
+  var people=ESP.people||[];
+  document.getElementById('rows').innerHTML = people.length
+    ? people.map(espRow).join('')
+    : '<tr><td colspan="6" class="empty">No verified EspaLuz users yet.</td></tr>';
+}
+
 function items(){
   var out=[];
   if(TAB!=='client'){ DATA.hiring.forEach(function(x){ out.push(['hiring',x]); }); }
@@ -202,18 +252,23 @@ function tab(id,label){
 
 function render(){
   var c=DATA.counts||{}, h=c.hiring_new||0, cl=c.client_new||0;
+  var espN=ESP&&ESP.summary?ESP.summary.real_people:0;
+  var fresh=ESP?(' · EspaLuz checked '+ESP.ageMin+' min ago'+(ESP.ageMin>120?' ⚠ sync late':'')):'';
   var all=DATA.hiring.concat(DATA.client);
   var ready=all.filter(function(x){return x.draftTailored;}).length;
   var done=(c.hiring_done||0)+(c.client_done||0)+(c.hiring_skipped||0)+(c.client_skipped||0);
   document.getElementById('sub').textContent=
-    'All streams — live from the AIdeazz database · '+(h+cl)+' open items';
+    'All streams — live from the AIdeazz database · '+(h+cl)+' open items'+fresh;
+  document.getElementById('tabs').innerHTML=
+    tab('all','All ('+(h+cl)+')')+tab('hiring','Employer ('+h+')')+tab('client','Client ('+cl+')')+
+    tab('espaluz','EspaLuz ('+espN+')');
+  if(TAB==='espaluz'){ renderEspaluz(); return; }
+  document.getElementById('head').innerHTML=HEAD_QUEUE;
   document.getElementById('tiles').innerHTML=
     tile('Employers',h,'to apply to')+
     tile('Clients',cl,'to contact')+
     tile('Drafts ready',ready,'written for this one',true)+
     tile('Closed',done,'done or skipped');
-  document.getElementById('tabs').innerHTML=
-    tab('all','All ('+(h+cl)+')')+tab('hiring','Employer ('+h+')')+tab('client','Client ('+cl+')');
   var list=items();
   document.getElementById('rows').innerHTML = list.length
     ? list.map(function(p){ return row(p[0],p[1]); }).join('')
@@ -283,7 +338,7 @@ function act(id,status){
     headers:{'content-type':'application/json'},
     body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; RECORD=null; load(); }).catch(function(){});
 }
-load();
+load(); loadEspaluz();
 </script></body></html>`;
 }
 
