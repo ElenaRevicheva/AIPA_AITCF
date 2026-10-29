@@ -33,9 +33,18 @@ async function api(method, p, params) {
   console.log(`open cards on the board: ${cards.length}`);
   const soap = cards.filter((c) => /\b(soap|sop)\b/i.test(c.name) && /html/i.test(c.name) && !/spanish version/i.test(c.name));
   const dup = cards.filter((c) => /spanish version of sub html/i.test(c.name));
+  // (2) 29 Oct, later: "Clean up golden rules of cloud agent memory" — she said Claude. Renamed, nothing else touched.
+  const cloud = cards.filter((c) => /golden rules of cloud agent memory/i.test(c.name));
+  console.log('rename cloud->Claude:', cloud.map((c) => `"${c.name}" ${c.shortUrl}`));
+  if (APPLY) for (const c of cloud) {
+    const name = c.name.replace(/\bcloud agent\b/i, 'Claude agent');
+    await api('PUT', `/cards/${c.id}`, { name });
+    const back = await api('GET', `/cards/${c.id}`, { fields: 'name' });
+    console.log(`READ BACK renamed: "${back.name}"`);
+  }
   console.log('target (keep):', soap.map((c) => `"${c.name}" ${c.shortUrl}`));
   console.log('duplicate (archive):', dup.map((c) => `"${c.name}" ${c.shortUrl}`));
-  if (soap.length !== 1 || dup.length !== 1) { console.error('need exactly one of each — nothing changed (already merged?)'); process.exit(1); }
+  if (soap.length !== 1 || dup.length !== 1) { console.error('SOAP merge: need exactly one of each — skipped (already merged?)'); return; }
   const [t] = soap, [d] = dup;
   console.log(`target desc now (${(t.desc || '').length} chars): ${JSON.stringify((t.desc || '').slice(0, 200))}`);
   console.log(`duplicate desc: ${JSON.stringify((d.desc || '').slice(0, 300))}`);

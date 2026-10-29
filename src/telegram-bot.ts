@@ -9607,7 +9607,7 @@ const WHISPER_PROMPT = [
   // Month names (common source of errors when mixed EN/ES/RU)
   'January, February, March, April, May, June, July, August, September, October, November, December.',
   // Project / brand vocabulary
-  'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena, Alisa.',
+  'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena, Alisa, Claude, Claude Code, Cursor, OpenClaw.',
   // Trello action vocabulary
   'Move card, create card, add card, archive card, move this card, add task, new task.',
   // Avoid common substitutions

@@ -1150,7 +1150,7 @@ async function downloadTelegramVoice(fileId: string, botToken: string): Promise<
  * Guessing at mishearings invents false corrections, which are worse than the
  * original error because they look deliberate.
  */
-const HEARD_AS: [RegExp, string][] = [
+const HEARD_AS: [RegExp, string | ((...m: string[]) => string)][] = [
   // "STO APA" (2 Sep 2026), "STO AIPA" (6 Oct 2026). Whisper hears the C as S.
   [/\bS[T7]O\s+A[IY]?P+A\b/gi, "CTO AIPA"],
   [/(^|\s)СТО\s+(?:AIPA|АИПА|АЙПА)(?=\s|$|[.,!?])/gi, "$1CTO AIPA"],
@@ -1165,13 +1165,18 @@ const HEARD_AS: [RegExp, string][] = [
   [/\bvibe\s*job\b/gi, "VibeJob"],
   [/\ba\s*tuona\b/gi, "Atuona"],
   [/\balg[oa]m\b/gi, "Algom"],
+  // "Clean up golden rules of cloud agent memory" (29 Oct 2026) — she said Claude, Whisper wrote the weather word, and
+  // it became the card's title. "cloud" is repaired ONLY in front of a Claude noun (agent, code, memory, desktop, app,
+  // CLI, SDK, skills, rules, session, cofounder) and never after Cursor / Google / Oracle / AWS, which are real clouds.
+  [/(?<!\b(?:cursor|google|oracle|aws|azure)\s)\bcloud\s+(agents?|code|memory|desktop|app|cli|sdk|skills?|rules?|sessions?|co-?founder)\b/gi,
+    (_m: string, noun: string) => `Claude ${/^code$/i.test(noun) ? 'Code' : noun}`],
   // No "Alice → Alisa" since this table runs on every voice note (14 Oct 2026): it rewrote every real Alice into her
   // daughter's name. Alisa is now a soft hint in WHISPER_PROMPT instead, which cannot overwrite a real Alice.
 ];
 
 export function repairNames(text: string): string {
   let out = text;
-  for (const [re, to] of HEARD_AS) out = out.replace(re, to);
+  for (const [re, to] of HEARD_AS) out = typeof to === 'string' ? out.replace(re, to) : out.replace(re, to);
   return out;
 }
 

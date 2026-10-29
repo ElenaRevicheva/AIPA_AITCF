@@ -201,5 +201,13 @@ const WITH_DUP = [...NOV, mk('e', 'Complete Spanish version of sub HTML and add 
 check('two HTML cards fit equally → BOTH come back so the bot asks "say which one"', v.rankCardsForQuery('sub HTML', WITH_DUP).map((c) => c.id).sort().join() === 'b,e');
 check('an archived card is never picked', v.rankCardsForQuery('Twitter Grok', [{ ...NOV[2], closed: true }]).length === 0);
 
+// ── 29 Oct 2026 (2) — she said "Claude", Whisper wrote "cloud", the card title kept the weather word ──────────────
+check('"golden rules of cloud agent memory" → Claude agent memory', v.repairNames('Clean up golden rules of cloud agent memory') === 'Clean up golden rules of Claude agent memory');
+check('"cloud code" → "Claude Code"', v.repairNames('open a cloud code session') === 'open a Claude Code session');
+check('"Cursor Cloud agent" is a real product — untouched', v.repairNames('the Cursor Cloud agent pushed it') === 'the Cursor Cloud agent pushed it');
+check('"Google Cloud SDK" untouched', v.repairNames('install the Google Cloud SDK') === 'install the Google Cloud SDK');
+check('"move it to the cloud" (no Claude noun) untouched', v.repairNames('move the backups to the cloud') === 'move the backups to the cloud');
+check('"STO AIPA" still becomes CTO AIPA (table unchanged)', v.repairNames('My STO AIPA does not learn') === 'My CTO AIPA does not learn');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
