@@ -98,6 +98,18 @@ async function setStatus(c, ids, from, to) {
       return;
     }
     const keep = await actTodayDeals();
+    // A job back in I Act TODAY that a MACHINE skipped earlier (sweep, or this sync) returns.
+    // Her own Skip stamps acted_at and is never undone.
+    let revived = 0;
+    if (APPLY) {
+      for (const id of keep.keys()) {
+        const r = await c.execute(
+          `UPDATE daily_queue SET status = 'new', updated_at = CURRENT_TIMESTAMP
+            WHERE lane = 'hiring' AND hubspot_deal_id = :deal_id AND status = 'skipped' AND acted_at IS NULL`,
+          { deal_id: id }, { autoCommit: true });
+        revived += r.rowsAffected || 0;
+      }
+    }
     const rows = (await c.execute(
       `SELECT RAWTOHEX(id) AS id, hubspot_deal_id FROM daily_queue WHERE lane = 'hiring' AND status = 'new'`,
       {}, { outFormat: 4002 })).rows || [];
@@ -107,7 +119,7 @@ async function setStatus(c, ids, from, to) {
       {}, { outFormat: 4002 })).rows || []).map(r => String(r.HUBSPOT_DEAL_ID)));
     const missing = [...keep].filter(([id]) => !linked.has(id));
     console.log(`${new Date().toISOString()} I Act TODAY: ${keep.size} hiring deals (HubSpot read only) · ` +
-      `queue hiring/new: ${rows.length} · to skip: ${go.length} · to add: ${missing.length}`);
+      `queue hiring/new: ${rows.length} · to skip: ${go.length} · to add: ${missing.length} · revived: ${revived}`);
     if (!APPLY) { console.log('dry run — nothing changed. Re-run with --apply.'); return; }
 
     const { upsertQueueItem } = require('../dist/daily-queue');
