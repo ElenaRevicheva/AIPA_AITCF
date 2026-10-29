@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 29 Oct ~13:45 | CRM: manual jobs mirror + daily dead-job clean; EspaLuz single source (proposal); 55 client sends (Elena's go) | `scripts/stage-manual-job.cjs`, queue cleanup cron, Oracle Postgres access, outreach sender | 3 commits today |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
