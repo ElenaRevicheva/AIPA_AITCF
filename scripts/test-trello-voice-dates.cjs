@@ -169,5 +169,37 @@ check('an answered rule cannot be flipped by a second tap', v.decideRule('R9', f
 check('unknown rule id → null, nothing written', v.decideRule('nope', true) === null);
 fsx.rmSync(LEARN_TMP, { recursive: true, force: true });
 
+
+// ── 29 Oct 2026 — "find the card about … and add there …" is an EDIT of an existing card, never a new one ─────────
+// Her exact voice note (board Kira Noviembre): no move/change word, no link → the old gate sent it to CREATE and a
+// second card appeared beside "Update SOAP AI Ops HTML with agent descriptions".
+const H29 = 'Find the task in the card. Kira noviembre. The card about my sub HTML and add there and making finishing the Spanish version because it will actually convert to my portfolio.';
+check('29 Oct: the old gate did NOT catch her message (documents the bug)', !v.isManagementCommand(H29) && !v.isLinkAttachRequest(H29));
+check('29 Oct: "find the card … add there" is an add-to-card request', v.isAddToCardRequest(H29));
+check('"add to the card about the dentist that it is at 4" is an add-to-card request', v.isAddToCardRequest('Add to the card about the dentist that it is at 4'));
+check('Spanish "busca la tarjeta … y agrega" is one', v.isAddToCardRequest('Busca la tarjeta del HTML y agrega que primero hay que limpiar la versión'));
+check('Russian "найди карточку … добавь туда" is one', v.isAddToCardRequest('Найди карточку про HTML и добавь туда, что сначала надо проверить страницу'));
+check('"add a task to send Marshall the link" stays a CREATE', !v.isAddToCardRequest('Add a task to send Marshall the link tomorrow'));
+check('"Добавь задачу купить молоко" stays a CREATE', !v.isAddToCardRequest('Добавь задачу купить молоко'));
+check('"find me a dentist in Panama" names no card → not an edit', !v.isAddToCardRequest('Find me a dentist in Panama'));
+check('"show my tasks" is not an edit', !v.isAddToCardRequest('Show my tasks'));
+check('"I need to add the Spanish version to my portfolio" (no card named) → not an edit', !v.isAddToCardRequest('I need to add the Spanish version to my portfolio'));
+check('"Post on LinkedIn about the audit" is not an edit', !v.isAddToCardRequest('Post on LinkedIn about the audit'));
+
+// The named board's open cards, ranked by what she said (Trello's own search is exact-word and found nothing for "sub HTML").
+const mk = (id, name) => ({ id, name, url: '', shortUrl: '' });
+const NOV = [mk('a', 'Научить код код. Каждой сессии применять методику моей AI Self-Learning Academy on Hands-On Engineering'),
+  mk('b', 'Update SOAP AI Ops HTML with agent descriptions'),
+  mk('c', 'Make maximum use of Twitter X subscription including Grok bot, and cursor availability, Imagine Engine'),
+  mk('d', 'Clean up all subscriptions and leave those that make sense')];
+check('"sub HTML" (misheard SOAP) → the SOAP HTML card, alone', v.rankCardsForQuery('sub HTML', NOV).map((c) => c.id).join() === 'b');
+check('"the card about my sub HTML" → the same card (card/about are noise)', v.rankCardsForQuery('the card about my sub HTML', NOV).map((c) => c.id).join() === 'b');
+check('"SOAP HTML" → the same card', v.rankCardsForQuery('SOAP HTML', NOV).map((c) => c.id).join() === 'b');
+check('"Twitter Grok" → the Twitter card', v.rankCardsForQuery('Twitter Grok', NOV).map((c) => c.id).join() === 'c');
+check('"buy milk" → nothing (no guess)', v.rankCardsForQuery('buy milk', NOV).length === 0);
+const WITH_DUP = [...NOV, mk('e', 'Complete Spanish version of sub HTML and add to portfolio')];
+check('two HTML cards fit equally → BOTH come back so the bot asks "say which one"', v.rankCardsForQuery('sub HTML', WITH_DUP).map((c) => c.id).sort().join() === 'b,e');
+check('an archived card is never picked', v.rankCardsForQuery('Twitter Grok', [{ ...NOV[2], closed: true }]).length === 0);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

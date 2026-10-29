@@ -91,6 +91,7 @@ import {
   isManagementCommand,
   extractUrls,
   isLinkAttachRequest,
+  isAddToCardRequest,
   isTaskCreation,
   pointsOnlyAtRecentCard,
   appendToCardDescription,
@@ -7863,7 +7864,7 @@ Ready to commit? Use:
         // A task → Trello, like voice. Anything else reaches Trello only as an EDIT of a card made in the last
         // 30 minutes (never a new card), and a question never does: "Can you describe how the apply kit works?"
         // is answered, not filed.
-        const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '');
+        const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '') || isAddToCardRequest(message || '');
         if (textIntent.type === 'task') {
           if (await routeToTrello(ctx, message || '', 'text', { savesToTasks: true })) { syncContextToDb(textUid); return; }
         } else if (textIntent.type !== 'question' && freshTrelloCards(textUid).length > 0 && editLike) {

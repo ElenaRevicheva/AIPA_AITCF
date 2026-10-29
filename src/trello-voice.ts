@@ -1730,6 +1730,23 @@ export function isLinkAttachRequest(text: string): boolean {
   return LINK_NOUN_RE.test(t) && ATTACH_VERB_RE.test(t) && !CREATE_VERB_RE.test(t);
 }
 
+// 29 Oct 2026 — "Find the task in the card, Kira noviembre, the card about my sub HTML, and add there …" became a NEW
+// card. The sentence has no move/change/archive word and no link, so neither MGMT_RE nor isLinkAttachRequest fired and
+// the message never reached the action classifier: it fell straight to "create a card", beside the card she named.
+// Two shapes mean "add to an EXISTING card": a FIND verb next to a card noun ("find the card about…", "busca la
+// tarjeta…", "найди карточку…"), or an ADD verb pointing at a card or at "there" ("add there", "add to the card",
+// "agrega a la tarea", "добавь в карточку"). A create that merely says "add a task…" is excluded by CREATE_VERB_RE.
+const FIND_VERB_RE = /(?<![\p{L}\p{N}])(find|look\s+(?:up|for)|locate|open|busca\p{L}*|encuentr\p{L}*|abre|найди|найти|ищи|поищи|открой)(?![\p{L}\p{N}])/iu;
+const ADD_TARGET_RE = /(?<![\p{L}\p{N}])(there|to\s+(?:it|this|that|the|my)\b|into\s+(?:it|this|that|the)\b|ah[ií]|all[ií]|a\s+(?:la|esa|esta|mi)\s+(?:tarea|tarjeta)|туда|в\s+(?:эту|ту|карточку|задачу)|к\s+(?:этой|той|карточке|задаче))(?![\p{L}\p{N}])/iu;
+
+/** "Find the card about X and add there Y", "busca la tarjeta … y agrega …", "найди карточку … добавь туда" — an edit of an existing card, never a create. */
+export function isAddToCardRequest(text: string): boolean {
+  const t = String(text || '');
+  if (CREATE_VERB_RE.test(t)) return false;
+  if (!CARD_NOUN_RE.test(t)) return false;
+  return (FIND_VERB_RE.test(t) && ATTACH_VERB_RE.test(t)) || (ATTACH_VERB_RE.test(t) && ADD_TARGET_RE.test(t));
+}
+
 // Words that only POINT at "this task" and carry no subject of their own (EN / ES / RU).
 const POINTER_WORDS = new Set((
   'wire attach add put insert connect pin paste include link links url urls this that the a an to into in on onto of ' +
@@ -1896,7 +1913,7 @@ export async function searchTrelloCards(query: string, boardHint?: string): Prom
     // A clear winner only; two near-equal names go back to her as "say which one".
     if (best && best.s >= 0.6) cards = ranked.filter((r) => best.s - r.s < 0.08).map((r) => r.c);
   }
-  if (!boardHint || cards.length === 0) return cards;
+  if (!boardHint) return cards;
 
   const boards = await getAllBoards();
   const hintWords = boardHint.toLowerCase().split(/\s+/).filter(w => w.length > 2);
@@ -1904,8 +1921,48 @@ export async function searchTrelloCards(query: string, boardHint?: string): Prom
   const all = boards.filter(b => hintWords.every(w => b.name.toLowerCase().includes(w)));
   const any = boards.filter(b => hintWords.some(w => b.name.toLowerCase().includes(w)));
   const matchIds = new Set((all.length ? all : any).map(b => b.id));
+  // 29 Oct 2026: she NAMED the board ("Kira noviembre, the card about my sub HTML") and Trello's exact-word search
+  // had nothing for "sub HTML" — the card is "Update SOAP AI Ops HTML …". A named board is a short list (a few dozen
+  // open cards): read it and rank by the words she said. A clear winner is returned; near-ties go back as "say which".
+  if (cards.length === 0 && matchIds.size > 0) {
+    const open: TrelloCard[] = [];
+    for (const id of matchIds) {
+      try {
+        open.push(...await trelloGet<TrelloCard[]>(`/boards/${id}/cards/open`, { fields: 'name,id,shortUrl,idList,idBoard,due,closed' }));
+      } catch (e) { console.warn('[TrelloVoice] board cards read failed:', (e as Error).message?.slice(0, 120)); }
+    }
+    const picked = rankCardsForQuery(query, open);
+    if (picked.length) console.log(`[TrelloVoice] "${query}" matched on the named board by sound: ${picked.map((c) => `"${c.name}"`).join(', ')}`);
+    return picked;
+  }
+  if (cards.length === 0) return cards;
   const filtered = matchIds.size > 0 ? cards.filter(c => matchIds.has(c.idBoard ?? '')) : cards;
   return filtered.length > 0 ? filtered : cards; // fall back to unfiltered if hint yielded nothing
+}
+
+// Words that name the card as a thing, not its subject — never evidence for a match.
+const QUERY_NOISE = new Set(('card cards task tasks tarea tareas tarjeta tarjetas карточка карточку карточке задача задачу задаче '
+  + 'the a an my this that about de la el mi про о моя мою').split(' '));
+
+/**
+ * Rank a board's cards against what she said (pure, exported for tests). Score = the share of her distinctive words
+ * (≥ 4 letters, spoken form) found in the card name, or the letter-pair similarity of the whole names, whichever is
+ * higher. Only a clear winner (≥ 0.5) is returned; names within 0.08 of it come back together so the caller asks.
+ */
+export function rankCardsForQuery(query: string, cards: TrelloCard[]): TrelloCard[] {
+  // Length is judged BEFORE the spoken form: spokenForm drops a leading h from "html" → "tml", which would then
+  // fall under the 4-letter bar and leave "sub HTML" with no distinctive word at all.
+  const qWords = query.toLowerCase().split(/[^\p{L}\p{N}]+/u)
+    .filter((w) => w.length >= 4 && !QUERY_NOISE.has(w)).map((w) => spokenForm(w)).filter(Boolean);
+  const scored = cards.filter((c) => !c.closed).map((c) => {
+    const nameWords = new Set(spokenForm(c.name).split(' '));
+    const shared = qWords.filter((w) => nameWords.has(w)).length;
+    const byWords = qWords.length ? shared / qWords.length : 0;
+    return { c, s: Math.max(byWords, spokenSimilarity(query, c.name)) };
+  }).sort((a, b) => b.s - a.s);
+  const best = scored[0];
+  if (!best || best.s < 0.5) return [];
+  return scored.filter((r) => best.s - r.s < 0.08).map((r) => r.c);
 }
 
 /**
@@ -1943,6 +2000,14 @@ ADDING to a card ("add / attach / wire this link to the task", "conecta / agrega
 words she wants with it. newDescription only when she says the description is WRONG and must be replaced. Never a
 "create" for a message that adds something to an existing card.
 
+FIND + ADD = UPDATE (29 Oct 2026). "Find the task/card about X [on board B] and add there Y", "busca la tarjeta de X y
+agrega Y", "найди карточку про X и добавь туда Y": she is pointing at a card that ALREADY EXISTS. Emit ONE "update" with
+cardQuery = the card's distinctive words, sourceBoardHint = the board she named, appendDescription = Y in her words.
+Never a "create" — a second card beside the one she named is the mistake she corrects most often.
+Speech recognition garbles acronyms and product names ("SOAP" → "sub"/"soap"/"sop", "GEO" → "geo"/"gio"): put the
+STABLE words in cardQuery (e.g. "HTML" rather than "sub HTML") — the code ranks the board's cards by sound and asks her
+when two fit.
+${learnedBlockFromDisk()}
 UPDATE also covers the DESCRIPTION ("edit this task", "make it clear that…", "отредактируй задачу", "это описание…",
 "уточни, что…", "aclara que…"): put the corrected text in newDescription, in her own words and language — it REPLACES
 the old description. Write the STATEMENT itself, not her instruction to you: drop "making it clear that", "edit it so",
@@ -2030,7 +2095,8 @@ export async function processMultiAction(
   source: 'voice' | 'text' = 'voice',
 ): Promise<{ handled: boolean; results: MultiActionItem[] }> {
   // A link request that names a card ("add this link to the dentist card …") must reach the classifier too.
-  if (!MGMT_RE.test(transcript) && !isLinkAttachRequest(transcript)) return { handled: false, results: [] };
+  // 29 Oct 2026: "find the card about … and add there …" (no link, no move word) must reach it too.
+  if (!MGMT_RE.test(transcript) && !isLinkAttachRequest(transcript) && !isAddToCardRequest(transcript)) return { handled: false, results: [] };
 
   const classified = await classifyMultiAction(transcript);
   if (!classified.length) return { handled: false, results: [] };
