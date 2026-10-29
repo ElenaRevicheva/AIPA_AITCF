@@ -337,6 +337,13 @@ export function heroImageUrl(meta: PodcastMeta): string {
  *  the mast tip at 80.7% across, 5.3% down). The page maps it through object-fit:cover at runtime, so the rings start
  *  on the beacon at every viewport. Override with PODCAST_HERO_BEACON_X / _Y when the still changes. */
 export const HERO_BEACON = { x: process.env.PODCAST_HERO_BEACON_X?.trim() || '0.807', y: process.env.PODCAST_HERO_BEACON_Y?.trim() || '0.053' };
+/** The same beacon in the SQUARE still (cover-source.jpg), which phones get: a tall narrow box would crop the wide
+ *  still to empty sky (Elena, 29 Oct, "on cell it is torn"). Mast tip at 50% across, 19% down. */
+export const HERO_BEACON_SQUARE = { x: process.env.PODCAST_HERO_BEACON_SQ_X?.trim() || '0.50', y: process.env.PODCAST_HERO_BEACON_SQ_Y?.trim() || '0.19' };
+/** The square still's URL: the cover's source, next to hero.jpg. */
+export function heroSquareUrl(meta: PodcastMeta): string {
+  return meta.heroUrl ? meta.heroUrl.replace(/hero\.jpg$/, 'cover-source.jpg') : meta.coverUrl;
+}
 
 export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const sorted = episodes.slice().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
@@ -400,7 +407,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <link rel="sitemap" type="application/xml" href="${xmlEscape(meta.siteUrl)}/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="preload" as="image" href="${esc(hero)}"/>
+<link rel="preload" as="image" href="${esc(hero)}" media="(min-width: 681px)"/>
+<link rel="preload" as="image" href="${esc(heroSquareUrl(meta))}" media="(max-width: 680px)"/>
 <link href="${BRAND_FONTS_HREF}" rel="stylesheet"/>
 <script type="application/ld+json">${jsonLd}</script>
 <script type="application/ld+json">${faqJsonLd}</script>
@@ -414,6 +422,7 @@ ${brandCss()}
   .hero{position:relative;min-height:min(86vh,820px);display:flex;align-items:flex-end;isolation:isolate;overflow:hidden}
   /* The still is alive (Elena, 29 Oct): it breathes, the halftone glow beats like a heart, a band of light flows
      through the dots and radio rings pulse from the mast beacon. The pointer only adds a drift on top. */
+  .hero-par picture{display:block;width:100%;height:100%}
   .hero-par{position:absolute;inset:-4%;z-index:-3;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .45s cubic-bezier(.2,.7,.2,1);will-change:transform}
   .hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);animation:breathe 11s ease-in-out infinite;transform-origin:80% 8%}
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
@@ -514,6 +523,8 @@ ${brandCss()}
   footer .big{display:block;margin:0 auto 22px;max-width:30ch;font:400 clamp(1.3rem,3vw,2.2rem)/1.15 var(--serif);letter-spacing:0;text-transform:none;color:var(--ink-60)}
   footer .big em{font-style:italic;color:var(--amber)}
   footer .g{background-image:var(--ramp-fb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(max-width:680px){.hero-img{object-position:center 30%;transform-origin:50% 20%}.hero-dither{opacity:.16}.hero-grain{opacity:.1}.hero-glow,.hero-flow{-webkit-mask-size:3px 3px;mask-size:3px 3px}
+    .hero-veil{background:linear-gradient(180deg,rgba(var(--veil),.5) 0%,rgba(var(--veil),.12) 22%,rgba(var(--veil),.35) 48%,rgba(var(--veil),.9) 80%,var(--bg) 100%)}}
   @media(max-width:680px){.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}.hero-in{padding-top:120px}.display{max-width:none}}
 </style>
 </head>
@@ -524,11 +535,14 @@ ${brandCss()}
     </div>
   </header>
   <section class="hero">
-    <div class="hero-par"><img class="hero-img" src="${esc(hero)}" alt="A 1930s Art Deco broadcasting house with a radio mast at dusk, on film — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/></div>
+    <div class="hero-par"><picture>
+      <source media="(max-width: 680px)" srcset="${esc(heroSquareUrl(meta))}"/>
+      <img class="hero-img" src="${esc(hero)}" alt="A 1930s Art Deco broadcasting house with a radio mast at dusk, on film — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/>
+    </picture></div>
     <div class="hero-dither" aria-hidden="true"></div>
     <div class="hero-flow" aria-hidden="true"></div>
     <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-rings" aria-hidden="true" data-bx="${HERO_BEACON.x}" data-by="${HERO_BEACON.y}"><svg viewBox="0 0 360 360"><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle class="beacon" cx="180" cy="180" r="3"/></svg></div>
+    <div class="hero-rings" aria-hidden="true" data-bx="${HERO_BEACON.x}" data-by="${HERO_BEACON.y}" data-bx-sq="${HERO_BEACON_SQUARE.x}" data-by-sq="${HERO_BEACON_SQUARE.y}"><svg viewBox="0 0 360 360"><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle class="beacon" cx="180" cy="180" r="3"/></svg></div>
     <div class="hero-grain" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-in">
@@ -611,10 +625,12 @@ ${rows}
     // Rings start on the mast beacon: image-space fractions → page pixels through object-fit:cover (center top).
     var hero=document.querySelector('.hero'),par=document.querySelector('.hero-par'),img=document.querySelector('.hero-img'),rings=document.querySelector('.hero-rings');
     if(!hero||!par||!img||!rings)return;
-    var bx=parseFloat(rings.getAttribute('data-bx')),by=parseFloat(rings.getAttribute('data-by'));
     function place(){var iw=img.naturalWidth,ih=img.naturalHeight;if(!iw||!ih)return;
+      var sq=/cover-source/.test(img.currentSrc||'');
+      var bx=parseFloat(rings.getAttribute(sq?'data-bx-sq':'data-bx')),by=parseFloat(rings.getAttribute(sq?'data-by-sq':'data-by'));
       var pr=par.getBoundingClientRect(),hr=hero.getBoundingClientRect(),s=Math.max(pr.width/iw,pr.height/ih),w=iw*s,hh=ih*s;
-      var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=0+by*hh+(pr.top-hr.top);
+      var posY=sq?0.30:0; // object-position: center 30% on phones (square), center top otherwise
+      var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=(pr.height-hh)*posY+by*hh+(pr.top-hr.top);
       rings.style.left=x.toFixed(1)+'px';rings.style.top=y.toFixed(1)+'px';rings.classList.add('on');}
     if(img.complete)place();img.addEventListener('load',place);window.addEventListener('resize',place,{passive:true});
   })();
