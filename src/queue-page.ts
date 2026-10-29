@@ -15,7 +15,7 @@
  * daily_queue). The page still issues NO HubSpot call of any kind.
  */
 export interface QueuePageOptions {
-  /** Where `api/today`, `api/record/:id`, `api/act` live. Relative on Oracle; absolute for the aideazz.xyz face. */
+  /** Prefix for the calls ('api/today', 'api/record/:id', 'api/act'): '' on Oracle (relative to /queue/), the /queue/ URL for the aideazz.xyz face. */
   apiBase: string;
   /**
    * true = the page is served from another origin (aideazz.xyz/ops) and must carry its own
@@ -343,4 +343,4 @@ load(); loadEspaluz();
 }
 
 /** The Oracle page, exactly as before: relative API, nginx's own basic-auth prompt. */
-export const QUEUE_PAGE = renderQueuePage({ apiBase: 'api/', remote: false });
+export const QUEUE_PAGE = renderQueuePage({ apiBase: '', remote: false }); // calls are 'api/today' etc., relative to /queue/ (28 Oct 'api/' doubled it: /queue/api/api/today 404)
