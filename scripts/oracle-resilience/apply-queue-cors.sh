@@ -40,6 +40,10 @@ fi
 NEW=$(cat <<EOF
 ${INDENT}# 28 Oct 2026 — aideazz.xyz/ops/ is the face of the CRM; the data stays here (apply-queue-cors.sh).
 ${INDENT}location /queue/api/ {
+${INDENT}    # 29 Oct: the app sends its own ACAO *; two values make the browser refuse the reply.
+${INDENT}    proxy_hide_header Access-Control-Allow-Origin;
+${INDENT}    proxy_hide_header Access-Control-Allow-Headers;
+${INDENT}    proxy_hide_header Access-Control-Allow-Methods;
 ${INDENT}    set \$ops_cors "";
 ${INDENT}    if (\$http_origin ~* ^https://(www\.)?aideazz\.xyz\$) { set \$ops_cors \$http_origin; }
 ${INDENT}    if (\$request_method = OPTIONS) {
