@@ -23,3 +23,10 @@ Payments: PayPal webhooks run inside each bot (`paypal_webhook.py`, `paypal_webh
 3. Web SaaS sends sign-ups and payments into unified as the same trial/paid events.
 4. One-time check of the 8 PayPal ids + the PF snapshot against PayPal / PagueloFácil.
 5. Her CRM EspaLuz lane and HubSpot read their counts from unified. Older stores frozen, not deleted.
+
+## Built 29 Oct (steps 1 + the verified layer)
+- Nightly dumps of the 3 EspaLuz databases (`~/backups/espaluz-pg/dump.sh`, 07:23 UTC, 14 days).
+- `truth_people` / `truth_runs` in `espaluz_unified`, rebuilt hourly by `scripts/espaluz-truth-sync.py` — reads every
+  store above, writes nothing else. First result: 37 real people, 37 trials, 0 active trials, 2 active in 30 days,
+  0 paid customers; all PayPal charges come from owner/admin payer accounts.
+- Still to plumb: web SaaS (needs Supabase service-role key on Oracle); CRM lane + HubSpot read from `truth_people`.
