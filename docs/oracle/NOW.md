@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 29 Oct ~18:15 | n8n "My workflow" reads her CRM (queue + EspaLuz) instead of HubSpot | n8n workflow uOo9i6L2D3h0GdLC, pm2 n8n restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
