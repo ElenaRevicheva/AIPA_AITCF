@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-29 13:30 | Scale Army Ashby board into the VJH ATS sweep; SEO & GEO Operator deal 67072175032 staged + kit complete | `VibeJobHunterAIPA_AIMCF/src/scrapers/ats_scraper.py`, `src/core/fit_gate.py` (measure first), Oracle `vibejobhunter` restart | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -170,6 +169,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 29 Oct ~13:55 UTC — Scale Army: SEO & GEO Operator deal staged, kit complete · VJH now watches their Ashby board · code on Oracle, SERVICE RESTART PENDING (Elena) · claim released
+- **DONE:** deal **67072175032** `[HIRING-MANUAL] AI Native Senior SEO & GEO Operator @ Scale Army` in 🔥 I act TODAY; all 6 notes read back from HubSpot (📌 posting · 🔎 brief · 🎯 role defense · 🛡️ defense + `CV_Elena_Revicheva_AI_Native_Senior_SEO_GEO_Operator_Scale_Army.pdf` · ✅ letter · 📋 Comet). VJH `8c93808` on `main` **and** pulled on Oracle: `"Scale Army Careers"` at priority 0 of `ASHBY_COMPANIES` (slug really has spaces; posting API 200, 77 jobs); the Ashby parser reads `secondaryLocations[].location` + `isRemote` and writes `Remote — …` where the gate looks; `fit_gate.residency_includes_home()` — a body sentence "open to candidates based in LATAM …" now outranks the recruiter's `Egypt` tag (exclusions still win). **Measured:** Scale Army's 77 open roles → before **2** passed `iron_clad_fit`, after **32** pass / **13** on her title lane (both SEO & GEO roles among them); Oracle's cached sweep of 2,317 jobs → +2, neither on the lane. Evals: 780 passed locally, 594 in Oracle's venv.
+- **NEXT (Elena, one command on Oracle):** `sudo systemctl restart vibejobhunter`. The checkout is at `8c93808` but the process that started **27 Oct 14:50 UTC** still runs the old code — the Claude auto-mode classifier refused the restart. Within the hour after it: journal line `[ASHBY][Scale Army Careers] Found 77 jobs`, then the judge's verdicts on the 13 lane titles.
+- **VERIFIED BY:** `node scripts/hs-audit-apply-kit.cjs` → `13 job deals · complete 13 · gaps 0` with the Scale Army row ✓LINK ✓L ✓CV ✓D ✓R ✓C; Oracle `git log -1` = `8c93808`; `systemctl show vibejobhunter -p ActiveEnterTimestamp` = 27 Oct 14:50 (**old**).
+- **RISK:** until the restart nothing changes in production. After it, up to 13 Scale Army titles reach the judge in the next cycle; the 13 Scale Army deals already parked in 🤖 AI working since Aug are NOT re-judged (dedupe by id) — `sweep_parked_borderline.py` is the read-only way to look at them. The kit's CV reviewer wrote on the 🛡️ note: *reads as a backend/AI automation engineer, lacking hands-on client SEO/GEO* — say the gap before they find it (the 🎯 note already opens with the 34-check AI Visibility Audit API).
 
 ### 🧭 29 Oct — "Client OS" = NO BUILD (Elena: "not reinvent bicycles") · `docs/selling/CLIENT_OS_STEP_BY_STEP.md` · no claim held
 - From Elena's X reply to a "one platform for agency client management" post. A six-step build plan was written and **withdrawn the same hour**: every piece already exists (HubSpot deal/tasks/files/chat, PagueloFacil, Resend, trello-voice). **Do not build a clients/projects/portal/invoice module.** The angle is selling *wiring* of an agency's existing tools. **Whose move:** Elena's — the 3-question reply to the poster; go on step 0 (the aideazz.xyz/ops face below).
