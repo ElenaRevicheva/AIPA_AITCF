@@ -182,7 +182,7 @@ function load(){
     if(!r.ok){document.getElementById('sub').textContent='could not load ('+r.status+')';return null;}
     return r.json();
   }).then(function(d){ if(d){ DATA=d; render(); } })
-    .catch(function(e){ if(String(e.message)!=='sign in'&&String(e.message)!=='401'){ document.getElementById('sub').textContent='could not reach the queue ('+e.message+')'; } });
+    .catch(function(e){ if(String(e.message)!=='sign in'&&String(e.message)!=='401'){ document.getElementById('sub').textContent='could not reach the queue ('+e.message+')'; var o=document.getElementById('out'); if(o){ o.hidden=false; } } });
 }
 
 function items(){
