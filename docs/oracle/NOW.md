@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 29 Oct ~13:45 | CRM: manual jobs mirror + daily dead-job clean; EspaLuz single source (proposal); 55 client sends (Elena's go) | `scripts/stage-manual-job.cjs`, queue cleanup cron, Oracle Postgres access, outreach sender | 3 commits today |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -179,6 +178,16 @@ git log keeps the record.
 
 ### 🧭 29 Oct — "Client OS" = NO BUILD (Elena: "not reinvent bicycles") · `docs/selling/CLIENT_OS_STEP_BY_STEP.md` · no claim held
 - From Elena's X reply to a "one platform for agency client management" post. A six-step build plan was written and **withdrawn the same hour**: every piece already exists (HubSpot deal/tasks/files/chat, PagueloFacil, Resend, trello-voice). **Do not build a clients/projects/portal/invoice module.** The angle is selling *wiring* of an agency's existing tools. **Whose move:** Elena's — the 3-question reply to the poster; go on step 0 (the aideazz.xyz/ops face below).
+
+### ✅ 29 Oct ~14:00 UTC — 14 client emails SENT via the existing sender (Cc Elena, Growth Operator PDF, industry film) · 20 drafts HELD · claim released
+- **DONE (Elena's go):** `hs-evaluate-and-send-outreach.cjs --send --only=…` on Oracle → 8 first contacts + 6 due follow-ups, 0 errors. Canary first (boston-school-international): delivered + opened (resend-webhook). Batch: 12/14 prospects + 13/14 Cc delivered at last check, 0 bounced. Registry: `cc` + `attachments` (ES PDF) added to these 14 only; 11 drafts got one lane-film line (clinics `e0rMKnH-noI`, real estate `y1ZhWyqJW0w`, other `l9Ubxqy7zDA`). Oracle == laptop md5 for the 11 drafts. Client lane synced: 14 closed.
+- **Of the 55 queued:** 14 sent today · 13 had already been emailed (HubSpot notes; not in resend-ledger, so the queue still offers them) · 8 follow-ups wait for today's firsts · **20 HELD — break Elena's rules** (score 88–99 + "todavía no aparece"; 3 also mix English): colombia-luxury-group, dopanama-fu, dr-daniela-correa, kaandela-restaurant-atlas-fu, kraemer-law-fu, mimosa-spa-san-francisco-atlas-fu, nomad-constructions-corp-fu, panama-aesthetics, panama-equity-kent-davis(+-fu), relofirm-fu, t-mapp-fu, we-sail-san-blas, elite-cartagena, ipanema-residences, panam-sonr-e, salud-sin-fronteras, san-blas-sailing, sota-dental-fu, yc-panama-yachts-fu. Fix = credential mode in `stage-manual-prospect.cjs` (needs a real per-prospect `pivot`).
+- **NEXT ~2 Nov (no cron runs this script — never put it on a timer, it would send the held drafts):** follow-ups `--send --only=` the `-fu` of: dental-implants-dental-tourism-costa-rica-atlas, costa-rica-dental-tourism-smile-restoration-expe-atlas, 5-things-you-need-to-know-about-dental-tourism-i-atlas, nova-dental-costa-rica-dental-treatments-advance-atlas, 10-reasons-to-have-a-plastic-surgery-in-colombia-atlas, offshore-circle-atlas, hidden-coast-realty-atlas (+ weddings-at-legend-santa-clara-in-cartagena-atlas-fu once its first exists). Equip them the same way first.
+
+### ✅ 29 Oct ~13:40 UTC — CRM hiring lane auto-synced hourly · DB port closed · EspaLuz source of truth = recommendation
+- **Hourly cron :41** `queue-hiring-keep-act-today.cjs --apply`: lane = HubSpot I Act TODAY (read only); adds missing (incl. [HIRING-MANUAL], with the kit's ✅ letter), skips dead; a machine-skipped row can come back, her own Skip (acted_at) never. Verified 13 = 13, rerun no-op. Log `~/logs/queue-hiring-sync.log`; crontab backup in `~/_session-backups/`.
+- **Local Postgres on the Oracle box:** no longer reachable from outside (every app uses localhost; the old remote user's last write was Feb 2026). Backups in `~/_session-backups/pg-lockdown-*`.
+- **EspaLuz users:** `espaluz_unified` (local Postgres) is the fullest store — 26 users, 32 trials (Jul 2025–Sep 2026, 3 active), 0 subscriptions with a PayPal id. The Oracle-DB `espaluz_funnel` (6 rows) and the bot JSON files under-count. **Recommended single source = `espaluz_unified`** (+ nightly dump — none exists). Waits for Elena's yes; nothing retired.
 
 ### ✅ 29 Oct ~13:30 UTC — hiring lane of her CRM = "I Act TODAY" only · 731 rows skipped (not deleted) · HubSpot read only
 - **DONE:** `scripts/queue-hiring-keep-act-today.cjs --apply` on Oracle: HubSpot search (read only, the VJH sweep's filter) → 13 hiring deals in I Act TODAY; daily_queue hiring/new 740 → **9**; 731 → `skipped`. Undo file in Oracle `~/_session-backups/queue-hiring-cleanup-2026-10-29T13-27-39-958Z.json` (`--undo=<file>`).
