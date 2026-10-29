@@ -30,3 +30,12 @@ Payments: PayPal webhooks run inside each bot (`paypal_webhook.py`, `paypal_webh
   store above, writes nothing else. First result: 37 real people, 37 trials, 0 active trials, 2 active in 30 days,
   0 paid customers; all PayPal charges come from owner/admin payer accounts.
 - Web SaaS plumbed 29 Oct (service key on Oracle): 40 real people incl. 3 web users. Still to do: CRM lane + HubSpot read from `truth_people`.
+
+## Other screens checked 29 Oct (not stores — nothing to merge)
+- `webhook.aideazz.xyz/espaluz/analytics` = the WhatsApp bot's own page (`EspaLuzWhatsApp/user_analytics.py`). Reads the
+  same `espaluz_unified` tables + `subscribers.json` + the PF file. Less strict than `truth_people`: WhatsApp only, trusts
+  a `status=active` label (its "PayPal Active 2" = Elena + her mom), includes her own number. Kept as is.
+- n8n (`~/.n8n`, PM2 `n8n`, since 13 Aug): ONE workflow "My workflow" — GET webhook `/crm/webhook/ops` → HubSpot deals
+  search → 23-line Code node → respond. Feeds the Aug ops-dashboard build at `webhook.aideazz.xyz/ops/`. No EspaLuz data,
+  no store of its own. nginx logs (≈14 days retained): 2 calls, both 401 — dormant. Superseded 31 Aug by `daily_queue`
+  (see `src/daily-queue.ts` header for why). Left running, untouched.
