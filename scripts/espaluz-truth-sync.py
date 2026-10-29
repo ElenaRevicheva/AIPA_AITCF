@@ -58,12 +58,12 @@ PF_FILE = WA_ENV.get('PAGUELOFACIL_PAYMENTS_FILE') or f'{HOME}/EspaLuzFamilybot/
 
 # Owner / test identities — labelled internal, never counted as users.
 # Kept in Oracle's cto-aipa/.env, not here: this repo is public.
-#   ESPALUZ_OWNER_EMAILS=a@x,b@y   ESPALUZ_OWNER_WA=<digits>[,<digits>]
+#   ESPALUZ_OWNER_EMAILS=a@x,b@y   ESPALUZ_OWNER_WA=<digits>[,<digits>]   ESPALUZ_OWNER_TG=<id>[,<id>]
 _csv = lambda v: [x.strip() for x in (v or '').split(',') if x.strip()]
 OWNER_EMAILS = {e.lower() for e in _csv(CTO_ENV.get('ESPALUZ_OWNER_EMAILS')) + [
     WA_ENV.get('ADMIN_TEST_EMAIL'), WA_ENV.get('ADMIN_CHECK_EMAIL_1'), WA_ENV.get('ADMIN_CHECK_EMAIL_2'),
 ] if e}
-OWNER_TG = {re.sub(r'\D', '', CTO_ENV.get('TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID') or '')} - {''}
+OWNER_TG = {re.sub(r'\D', '', x) for x in [CTO_ENV.get('TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID') or ''] + _csv(CTO_ENV.get('ESPALUZ_OWNER_TG'))} - {''}
 OWNER_WA = {re.sub(r'\D', '', x) for x in _csv(CTO_ENV.get('ESPALUZ_OWNER_WA'))}
 
 warnings = []
