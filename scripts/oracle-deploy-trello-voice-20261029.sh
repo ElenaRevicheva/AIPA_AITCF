@@ -5,9 +5,11 @@
 # pm2 start time is newer than dist/trello-voice.js, and the compiled dist carries isAddToCardRequest.
 set -euo pipefail
 HOST=oracle-cto-aipa
-REMOTE=~/cto-aipa
+REMOTE=/home/ubuntu/cto-aipa   # literal: an unquoted ~ expands on the LAPTOP
 STAMP=$(date -u +%Y%m%d-%H%M%S)
-EXPECT_TV="${EXPECT_TV:-211bbcb471acdb4632b55d95280dbf50}"   # md5 of src/trello-voice.ts before this change (git ea9deacc)
+EXPECT_TV="${EXPECT_TV:-211bbcb471acdb4632b55d95280dbf50}"   # md5 of src/trello-voice.ts before this change (git ea9deacc, LF)
+# Ran 29 Oct 14:28 UTC: Oracle held the SAME git version with CRLF endings (md5 0f7eaa34…) from an earlier Windows copy, so the
+# guard stopped once (correctly: it cannot tell "foreign work" from "line endings"); rerun with EXPECT_TV=<crlf md5> deployed it.
 EXPECT_TB="${EXPECT_TB:-65074953de59bf7dfbc5e80892f639de}"   # md5 of src/telegram-bot.ts before this change
 FILES="src/trello-voice.ts dist/trello-voice.js src/telegram-bot.ts dist/telegram-bot.js scripts/test-trello-voice-dates.cjs"
 
