@@ -364,7 +364,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
         <p>Hit Follow and the first drop lands in your app automatically — wherever you listen.</p></div>
       </div>`;
   const countLabel = total ? `${total} episode${total > 1 ? 's' : ''}` : 'Launching soon';
-  const waveBars = Array.from({ length: 72 }, (_, i) => `<span style="animation-delay:${(i * 0.035).toFixed(2)}s"></span>`).join('');
+  // Full-bleed equalizer (Elena, 29 Oct: "this running wave should be along all the screen"): 200 bars, edge to edge.
+  const waveBars = Array.from({ length: 200 }, (_, i) => `<span style="animation-delay:${((i % 50) * 0.035).toFixed(2)}s"></span>`).join('');
   const jsonLd = generatePodcastJsonLd(meta, sorted);
   const faqJsonLd = generatePodcastFaqJsonLd(meta, sorted);
   const seoDesc = seoDescription(meta);
@@ -461,9 +462,9 @@ ${brandCss()}
   .ticker .dot{flex:none;font-size:6px;color:var(--ink-45)}
   @keyframes az-ticker{to{transform:translateX(-50%)}}
   /* equalizer — the audio signature, kept */
-  .wave{display:flex;align-items:center;justify-content:center;gap:4px;height:40px;margin:30px 0 0;opacity:.75;
-    -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-  .wave span{flex:1;max-width:4px;height:100%;border-radius:4px;background:var(--ramp-fb);transform:scaleY(.16);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
+  .wave{position:relative;left:50%;width:100vw;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-between;gap:3px;height:48px;margin:26px 0 0;padding:0 8px;opacity:.8;
+    -webkit-mask:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);mask:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+  .wave span{flex:1 1 0;min-width:2px;height:100%;border-radius:4px;background:var(--ramp-fb);transform:scaleY(.16);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
   @keyframes eq{0%,100%{transform:scaleY(.16)}50%{transform:scaleY(1)}}
   @media(prefers-reduced-motion:reduce){.wave span{transform:scaleY(.5)}}
   /* sections */
