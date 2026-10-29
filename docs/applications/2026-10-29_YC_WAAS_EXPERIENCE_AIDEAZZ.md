@@ -102,3 +102,31 @@ EventBridge), Oracle Cloud.
 
 **Not claimed, deliberately:** paying EspaLuz subscribers (truth layer 29 Oct: 0 paying customers);
 X/Twitter automation (X API 402 since 25 Oct); the podcast (in progress today).
+
+---
+
+## "What I'm looking for" field (polished 29 Oct 2026)
+
+```
+Looking for: a full-time, salaried role at a funded AI-first company (Seed to Series A) as an
+Applied LLM / AI Product Engineer. Remote from Panama (UTC-5), with real overlap for US and
+European teams.
+
+What I work on: production LLM systems that people use every day — persistent memory and RAG,
+voice/text/image interaction, tool-using agents — and the unglamorous part that decides whether
+they survive: provider fallback, evals, cost control, and proving from the logs that a change
+produced output, not just that it ran.
+
+What I bring: 10 production agents I designed, shipped and have operated solo for 18 months
+(aideazz.xyz/portfolio). LLM orchestration across six providers with free-first fallback, RAG on
+pgvector, CRM automation, AWS Lambda + Oracle Cloud at near-zero infra cost. I build with Claude
+Code and Cursor daily without giving up rigor: a deploy counts when the compiled file matches the
+commit and the log shows a result. I publish my own postmortems at aideazz.xyz/ai-ops-wiki.html.
+Before this I spent seven years as a Deputy CEO, so I can brief the person signing the cheque and
+the person reading the stack trace in the same meeting.
+
+Not a fit: research with nothing shipped, roles without real users or production ownership, and
+teams where "move fast" means skipping correctness.
+
+I want to own real systems end to end on a small team that ships.
+```
