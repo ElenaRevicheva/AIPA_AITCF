@@ -55,6 +55,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 15:20 | CRM client lane = CLIENT deals in I Act TODAY (Elena go); 6 skeleton client deals out of I Act TODAY | `src/client-lane.ts` → Oracle `dist/client-lane.js` + `pm2 restart cto-aipa`; HubSpot 6 deal stages | — |
 | Claude Code | 2026-10-30 16:20 | DEPLOYING Sonnet env switch + Claude-last in free mode (Elena: "yes, deploy") | Oracle: cto-aipa dist, VJH src, EspaLuz WA/Family, dragontrade + their .env; restarts all six | 0c78e522 |
 
 **Rules**
