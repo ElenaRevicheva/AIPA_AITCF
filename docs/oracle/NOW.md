@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 15:30 | Sonnet 4.5 retirement (30 Nov; degraded from 30 Oct): every Sonnet call site reads env, no hardcoded id | cto-aipa src (lead-triage, research-agent, podcast*, voice-growth-engine, llm-resilience); VJH, EspaLuzWhatsApp, EspaLuzFamilybot, dragontrade model lines + Oracle .env; restarts vibejobhunter, espaluz-*, dragontrade-main, cto-aipa | 600e52a7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
