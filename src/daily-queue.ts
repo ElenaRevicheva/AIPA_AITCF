@@ -43,6 +43,15 @@ export interface QueueItem {
   status: QueueStatus;
   hubspotDealId?: string | undefined;
   createdAt?: string | undefined;
+  /** Record page only: her copy of the deal's HubSpot notes, oldest first. */
+  kitNotes?: KitNote[] | undefined;
+  kitSyncedAt?: string | undefined;
+}
+
+export interface KitNote {
+  kind: 'posting' | 'brief' | 'role' | 'defense' | 'letter' | 'comet' | 'note';
+  at: string;
+  text: string;
 }
 
 let initialised = false;
@@ -85,6 +94,17 @@ export async function initDailyQueueTable(): Promise<void> {
         IF SQLCODE != -955 AND SQLCODE != -1408 THEN RAISE; END IF;
       END;
     `);
+    // 30 Oct 2026 — Elena's own copy of each live deal's HubSpot notes (the apply kit: 📌 🔎 🎯 🛡️ ✅ 📋),
+    // written hourly by scripts/queue-hiring-keep-act-today.cjs. ORA-1430 = column already exists.
+    for (const col of ['kit_notes CLOB', 'kit_synced_at TIMESTAMP']) {
+      await connection.execute(`
+        BEGIN
+          EXECUTE IMMEDIATE 'ALTER TABLE daily_queue ADD (${col})';
+        EXCEPTION WHEN OTHERS THEN
+          IF SQLCODE != -1430 THEN RAISE; END IF;
+        END;
+      `);
+    }
     await connection.commit();
     initialised = true;
   } finally {
@@ -205,10 +225,11 @@ export async function getQueueItemById(id: string): Promise<QueueItem | null> {
     const res = await connection.execute(
       `SELECT RAWTOHEX(id) AS id, lane, external_key, title, company, action_url, draft,
               draft_tailored, draft_provider, draft_reason, score, status,
-              hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at
+              hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
+              kit_notes, TO_CHAR(kit_synced_at, 'YYYY-MM-DD HH24:MI') AS kit_synced_at
          FROM daily_queue WHERE id = HEXTORAW(:id)`,
       { id: id.replace(/-/g, '') },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: FETCH_DRAFT },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: { ...FETCH_DRAFT, KIT_NOTES: { type: oracledb.STRING } } },
     );
     const r = ((res.rows as Record<string, unknown>[]) || [])[0];
     if (!r) return null;
@@ -227,9 +248,21 @@ export async function getQueueItemById(id: string): Promise<QueueItem | null> {
       status: String(r.STATUS) as QueueStatus,
       hubspotDealId: r.HUBSPOT_DEAL_ID ? String(r.HUBSPOT_DEAL_ID) : undefined,
       createdAt: r.CREATED_AT ? String(r.CREATED_AT) : undefined,
+      kitNotes: parseKit(r.KIT_NOTES),
+      kitSyncedAt: r.KIT_SYNCED_AT ? String(r.KIT_SYNCED_AT) : undefined,
     };
   } finally {
     await connection.close();
+  }
+}
+
+function parseKit(v: unknown): KitNote[] | undefined {
+  if (!v) return undefined;
+  try {
+    const a = JSON.parse(String(v));
+    return Array.isArray(a) ? a as KitNote[] : undefined;
+  } catch {
+    return undefined;
   }
 }
 

@@ -115,6 +115,7 @@ export function renderQueuePage(opts: QueuePageOptions): string {
   button:hover,a.btn:hover{border-color:var(--fg)}
   .empty{padding:26px 14px;color:var(--mut);text-align:center}
   .quiet{color:var(--mut);font-size:13px;padding:2px 0 10px}
+  details.kit{margin:6px 0}details.kit summary{cursor:pointer;font-weight:600;padding:4px 0}
   footer{max-width:1120px;margin:24px auto 0;color:var(--mut);font-size:12px;
     border-top:1px solid var(--line);padding-top:12px}
   .login{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:22px;max-width:480px}
@@ -129,7 +130,7 @@ ${loginBox}
 <div class="tiles" id="tiles"></div>
 <div class="tabs" id="tabs"></div>
 <table><thead id="head"></thead><tbody id="rows"></tbody></table>
-<footer>Reads the AIdeazz operational database only. HubSpot is never written to, or read from, by this page.</footer>
+<footer>Your AIdeazz database. Jobs, clients and kit notes are copied from HubSpot hourly; your clicks (Did it, Skip) stay here and never reach HubSpot. This page itself never calls HubSpot.</footer>
 </div>
 <script>
 var E=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
@@ -288,6 +289,19 @@ function timelineHtml(){
   }).join('')+'</div>';
 }
 
+// 30 Oct 2026: her own copy of every HubSpot note on the deal (the apply kit), oldest first.
+var KIT_LABEL={posting:'📌 Posting',brief:'🔎 Company brief',role:'🎯 Role defense',defense:'🛡️ Technical defense + CV',letter:'✅ Cover letter',comet:'📋 Comet prompt',note:'Note'};
+function kitHtml(){
+  if(!RECORD){ return ''; }
+  var k=(RECORD.item&&RECORD.item.kitNotes)||[];
+  if(!k.length){ return ''; }
+  return '<div class="sec">Your copy of the kit · '+k.length+' notes · copied from HubSpot '+E(RECORD.item.kitSyncedAt||'')+' UTC</div>'+
+    k.map(function(n){
+      return '<details class="kit" onclick="event.stopPropagation()"><summary>'+E(KIT_LABEL[n.kind]||'Note')+
+        ' <span class="quiet">'+E((n.at||'').slice(0,10))+'</span></summary><pre>'+E(n.text)+'</pre></details>';
+    }).join('');
+}
+
 function row(lane,x){
   var open=(OPEN===x.id);
   var badge = lane==='hiring'
@@ -316,7 +330,7 @@ function row(lane,x){
       '<button onclick="event.stopPropagation();act(\\''+x.id+'\\',\\'done\\')">Did it</button>'+
       '<button onclick="event.stopPropagation();act(\\''+x.id+'\\',\\'skipped\\')">Skip</button>'+
       (x.hubspotDealId?'<a class="btn" target="_blank" rel="noopener" href="https://app.hubspot.com/contacts/51409153/record/0-3/'+E(x.hubspotDealId)+'">HubSpot record</a>':'')+
-      '</div></td></tr>';
+      '</div>'+kitHtml()+'</td></tr>';
   }
   return html;
 }

@@ -25,6 +25,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const db = require('../dist/database');
+const oracledb = require('oracledb');
 
 const APPLY = process.argv.includes('--apply');
 const UNDO = (process.argv.find(a => a.startsWith('--undo=')) || '').slice(7);
@@ -40,18 +41,39 @@ const text = (h) => String(h || '').replace(/<br\s*\/?>|<\/p>/gi, '\n').replace(
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/\n{3,}/g, '\n\n').trim();
 
-/** Posting URL + the kit's ✅ letter, from the deal's own notes (read only). */
+/** Which kit note this is — the same markers hs-audit-apply-kit.cjs counts. */
+function kindOf(body) {
+  if (body.includes('📋 COMET PROMPT')) return 'comet';
+  if (body.includes('TECHNICAL DEFENSE')) return 'defense';
+  if (body.includes('🎯 ROLE DEFENSE')) return 'role';
+  if (body.includes('COMPANY BRIEF')) return 'brief';
+  if (/COVER LETTER/i.test(body)) return 'letter';
+  if (body.includes('JOB POSTING:')) return 'posting';
+  return 'note';
+}
+
+/** Posting URL, the kit's ✅ letter, and Elena's own copy of EVERY note on the deal (read only). */
 async function dealPacket(dealId) {
   const a = await hsGet(`/crm/v4/objects/deals/${dealId}/associations/notes?limit=100`);
+  const ids = (a.results || []).map((r) => String(r.toObjectId));
+  const notes = [];
+  for (let i = 0; i < ids.length; i += 100) {
+    const r = await fetch(`${HS}/crm/v3/objects/notes/batch/read`, { method: 'POST', headers: H(), body: JSON.stringify({
+      properties: ['hs_note_body', 'hs_timestamp'], inputs: ids.slice(i, i + 100).map((id) => ({ id })) }) });
+    if (!r.ok) throw new Error(`HubSpot notes batch ${r.status}`);
+    notes.push(...((await r.json()).results || []));
+  }
+  notes.sort((x, y) => String(x.properties?.hs_timestamp || '').localeCompare(String(y.properties?.hs_timestamp || '')));
   let url = '', letter = '';
-  for (const { toObjectId } of a.results || []) {
-    const n = await hsGet(`/crm/v3/objects/notes/${toObjectId}?properties=hs_note_body`);
+  const kit = [];
+  for (const n of notes) {
     const body = n.properties?.hs_note_body || '';
     url = url || (body.match(/JOB POSTING:\s*<code>([^<]+)<\/code>/)
       || body.match(/href="(https?:[^"]+)"[^>]*>(?:\s*<[^>]+>)*\s*👉\s*APPLY/) || [])[1] || '';
     if (!letter && body.includes('✅ READY TO SEND — cover letter')) letter = text(body);
+    kit.push({ kind: kindOf(body), at: String(n.properties?.hs_timestamp || ''), text: text(body) });
   }
-  return { url: url.replace(/&amp;/g, '&'), letter };
+  return { url: url.replace(/&amp;/g, '&'), letter, kit };
 }
 
 /** id → dealname of every hiring deal in I Act TODAY. */
@@ -90,6 +112,8 @@ async function setStatus(c, ids, from, to) {
 }
 
 (async () => {
+  // Adds kit_notes / kit_synced_at if missing (idempotent DDL, same as the server).
+  await require('../dist/daily-queue').initDailyQueueTable();
   const c = await db.getPoolConnection();
   try {
     if (UNDO) {
@@ -123,9 +147,11 @@ async function setStatus(c, ids, from, to) {
     if (!APPLY) { console.log('dry run — nothing changed. Re-run with --apply.'); return; }
 
     const { upsertQueueItem } = require('../dist/daily-queue');
+    const packets = new Map();
+    for (const id of keep.keys()) packets.set(id, await dealPacket(id));
     for (const [id, name] of missing) {
       const [title, company = ''] = name.replace(/^\[[^\]]+\]\s*/, '').split(' @ ');
-      const { url, letter } = await dealPacket(id);
+      const { url, letter } = packets.get(id);
       // Same job already queued under an older deal and skipped by a MACHINE (acted_at empty)
       // → revive it. Her own Skip stamps acted_at and is never undone.
       await c.execute(
@@ -139,6 +165,22 @@ async function setStatus(c, ids, from, to) {
       });
       console.log(`added: ${name.slice(0, 90)}${letter ? ' (with ✅ letter)' : ' (letter not ready yet)'}`);
     }
+    // 30 Oct 2026 — her own copy of the kit: every note on every live deal, refreshed hourly.
+    // The result line is the reconciliation: copied N of N live deals, and how many carry the full kit.
+    const FULL = ['posting', 'brief', 'role', 'defense', 'letter', 'comet'];
+    let copied = 0, notes = 0, full = 0;
+    for (const [id, p] of packets) {
+      const r = await c.execute(
+        `UPDATE daily_queue SET kit_notes = :kit, kit_synced_at = CURRENT_TIMESTAMP
+          WHERE lane = 'hiring' AND hubspot_deal_id = :deal_id AND status IN ('new', 'working')`,
+        { kit: { val: JSON.stringify(p.kit), type: oracledb.DB_TYPE_CLOB }, deal_id: id }, { autoCommit: true });
+      if (r.rowsAffected) {
+        copied++; notes += p.kit.length;
+        const kinds = new Set(p.kit.map((n) => n.kind));
+        if (FULL.every((k) => kinds.has(k))) full++;
+      }
+    }
+    console.log(`kit copied: ${copied}/${keep.size} live deals · ${notes} notes · full kit (📌🔎🎯🛡️✅📋) on ${full}`);
     if (!go.length) return;
     const dir = path.join(process.env.HOME || '.', '_session-backups');
     fs.mkdirSync(dir, { recursive: true });
