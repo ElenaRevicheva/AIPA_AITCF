@@ -48,6 +48,14 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - OPEN: OpenClaw still lists `anthropic/claude-sonnet-4-5` (`scripts/model-tier.cjs` TIERS; the laptop copy has an uncommitted 26 Oct diff, left untouched). Swap it before 30 Nov.
 - VERIFIED BY: live call on Oracle through `dist/llm-resilience.js`: `tier=free claudeAskedFirst=false`, Gemini answered "waterfall ok" in 2.9 s, skipped []. All 6 services active, 0 traceback lines since restart; cto-aipa started 16:02:27, after the file (16:02:26); live md5 = build.
 
+**⏳ 30 Oct (evening) — A+B+C built and pushed; the Oracle deploy WAITS for Elena's "deploy" (classifier refused it).**
+- A: every Claude call checks `MODEL_TIER` first (free: Gemini → Groq → Grok → OpenAI → Claude last; credit: Claude first). cto-aipa `03fb226a` (askAI, photo, PDF, Atuona, research, triage, blog), VJH `01d8365`, EspaLuz WA `c7844d4` + Family `5156e8e`, Algom `0aaa90b`; `scripts/model-tier.cjs` `8e97dfb3` now writes `MODEL_TIER` into all five bot `.env` files.
+- B: `scripts/pii-guard.cjs` (the pre-commit gate in every fleet repo) blocks an added direct Claude call unless it carries a `tier-gated` marker; the rule is also in CLAUDE.md §4 + the Cursor rule (Cursor Cloud runs no local hooks).
+- C: portfolio badge + CTO AIPA card (EN/ES) rewritten to the real order. Committed locally in `D:/aideazz/aideazz`, NOT pushed: publish only after the deploy, so the public claim is true when it appears.
+- Staged deploy: `/tmp/sonnet/deploy2` on the laptop → `scp -r deploy2 oracle-cto-aipa:tier-deploy && ssh oracle-cto-aipa bash ~/tier-deploy/apply.sh` (backs up `*.bak-tier-20261030`; 14 files md5 == git before the change; `espaluz_bridge.py` edited IN PLACE, aborts if an anchor is not unique).
+- Sonnet 5.5 NOT switched: it rejects `temperature` (400), and EspaLuz WA (0.7) and lead triage (0.1) send it. Remove those first, then it is a `.env` line. Also: API version `2026-10-21` rejects `temperature` on every model; the bots send `2023-06-01`, so an SDK upgrade that switches the default version would break those calls.
+- OpenClaw 2026.2.14 has no Sonnet newer than 4.5 in its catalog: upgrade OpenClaw or use Opus 4.6 / Haiku 4.5 there before 30 Nov (Elena's call).
+
 ## 1. The session board — claim before you touch
 
 There is no file locking. This table is the substitute, and it works only because both
