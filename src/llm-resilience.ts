@@ -30,6 +30,16 @@ import type Anthropic from '@anthropic-ai/sdk';
 export const groqModel = (): string =>
   (process.env.GROQ_MODEL || 'llama-3.3-70b-versatile').trim();
 
+/**
+ * Same rule for Claude's quality tier (30 Oct 2026): Anthropic retires
+ * claude-sonnet-4-5 on 30 Nov 2026 (degraded from 30 Oct), and six call sites here
+ * named it directly. Every Sonnet call site resolves through this.
+ * Cutover = set CLAUDE_SONNET_MODEL in .env and restart. The same variable name is
+ * read by VJH and dragontrade, so one fleet-wide .env edit moves them all.
+ */
+export const sonnetModel = (): string =>
+  (process.env.CLAUDE_SONNET_MODEL || 'claude-sonnet-4-6').trim();
+
 const GROQ_MAX_TOKENS = 8000;
 
 // Tier 3 (June 11 2026): xAI Grok — the rhino-sneezing-lemon team credits, already

@@ -14,7 +14,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, sonnetModel } from './llm-resilience';
 import { transcribeAndTranslate } from './speechmatics';
 import { buildPodcastPackage } from './podcast-engine';
 import { publishVoiceCampaign } from './voice-campaign-publish';
@@ -117,7 +117,7 @@ export async function runPodcast(ctx: any): Promise<void> {
       await ctx.reply('🌐 Russian detected. Translating and polishing into a tech-savvy English episode (your idea, your structure — elevated)...');
       polishedScript = await claudeWithGroqFallback(
         anthropic,
-        process.env.PODCAST_ENGINE_MODEL || 'claude-sonnet-4-5-20250929',
+        process.env.PODCAST_ENGINE_MODEL || sonnetModel(),
         2600,
         POLISH_SYSTEM,
         `RAW TRANSCRIPT (Russian, spoken):\n\n${originalTranscript.slice(0, 14000)}`,

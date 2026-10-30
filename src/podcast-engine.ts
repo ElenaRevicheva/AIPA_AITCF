@@ -12,7 +12,7 @@
  */
 
 import type Anthropic from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, sonnetModel } from './llm-resilience';
 import type { TranscribeResult, SpeakerSegment } from './speechmatics';
 import { buildContentCluster, type ContentCluster } from './voice-growth-engine';
 
@@ -99,7 +99,7 @@ export async function buildPodcastPackage(
   source: TranscribeResult,
   opts: { numSocialPerChannel?: number; model?: string } = {},
 ): Promise<PodcastPackage> {
-  const model = opts.model || process.env.PODCAST_ENGINE_MODEL || process.env.VOICE_ENGINE_MODEL || 'claude-sonnet-4-5-20250929';
+  const model = opts.model || process.env.PODCAST_ENGINE_MODEL || process.env.VOICE_ENGINE_MODEL || sonnetModel();
 
   // 1. Reuse the bilingual content cluster (blog EN+ES + LinkedIn + IG).
   const cluster = await buildContentCluster(anthropic, source, { numSocialPerChannel: opts.numSocialPerChannel ?? 4, model });

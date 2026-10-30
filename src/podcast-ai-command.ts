@@ -13,7 +13,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, sonnetModel } from './llm-resilience';
 import { transcribeAndTranslate } from './speechmatics';
 import { buildPodcastPackage } from './podcast-engine';
 import { publishVoiceCampaign } from './voice-campaign-publish';
@@ -40,7 +40,7 @@ export async function runPodcastAi(ctx: any): Promise<void> {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const script = await claudeWithGroqFallback(
       anthropic,
-      process.env.PODCAST_ENGINE_MODEL || 'claude-sonnet-4-5-20250929',
+      process.env.PODCAST_ENGINE_MODEL || sonnetModel(),
       2200,
       SCRIPT_SYSTEM,
       `Write a spoken podcast episode script about: ${topic}`,

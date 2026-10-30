@@ -29,7 +29,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
-import { isAnthropicCreditExhaustion, groqModel } from './llm-resilience';
+import { isAnthropicCreditExhaustion, groqModel, sonnetModel } from './llm-resilience';
 import { bdSerpSearch, bdFetch, bdScrapingBrowserFetch, isBrightDataConfigured } from './brightdata-enrich';
 
 export type ResearchMode = 'client' | 'employer' | 'competitor';
@@ -233,7 +233,7 @@ export async function runResearchAgent(
   const started = Date.now();
   const maxToolCalls = opts.maxToolCalls ?? 8;
   const timeoutMs = opts.timeoutMs ?? 120_000;
-  const model = opts.model ?? 'claude-sonnet-4-5';
+  const model = opts.model ?? sonnetModel();
 
   if (!isBrightDataConfigured()) {
     return {

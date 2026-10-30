@@ -7,7 +7,7 @@
 
 import Groq from 'groq-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback, groqModel } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel, sonnetModel } from './llm-resilience';
 import {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
@@ -20,7 +20,6 @@ import {
 } from './database';
 import { pushLeadToHubSpot, HS_STAGES, getActionableHubSpotDeals, isFreeEmailDomain } from "./hubspot-client";
 
-const CLAUDE_MODEL = 'claude-sonnet-4-5';
 /** Groq free tier TPM ~12k — huge inquiry bodies must be clipped or requests fail with 413. */
 const TRIAGE_CONTEXT_MAX_CHARS = 3600;
 const TRIAGE_FALLBACK_MODEL = process.env.TRIAGE_FALLBACK_MODEL || 'claude-haiku-4-5-20251001';
@@ -175,7 +174,7 @@ async function classifyLead(
     try {
       const refineCtx = truncateTriageContext(lead.context).slice(0, 2500);
       const refined = await claudeWithGroqFallback(
-        anthropic, CLAUDE_MODEL, 150, null,
+        anthropic, sonnetModel(), 150, null,
         `Refine this lead summary to be maximally actionable in one sentence.
 Context: ${refineCtx}
 Current summary: ${parsed.one_line_summary}

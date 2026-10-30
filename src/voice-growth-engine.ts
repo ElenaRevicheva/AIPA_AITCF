@@ -15,7 +15,7 @@
  */
 
 import type Anthropic from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, sonnetModel } from './llm-resilience';
 import type { TranscribeResult } from './speechmatics';
 
 const AIDEAZZ_SITE = (process.env.AIDEAZZ_SITE_URL || 'https://aideazz.xyz').replace(/\/$/, '');
@@ -125,7 +125,7 @@ export async function buildContentCluster(
 ): Promise<ContentCluster> {
   const numSocial = opts.numSocialPerChannel ?? 3;
   const channels = opts.channels ?? ['linkedin', 'instagram'];
-  const model = opts.model || process.env.VOICE_ENGINE_MODEL || 'claude-sonnet-4-5-20250929';
+  const model = opts.model || process.env.VOICE_ENGINE_MODEL || sonnetModel();
   const transcriptEN = source.transcript;
   const transcriptES = source.translations['es'] || '';
 
