@@ -341,6 +341,14 @@ export const HERO_BEACON = { x: process.env.PODCAST_HERO_BEACON_X?.trim() || '0.
  *  still to empty sky (Elena, 29 Oct, "on cell it is torn"). Mast tip at 50% across, 19% down. */
 export const HERO_BEACON_SQUARE = { x: process.env.PODCAST_HERO_BEACON_SQ_X?.trim() || '0.50', y: process.env.PODCAST_HERO_BEACON_SQ_Y?.trim() || '0.19' };
 /** The square still's URL: the cover's source, next to hero.jpg. */
+/** Tab + home-screen icon = the AIdeazz AZ mark, the same files as aideazz.xyz and EspaLuz (Elena, 30 Oct: "the icon
+ *  should be the same actual AZ as other pages have"). Served from the podcast site itself so /favicon.ico also works. */
+export function brandIconLinks(meta: PodcastMeta): string {
+  const site = meta.siteUrl.replace(/\/$/, '');
+  return `<link rel="icon" href="${site}/favicon.ico?v=az1" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="${site}/favicon-32.png?v=az1"/>
+<link rel="apple-touch-icon" href="${site}/apple-touch-icon.png?v=az1"/>`;
+}
 export function heroSquareUrl(meta: PodcastMeta): string {
   return meta.heroUrl ? meta.heroUrl.replace(/hero\.jpg$/, 'cover-source.jpg') : meta.coverUrl;
 }
@@ -395,8 +403,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${xmlEscape(meta.title)} — AI podcast by ${xmlEscape(meta.author)}</title>
-<link rel="icon" type="image/png" href="https://aideazz.xyz/faviconnew.png"/>
-<link rel="apple-touch-icon" href="https://aideazz.xyz/faviconnew.png"/>
+${brandIconLinks(meta)}
 <meta name="description" content="${xmlEscape(seoDesc)}"/>
 <meta name="keywords" content="AI podcast, AI-augmented, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, AIdeazz, Elena Revicheva"/>
 <meta name="author" content="${xmlEscape(meta.author)}"/>

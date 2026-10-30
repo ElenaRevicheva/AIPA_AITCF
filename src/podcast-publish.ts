@@ -8,7 +8,7 @@
  * Gated by the caller (PODCAST_PUBLISH_ENABLED). Uses the same GITHUB_TOKEN as the blog pipeline.
  */
 
-import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, brandCss, brandLockup, BRAND_FONTS_HREF, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, brandCss, brandIconLinks, brandLockup, BRAND_FONTS_HREF, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
 
 /** URL of the real AIdeazz brand icon (the gradient "A" mark in the aideazz.xyz address bar). */
 const BRAND_ICON_URL = process.env.PODCAST_ICON_URL?.trim() || 'https://aideazz.xyz/faviconnew.png';
@@ -224,7 +224,7 @@ export function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
 <meta property="og:title" content="${esc(e.title)}"/>
 <meta property="og:image" content="${meta.coverUrl}"/>
 <meta name="theme-color" content="#020617"/>
-<link rel="icon" type="image/png" href="https://aideazz.xyz/faviconnew.png"/>
+${brandIconLinks(meta)}
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="${BRAND_FONTS_HREF}" rel="stylesheet"/>
 <style>
