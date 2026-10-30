@@ -55,7 +55,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-30 15:20 | CRM client lane = CLIENT deals in I Act TODAY (Elena go); 6 skeleton client deals out of I Act TODAY | `src/client-lane.ts` → Oracle `dist/client-lane.js` + `pm2 restart cto-aipa`; HubSpot 6 deal stages | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -251,11 +250,12 @@ git log keeps the record.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
 
-### 🧭 30 Oct ~15:10 UTC — CRM CLIENT lane is all skeletons (read only, nothing changed) · needs Elena's go
-- **Measured:** `/queue/api/today` serves 25 client cards (client/new 44). **All 25** link to HubSpot deals in **⏳ Sent — passive wait** — already contacted. Most created Jul–Aug; Panama Equity and Mimosa Spa appear twice (two drafts, one deal).
-- **Why:** `src/client-lane.ts` fills the lane from `docs/selling/outreach-registry.json` top-40 by score, excluding only slugs in `data/resend-ledger.json`. Anything sent by WhatsApp / HubSpot email / Make is invisible to it, and it never reads the deal stage. Log: `[client-lane] queued 40, closed 0 already-sent, pool 246 unsent`.
-- **HubSpot I Act TODAY (non-hiring) = 34 deals:** 5 `[CLIENT-CTO-INGEST]` from 9 May with no notes (Interventas, Content Solutions AI, Genius Remote Panamá, +AAA Development, ASI GROUP) · 1 placeholder `[CLIENT-MANUAL] HIT-LIST — remaining 30 targets` · 1 `[PARTNER-MANUAL] PUMAS.digital` (partner, see memory before touching) · 27 Atlas/ingest deals Aug–Oct.
-- **Proposal (one filter, mirrors the hiring lane):** client lane = CLIENT deals in I Act TODAY only; a registry draft shows when one exists; rows whose deal left I Act TODAY → machine-`skipped` with undo file; her own Skip never revived. Plus her verdict on the 7 skeleton deals in HubSpot. **Not built — Elena's go.**
+### ✅ 30 Oct ~16:08 UTC — CRM CLIENT lane = 27 CLIENT deals in HubSpot I Act TODAY, one card each (Elena's go) · claim released
+- **Was:** 25 cards served, all deals already in ⏳ Sent — passive wait (registry top-40 minus Resend ledger; WA/HubSpot/Make sends invisible), 2 duplicated.
+- **Now (cto-aipa `70c71aeb`, `src/client-lane.ts`):** `[CLIENT-*]` deals in I Act TODAY (HubSpot read only; token search also matched PUMAS' "(not a client" → name must start `[CLIENT-`); best unsent registry draft per deal, else a deal-only card; other open rows → machine-`skipped` (acted_at empty, undo `~/_session-backups/queue-client-sync-*.json`); her Skip never revived; HubSpot failure = no change. Hourly (was 6h). Page client limit 25 → 50.
+- **HubSpot (Elena's go):** 6 skeleton deals → ❌ Closed with reason "Elena 30 Oct 2026: …": Interventas, Content Solutions AI, Genius Remote Panamá, +AAA Development, ASI GROUP, HIT-LIST placeholder. Undo `~/_session-backups/client-skeletons-undo-2026-10-30T16-03-53-215Z.json`. PUMAS untouched (stays in HubSpot I Act TODAY, not in the CRM client lane).
+- **VERIFIED BY:** pm2 log `[client-lane] I Act TODAY 27 client deals · queued 27 · closed 0 already-sent · skipped 44 not in I Act TODAY`; `/queue/api/today` → client 27 (21 with draft, 6 deal-only), duplicate deals 0, hiring 14. Oracle `dist/client-lane.js` md5 `07a554d7…`, `queue-routes.js` `994620720b…` = build of `70c71aeb`; cto-aipa started 16:07:18 UTC, newer than the files. Backup of old dist: `~/_session-backups/client-lane-20261030/`.
+- **RISK:** drafts are old registry letters — the 85+ audit rule ([[feedback_never_claim_invisible_on_high_audit]]) still applies before any send; 6 deal-only cards need a letter written.
 
 ### ✅ 30 Oct ~14:48 UTC — CRM hiring lane = 14 LIVE I Act TODAY jobs; 6 closed postings swept · claim released
 - **Checked:** every row `/queue/api/today` served (20) was already in HubSpot I Act TODAY — no other stage leaks in (page shows `status='new'` only; hourly :41 sync keeps it equal). **But 6 were dead:** 4 Puente Talent ("This role is no longer accepting applications."), SIPEngines on Torre ("This job post is closed."), David Kennedy Teamtailor (HTTP 410).
