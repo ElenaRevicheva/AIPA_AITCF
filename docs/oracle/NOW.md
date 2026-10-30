@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Oct 01:10 | podcast hero v3: Atuona cinemagraph (Runway img→video), physical beacon light, living grain, scroll depth | `src/podcast-feed.ts`, `scripts/podcast-hero-*.cjs`, repo `aideazz-podcast` (+hero mp4s), Oracle dist podcast-feed.js | a8add602 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
