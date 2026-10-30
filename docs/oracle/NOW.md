@@ -40,13 +40,13 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 
 **22 Oct — EspaLuz Alisa mode: Pere + Titi talk in their own voices (LIVE).** DONE: per-hero MiniMax voices (Replicate, `REPLICATE_API_TOKEN` added to the bot `.env`) over 4 new talking clips in `heroes/`; gTTS voice note skipped for Alisa. NEXT (Elena): pick voices from the samples → set `PERE_VOICE` / `TITI_VOICE` in the bot `.env` + restart. VERIFIED BY: Oracle dry run built a 17 s Pere→Titi→Pere video in 31 s; sample sent to CTO Telegram; bot active 14:55 UTC. RISK: adds ~30 s per Alisa reply; a Replicate failure falls back to the old gTTS video. Steps 3–4 (exact lip-sync, live rig) deferred by Elena.
 
-**🔁 30 Oct — Sonnet 4.5 retires 30 Nov (degraded from TODAY): model id now comes from `.env`, code pushed, Oracle deploy WAITS for Elena's "Deploy".**
-- DONE: every Sonnet call site reads env, default `claude-sonnet-4-6`. Knob = `CLAUDE_SONNET_MODEL` (cto-aipa `sonnetModel()` in `src/llm-resilience.ts` `0765bc83`; VJH `sonnet_model()` in `src/utils/model_config.py` `05bb922`; dragontrade `e1195f8`); EspaLuz keeps its own `CLAUDE_MODEL_NAME` (WhatsApp `76d8b41`, Familybot `bb580f6`). Next retirement = edit one `.env` line + restart.
-- NEXT (needs Elena's OK, the classifier refused the production deploy): run the staged script: `scp -r /tmp/sonnet/deploy oracle-cto-aipa:sonnet-deploy && ssh oracle-cto-aipa bash ~/sonnet-deploy/apply.sh`. It backs up each file and `.env` (`*.bak-sonnet-20261030`), copies 23 files (all 18 non-dist live files md5 == git before the change; the 7 cto-aipa dist files differ only by the model lines), edits `EspaLuzWhatsApp/espaluz_bridge.py` IN PLACE (Oracle-only drift, never copy over it), sets the env knobs, then restarts cto-aipa, dragontrade-main, vibejobhunter(+web) and espaluz-whatsapp/familybot.
-- 🔴 FOUND: Oracle `EspaLuzWhatsApp/.env` has `CLAUDE_MODEL_NAME=claude-sonnet-4-20250514`, an id retired in June, so `main.py` there 404s today. The deploy script fixes it.
-- OPEN: OpenClaw still lists `anthropic/claude-sonnet-4-5` (`~/.openclaw/openclaw.json`, written by `scripts/model-tier.cjs`). That file has someone's UNCOMMITTED 26 Oct diff on the laptop, so it was left untouched. Swap it before 30 Nov, after checking OpenClaw 2026.2.14's catalog knows `claude-sonnet-4-6`.
-- VERIFIED BY: tsc 0; py_compile + import of all edited VJH modules; `node --check`; `grep claude-sonnet-4-5` in source = 0 call sites in all 5 repos.
-- RISK: not live-probed (the classifier refused the key probe). `claude-sonnet-4-6` answered 200 on the cto-aipa key on 15 Jun. The Anthropic org was out of credit on 28 Oct, so every path falls back to Groq/Gemini either way.
+**🔁 30 Oct — Sonnet 4.5 retires 30 Nov: model ids now come from `.env`, and Claude is LAST in free mode on every cto-aipa path. LIVE on Oracle 15:59 / 16:02 UTC.**
+- DONE: knob `CLAUDE_SONNET_MODEL=claude-sonnet-4-6` in cto-aipa, VJH and dragontrade `.env`; EspaLuz uses `CLAUDE_MODEL_NAME` (+ Familybot `CLAUDE_CHAIN_MODEL`). Next retirement = edit those lines + restart. Commits: cto-aipa `0765bc83` `0c78e522` `798a1a46`, VJH `05bb922`, WA `76d8b41`, Family `bb580f6`, Algom `e1195f8`. Backups on Oracle: `*.bak-sonnet-20261030`, `*.bak-review-20261030`.
+- DONE, found while deploying: the 25 Oct "Claude last when `MODEL_TIER=free`" rule existed only in `completeWithProfile`. `claudeWithGroqFallback` (21 callers) and the GitHub code review (Opus → Haiku → "review failed") still asked Claude FIRST: 20 + 13 credit-400 lines in the log. Both now hand over to the shared chain in free mode.
+- 🔴 FIXED: Oracle `EspaLuzWhatsApp/.env` had `CLAUDE_MODEL_NAME=claude-sonnet-4-20250514` (retired in June).
+- WAITS FOR ELENA: VJH (~20 direct Claude calls), EspaLuz WA/Family (quality chain) and Algom have no `MODEL_TIER` switch at all: Claude refuses in under 1 s (no credit = no cost) and their own waterfall answers. Giving them the switch means `model-tier.cjs` also writes `MODEL_TIER` into their `.env`. That is new wiring, so it is her call.
+- OPEN: OpenClaw still lists `anthropic/claude-sonnet-4-5` (`scripts/model-tier.cjs` TIERS; the laptop copy has an uncommitted 26 Oct diff, left untouched). Swap it before 30 Nov.
+- VERIFIED BY: live call on Oracle through `dist/llm-resilience.js`: `tier=free claudeAskedFirst=false`, Gemini answered "waterfall ok" in 2.9 s, skipped []. All 6 services active, 0 traceback lines since restart; cto-aipa started 16:02:27, after the file (16:02:26); live md5 = build.
 
 ## 1. The session board — claim before you touch
 
@@ -56,7 +56,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-10-30 15:20 | CRM client lane = CLIENT deals in I Act TODAY (Elena go); 6 skeleton client deals out of I Act TODAY | `src/client-lane.ts` → Oracle `dist/client-lane.js` + `pm2 restart cto-aipa`; HubSpot 6 deal stages | — |
-| Claude Code | 2026-10-30 16:20 | DEPLOYING Sonnet env switch + Claude-last in free mode (Elena: "yes, deploy") | Oracle: cto-aipa dist, VJH src, EspaLuz WA/Family, dragontrade + their .env; restarts all six | 0c78e522 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
