@@ -522,7 +522,9 @@ ${brandCss()}
   footer{text-align:center;padding:54px 20px 50px;color:var(--ink-45);font:300 11px var(--lab);letter-spacing:.14em;text-transform:uppercase;border-top:1px solid var(--line);margin-top:54px}
   footer .big{display:block;margin:0 auto 22px;max-width:30ch;font:400 clamp(1.3rem,3vw,2.2rem)/1.15 var(--serif);letter-spacing:0;text-transform:none;color:var(--ink-60)}
   footer .big em{font-style:italic;color:var(--amber)}
-  footer .g{background-image:var(--ramp-fb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* the lab's mark, as on aideazz.xyz/atlas: serif copyright line + spaced small caps under it */
+  footer .copy{display:block;font:400 clamp(22px,2.6vw,30px)/1.2 var(--serif);letter-spacing:0;text-transform:none;color:var(--ink)}
+  footer .rights{display:block;margin-top:10px;font:300 11px var(--lab);letter-spacing:.32em;text-transform:uppercase;color:var(--ink-45)}
   @media(max-width:680px){.hero-img{object-position:center 30%;transform-origin:50% 20%}.hero-dither{opacity:.16}.hero-grain{opacity:.1}.hero-glow,.hero-flow{-webkit-mask-size:3px 3px;mask-size:3px 3px}
     .hero-veil{background:linear-gradient(180deg,rgba(var(--veil),.5) 0%,rgba(var(--veil),.12) 22%,rgba(var(--veil),.35) 48%,rgba(var(--veil),.9) 80%,var(--bg) 100%)}}
   @media(max-width:680px){.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}.hero-in{padding-top:120px}.display{max-width:none}}
@@ -605,7 +607,8 @@ ${rows}
 </div>
 <footer>
   <span class="big">Built in public, <em>on the go</em> — one person, a fleet of agents, and the honest notes.</span>
-  © ${new Date().getFullYear()} ${esc(meta.author)} &middot; AIdeazz AI Lab &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span>
+  <span class="copy">&copy; ${new Date().getFullYear()} AIdeazz AI Lab</span>
+  <span class="rights">All rights reserved</span>
 </footer>
 <script>
   // Pointer parallax + glow (as on hud.ai / Perplexity hero art): the still drifts a few px against the cursor and the
