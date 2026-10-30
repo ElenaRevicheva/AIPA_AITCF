@@ -10,6 +10,7 @@
  *   opus   — the grant is fresh and large (set by hand; today's state until 8 Nov)
  *   claude — a new grant arrived: Sonnet (covered by the Max plan she already pays)
  *   free   — no grant: Gemini first (free tier), Claude only if Gemini fails
+ *   Every tier wires ALL FIVE providers (Gemini, Groq, Grok, OpenAI, Claude) — only the order changes (Elena, 26 Oct).
  * and tells her in Telegram which one, and why.
  *
  *   node scripts/model-tier.cjs --auto          (cron daily; acts and messages her ONLY when the tier changes)
@@ -28,13 +29,13 @@ const arg = (k) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').sli
 
 const TIERS = {
   opus: { env: { MODEL_TIER: 'claude', STUDY_PACK_MODEL: 'claude-opus-5-5', FACTCHECK_MODEL: 'claude-opus-5-5' },
-    openclaw: { primary: 'anthropic/claude-opus-4-6', fallbacks: ['anthropic/claude-sonnet-4-5', 'google/gemini-2.5-flash', 'xai/grok-3', 'openai/gpt-4.1'] } },
+    openclaw: { primary: 'anthropic/claude-opus-4-6', fallbacks: ['anthropic/claude-sonnet-4-5', 'google/gemini-flash-latest', 'groq/openai/gpt-oss-120b', 'xai/grok-3', 'openai/gpt-4.1'] } },
   claude: { env: { MODEL_TIER: 'claude', STUDY_PACK_MODEL: 'claude-sonnet-5-5', FACTCHECK_MODEL: 'claude-sonnet-5-5' },
-    openclaw: { primary: 'anthropic/claude-sonnet-4-5', fallbacks: ['google/gemini-2.5-flash', 'xai/grok-3', 'openai/gpt-4.1'] } },
+    openclaw: { primary: 'anthropic/claude-sonnet-4-5', fallbacks: ['google/gemini-flash-latest', 'groq/openai/gpt-oss-120b', 'xai/grok-3', 'openai/gpt-4.1'] } },
   free: { env: { MODEL_TIER: 'free', STUDY_PACK_MODEL: 'claude-sonnet-5-5', FACTCHECK_MODEL: 'claude-sonnet-5-5' },
     // 25 Oct 22:05: with Claude second, its billing failure ended the turn ("No backup answered") — in free mode the
     // next model after Gemini must come from another company; Claude (no credit) last, still wired.
-    openclaw: { primary: 'google/gemini-flash-latest', fallbacks: ['google/gemini-2.5-flash', 'xai/grok-3', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5'] } },
+    openclaw: { primary: 'google/gemini-flash-latest', fallbacks: ['google/gemini-2.5-flash', 'groq/openai/gpt-oss-120b', 'xai/grok-3', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5'] } },
     // 25 Oct 23:40: gemini-flash-latest (served as gemini-3.8-flash, free) read slide 2 correctly where 2.5-flash
     // reversed its meaning; gemini-pro-latest is better still but not in OpenClaw 2026.2.14's model catalog.
 };
