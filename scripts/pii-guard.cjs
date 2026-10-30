@@ -456,6 +456,37 @@ for (const rel of staged) {
     warnings.push(...(t.match(PHONE_RE) || []));
   }
 }
+// 30 Oct 2026 — paid-model gate (Elena approved "A+B"). The cost order (free providers first, Claude last while
+// MODEL_TIER=free, Claude first when there is credit) lives in each repo's gateway file. On 30 Oct 33 calls in one
+// day still asked Claude first because they called it directly, written before the rule or without knowing it.
+// So: an ADDED line that calls Claude directly blocks the commit, unless it is in a gateway file or carries a
+// `tier-gated` marker (meaning: a free-tier check runs before it and hands over to the waterfall).
+const MODEL_GATEWAYS = /(^|\/)(llm-resilience\.ts|llm_chain\.py|claude_helper\.py|llm_judge\.py)$/;
+const DIRECT_CLAUDE = /messages\.create\s*\(|api\.anthropic\.com\/v1\/messages/;
+const CODE_FILE = /\.(ts|tsx|js|cjs|mjs|py)$/;
+const directCalls = [];
+for (const rel of staged) {
+  if (!CODE_FILE.test(rel) || MODEL_GATEWAYS.test(rel) || /(^|\/)(tests?|__tests__)\//.test(rel) || /\.(test|spec)\./.test(rel)) continue;
+  let diff = '';
+  try { diff = git(['diff', '--cached', '-U0', '--', rel], repo); } catch { continue; }
+  let ln = 0;
+  for (const line of diff.split('\n')) {
+    const h = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
+    if (h) { ln = Number(h[1]) - 1; continue; }
+    if (line.startsWith('+++')) continue;
+    if (line.startsWith('+')) {
+      ln++;
+      if (DIRECT_CLAUDE.test(line) && !/tier-gated/.test(line)) directCalls.push({ kind: 'DIRECT_CLAUDE_CALL', rel, sample: `line ${ln}: ${line.slice(1).trim().slice(0, 90)}` });
+    } else if (!line.startsWith('-')) ln++;
+  }
+}
+if (directCalls.length) {
+  findings.push(...directCalls);
+  console.error('\nA direct Claude call skips the cost order (free first; Claude last while MODEL_TIER=free).');
+  console.error('Route it through the waterfall: completeWithProfile / claudeWithGroqFallback (cto-aipa),');
+  console.error('llm_chain / claude_helper (Python bots). If a free-tier check already runs before it and');
+  console.error('hands over to the waterfall, mark the line with a `tier-gated` comment.');
+}
 if (LISTED && findings.length) {
   console.error('\nThis repo is one of the eight assets in the DataVendor listing.');
   console.error('Its PII gate is binary: score = 55 - 5.75*ln(findings), pass is 71, so a');

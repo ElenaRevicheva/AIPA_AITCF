@@ -69,3 +69,7 @@ files or the AI Ops Wiki. Link to those instead.
 
 > The same contract is in `CLAUDE.md` for Claude Code. If you change one, change both —
 > a rule that only one side can read is the bug this rule exists to prevent.
+
+## Paid-model calls (mirror of CLAUDE.md §4)
+
+- **Never call Claude directly — go through the cost-aware waterfall** (Elena, 30 Oct 2026). Order: free first (Gemini → Groq → Grok → OpenAI), Claude LAST while `MODEL_TIER=free`, Claude first when there is credit; `scripts/model-tier.cjs` sets the tier from her Anthropic billing mail. Use `completeWithProfile` / `claudeWithGroqFallback` (cto-aipa) or `llm_chain` / `claude_helper` (Python bots). A direct `messages.create` must sit behind `if (freeTier())` and carry a `tier-gated` comment — `scripts/pii-guard.cjs` blocks any added line that does not. Model ids come from `.env` (`CLAUDE_SONNET_MODEL`, EspaLuz `CLAUDE_MODEL_NAME`), never a literal.

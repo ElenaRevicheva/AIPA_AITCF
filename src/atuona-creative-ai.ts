@@ -9,7 +9,7 @@ import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
-import { grokComplete, groqModel, deepseekComplete, deepseekConfigured, completeWithProfileDetailed } from './llm-resilience';
+import { grokComplete, groqModel, deepseekComplete, deepseekConfigured, completeWithProfileDetailed, freeTier } from './llm-resilience';
 import {
   parseVideoProvider,
   providerGrade,
@@ -4335,6 +4335,8 @@ async function createContent(
       // 7 Oct 2026: Fable 5.1 / Opus 5+ reject `temperature` (400) and always think — thinking spends from max_tokens,
       // so give room. Fable gets Anthropic's server-side refusal fallback; a refusal that survives it drops to the
       // DeepSeek/Groq/Grok chain below instead of returning empty text.
+      // 30 Oct 2026: free mode skips Claude; the fallback below (DeepSeek, Groq, Grok, shared chain) writes instead.
+      if (freeTier()) { const e: any = new Error('MODEL_TIER=free'); e.status = 400; throw e; }
       const model = AI_CONFIG.primaryModel;
       const noSampling = /^claude-(fable|mythos|opus-5|sonnet-5|opus-4-[78])/.test(model);
       const serverFallback = /^claude-(fable|mythos)/.test(model);

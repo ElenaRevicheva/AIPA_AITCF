@@ -29,7 +29,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
-import { isAnthropicCreditExhaustion, groqModel, sonnetModel } from './llm-resilience';
+import { isAnthropicCreditExhaustion, groqModel, sonnetModel, freeTier } from './llm-resilience';
 import { bdSerpSearch, bdFetch, bdScrapingBrowserFetch, isBrightDataConfigured } from './brightdata-enrich';
 
 export type ResearchMode = 'client' | 'employer' | 'competitor';
@@ -267,7 +267,9 @@ export async function runResearchAgent(
 
     let resp: Anthropic.Message;
     try {
-      resp = await anthropic.messages.create({
+      // 30 Oct 2026: free mode goes straight to the fallback below (Perplexity researches it whole), Claude not first.
+      if (freeTier()) throw new Error('MODEL_TIER=free');
+      resp = await anthropic.messages.create({ // tier-gated
         model,
         max_tokens: 2048,
         system,

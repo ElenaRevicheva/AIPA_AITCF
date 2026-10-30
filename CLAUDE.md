@@ -299,6 +299,7 @@ preference. Never let a model re-tell an incident.
   the second pass, after the letter exists). Done = the deal carries 🔎 company brief (Perplexity), 🎯 role defense,
   🛡️ technical defense + the posting-shaped CV, ✅ cover letter, 📋 Comet prompt — and `node scripts/hs-audit-apply-kit.cjs`
   on Oracle shows the deal ✓ in every column. Read the notes back from HubSpot before saying it is done.
+- **Never call Claude directly — go through the cost-aware waterfall** (Elena, 30 Oct 2026). Order: free first (Gemini → Groq → Grok → OpenAI), Claude LAST while `MODEL_TIER=free`, Claude first when there is credit; `scripts/model-tier.cjs` sets the tier from her Anthropic billing mail. Use `completeWithProfile` / `claudeWithGroqFallback` (cto-aipa) or `llm_chain` / `claude_helper` (Python bots). A direct `messages.create` must sit behind `if (freeTier())` and carry a `tier-gated` comment — `scripts/pii-guard.cjs` blocks any added line that does not. Model ids come from `.env` (`CLAUDE_SONNET_MODEL`, EspaLuz `CLAUDE_MODEL_NAME`), never a literal.
 - **Never `git add -A`** here — stage named files only.
 - Build locally, `scp` to Oracle, then **always `pm2 restart cto-aipa
   --update-env`**. Node caches modules; a copied file with no restart means the

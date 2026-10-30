@@ -7,7 +7,7 @@ import { registerCommunityCallbacks } from './community-notify';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
-import { claudeWithGroqFallback, groqModel, completeWithProfileDetailed, geminiComplete } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel, completeWithProfileDetailed, geminiComplete, freeTier } from './llm-resilience';
 import { 
   getRelevantMemory, 
   saveMemory,
@@ -742,9 +742,11 @@ function escapeMarkdown(text: string): string {
 // =============================================================================
 
 async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> {
+  // 30 Oct 2026: free mode = the shared chain from the start (Claude last); with credit, Claude first as before.
+  if (freeTier()) return (await completeWithProfileDetailed('quality', null, prompt, maxTokens, 'telegram/askAI')).text;
   // Try Claude first (better quality)
   try {
-    const response = await anthropic.messages.create({
+    const response = await anthropic.messages.create({ // tier-gated
       model: 'claude-opus-4-8',
       max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }]
@@ -8070,8 +8072,10 @@ Keep response concise for Telegram. Use emojis.`;
       try {
         // Claude takes images up to 5 MB; a bigger file goes straight to the waterfall below.
         if (base64Image.length > 5 * 1024 * 1024) throw new Error('image over Claude\'s 5 MB limit');
+        // 30 Oct 2026: free mode skips straight to the waterfall below (Claude last there).
+        if (freeTier()) throw new Error('MODEL_TIER=free');
         // Try Claude Vision (requires credits)
-        const response = await anthropic.messages.create({
+        const response = await anthropic.messages.create({ // tier-gated
           model: 'claude-opus-4-8',
           max_tokens: 1500,
           messages: [{
@@ -8285,7 +8289,9 @@ Write it all in the ANSWER LANGUAGE above. Keep it concise for Telegram: plain t
         try {
           // A long PDF costs Opus about 1.5-3k tokens a page and Claude stops at 100 pages; Gemini reads it whole.
           if (facts.pages > PDF_CLAUDE_MAX_PAGES) throw new Error(`${facts.pages} pages, over ${PDF_CLAUDE_MAX_PAGES} for Claude`);
-          const response = await anthropic.beta.messages.create({
+          // 30 Oct 2026: free mode reads the PDF with Gemini first (Claude last).
+          if (freeTier()) throw new Error('MODEL_TIER=free');
+          const response = await anthropic.beta.messages.create({ // tier-gated
             model: 'claude-opus-4-8',
             max_tokens: 1500,
             messages: [{ role: 'user', content: [

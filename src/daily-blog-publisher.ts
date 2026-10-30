@@ -17,7 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
-import { claudeWithGroqFallback, geminiComplete, groqModel, completeWithProfileDetailed } from "./llm-resilience";
+import { claudeWithGroqFallback, geminiComplete, groqModel, completeWithProfileDetailed, freeTier } from "./llm-resilience";
 import { SITEMAP_COMMIT_MESSAGE, devtoCanonicalPreface } from "./blog-github-commit";
 import {
   MIN_FACTS,
@@ -87,7 +87,9 @@ async function blogOwnChain(
     console.warn("📰 Gemini blog-gen failed, falling back to Anthropic/Groq/Grok:", String(ge?.message || ge).slice(0, 120));
   }
   try {
-    const resp = await anthropic.messages.create({
+    // 30 Oct 2026: free mode skips Claude here; the shared chain (Groq, Grok, OpenAI, Claude last) writes instead.
+    if (freeTier()) throw new Error("MODEL_TIER=free");
+    const resp = await anthropic.messages.create({ // tier-gated
       model,
       max_tokens: maxTokens,
       ...(system ? { system } : {}),

@@ -7,7 +7,7 @@
 
 import Groq from 'groq-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback, groqModel, sonnetModel } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel, sonnetModel, freeTier, completeWithProfile } from './llm-resilience';
 import {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
@@ -98,14 +98,21 @@ async function classifyLeadAnthropic(
   prompt: string,
   anthropic: Anthropic
 ): Promise<TriageResult> {
-  const response = await anthropic.messages.create({
-    model: TRIAGE_FALLBACK_MODEL,
-    max_tokens: 350,
-    temperature: 0.1,
-    messages: [{ role: 'user', content: prompt }],
-  });
-  const raw =
-    response.content[0]?.type === 'text' ? response.content[0].text.trim() : '{}';
+  // 30 Oct 2026: free mode classifies via the shared chain (Gemini first, Claude last); with credit, Claude first,
+  // and if Claude fails the shared chain still answers instead of returning a blank default triage.
+  let raw: string;
+  try {
+    if (freeTier()) throw new Error('MODEL_TIER=free');
+    const response = await anthropic.messages.create({ // tier-gated
+      model: TRIAGE_FALLBACK_MODEL,
+      max_tokens: 350,
+      temperature: 0.1,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    raw = response.content[0]?.type === 'text' ? response.content[0].text.trim() : '{}';
+  } catch {
+    raw = (await completeWithProfile('classify', null, prompt, 350, 'triage')).trim() || '{}';
+  }
   const parsed = parseTriageJson(raw) || defaultTriage();
   parsed.urgency = Math.max(1, Math.min(5, Math.round(parsed.urgency || 1)));
   parsed.signal_type = parsed.signal_type || 'unknown';
