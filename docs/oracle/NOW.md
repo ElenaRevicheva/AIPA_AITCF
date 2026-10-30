@@ -40,6 +40,14 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 
 **22 Oct — EspaLuz Alisa mode: Pere + Titi talk in their own voices (LIVE).** DONE: per-hero MiniMax voices (Replicate, `REPLICATE_API_TOKEN` added to the bot `.env`) over 4 new talking clips in `heroes/`; gTTS voice note skipped for Alisa. NEXT (Elena): pick voices from the samples → set `PERE_VOICE` / `TITI_VOICE` in the bot `.env` + restart. VERIFIED BY: Oracle dry run built a 17 s Pere→Titi→Pere video in 31 s; sample sent to CTO Telegram; bot active 14:55 UTC. RISK: adds ~30 s per Alisa reply; a Replicate failure falls back to the old gTTS video. Steps 3–4 (exact lip-sync, live rig) deferred by Elena.
 
+**🔁 30 Oct — Sonnet 4.5 retires 30 Nov (degraded from TODAY): model id now comes from `.env`, code pushed, Oracle deploy WAITS for Elena's "Deploy".**
+- DONE: every Sonnet call site reads env, default `claude-sonnet-4-6`. Knob = `CLAUDE_SONNET_MODEL` (cto-aipa `sonnetModel()` in `src/llm-resilience.ts` `0765bc83`; VJH `sonnet_model()` in `src/utils/model_config.py` `05bb922`; dragontrade `e1195f8`); EspaLuz keeps its own `CLAUDE_MODEL_NAME` (WhatsApp `76d8b41`, Familybot `bb580f6`). Next retirement = edit one `.env` line + restart.
+- NEXT (needs Elena's OK, the classifier refused the production deploy): run the staged script: `scp -r /tmp/sonnet/deploy oracle-cto-aipa:sonnet-deploy && ssh oracle-cto-aipa bash ~/sonnet-deploy/apply.sh`. It backs up each file and `.env` (`*.bak-sonnet-20261030`), copies 23 files (all 18 non-dist live files md5 == git before the change; the 7 cto-aipa dist files differ only by the model lines), edits `EspaLuzWhatsApp/espaluz_bridge.py` IN PLACE (Oracle-only drift, never copy over it), sets the env knobs, then restarts cto-aipa, dragontrade-main, vibejobhunter(+web) and espaluz-whatsapp/familybot.
+- 🔴 FOUND: Oracle `EspaLuzWhatsApp/.env` has `CLAUDE_MODEL_NAME=claude-sonnet-4-20250514`, an id retired in June, so `main.py` there 404s today. The deploy script fixes it.
+- OPEN: OpenClaw still lists `anthropic/claude-sonnet-4-5` (`~/.openclaw/openclaw.json`, written by `scripts/model-tier.cjs`). That file has someone's UNCOMMITTED 26 Oct diff on the laptop, so it was left untouched. Swap it before 30 Nov, after checking OpenClaw 2026.2.14's catalog knows `claude-sonnet-4-6`.
+- VERIFIED BY: tsc 0; py_compile + import of all edited VJH modules; `node --check`; `grep claude-sonnet-4-5` in source = 0 call sites in all 5 repos.
+- RISK: not live-probed (the classifier refused the key probe). `claude-sonnet-4-6` answered 200 on the cto-aipa key on 15 Jun. The Anthropic org was out of credit on 28 Oct, so every path falls back to Groq/Gemini either way.
+
 ## 1. The session board — claim before you touch
 
 There is no file locking. This table is the substitute, and it works only because both
@@ -47,7 +55,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-30 15:30 | Sonnet 4.5 retirement (30 Nov; degraded from 30 Oct): every Sonnet call site reads env, no hardcoded id | cto-aipa src (lead-triage, research-agent, podcast*, voice-growth-engine, llm-resilience); VJH, EspaLuzWhatsApp, EspaLuzFamilybot, dragontrade model lines + Oracle .env; restarts vibejobhunter, espaluz-*, dragontrade-main, cto-aipa | 600e52a7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
