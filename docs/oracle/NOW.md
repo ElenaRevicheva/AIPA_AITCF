@@ -55,7 +55,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-30 19:55 | aideazz.xyz phone home-screen icon = the AZ (Elena) | aideazz repo: public/apple-touch-icon.png, index.html, 6 public/*.html icon line, scripts/generate-ai-ops-wiki.mjs | df71792c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -215,7 +214,7 @@ git log keeps the record.
 
 
 ### ✅ 30 Oct ~19:40 UTC — podcast tab + home-screen icon = the AZ (Elena) · LIVE · Oracle deployed · claim released
-- **DONE:** podcast pages pointed at the old "A" (`aideazz.xyz/faviconnew.png`). Now `brandIconLinks()` in `src/podcast-feed.ts` (used by landing + episode pages) → the podcast site's own `favicon.ico` + `favicon-32.png` (= aideazz.xyz, md5 `abed3783…`/`e2d90073…`) + `apple-touch-icon.png` (= EspaLuz's AZ on violet, `5cd8e0f9…`), `?v=az1`. Note: aideazz.xyz's own apple-touch-icon is STILL the old "A" (`274b8fe0…`) — not touched. cto-aipa `be3f3c16`, aideazz-podcast `4d15faf`.
+- **DONE:** podcast pages pointed at the old "A" (`aideazz.xyz/faviconnew.png`). Now `brandIconLinks()` in `src/podcast-feed.ts` (used by landing + episode pages) → the podcast site's own `favicon.ico` + `favicon-32.png` (= aideazz.xyz, md5 `abed3783…`/`e2d90073…`) + `apple-touch-icon.png` (= EspaLuz's AZ on violet, `5cd8e0f9…`), `?v=az1`. aideazz.xyz's phone icon swapped too (19:58 UTC): `public/apple-touch-icon.png` = the same AZ `5cd8e0f9…` (was the old "A" `274b8fe0…`), `?v=az1` on index + atlas, atlas-finder, pitch, sop-ai-ops(-es), ai-ops-wiki and in `generate-ai-ops-wiki.mjs` (wiki-ship fast-forwards before generating, so the nightly rebuild keeps it). aideazz `4cbf5ce`; live icon md5 = `5cd8e0f98501`, all 5 pages carry `?v=az1`. cto-aipa `be3f3c16`, aideazz-podcast `4d15faf`.
 - **VERIFIED BY:** live icons md5 = local; live index `cdc93cdba119` and newest episode page `7c4d8dfd2f42` = git; Oracle `dist/podcast-feed.js` `f89e44c6…` + `podcast-publish.js` `e67d6859…` = laptop, files 19:40:34 < restart 19:40:36 UTC, backup `~/_session-backups/podcast-azicon-20261030-194034/`; Oracle's rebuild into a fresh clone produced the same two md5s (only `cover.png` re-encodes, harmless).
 
 ### ✅ 30 Oct ~19:35 UTC — podcast hero on LAPTOPS: whole building visible again · LIVE · Oracle generator deployed 19:36 UTC · claim released
