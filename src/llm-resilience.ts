@@ -378,7 +378,7 @@ const CHAIN_ORDER: Record<ChainProfile, ProviderName[]> = {
  */
 const PAID: ProviderName[] = ['claude'];
 let tierCache = { at: 0, free: false };
-function freeTier(): boolean {
+export function freeTier(): boolean {
   if (Date.now() - tierCache.at < 60_000) return tierCache.free;
   let free = (process.env.MODEL_TIER || '') === 'free';
   try {

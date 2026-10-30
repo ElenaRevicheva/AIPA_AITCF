@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback, groqModel } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel, freeTier, completeWithProfileDetailed } from './llm-resilience';
 import {
   initializeDatabase,
   saveMemory,
@@ -565,7 +565,23 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
   let review: string;
   let modelUsed: string;
 
-  if (hasCriticalIssues) {
+  // 30 Oct 2026: the 25-26 Oct order rule. In free mode the shared chain reviews (Claude last); a chain that
+  // runs out hands over to it before giving up, instead of ending on "Review generation failed".
+  const sharedChainReview = async (why: string): Promise<[string, string]> => {
+    const d = await completeWithProfileDetailed('quality', null, aiPrompt, Math.min(AI_MODELS.maxTokens, 8192), 'code-review');
+    return [d.text, `${d.provider} (shared chain, ${why})`];
+  };
+
+  if (hasCriticalIssues && freeTier()) {
+    try {
+      [review, modelUsed] = await sharedChainReview('MODEL_TIER=free');
+    } catch (err: unknown) {
+      const m = err instanceof Error ? err.message : String(err);
+      console.error(`🔐 Critical review: shared chain failed: ${m.slice(0, 220)}`);
+      review = `_(Review generation failed. Static analysis below.)_\n\n${analysisSummary}`;
+      modelUsed = 'unavailable';
+    }
+  } else if (hasCriticalIssues) {
     try {
       console.log(`🔐 Using ${AI_MODELS.critical} for critical code review...`);
       review = await anthropicTextReview(AI_MODELS.critical, aiPrompt, AI_MODELS.maxTokens);
@@ -583,8 +599,12 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
       } catch (err2: unknown) {
         const m2 = err2 instanceof Error ? err2.message : String(err2);
         console.error(`🔐 Haiku fallback failed: ${m2.slice(0, 220)}`);
-        review = `_(Review generation failed. Static analysis below.)_\n\n${analysisSummary}`;
-        modelUsed = 'unavailable';
+        try {
+          [review, modelUsed] = await sharedChainReview('Claude failed');
+        } catch {
+          review = `_(Review generation failed. Static analysis below.)_\n\n${analysisSummary}`;
+          modelUsed = 'unavailable';
+        }
       }
     }
   } else {
@@ -625,6 +645,7 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
         console.warn(`⚡ Groq review failed (${msg.slice(0, 160)}), using Claude Haiku fallback...`);
       }
       try {
+        if (freeTier()) throw new Error('MODEL_TIER=free: Claude goes last, after the shared chain');
         review = await anthropicTextReview(
           CODE_REVIEW_FALLBACK_MODEL,
           aiPrompt,
@@ -633,9 +654,14 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
         modelUsed = `${CODE_REVIEW_FALLBACK_MODEL} (Groq fallback)`;
       } catch (err2: unknown) {
         const m2 = err2 instanceof Error ? err2.message : String(err2);
-        console.error(`❌ Haiku fallback failed: ${m2.slice(0, 220)}`);
-        review = `_(Automated review unavailable: ${msg.slice(0, 280)})_\n\n**Static analysis:**\n${analysisSummary}`;
-        modelUsed = 'unavailable';
+        const free = m2.startsWith('MODEL_TIER=free');
+        if (!free) console.error(`❌ Haiku fallback failed: ${m2.slice(0, 220)}`);
+        try {
+          [review, modelUsed] = await sharedChainReview(free ? 'MODEL_TIER=free' : 'Groq + Claude failed');
+        } catch {
+          review = `_(Automated review unavailable: ${msg.slice(0, 280)})_\n\n**Static analysis:**\n${analysisSummary}`;
+          modelUsed = 'unavailable';
+        }
       }
     }
   }
