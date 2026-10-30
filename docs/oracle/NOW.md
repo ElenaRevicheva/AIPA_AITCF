@@ -63,6 +63,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 21:00 | DEPLOYING A+B (Elena: "yes, deploy") | Oracle: cto-aipa dist + model-tier.cjs, VJH src, EspaLuz WA/Family, Algom + MODEL_TIER in 5 bot .env; restarts all six | 40772c86 |
 | Claude Code | 30 Oct 20:20 | EspaLuz kids items 1-8 (step tracker, dialogue rules, pronunciation check, star unlock, both ways, photos, mission follow-up, weekly story) | `EspaLuzFamilybot/main.py`, ascent `Classroom.tsx` + `espaluz-chat`, Oracle `espaluz-familybot` | (this row) |
 
 **Rules**
