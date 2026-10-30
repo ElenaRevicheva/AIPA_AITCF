@@ -97,8 +97,20 @@ function apply(tier) {
   fs.copyFileSync(OCJSON, `${OCJSON}.bak-model-tier-${stamp}`);
   fs.writeFileSync(ENV, env);
   fs.writeFileSync(OCJSON, `${JSON.stringify(oc, null, 2)}\n`);   // OpenClaw hot-reloads its model config
-  console.log(`tier ${tier} applied (${stamp})`);
+  // 30 Oct 2026 (Elena: "A"): the other bots get the same switch, so a top-up or an empty account changes the order
+  // fleet-wide, not only in cto-aipa. Only the MODEL_TIER line is touched; each bot re-reads it on every call.
+  for (const bot of FLEET_ENVS) {
+    if (!fs.existsSync(bot)) continue;
+    const b = fs.readFileSync(bot, 'utf8');
+    const line = `MODEL_TIER=${t.env.MODEL_TIER}`;
+    const next = /^MODEL_TIER=.*$/m.test(b) ? b.replace(/^MODEL_TIER=.*$/m, line) : `${b.replace(/\n?$/, '\n')}${line}\n`;
+    if (next !== b) { fs.copyFileSync(bot, `${bot}.bak-model-tier-${stamp}`); fs.writeFileSync(bot, next); }
+  }
+  console.log(`tier ${tier} applied (${stamp}) — cto-aipa, OpenClaw and ${FLEET_ENVS.length} bot .env files`);
 }
+
+const FLEET_ENVS = ['VibeJobHunterAIPA_AIMCF', 'EspaLuzWhatsApp', 'EspaLuzFamilybot', 'EspaLuz_Influencer', 'dragontrade-agent']
+  .map((d) => path.join(HOME, d, '.env'));
 
 const STATE = path.join(HOME, '.openclaw', 'private', 'model-tier.json');
 function current() {
