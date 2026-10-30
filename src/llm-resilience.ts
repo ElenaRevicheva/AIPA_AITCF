@@ -201,6 +201,11 @@ export async function claudeWithGroqFallback(
   userPrompt: string,
   label: string,
 ): Promise<string> {
+  // 30 Oct 2026: the 25 Oct ORDER RULE reached the shared chain but not this helper (21 callers), so with
+  // MODEL_TIER=free it still asked Claude FIRST (20 "falling back to Groq" lines in the live log). In free
+  // mode hand over to the shared quality chain: Gemini → Groq → Grok → OpenAI → Claude last. With credit
+  // (tier claude/opus) the caller's Claude model goes first, as before.
+  if (freeTier()) return completeWithProfile('quality', systemPrompt, userPrompt, maxTokens, label);
   try {
     const resp = await anthropic.messages.create({
       model,
