@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-30 15:05 | CRM hiring lane = live I Act TODAY only: sweep misses closed postings (long desc → page never opened; HTTP 410 ignored) | VJH `scripts/sweep_i_act_today.py`; HubSpot I Act TODAY stages (AUTO-SWEEP, undo file) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -229,6 +228,14 @@ git log keeps the record.
 - **NEXT (acceptance, whoever is next):** the first real voice note through the new path is the test — e.g. "find the card about SOAP HTML in Kira noviembre and add there …" → reply "📝 added to the description", no new card; grep `[TrelloVoice] actions: update(` and `matched on the named board by sound` in `~/.pm2/logs/cto-aipa-out-9.log`. A note saying "Claude" must come back spelled Claude.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
+
+### ✅ 30 Oct ~14:48 UTC — CRM hiring lane = 14 LIVE I Act TODAY jobs; 6 closed postings swept · claim released
+- **Checked:** every row `/queue/api/today` served (20) was already in HubSpot I Act TODAY — no other stage leaks in (page shows `status='new'` only; hourly :41 sync keeps it equal). **But 6 were dead:** 4 Puente Talent ("This role is no longer accepting applications."), SIPEngines on Torre ("This job post is closed."), David Kennedy Teamtailor (HTTP 410).
+- **Root cause (VJH `9a1717b`):** `sweep_i_act_today.py` (daily 07:55 Panama) called `enrich_with_state(url, desc)` — which returns WITHOUT fetching when the stored description is long, so the closed markers never ran; non-200 = "unknown". Now `force=True` + `page_gone()` (410 only). Tests `evals/test_closed_markers.py` 5/5.
+- **VERIFIED BY:** dry run REJECT 6 (each confirmed by curl); `--apply --dead-only` → `MOVED 6 deals to closedlost` (AUTO-SWEEP label, read back from HubSpot); CRM sync `14 hiring deals · to skip: 6 · skipped: 6`; `/queue/api/today` → **14 rows**. VJH laptop = GitHub = Oracle `9a1717b`, md5 `84dad1db…`.
+- **Undo:** VJH `autonomous_data/sweep_undo_20261030T144742.json`; CRM `~/_session-backups/queue-hiring-cleanup-2026-10-30T14-48-22-535Z.json` (`--undo=`).
+- **Kept on absence of evidence (by design, open them by hand):** Clara (remotefront 429, also NO ✅ letter), INDG (Himalayas 403), Pasito (WaaS 406). Gate flags, not moved: Truelogic FDE "roster excludes Panama"; 3 Scale Army "iron-clad" (earlier overruled as LATAM-open).
+- **Trap:** HubSpot search lags a stage change by ~20 s — the first sync after a move still counts the old stage. Re-run, don't debug.
 
 ### ✅ 29 Oct ~18:40 UTC — Elena's bookmark folder "CRM AIdeazz AL Lab" (6 links) checked: all on ONE source, no sample data
 - **BUG FIXED (mine, 28 Oct):** `webhook.aideazz.xyz/queue/` showed 0 everywhere — `QUEUE_PAGE` used `apiBase:'api/'` + calls `'api/today'` → `/queue/api/api/today` 404 (nginx log). Now `apiBase:''`; dist md5 laptop = Oracle `6aee8dcf…`, pm2 restarted.
