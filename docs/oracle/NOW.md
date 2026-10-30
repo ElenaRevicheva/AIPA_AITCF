@@ -60,7 +60,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-30 16:50 | Own-CRM Phase A: kit notes copied into daily_queue.kit_notes by the hourly hiring sync; record page shows them; honest footer | `src/daily-queue.ts` `src/queue-routes.ts` `src/queue-page.ts` `scripts/queue-hiring-keep-act-today.cjs` → Oracle dist + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -285,12 +284,12 @@ git log keeps the record.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
 
-### 🧭 30 Oct ~16:45 UTC — "own CRM" Phase A under the golden rule: measured, proposal only · needs Elena's yes
-- **Elena asked:** agents write to her DB too (HubSpot unchanged) — only if no bicycle is reinvented.
-- **Measured:** ~30 scripts write HubSpot notes directly (no shared helper) → "every agent dual-writes" = 30 edits = a rebuild. **Rejected.**
-- **What exists:** `scripts/queue-hiring-keep-act-today.cjs` (hourly) already opens EVERY note of each hiring I Act TODAY deal (`dealPacket`) and keeps only the ✅ letter; `daily_queue` row per deal; the record page; `database.ts` already has the add-a-column pattern (`ALTER TABLE … ADD`, business_leads).
-- **Proposal (surgical):** one CLOB column `kit_notes` on `daily_queue`; `dealPacket` keeps the 📌 🔎 🎯 🛡️ ✅ 📋 notes it already reads (re-copied hourly for every live hiring row); record page shows them under the letter; the sync's log line gains `kit copied N/N deals` (the reconciliation). Footer → "Copied from HubSpot hourly — your clicks stay here". Writers, HubSpot and the apply kit untouched. Hiring lane only (clients next, own step).
-- **Honest limit:** still a read-replica of HubSpot (Phase B — agents writing her DB first — would need the 30 writers; not proposed).
+### ⏸️ 30 Oct ~20:35 UTC — own-CRM Phase A LIVE: her own copy of the apply kit · PAUSED by Elena ("sync everything so we can pause") · claim released
+- **DONE:** `scripts/queue-hiring-keep-act-today.cjs` (hourly :41, already read every note) now keeps ALL notes of each live hiring deal (batch read, labelled 📌🔎🎯🛡️✅📋) in `daily_queue.kit_notes` + `kit_synced_at` (idempotent ALTER in `initDailyQueueTable`); record page shows "Your copy of the kit" under the buttons; footer now true ("copied from HubSpot hourly; your clicks stay here"). cto-aipa `4bae2778` + `621b54af`; aideazz face `60cb671`. HubSpot read only; no writer / kit step / VJH touched.
+- **VERIFIED BY:** sync line `kit copied: 14/14 live deals · 110 notes · full kit (link🔎🎯🛡️✅📋) on 14`; `/queue/api/record/<Truelogic>` → 6 kit notes (posting 674 · brief 1096 · role 6114 · defense 5020 · letter 1781 · comet 4516 chars); aideazz.xyz/ops/ 200 with the new footer; laptop = GitHub = Oracle: cto-aipa `621b54af` (Oracle by named files: client-lane `07a554d7`, queue-routes `994620720b`, daily-queue `280884bd`, queue-page `d05428bb`, sync script `1bcbd711`; cto-aipa started 20:29:33 UTC, after the files), aideazz `60cb671` (Oracle clone too), VJH laptop=GitHub `01d8365`.
+- **Not mine, noted:** Oracle VJH HEAD label is `9a1717b` while its working tree is byte-identical to `01d8365` (the fleet model-tier deploy copied files, did not move HEAD) → `git status` there shows 11 M files that are NOT drift. Do not "clean" them; a `git reset origin/main` (mixed) would only move the label — the deploying agent's call.
+- **NEXT (when Elena resumes, her pick):** client-lane kit copy (same sync pattern, client notes) · or stop here. Phase B (agents write her DB first) is NOT proposed — 30 writers.
+- **RISK:** the copy is a read-replica — HubSpot down = last copy shown, nothing new. Backups of replaced Oracle files: `~/_session-backups/crm-kit-copy-20261030/`, `~/_session-backups/client-lane-20261030/`.
 
 ### ✅ 30 Oct ~16:27 UTC — "Kristina Williams" / "Galya Spinnis" = Elena's own fake TEST names → 5 deals closed
 - Elena: they are her testing names. Closed by exact id with reason "TEST — Elena's own fake testing name": 63035617862, 63281002620 (were I Act TODAY), 63036381451, 63261828237, 63300521279 (were 🤖 AI working). 63265804355 was already closed. Undo `~/_session-backups/client-test-names-undo-2026-10-30T16-26-45-449Z.json`.
