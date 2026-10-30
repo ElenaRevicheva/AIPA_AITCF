@@ -437,6 +437,23 @@ ${brandCss()}
   .hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);animation:breathe 11s ease-in-out infinite;transform-origin:80% 8%}
   .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);opacity:0;transition:opacity 1.6s ease}
   .hero-video.on{opacity:1}
+  .hero-back{display:none}
+  /* Laptops (Elena, 30 Oct: "on laptop the lower part of the image is eaten"): a screen wider than the 16:9 still made
+     object-fit:cover crop a third of the picture off the bottom — the building's base and plaza. On any screen at least
+     as wide as the still, the still now fits its full height, anchored right where the building stands; the sky on the
+     left is the same still, blurred, and the seam is masked out. Narrower screens keep cover, anchored right. */
+  @media(min-width:681px){
+    .hero-par{container-type:size}
+    .hero-back{display:block;position:absolute;inset:0;background-size:cover;background-position:left bottom;filter:blur(34px) saturate(.8) brightness(.92);transform:scale(1.12)}
+    .hero-img,.hero-video{object-position:100% 50%}
+    @container (min-aspect-ratio: 16/9){
+      .hero-img,.hero-video{object-fit:contain;object-position:100% 50%;
+        -webkit-mask-image:linear-gradient(90deg,transparent calc(100% - 177.8cqh),#000 calc(100% - 177.8cqh + 26cqh));
+        mask-image:linear-gradient(90deg,transparent calc(100% - 177.8cqh),#000 calc(100% - 177.8cqh + 26cqh))}
+    }
+    .hero .hero-veil{background:linear-gradient(90deg,rgba(var(--veil),.5) 0%,rgba(var(--veil),.24) 40%,transparent 60%),
+      linear-gradient(180deg,rgba(var(--veil),.5) 0%,rgba(var(--veil),.04) 22%,rgba(var(--veil),.04) 70%,rgba(var(--veil),.26) 92%,var(--bg) 100%)}
+  }
   .hero.has-video .hero-img{animation:none}
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
   .hero-glow{position:absolute;inset:-4%;z-index:-2;pointer-events:none;mix-blend-mode:screen;opacity:var(--glow,.6);
@@ -573,7 +590,7 @@ ${brandCss()}
     </div>
   </header>
   <section class="hero">
-    <div class="hero-par"><picture>
+    <div class="hero-par"><div class="hero-back" style="background-image:url('${esc(hero)}')"></div><picture>
       <source media="(max-width: 680px)" srcset="${esc(heroSquareUrl(meta))}"/>
       <img class="hero-img" src="${esc(hero)}" alt="A 1930s Art Deco broadcasting house with a radio mast at dusk, on film — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/>
     </picture>${motionWide ? `<video class="hero-video" muted loop playsinline preload="none" aria-hidden="true" data-wide="${esc(motionWide)}" data-tall="${esc(motionTall || motionWide)}"></video>` : ''}</div>
@@ -661,15 +678,18 @@ ${rows}
     h.addEventListener('pointerleave',function(){px=0;py=0;glow=.55;if(!raf)raf=requestAnimationFrame(paint);});
   })();
   (function(){
-    // Rings start on the mast beacon: image-space fractions → page pixels through object-fit:cover (center top).
+    // The lamp sits on the mast tip: image-space fractions → page pixels through whatever object-fit / object-position
+    // the CSS chose for this screen (cover on phones and narrow screens, contain + right on wide ones).
     var hero=document.querySelector('.hero'),par=document.querySelector('.hero-par'),img=document.querySelector('.hero-img'),rings=document.querySelector('.hero-beacon');
     if(!hero||!par||!img||!rings)return;
     function place(){var iw=img.naturalWidth,ih=img.naturalHeight;if(!iw||!ih)return;
       var sq=/cover-source/.test(img.currentSrc||'');
       var bx=parseFloat(rings.getAttribute(sq?'data-bx-sq':'data-bx')),by=parseFloat(rings.getAttribute(sq?'data-by-sq':'data-by'));
-      var pr=par.getBoundingClientRect(),hr=hero.getBoundingClientRect(),s=Math.max(pr.width/iw,pr.height/ih),w=iw*s,hh=ih*s;
-      var posY=sq?1:0; // object-position: center bottom on phones (square), center top otherwise
-      var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=(pr.height-hh)*posY+by*hh+(pr.top-hr.top);
+      var cs=getComputedStyle(img),op=(cs.objectPosition||'50% 50%').split(' ');
+      var ox=parseFloat(op[0])/100,oy=parseFloat(op[1]||'50%')/100;if(isNaN(ox))ox=.5;if(isNaN(oy))oy=.5;
+      var pr=par.getBoundingClientRect(),hr=hero.getBoundingClientRect();
+      var s=cs.objectFit==='contain'?Math.min(pr.width/iw,pr.height/ih):Math.max(pr.width/iw,pr.height/ih),w=iw*s,hh=ih*s;
+      var x=(pr.width-w)*ox+bx*w+(pr.left-hr.left),y=(pr.height-hh)*oy+by*hh+(pr.top-hr.top);
       rings.style.left=x.toFixed(1)+'px';rings.style.top=y.toFixed(1)+'px';rings.classList.add('on');}
     if(img.complete)place();img.addEventListener('load',place);window.addEventListener('resize',place,{passive:true});
   })();
