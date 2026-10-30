@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Oct 13:10 | EspaLuz kids: every shot reachable + rotated (Titi `hello` tag, greeting on web), then buddy.ai-style additions | `EspaLuzFamilybot/main.py`, ascent `Classroom.tsx` + `espaluz-chat/index.ts`, Oracle bot service | 3e49e756 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
