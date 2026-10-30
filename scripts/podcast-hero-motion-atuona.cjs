@@ -21,12 +21,14 @@ const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const only = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1];
 const site = (process.env.PODCAST_SITE_URL || 'https://podcast.aideazz.xyz').replace(/\/$/, '');
 
+// v2 of the motion (Elena, 30 Oct: "clouds move less speedy and cover more space of the screen").
 const MOTION =
-  'Locked-off static camera on a tripod, absolutely no camera movement, no zoom, no pan. Cinemagraph: a thin layer of ' +
-  'dusk haze drifts very slowly across the plaza, high clouds move almost imperceptibly, the small warm beacon at the ' +
-  'tip of the radio mast pulses softly on and off, faint heat shimmer above the stone, analog film grain flickers. ' +
-  'The building, the plaza and the horizon stay perfectly still. Muted faded palette unchanged. Seamless loop, ' +
-  'no people, no text, no new objects.';
+  'Locked-off static camera on a tripod, absolutely no camera movement, no zoom, no pan. Cinemagraph: the ENTIRE sky is ' +
+  'filled with vast layered dusk clouds — soft cumulus and thin cirrus veils stretching across the whole frame from edge to ' +
+  'edge, above the building and behind the mast — drifting EXTREMELY slowly, barely perceptible, like a long-exposure ' +
+  'time-lapse played at quarter speed. A thin layer of haze moves very slowly across the plaza. The small warm beacon at ' +
+  'the tip of the radio mast pulses softly. The building, the plaza and the horizon stay perfectly still. Muted faded ' +
+  'cream-violet palette unchanged, analog film grain. Seamless loop, no people, no text, no new objects.';
 
 const CLIPS = [
   { stem: 'wide', image: `${site}/hero.jpg`, ratio: '1280:720' },

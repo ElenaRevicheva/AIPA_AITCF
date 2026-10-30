@@ -555,8 +555,14 @@ ${brandCss()}
   /* the lab's mark, as on aideazz.xyz/atlas: serif copyright line + spaced small caps under it */
   footer .copy{display:block;font:400 clamp(22px,2.6vw,30px)/1.2 var(--serif);letter-spacing:0;text-transform:none;color:var(--ink)}
   footer .rights{display:block;margin-top:10px;font:300 11px var(--lab);letter-spacing:.32em;text-transform:uppercase;color:var(--ink-45)}
-  @media(max-width:680px){.hero-img{object-position:center 30%;transform-origin:50% 20%}.hero-dither{opacity:.16}.hero-grain{opacity:.1}.hero-glow,.hero-flow{-webkit-mask-size:3px 3px;mask-size:3px 3px}
-    .hero-veil{background:linear-gradient(180deg,rgba(var(--veil),.5) 0%,rgba(var(--veil),.12) 22%,rgba(var(--veil),.35) 48%,rgba(var(--veil),.9) 80%,var(--bg) 100%)}}
+  /* phones (Elena, 30 Oct: "barely visible building, most part dark"): the hero fills the screen, the words sit up in the
+     empty sky, the veil is heavy only behind the words and light where the building stands, and the building keeps the
+     bottom of the frame to itself */
+  @media(max-width:680px){.hero{min-height:100svh;align-items:flex-start}.hero-in{padding:100px 20px 0}
+    .display{font-size:clamp(38px,10.5vw,50px);max-width:none}.lede{margin-top:12px;font-size:15px;line-height:1.5;max-width:none}
+    .hero-meta{margin-top:12px;gap:8px;font-size:10.5px}.actions{margin-top:16px;gap:12px}.play{width:50px;height:50px}.iconlinks{margin-left:0}
+    .hero-img,.hero-video{object-position:center bottom;transform-origin:50% 20%}.hero-dither{opacity:.14}.hero-grain{opacity:.1}.hero-glow,.hero-flow{-webkit-mask-size:3px 3px;mask-size:3px 3px}
+    .hero-veil{background:linear-gradient(180deg,rgba(var(--veil),.62) 0%,rgba(var(--veil),.42) 36%,rgba(var(--veil),.12) 58%,rgba(var(--veil),.04) 88%,var(--bg) 100%)}}
   @media(max-width:680px){.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}.hero-in{padding-top:120px}.display{max-width:none}}
 </style>
 </head>
@@ -662,7 +668,7 @@ ${rows}
       var sq=/cover-source/.test(img.currentSrc||'');
       var bx=parseFloat(rings.getAttribute(sq?'data-bx-sq':'data-bx')),by=parseFloat(rings.getAttribute(sq?'data-by-sq':'data-by'));
       var pr=par.getBoundingClientRect(),hr=hero.getBoundingClientRect(),s=Math.max(pr.width/iw,pr.height/ih),w=iw*s,hh=ih*s;
-      var posY=sq?0.30:0; // object-position: center 30% on phones (square), center top otherwise
+      var posY=sq?1:0; // object-position: center bottom on phones (square), center top otherwise
       var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=(pr.height-hh)*posY+by*hh+(pr.top-hr.top);
       rings.style.left=x.toFixed(1)+'px';rings.style.top=y.toFixed(1)+'px';rings.classList.add('on');}
     if(img.complete)place();img.addEventListener('load',place);window.addEventListener('resize',place,{passive:true});
@@ -674,6 +680,7 @@ ${rows}
     var c=navigator.connection;if(c&&(c.saveData||/2g/.test(c.effectiveType||'')))return;
     var tall=window.matchMedia('(max-width: 680px)').matches;
     v.src=tall?v.getAttribute('data-tall'):v.getAttribute('data-wide');
+    v.defaultPlaybackRate=0.6;v.playbackRate=0.6; // Elena, 30 Oct: clouds slower — the loop plays at 0.6x (10 s → ~17 s)
     v.addEventListener('playing',function(){v.classList.add('on');hero.classList.add('has-video');},{once:true});
     v.addEventListener('error',function(){v.remove();});
     var p=v.play();if(p&&p.catch)p.catch(function(){});
