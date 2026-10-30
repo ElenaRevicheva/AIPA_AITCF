@@ -44,7 +44,7 @@ export function registerQueueRoutes(app: Express): void {
     try {
       const [hiring, client, counts] = await Promise.all([
         getQueue('hiring', 25),
-        getQueue('client', 25),
+        getQueue('client', 50), // 30 Oct: lane = I Act TODAY client deals (28) — 25 cut 3 off
         getQueueCounts(),
       ]);
       res.set('cache-control', 'no-store').json({ hiring, client, counts });
