@@ -167,7 +167,9 @@ async function setStatus(c, ids, from, to) {
     }
     // 30 Oct 2026 — her own copy of the kit: every note on every live deal, refreshed hourly.
     // The result line is the reconciliation: copied N of N live deals, and how many carry the full kit.
-    const FULL = ['posting', 'brief', 'role', 'defense', 'letter', 'comet'];
+    // The posting LINK counts, wherever it sits: hand-staged deals carry a 📌 note, VJH deals put
+    // the link inside their own note (the audit's ✓LINK reads it the same way).
+    const FULL = ['brief', 'role', 'defense', 'letter', 'comet'];
     let copied = 0, notes = 0, full = 0;
     for (const [id, p] of packets) {
       const r = await c.execute(
@@ -177,10 +179,10 @@ async function setStatus(c, ids, from, to) {
       if (r.rowsAffected) {
         copied++; notes += p.kit.length;
         const kinds = new Set(p.kit.map((n) => n.kind));
-        if (FULL.every((k) => kinds.has(k))) full++;
+        if (p.url && FULL.every((k) => kinds.has(k))) full++;
       }
     }
-    console.log(`kit copied: ${copied}/${keep.size} live deals · ${notes} notes · full kit (📌🔎🎯🛡️✅📋) on ${full}`);
+    console.log(`kit copied: ${copied}/${keep.size} live deals · ${notes} notes · full kit (link🔎🎯🛡️✅📋) on ${full}`);
     if (!go.length) return;
     const dir = path.join(process.env.HOME || '.', '_session-backups');
     fs.mkdirSync(dir, { recursive: true });
