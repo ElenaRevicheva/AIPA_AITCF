@@ -55,6 +55,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 19:30 | podcast hero: laptop crop eats the building base (wide screens show full still height) | src/podcast-feed.ts, podcast repo index.html, Oracle dist/podcast-feed.js + pm2 cto-aipa | a0031654 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
