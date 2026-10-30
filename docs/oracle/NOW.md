@@ -55,6 +55,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 20:00 | deploy podcast generator laptop fix to Oracle (Elena: "Yes, deploy it") | Oracle dist/podcast-feed.js + pm2 cto-aipa | 37992232 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
