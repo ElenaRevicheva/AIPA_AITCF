@@ -55,6 +55,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 19:50 | podcast tab/home icon = the AZ (Elena) | src/podcast-feed.ts, src/podcast-publish.ts, podcast repo icons + pages, Oracle dist + pm2 cto-aipa | 7c09dae1 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
