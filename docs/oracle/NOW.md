@@ -55,7 +55,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 30 Oct 15:40 | Classroom: readable kid-style captions + the "didn't hear you" error after Elena's publish | ascent `Classroom.tsx`, `voice-to-text` function | 00e7764f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -178,6 +177,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 30 Oct ~15:50 UTC — classroom after Elena's publish: "words black, not visible, not juicy" + "I didn't hear you" error → both fixed · claim released · Elena: one more Publish
+- **Error (root cause from logs):** `voice-to-text` called only OpenAI Whisper → `429 insufficient_quota / credit_balance_exhausted` at 15:33 and 15:34 UTC (OpenAI dry since 23 Oct) → toast "No te escuché bien". **Fix LIVE: `voice-to-text` v165** = Groq `whisper-large-v3-turbo` → Groq `whisper-large-v3` → OpenAI (free first, secret-gated). Proof: both Groq models on the bot's `heroes/kids-greeting.mp4` → HTTP 200, exact ES+EN transcript ("Hola, soy Pere. Hablo despacito…").
+- **Captions (root cause):** `bg-white/92` is not a Tailwind 3 opacity step → no CSS generated → transparent box, black text on the painting. Now speech bubbles: Pere lime + 🦥, Titi orange + 🐒 (mirrored), unnamed question = yellow card; Spanish 2xl bold, English under it; the line being spoken lifts with a yellow ring; font Baloo 2 (Google Fonts link in `index.html`). ascent `5af4cf0`; tsc/eslint/vite build clean; preview rendered with the real built CSS over `classroom-c.jpg` (headless Chrome).
+- **NEXT (Elena):** Lovable → Publish → Update (ships the bubbles; the error fix is already live without it). Then one spoken answer in the classroom → expect a reply, and logs `transcribed by groq whisper-large-v3-turbo`.
+- **RISK:** Groq free tier has a per-day audio cap (minutes, per model) — the second model and OpenAI are the fallbacks; if all fail the toast returns and the log names each provider's error.
 
 ### ✅ 30 Oct ~14:50 UTC — EspaLuz kids: ages 6-7 + better-than-Buddy LIVE on bot and web tutor; bot repo fully synced git = Oracle = laptop · claim released · ONE move is Elena's
 - **DONE:** 6-7 first grade (no baby talk, 6-12 word sentences with porque/because; once per lesson read a sentence aloud, one why-question, a real-life mission; riddles; first-grade themes). Bot `8c78ac2` deployed on Elena's "do deploy" (restart 14:39 UTC, `main.py` `4402aed0…`); web tutor `espaluz-chat` **v203** (verify_jwt on). This also put the stalled 13:10 session's bot commit `54ff463` live.
