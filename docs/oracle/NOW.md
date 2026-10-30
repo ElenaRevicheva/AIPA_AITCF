@@ -55,6 +55,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Oct 15:40 | Classroom: readable kid-style captions + the "didn't hear you" error after Elena's publish | ascent `Classroom.tsx`, `voice-to-text` function | 00e7764f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
