@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 30 Oct 01:10 | podcast hero v3: Atuona cinemagraph (Runway img→video), physical beacon light, living grain, scroll depth | `src/podcast-feed.ts`, `scripts/podcast-hero-*.cjs`, repo `aideazz-podcast` (+hero mp4s), Oracle dist podcast-feed.js | a8add602 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -170,6 +169,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 30 Oct ~10:30 UTC — podcast hero v3: the still MOVES (Atuona cinemagraph), the beacon is a lamp, grain lives, scroll pushes in · Elena: "the circles are generic, movement tiny, no effects" → "follow your recommendations, go" · claim released
+- **DONE:** `scripts/podcast-hero-motion-atuona.cjs` (Oracle) → Runway `gen4.5` `image_to_video` from the SAME stills, camera locked, 5 s: wide `1280:720` from hero.jpg, tall `720:1280` from cover-source.jpg (task `dd91a0dc…`); Runway credits 629 → ~509. Laptop (ffmpeg-static in the scratchpad, never Oracle): ping-pong (forward+reverse) → seamless 10 s loops, h264 crf 27/28, `hero-motion.mp4` **1.0 MB**, `hero-motion-tall.mp4` **2.9 MB**, committed to aideazz-podcast `8e9d358`. Generator (`src/podcast-feed.ts`, cto-aipa `282704af`): `<video muted loop playsinline preload=none>` over the `<picture>` poster, src picked by viewport, skipped under reduced-motion / data-saver / 2g, fades in on `playing`; the SVG rings are GONE → `.hero-beacon` = core + blurred bloom + slow conic beam sweep (14 s) + lamp pulse, placed on the mast tip by the same object-fit math; grain tile jittered at ~10 fps (`steps(1)`); `@supports(animation-timeline:view())` push-in + veil deepen on scroll. Oracle `dist/podcast-feed.js` `bccad36d…` = git, restart 10:27:14 UTC, backup `~/_session-backups/podcast-v3-20261030-102712/`.
+- **VERIFIED (local preview, Browser pane):** desktop `.hero-video.on`, `currentSrc=hero-motion.mp4`, playing at t=5.0 s; phone `hero-motion-tall.mp4` playing; beacon `.on` placed; `animation-timeline: view()` supported; grain/beam animations running; 0 console errors except the expected 404 before the mp4 existed. **Live 4everland check: watcher running at the time of writing** (build of `8e9d358` + mp4 md5).
+- **Frames checked:** wide = clouds roll in over a still building; tall = clouds then heavy haze rolls across the plaza (dramatic, kept). Runway de-grained the still; the CSS grain overlay restores it.
+- **RISK:** bandwidth — 1 MB (desktop) / 2.9 MB (phone) per first visit against the 100 GB/month allowance that ran out yesterday; `preload=none` + the data-saver skip keep it to visitors who scroll in. If the allowance tightens, drop the tall clip first. Runway removed the still's grain and added clouds not in the still — the poster→video fade hides the cut.
 
 ### ✅ RESOLVED 21:20 UTC — Elena topped up 4everland; all three sites 200; podcast v2 LIVE (CID `bafybeihjvax…`, build `bbaa44f` success 21:19:45Z; dashboard Redeploy at 21:14 had replayed `d7c2841`, as the doc says). Durable write-up: ORACLE_ALL_PRODUCTS_RESILIENCE.md § "4everland free allowance exhausted". Was:
 ### 🔴 29 Oct 20:48 UTC — ALL 4everland SITES DOWN: aideazz.xyz, podcast.aideazz.xyz, atuona.xyz answer **403 "Insufficient data volume, unable to access temporarily!"** (4everland's own quota refusal, via BunnyCDN pull zone 5088105) · Elena's move (billing/usage in the 4everland dashboard)
