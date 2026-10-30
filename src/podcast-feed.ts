@@ -344,6 +344,13 @@ export const HERO_BEACON_SQUARE = { x: process.env.PODCAST_HERO_BEACON_SQ_X?.tri
 export function heroSquareUrl(meta: PodcastMeta): string {
   return meta.heroUrl ? meta.heroUrl.replace(/hero\.jpg$/, 'cover-source.jpg') : meta.coverUrl;
 }
+/** v3 (30 Oct 2026): 5 s cinemagraph loops rendered from the same stills through Atuona's Runway lane
+ *  (scripts/podcast-hero-motion-atuona.cjs): hero-motion.mp4 (16:9, desktop) and hero-motion-tall.mp4 (9:16, phones).
+ *  The still stays as poster and as the reduced-motion / data-saver fallback. */
+export function heroMotionUrl(meta: PodcastMeta, tall = false): string | null {
+  if (!meta.heroUrl) return null;
+  return meta.heroUrl.replace(/hero\.jpg$/, tall ? 'hero-motion-tall.mp4' : 'hero-motion.mp4');
+}
 
 export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const sorted = episodes.slice().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
@@ -377,6 +384,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   const faqJsonLd = generatePodcastFaqJsonLd(meta, sorted);
   const seoDesc = seoDescription(meta);
   const hero = heroImageUrl(meta);
+  const motionWide = heroMotionUrl(meta, false);
+  const motionTall = heroMotionUrl(meta, true);
   const tickerItems = ['AI-augmented', 'Agentic', 'From A to Z', countLabel, 'Recorded in Panamá, on the go', 'Honest field notes', 'AIdeazz AI Lab'];
   const ticker = tickerItems.concat(tickerItems).map((t) => `<span class="tk">${esc(t)}</span><span class="dot" aria-hidden="true">&#9679;</span>`).join('');
 
@@ -420,11 +429,15 @@ ${brandCss()}
   .topin{max-width:1080px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   /* hero: the Atuona still, full-bleed, under a dither veil that fades into the page */
   .hero{position:relative;min-height:min(86vh,820px);display:flex;align-items:flex-end;isolation:isolate;overflow:hidden}
-  /* The still is alive (Elena, 29 Oct): it breathes, the halftone glow beats like a heart, a band of light flows
-     through the dots and radio rings pulse from the mast beacon. The pointer only adds a drift on top. */
-  .hero-par picture{display:block;width:100%;height:100%}
+  /* The still is alive (Elena, 29 Oct / 30 Oct v3): a cinemagraph loop rendered from the same still (haze, clouds,
+     beacon, grain move; camera locked) sits over the poster; the beacon is a physical lamp (bloom + beam + halation),
+     the grain flickers like a projector, and on scroll the picture pushes in. Pointer drift on top. */
   .hero-par{position:absolute;inset:-4%;z-index:-3;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .45s cubic-bezier(.2,.7,.2,1);will-change:transform}
+  .hero-par picture{display:block;width:100%;height:100%}
   .hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);animation:breathe 11s ease-in-out infinite;transform-origin:80% 8%}
+  .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.82) contrast(1.04);opacity:0;transition:opacity 1.6s ease}
+  .hero-video.on{opacity:1}
+  .hero.has-video .hero-img{animation:none}
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
   .hero-glow{position:absolute;inset:-4%;z-index:-2;pointer-events:none;mix-blend-mode:screen;opacity:var(--glow,.6);
     background:radial-gradient(560px circle at var(--mx,62%) var(--my,46%),rgba(253,230,138,.95),rgba(250,204,21,.38) 32%,rgba(124,58,237,.18) 58%,transparent 72%);
@@ -438,15 +451,32 @@ ${brandCss()}
     -webkit-mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);mask-image:radial-gradient(circle,#000 .95px,transparent 1.25px);
     -webkit-mask-size:4px 4px;mask-size:4px 4px;animation:flow 13s linear infinite}
   @keyframes flow{0%{background-position:130% 0}100%{background-position:-130% 0}}
-  .hero-rings{position:absolute;left:66%;top:30%;width:0;height:0;z-index:-1;pointer-events:none;overflow:visible;opacity:0;transition:opacity 1.2s}
-  .hero-rings.on{opacity:1}
-  .hero-rings svg{position:absolute;left:-180px;top:-180px;width:360px;height:360px;overflow:visible}
-  .hero-rings circle{fill:none;stroke:#fde68a;stroke-width:1.2;opacity:0;transform-origin:180px 180px;animation:ring-out 4.8s cubic-bezier(.2,.6,.3,1) infinite}
-  .hero-rings circle:nth-child(2){animation-delay:1.6s}.hero-rings circle:nth-child(3){animation-delay:3.2s}
-  .hero-rings .beacon{fill:#fde68a;stroke:none;opacity:1;animation:beacon 2.4s ease-in-out infinite;filter:drop-shadow(0 0 6px #fde68a) drop-shadow(0 0 14px rgba(250,204,21,.8))}
-  @keyframes ring-out{0%{transform:scale(.05);opacity:.9}70%{opacity:.18}100%{transform:scale(1);opacity:0}}
-  @keyframes beacon{0%,100%{opacity:.55}10%{opacity:1}20%{opacity:.7}30%{opacity:1}55%{opacity:.55}}
-  @media(prefers-reduced-motion:reduce){.hero-par,.hero-glow{transform:none;transition:none}.hero-img,.hero-glow,.hero-flow,.hero-rings circle,.hero-rings .beacon{animation:none}.hero-rings{display:none}}
+  /* living grain: a large noise tile jittered at ~10 fps, the way a print flickers through a projector */
+  .hero-grain{position:absolute;inset:-12%;z-index:-2;opacity:.16;mix-blend-mode:overlay;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain .9s steps(1) infinite}
+  @keyframes grain{0%{transform:translate(0,0)}10%{transform:translate(-3%,-4%)}20%{transform:translate(4%,2%)}30%{transform:translate(-2%,5%)}40%{transform:translate(5%,-3%)}50%{transform:translate(-5%,1%)}60%{transform:translate(2%,6%)}70%{transform:translate(-4%,-2%)}80%{transform:translate(3%,-6%)}90%{transform:translate(-1%,3%)}100%{transform:translate(0,0)}}
+  /* the beacon: a lamp, not a drawing — bloom, a slow sweeping beam through the haze, halation; placed on the mast tip by JS */
+  .hero-beacon{position:absolute;left:66%;top:30%;width:0;height:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.4s}
+  .hero-beacon.on{opacity:1}
+  .hero-beacon .core{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#fff7d6;
+    box-shadow:0 0 6px 2px #fde68a,0 0 18px 6px rgba(250,204,21,.75),0 0 46px 16px rgba(250,204,21,.28);animation:lamp 2.4s ease-in-out infinite}
+  .hero-beacon .bloom{position:absolute;left:-170px;top:-170px;width:340px;height:340px;border-radius:50%;mix-blend-mode:screen;
+    background:radial-gradient(circle,rgba(253,230,138,.55) 0%,rgba(250,204,21,.22) 22%,rgba(237,184,103,.08) 48%,transparent 70%);filter:blur(6px);animation:lamp 2.4s ease-in-out infinite}
+  .hero-beacon .beam{position:absolute;left:-420px;top:-420px;width:840px;height:840px;border-radius:50%;mix-blend-mode:screen;opacity:.55;
+    background:conic-gradient(from 0deg,transparent 0deg,rgba(253,230,138,.0) 6deg,rgba(253,230,138,.32) 14deg,rgba(253,230,138,.0) 24deg,transparent 360deg);
+    -webkit-mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.6) 30%,transparent 62%);mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.6) 30%,transparent 62%);
+    filter:blur(10px);animation:sweep 14s linear infinite}
+  @keyframes lamp{0%,100%{opacity:.62}10%{opacity:1}22%{opacity:.78}32%{opacity:1}58%{opacity:.62}}
+  @keyframes sweep{to{transform:rotate(360deg)}}
+  /* scroll-driven depth: the picture pushes in and the veil deepens as the hero leaves the screen (CSS scroll timeline, no JS) */
+  @supports (animation-timeline: view()){
+    .hero-par{animation:push linear both;animation-timeline:view();animation-range:exit 0% exit 100%}
+    .hero-veil{animation:deepen linear both;animation-timeline:view();animation-range:exit 0% exit 100%}
+  }
+  @keyframes push{to{transform:translate3d(var(--px,0px),calc(var(--py,0px) + 6%),0) scale(1.12)}}
+  @keyframes deepen{to{opacity:1;background:linear-gradient(180deg,rgba(var(--veil),.7),rgba(var(--veil),.95))}}
+  @media(prefers-reduced-motion:reduce){.hero-par,.hero-glow{transform:none;transition:none;animation:none}.hero-img,.hero-glow,.hero-flow,.hero-grain,.hero-beacon .core,.hero-beacon .bloom,.hero-beacon .beam,.hero-veil{animation:none}.hero-video{display:none}}
   .hero-veil{position:absolute;inset:0;z-index:-1;pointer-events:none;
     background:linear-gradient(180deg,rgba(var(--veil),.55) 0%,rgba(var(--veil),.05) 26%,rgba(var(--veil),.1) 55%,rgba(var(--veil),.92) 88%,var(--bg) 100%)}
   .hero-in{position:relative;width:100%;max-width:1080px;margin:0 auto;padding:150px 24px 54px}
@@ -540,11 +570,11 @@ ${brandCss()}
     <div class="hero-par"><picture>
       <source media="(max-width: 680px)" srcset="${esc(heroSquareUrl(meta))}"/>
       <img class="hero-img" src="${esc(hero)}" alt="A 1930s Art Deco broadcasting house with a radio mast at dusk, on film — the ${esc(meta.title)} artwork, rendered by the AIdeazz Atuona studio" fetchpriority="high"/>
-    </picture></div>
+    </picture>${motionWide ? `<video class="hero-video" muted loop playsinline preload="none" aria-hidden="true" data-wide="${esc(motionWide)}" data-tall="${esc(motionTall || motionWide)}"></video>` : ''}</div>
     <div class="hero-dither" aria-hidden="true"></div>
     <div class="hero-flow" aria-hidden="true"></div>
     <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-rings" aria-hidden="true" data-bx="${HERO_BEACON.x}" data-by="${HERO_BEACON.y}" data-bx-sq="${HERO_BEACON_SQUARE.x}" data-by-sq="${HERO_BEACON_SQUARE.y}"><svg viewBox="0 0 360 360"><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle cx="180" cy="180" r="150"/><circle class="beacon" cx="180" cy="180" r="3"/></svg></div>
+    <div class="hero-beacon" aria-hidden="true" data-bx="${HERO_BEACON.x}" data-by="${HERO_BEACON.y}" data-bx-sq="${HERO_BEACON_SQUARE.x}" data-by-sq="${HERO_BEACON_SQUARE.y}"><span class="beam"></span><span class="bloom"></span><span class="core"></span></div>
     <div class="hero-grain" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-in">
@@ -626,7 +656,7 @@ ${rows}
   })();
   (function(){
     // Rings start on the mast beacon: image-space fractions → page pixels through object-fit:cover (center top).
-    var hero=document.querySelector('.hero'),par=document.querySelector('.hero-par'),img=document.querySelector('.hero-img'),rings=document.querySelector('.hero-rings');
+    var hero=document.querySelector('.hero'),par=document.querySelector('.hero-par'),img=document.querySelector('.hero-img'),rings=document.querySelector('.hero-beacon');
     if(!hero||!par||!img||!rings)return;
     function place(){var iw=img.naturalWidth,ih=img.naturalHeight;if(!iw||!ih)return;
       var sq=/cover-source/.test(img.currentSrc||'');
@@ -636,6 +666,17 @@ ${rows}
       var x=(pr.width-w)*0.5+bx*w+(pr.left-hr.left),y=(pr.height-hh)*posY+by*hh+(pr.top-hr.top);
       rings.style.left=x.toFixed(1)+'px';rings.style.top=y.toFixed(1)+'px';rings.classList.add('on');}
     if(img.complete)place();img.addEventListener('load',place);window.addEventListener('resize',place,{passive:true});
+  })();
+  (function(){
+    // The cinemagraph: loaded only when motion is welcome (no reduced-motion, no data saver), the still is the poster.
+    var v=document.querySelector('.hero-video'),hero=document.querySelector('.hero');if(!v||!hero)return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    var c=navigator.connection;if(c&&(c.saveData||/2g/.test(c.effectiveType||'')))return;
+    var tall=window.matchMedia('(max-width: 680px)').matches;
+    v.src=tall?v.getAttribute('data-tall'):v.getAttribute('data-wide');
+    v.addEventListener('playing',function(){v.classList.add('on');hero.classList.add('has-video');},{once:true});
+    v.addEventListener('error',function(){v.remove();});
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
   })();
 </script>
 </body>
