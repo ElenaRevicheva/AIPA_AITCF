@@ -47,7 +47,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (took over the stalled 13:10 session) | 30 Oct 14:35 | EspaLuz kids: deploy bot `54ff463`; retarget prompts + copy to ages 6-7 (not toddlers); better-than-Buddy prompt lines (reading aloud, why-questions) | `EspaLuzFamilybot/main.py` + `espaluz_menu.py`, ascent `espaluz-chat/index.ts` + dashboard copy, Oracle `espaluz-familybot` service | ac2e2496 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -170,6 +169,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 30 Oct ~14:45 UTC — EspaLuz kids: ages 6-7 (not toddlers) + better-than-Buddy prompt lines · took over the stalled 13:10 session · claim released · 3 moves are Elena's
+- **Found:** the 13:10 session committed bot `54ff463` + ascent `6f7b319` and deployed `espaluz-chat` v202 (13:40), but the Oracle bot still ran `ddef1027…` (28 Oct) and Lovable was never published (live bundle still `index-BTAtEbGd.js`, no `kids-greeting`).
+- **DONE (Elena: "focus on 6-7 not toddlers", "better than Buddy where we can, no reinventing"):** prompt lines + labels only. 5-7 → 6-7 first grade, no baby talk, 6-12 word sentences joined with porque/because; once per lesson the child READS one sentence aloud, answers one why-question, and gets a mission (one sentence to say to a real person today); game = riddle / Titi's mistake; first-grade themes (my day, the clock, numbers to 100, weather). Bot `8c78ac2` (`main.py` md5 `4402aed0…`, `espaluz_menu.py` `9c9e546e…`), ascent `37ec302` (prompt + dashboard copy "ages 6-7", "Reads along"). **`espaluz-chat` v203 LIVE** (verify_jwt on; no-JWT call → 401).
+- **NEXT (Elena):** (1) approve the Oracle bot deploy — the auto-mode classifier refused the scp+restart; command: backup already at `~/_session-backups/espaluz-kids-6-7-20261030-142828/`, then `scp main.py espaluz_menu.py` → `~/EspaLuzFamilybot/` + `sudo systemctl restart espaluz-familybot` (uptime was 28 Oct, nobody mid-deploy). Proof = md5 `4402aed0…` + an Alisa turn's `🎬 hero line` journal lines. (2) Lovable → Publish → Update (ships `6f7b319` greeting/stars/memory + `37ec302` copy, and restores verify_jwt on the other 7 functions). (3) One classroom turn from her signed-in tab = the live output proof of v203.
+- **VERIFIED BY:** `list_edge_functions` espaluz-chat v203 `verify_jwt:true`; curl no-JWT → 401; `py_compile` OK; `tsc --noEmit` 0. NOT yet verified: a real 6-7 reply (needs a signed-in call — the auth.users lookup was refused as PII).
+- **RISK:** until (1), Telegram Alisa mode still says 5-7 and lacks the 13:10 shot fixes; web prompt and bot prompt disagree.
+
 
 ### 🔎 30 Oct ~13:00 UTC — EspaLuz kids: shot-inventory audit (Elena: "how many video shots are integrated now? make sure all are used in the chat") · no code changed · claim not needed
 - **Count:** **24 shots + the /kids greeting = 25 files**, identical on both surfaces. 14 from 21-22 Oct (hello ×2 incl. duo, goodbye, breathing, sleepy, cheer ×2, silly, dance, crosscrawl, talking ×4) + 10 from 28 Oct (counting ×2, thinking, clap, listening ×2, freeze, oops, highfive, peekaboo). Laptop manifest `ascent-saas-builder/creatives/pere-titi-20261021/MANIFEST.md5` (`bot-720/` 15 + `bot-720-20261028/` 10).
