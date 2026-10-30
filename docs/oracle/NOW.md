@@ -61,7 +61,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-10-30 16:50 | Own-CRM Phase A: kit notes copied into daily_queue.kit_notes by the hourly hiring sync; record page shows them; honest footer | `src/daily-queue.ts` `src/queue-routes.ts` `src/queue-page.ts` `scripts/queue-hiring-keep-act-today.cjs` → Oracle dist + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
-| Claude Code | 30 Oct 20:20 | EspaLuz kids items 1-8 (step tracker, dialogue rules, pronunciation check, star unlock, both ways, photos, mission follow-up, weekly story) | `EspaLuzFamilybot/main.py`, ascent `Classroom.tsx` + `espaluz-chat`, Oracle `espaluz-familybot` | (this row) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -184,6 +183,13 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 30 Oct ~20:30 UTC — EspaLuz kids items 1-8 built (Elena: "do all except the parent report") · bot LIVE, web tutor LIVE, page on Publish · claim released
+- **Both surfaces, same design** (bot `main.py` KIDS_STEPS/KIDS_STORIES/kids_sentence_check ⇄ `espaluz-chat` kidsTurnContext): (1) lesson-step tracker — 8 steps from the turn count (bot: session `kids_turn`, new lesson after 3 h quiet or /kids; web: the page sends `kids.turn`); (2) dialogue rules — 2-3 lines + ONE question, her words back, HER topic, correct only real mistakes, remember what she said; (3) gentle sentence check — target sentence from the last reply vs what Whisper heard → "¡Casi! Se dice mucho"; (4) stars — every 5 → Titi's dance (bot: `titi-dance.mp4` sent after the heroes' video; web: full-screen dance + banner + browser voice); (5) both ways (prompt + dashboard card); (7) mission remembered, asked about in the next day's hello (bot: prefs; web: localStorage); (8) a weekly Panama story with a feeling + a checked fact (7 stories, ISO week; this week = the shy toucan).
+- **(6) photos — Telegram only:** a kids-mode photo → Grok vision (`XAI_API_KEY`, verified describes images) → becomes her message in the normal lesson flow. The old photo path used OpenAI gpt-4o, DRY since 23 Oct → every photo failed for everyone (adult OCR path still on gpt-4o — not fixed here). Web has no free vision model (Groq lists none; Gemini 402) → no photo button on the web.
+- **VERIFIED:** unit runs of sentence check (muy→mucho caught; correct sentence celebrated; unrelated = no check), stars/mission/next-day hello (Python + the TS port give identical output); 4-turn simulated dialogue on Groq gpt-oss-20b with the real prompt: follows her topic (cat Luna → game + sentence), steps advance, no re-greeting; false correction "gata blanca → gato blanco" found and fixed (2/2 keep "Tu gata Luna es blanca"). Bot `2c52133` md5 `32f3e939…`, restart 20:23:32, 0 errors (compare-before-swap each time). `espaluz-chat` **v214** boots (OPTIONS 200, no-JWT 401). ascent `c21cd09`.
+- **NOT yet seen live:** a real /kids lesson on Telegram and a classroom lesson after Publish. **NEXT (Elena):** Lovable Publish, then one lesson on each (try a photo of a toy on Telegram).
+- **RISK:** Groq gpt-oss-20b free tier = **8,000 tokens/min** (hit in testing; the prompt is ~2.5k tokens/turn → ~3 child turns/min across ALL web users); 120b daily cap; qwen fallback 1,000 output tokens/min. Telegram's chain answers via Grok (paid, cheap).
 
 ### ✅ 30 Oct ~20:10 UTC — EspaLuz kids: Spanish correctness + clip rotation fixed on both; Buddy-and-beyond proposal waits for Elena's pick
 - **Correctness:** web had taught "Amo a mi mamá Elena muy" (gpt-oss-20b). Gemini is NOT free any more on the bot key (`402 prepayment credits are depleted`) → bot answers via Grok (correct Spanish). Fix = Spanish guard in both prompts (muy never with a verb → mucho; querer/amar for people) + ONE lesson step per message, no re-greeting. Proof on Oracle: gpt-oss-20b with the guard → "Amo mucho a mi mamá Elena" 3/3. Grok NOT added to web (paid; the guard made it unnecessary). `espaluz-chat` **v211** (ascent `0cf123b`).
