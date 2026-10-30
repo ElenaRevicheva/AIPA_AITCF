@@ -47,6 +47,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-30 15:05 | CRM hiring lane = live I Act TODAY only: sweep misses closed postings (long desc → page never opened; HTTP 410 ignored) | VJH `scripts/sweep_i_act_today.py`; HubSpot I Act TODAY stages (AUTO-SWEEP, undo file) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
