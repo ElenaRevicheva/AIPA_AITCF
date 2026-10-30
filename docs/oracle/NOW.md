@@ -40,21 +40,17 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 
 **22 Oct — EspaLuz Alisa mode: Pere + Titi talk in their own voices (LIVE).** DONE: per-hero MiniMax voices (Replicate, `REPLICATE_API_TOKEN` added to the bot `.env`) over 4 new talking clips in `heroes/`; gTTS voice note skipped for Alisa. NEXT (Elena): pick voices from the samples → set `PERE_VOICE` / `TITI_VOICE` in the bot `.env` + restart. VERIFIED BY: Oracle dry run built a 17 s Pere→Titi→Pere video in 31 s; sample sent to CTO Telegram; bot active 14:55 UTC. RISK: adds ~30 s per Alisa reply; a Replicate failure falls back to the old gTTS video. Steps 3–4 (exact lip-sync, live rig) deferred by Elena.
 
-**🔁 30 Oct — Sonnet 4.5 retires 30 Nov: model ids now come from `.env`, and Claude is LAST in free mode on every cto-aipa path. LIVE on Oracle 15:59 / 16:02 UTC.**
-- DONE: knob `CLAUDE_SONNET_MODEL=claude-sonnet-4-6` in cto-aipa, VJH and dragontrade `.env`; EspaLuz uses `CLAUDE_MODEL_NAME` (+ Familybot `CLAUDE_CHAIN_MODEL`). Next retirement = edit those lines + restart. Commits: cto-aipa `0765bc83` `0c78e522` `798a1a46`, VJH `05bb922`, WA `76d8b41`, Family `bb580f6`, Algom `e1195f8`. Backups on Oracle: `*.bak-sonnet-20261030`, `*.bak-review-20261030`.
-- DONE, found while deploying: the 25 Oct "Claude last when `MODEL_TIER=free`" rule existed only in `completeWithProfile`. `claudeWithGroqFallback` (21 callers) and the GitHub code review (Opus → Haiku → "review failed") still asked Claude FIRST: 20 + 13 credit-400 lines in the log. Both now hand over to the shared chain in free mode.
-- 🔴 FIXED: Oracle `EspaLuzWhatsApp/.env` had `CLAUDE_MODEL_NAME=claude-sonnet-4-20250514` (retired in June).
-- WAITS FOR ELENA: VJH (~20 direct Claude calls), EspaLuz WA/Family (quality chain) and Algom have no `MODEL_TIER` switch at all: Claude refuses in under 1 s (no credit = no cost) and their own waterfall answers. Giving them the switch means `model-tier.cjs` also writes `MODEL_TIER` into their `.env`. That is new wiring, so it is her call.
-- OPEN: OpenClaw still lists `anthropic/claude-sonnet-4-5` (`scripts/model-tier.cjs` TIERS; the laptop copy has an uncommitted 26 Oct diff, left untouched). Swap it before 30 Nov.
-- VERIFIED BY: live call on Oracle through `dist/llm-resilience.js`: `tier=free claudeAskedFirst=false`, Gemini answered "waterfall ok" in 2.9 s, skipped []. All 6 services active, 0 traceback lines since restart; cto-aipa started 16:02:27, after the file (16:02:26); live md5 = build.
-
-**⏳ 30 Oct (evening) — A+B+C built and pushed; the Oracle deploy WAITS for Elena's "deploy" (classifier refused it).**
-- A: every Claude call checks `MODEL_TIER` first (free: Gemini → Groq → Grok → OpenAI → Claude last; credit: Claude first). cto-aipa `03fb226a` (askAI, photo, PDF, Atuona, research, triage, blog), VJH `01d8365`, EspaLuz WA `c7844d4` + Family `5156e8e`, Algom `0aaa90b`; `scripts/model-tier.cjs` `8e97dfb3` now writes `MODEL_TIER` into all five bot `.env` files.
-- B: `scripts/pii-guard.cjs` (the pre-commit gate in every fleet repo) blocks an added direct Claude call unless it carries a `tier-gated` marker; the rule is also in CLAUDE.md §4 + the Cursor rule (Cursor Cloud runs no local hooks).
-- C: portfolio badge + CTO AIPA card (EN/ES) rewritten to the real order. Committed locally in `D:/aideazz/aideazz`, NOT pushed: publish only after the deploy, so the public claim is true when it appears.
-- Staged deploy: `/tmp/sonnet/deploy2` on the laptop → `scp -r deploy2 oracle-cto-aipa:tier-deploy && ssh oracle-cto-aipa bash ~/tier-deploy/apply.sh` (backs up `*.bak-tier-20261030`; 14 files md5 == git before the change; `espaluz_bridge.py` edited IN PLACE, aborts if an anchor is not unique).
-- Sonnet 5.5 NOT switched: it rejects `temperature` (400), and EspaLuz WA (0.7) and lead triage (0.1) send it. Remove those first, then it is a `.env` line. Also: API version `2026-10-21` rejects `temperature` on every model; the bots send `2023-06-01`, so an SDK upgrade that switches the default version would break those calls.
-- OpenClaw 2026.2.14 has no Sonnet newer than 4.5 in its catalog: upgrade OpenClaw or use Opus 4.6 / Haiku 4.5 there before 30 Nov (Elena's call).
+**✅ 30 Oct — fleet cost order LIVE on Oracle (20:20 UTC): free first, Claude LAST while `MODEL_TIER=free`, Claude FIRST when credit lands. Model ids come from `.env`.**
+- HOW IT WORKS: `scripts/model-tier.cjs` (cron 15:30 UTC) reads Elena's Anthropic billing mail and writes `MODEL_TIER` into cto-aipa + VJH + EspaLuz WA/Family/Influencer + Algom `.env`; every Claude call checks it first (cto-aipa `freeTier()`, VJH `free_tier()` in `model_config.py`, EspaLuz `llm_chain.free_tier()`, Algom `llm-chain.mjs freeTier()`), re-read per call, no restart. Sonnet id: `CLAUDE_SONNET_MODEL` (cto-aipa, VJH, Algom) / `CLAUDE_MODEL_NAME` (EspaLuz) = `claude-sonnet-4-6`.
+- GUARD: `scripts/pii-guard.cjs` (pre-commit in every fleet repo) blocks an ADDED direct Claude call unless it carries `tier-gated`. Rule in CLAUDE.md §4 + Cursor rule. Cursor Cloud runs no local hooks: read the rule.
+- VERIFIED BY (20:20 UTC, live code on Oracle, tier=free): CTO AIPA + VJH answered "waterfall ok" with Claude NOT asked; EspaLuz WA + Family answered via the chain (Gemini 402, Groq 429, then Grok); Algom `freeTier()=true`; 20/20 live files md5 = git; 6 services active, 0 error lines; cto-aipa started 20:20:02 > files 20:19:59. Backups `*.bak-tier-20261030`, `*.bak-sonnet-20261030`.
+- 🔴 FOUND: Gemini returns `402 Payment Required` on the EspaLuz key; Groq was 429 at the same time, so EspaLuz leaned on Grok. Check that key's Google billing.
+- NEXT (Elena's call, none urgent):
+  1. **Sonnet 5.5:** cheaper and smarter, but it rejects `temperature` (400). First remove `temperature` from EspaLuz WA (0.7) + lead triage (0.1), then set `.env` to `claude-sonnet-5-5`. Do it as its own step so a tone change is attributable.
+  2. **OpenClaw 2026.2.14** has no Sonnet newer than 4.5 in its catalog: upgrade it, or use Opus 4.6 / Haiku 4.5 there, before 30 Nov.
+  3. **Atlas/WHITESPACE** still asks Claude first (own chain, not touched today).
+  4. **API version `2026-10-21`** rejects `temperature` on every model; the bots send `2023-06-01`. An SDK upgrade that moves the default version would break those calls.
+- Portfolio badge + CTO AIPA card (EN/ES) now describe this order: aideazz `b4ae153`.
 
 ## 1. The session board — claim before you touch
 
@@ -64,7 +60,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-10-30 16:50 | Own-CRM Phase A: kit notes copied into daily_queue.kit_notes by the hourly hiring sync; record page shows them; honest footer | `src/daily-queue.ts` `src/queue-routes.ts` `src/queue-page.ts` `scripts/queue-hiring-keep-act-today.cjs` → Oracle dist + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
-| Claude Code | 2026-10-30 21:00 | DEPLOYING A+B (Elena: "yes, deploy") | Oracle: cto-aipa dist + model-tier.cjs, VJH src, EspaLuz WA/Family, Algom + MODEL_TIER in 5 bot .env; restarts all six | 40772c86 |
 | Claude Code | 30 Oct 20:20 | EspaLuz kids items 1-8 (step tracker, dialogue rules, pronunciation check, star unlock, both ways, photos, mission follow-up, weekly story) | `EspaLuzFamilybot/main.py`, ascent `Classroom.tsx` + `espaluz-chat`, Oracle `espaluz-familybot` | (this row) |
 
 **Rules**
