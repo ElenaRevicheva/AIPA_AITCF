@@ -23,11 +23,11 @@ also be possible in **EspaLuz WhatsApp** — in LATAM, WhatsApp is the winner. M
 
 1. ✅ (31 Oct 19:34:35 UTC: Elena linked; `connected_bots` platform=whatsapp, id = `wa_`+hash, no phone stored) **Link WhatsApp to the family** — `connected_bots.platform='whatsapp'`, WhatsApp accepts `connect CODE`; the
    kids-memory/report functions take a WhatsApp identity. Without this, nothing below can share memory.
-2. **Kids mode on WhatsApp** — a `/kids`-style trigger ("Alisa" / "kids") that reuses the SAME rules as Telegram:
+2. ⏳ (built + deployed 31 Oct 19:46 UTC, waits on a real lesson) **Kids mode on WhatsApp** — DONE DIFFERENTLY than planned: no Python copy. `EspaLuzWhatsApp/kids_lessons.py` sends each turn to the SaaS `espaluz-chat` (v237) with `ESPALUZ_BOT_SECRET` + the hashed WhatsApp id → ONE kids brain for web + WhatsApp (every live-test rule applies at once; rows land as classroom, source `whatsapp`, so memory + the report see them). "kids" starts, "adult" ends, 2 h quiet ends. Voice notes → Groq Whisper → turn; photos → the same vision path (= step 4 too). Menu shows KIDS MODE + FAMILY ACCOUNT. Old plan text: — a `/kids`-style trigger ("Alisa" / "kids") that reuses the SAME rules as Telegram:
    copy the kids block of `EspaLuzFamilybot/main.py` (steps, stories, `kids_heard`, filters, memory card, emergency/
    stop, sit-still, and the 31 Oct 18:36 "talk less" rule = espaluz-chat `KIDS_QUIET`) into one shared module, so both bots import it instead of drifting twins. Fix "preschooler" → 6–7.
 3. **Hero voices** — Pere and Titi as WhatsApp voice notes (same MiniMax voices via Replicate, gTTS fallback).
-4. **Photos** — her photo → Grok vision → the heroes talk about it (same prompt as the web).
+4. ⏳ (rides on step 2: a photo in kids mode goes to the same espaluz-chat photo path) **Photos** — her photo → Grok vision → the heroes talk about it (same prompt as the web).
 5. **Parent report** — the existing report loop sends to the parent's WhatsApp when the family's link is WhatsApp.
 6. **Stars/stickers** — a short "⭐ 23 · 🦥🐒🦜🐸" line at the end of a lesson (text, no page needed).
 
