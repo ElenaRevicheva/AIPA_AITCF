@@ -1007,8 +1007,9 @@ export function groundDueDate(c: CardClassification, spoken: string): CardClassi
 
 /**
  * The column she NAMED wins, even when Whisper spelled it in Latin letters (31 Oct 2026).
- * She said "Надо сделать"; the transcript read "N'ada zdjela'c'", the model returned no listNameHint, and the card
- * went to Cita. Apostrophes and "j" softeners are stripped, then both alphabets are matched.
+ * She said "Надо сделать"; the transcript read "N'ada zdjela'c'", and the model returned listNameHint "Cita" — a
+ * column she never said, which then won as "spoken". Apostrophes and "j" softeners are stripped, then both
+ * alphabets are matched.
  */
 export function spokenColumn(text: string): string | null {
   const t = String(text || '').toLowerCase().replace(/['’ʼ`]/g, '').replace(/(?<=[a-z])j(?=[aeiou])/g, '');
@@ -1017,11 +1018,28 @@ export function spokenColumn(text: string): string | null {
   return null;
 }
 
+const CYR_LAT: Record<string, string> = {
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'i', к: 'k', л: 'l', м: 'm',
+  н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sh',
+  ы: 'y', э: 'e', ю: 'ju', я: 'ja', ь: '', ъ: '',
+};
+function latinWords(s: string): string[] {
+  return String(s || '').toLowerCase().replace(/['’ʼ`]/g, '').replace(/[а-яё]/g, (ch) => CYR_LAT[ch] ?? ch)
+    .replace(/(?<=[a-z])j(?=[aeiou])/g, '').split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+}
+
+/** A column hint counts only if one of its words is in what she said (either alphabet, one slip allowed). */
+export function hintWasSpoken(hint: string, spoken: string): boolean {
+  const said = latinWords(spoken);
+  return latinWords(hint).some((h) => said.some((w) => w === h || (h.length >= 4 && w.length >= 4 && withinOneEdit(w, h))));
+}
+
 export function groundListHint(c: CardClassification, spoken: string): CardClassification {
-  if (c.listNameHint?.trim()) return c;
   const col = spokenColumn(spoken);
-  if (!col) return c;
-  console.log(`[TrelloVoice] column "${col}" heard in her words — model missed it`);
+  const hint = c.listNameHint?.trim();
+  if (hint && hintWasSpoken(hint, spoken)) return c;
+  if (hint) console.log(`[TrelloVoice] column hint "${hint}" dropped: not in what she said`);
+  if (col) console.log(`[TrelloVoice] column "${col}" heard in her words`);
   return { ...c, listNameHint: col };
 }
 

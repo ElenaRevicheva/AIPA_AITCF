@@ -248,7 +248,11 @@ check('"N\'ada zdjela\'c\'" (her park note) → column Надо сделать',
 check('Cyrillic "надо сделать" → Надо сделать', v.spokenColumn('Kira Noviembre, надо сделать, купить молоко') === 'Надо сделать');
 check('"nado sdelat" → Надо сделать', v.spokenColumn('Kira noviembre nado sdelat kupit moloko') === 'Надо сделать');
 check('"поток" → Надо сделать', v.spokenColumn('Кира ноябрь, в поток: позвонить врачу') === 'Надо сделать');
-check('a column the model already heard is kept', v.groundListHint({ listNameHint: 'Cita' }, PARK).listNameHint === 'Cita');
+check('her park note: the invented "Cita" loses to the spoken Надо сделать (Oracle log 31 Oct)', v.groundListHint({ listNameHint: 'Cita' }, PARK).listNameHint === 'Надо сделать');
+check('"Cita" she really said is kept', v.groundListHint({ listNameHint: 'Cita' }, 'Kira Octubre, Cita, dentista 15 de octubre').listNameHint === 'Cita');
+check('"CETA" (Whisper slip) still counts as Cita', v.groundListHint({ listNameHint: 'Cita' }, 'Kira octubre datirovano CETA 16 octubre').listNameHint === 'Cita');
+check('"Датировано" hint grounded by Latin "datirovano"', v.hintWasSpoken('Датировано', 'kira octubre datirovano vrach'));
+check('an invented hint with no column spoken → no hint (code picks the column)', v.groundListHint({ listNameHint: 'Cita' }, 'Kira Noviembre купить молоко').listNameHint === null);
 check('no column spoken → no hint', v.spokenColumn('Kira Noviembre cita con el dentista 28 de noviembre') === null);
 
 console.log(`\n${pass} passed, ${fail} failed`);
