@@ -186,7 +186,10 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       const unknown = sIds.filter((id) => !byId[id]);
       if (unknown.length) problems.push(`unknown bullet ids: ${unknown.slice(0, 3).join(', ')}`);
       ids.forEach((id) => used.add(id));
-      if (ids.length) sections.push({ heading: headingOf(heading), ids });
+      // 31 Oct 2026 (Nuro test, Grok composing): one heading printed three times. Same heading → one section.
+      const same = sections.find((x) => norm(x.heading) === norm(headingOf(heading)));
+      if (same) same.ids.push(...ids);
+      else if (ids.length) sections.push({ heading: headingOf(heading), ids });
     }
     const total = sections.reduce((n, s) => n + s.ids.length, 0);
     // 13 Oct 2026 (Elena): a posting far from her evidence used to fall all the way back to the generic lane CV. The
