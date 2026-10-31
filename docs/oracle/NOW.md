@@ -100,6 +100,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 16:55 | EspaLuz web stars/stickers + classroom photos, then parent report | ascent `src/pages/Classroom.tsx`, `supabase/functions/espaluz-chat`; EspaLuzFamilybot `main.py`; Oracle `espaluz-familybot` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
