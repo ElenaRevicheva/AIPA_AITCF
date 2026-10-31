@@ -15,13 +15,13 @@ also be possible in **EspaLuz WhatsApp** — in LATAM, WhatsApp is the winner. M
 | Hero voices (Pere 0.82, Titi 0.9) | ✅ | ✅ | ❌ — one gTTS voice |
 | Hero clips / pictures | ✅ | ✅ | ❌ |
 | Photos the heroes talk about | ✅ (after Publish) | ✅ | ? (image handling exists for adults — to check) |
-| Linked to the family's SaaS account (`connect CODE`) | — | ✅ | ❌ (Phase 1 of ONE_FAMILY_MEMORY_PLAN) |
+| Linked to the family's SaaS account (`connect CODE`) | — | ✅ | ✅ (31 Oct, step 1) |
 | Parent report after each lesson | — | ✅ | ❌ |
 | Stars / stickers | ✅ (after Publish) | stars only | ❌ |
 
 ## Order (each step shippable, verified from logs before the next; surgical, no rebuild)
 
-1. ⏳ (built 31 Oct 17:48, waits on a real link) **Link WhatsApp to the family** — `connected_bots.platform='whatsapp'`, WhatsApp accepts `connect CODE`; the
+1. ✅ (31 Oct 19:34:35 UTC: Elena linked; `connected_bots` platform=whatsapp, id = `wa_`+hash, no phone stored) **Link WhatsApp to the family** — `connected_bots.platform='whatsapp'`, WhatsApp accepts `connect CODE`; the
    kids-memory/report functions take a WhatsApp identity. Without this, nothing below can share memory.
 2. **Kids mode on WhatsApp** — a `/kids`-style trigger ("Alisa" / "kids") that reuses the SAME rules as Telegram:
    copy the kids block of `EspaLuzFamilybot/main.py` (steps, stories, `kids_heard`, filters, memory card, emergency/
