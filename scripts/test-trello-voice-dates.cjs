@@ -209,5 +209,20 @@ check('"Google Cloud SDK" untouched', v.repairNames('install the Google Cloud SD
 check('"move it to the cloud" (no Claude noun) untouched', v.repairNames('move the backups to the cloud') === 'move the backups to the cloud');
 check('"STO AIPA" still becomes CTO AIPA (table unchanged)', v.repairNames('My STO AIPA does not learn') === 'My CTO AIPA does not learn');
 
+// ── 31 Oct 2026 — no date spoken, model invented "28 November", card went to Cita ────────────────────────────────
+const PARK = 'Postav\' sadac\'o. Kira novijembre. N\'ada zdjela\'c\'. Schazit\' s dočke u parke Metropolitano i posmatrit\' tam\' Monotidi i Peresoso Pere.';
+const inv = { dueDate: '2026-11-28', dueTime: null, subtaskDueDates: null, listTarget: 'dated' };
+const g = (text, c = inv) => v.groundDueDate(c, text).dueDate;
+check('her 31 Oct park note: invented date dropped', g(PARK) === null);
+check('"Kira Noviembre, надо сделать: сходить в парк" (Cyrillic) → dropped', g('Kira Noviembre, надо сделать: сходить с дочкой в парк') === null);
+check('"Кира ноябрь, купить молоко" → dropped (board name is not a day)', g('Кира ноябрь, купить молоко') === null);
+check('"28 de noviembre" kept', g('Kira Noviembre, cita con el dentista 28 de noviembre') === '2026-11-28');
+check('"двадцать восьмого ноября" kept', g('Кира ноябрь, врач двадцать восьмого ноября') === '2026-11-28');
+check('"tomorrow" kept', g('call the bank tomorrow') === '2026-11-28');
+check('"el viernes" kept', g('llamar al banco el viernes') === '2026-11-28');
+check('"в субботу" kept', g('сходить в парк в субботу') === '2026-11-28');
+check('"by end of November" kept', g('finish the deck by end of November') === '2026-11-28');
+check('no date → nothing to ground', v.groundDueDate({ dueDate: null }, PARK).dueDate === null);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

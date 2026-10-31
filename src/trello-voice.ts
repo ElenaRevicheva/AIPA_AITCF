@@ -925,6 +925,45 @@ function applyCategoryColor(c: CardClassification): CardClassification {
   return { ...c, labelColor: derived };
 }
 
+// Words that can carry a date in her three languages (and Whisper's Latin spelling of Russian).
+const DATE_SIGNAL_RE = new RegExp([
+  '\\d',
+  // months — the board name ("Kira Noviembre") is cut out before this test
+  'enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre',
+  'january|february|march|april|june|july|august|september|october|november|december',
+  'январ|феврал|март|апрел|ма[яйе]\\b|июн|июл|август|сентябр|октябр|ноябр|декабр',
+  // weekdays
+  'lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo',
+  'monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekend',
+  'понедельник|вторник|сред[уае]|четверг|пятниц|суббот|воскресень|выходн',
+  // relative days
+  'today|tomorrow|tonight|next week|next month|end of|deadline',
+  '\\bhoy\\b|ma[ñn]ana|pasado ma|semana|pr[oó]xim|fin de',
+  'сегодня|завтра|послезавтра|недел|месяц|до конца|к концу',
+  'sevodn|segodn|zavtra|nedel|mesjac|mesyac',
+  // spoken numbers and ordinals
+  '\\b(?:pervo|vtoro|tretje|chetvert|pjato|pyato|shesto|sedmo|vosmo|devjato|desjato|dvadcat|tridcat)',
+  'первого|второго|третьего|четв[её]ртого|пятого|шестого|седьмого|восьмого|девятого|десятого|надцатого|двадцат|тридцат',
+  '\\b(?:uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|quince|veinte|treinta|primero)\\b',
+  '\\b(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|twent\\w*|thirt\\w*)\\b',
+].join('|'), 'iu');
+
+/**
+ * A due date the model INVENTED is dropped before it can move the card (31 Oct 2026).
+ * "Поставь задачу, Kira Noviembre, надо сделать: сходить с дочкой в парк Метрополитано" — no date spoken —
+ * came back due 28 November, and reconcileUrgency then filed it in "Датировано / Cita" BECAUSE of that date.
+ * The prompt's own examples are full of "28th of October / 28th of November" and the month board's name is a
+ * month, so the model filled a required-looking slot. A date is kept only when the words she said can carry one;
+ * the board name ("Kira Noviembre") is cut out first, because naming the board is not naming a day.
+ */
+export function groundDueDate(c: CardClassification, spoken: string): CardClassification {
+  if (!c.dueDate && !c.subtaskDueDates?.length) return c;
+  const said = String(spoken || '').toLowerCase().replace(/(?:kira|кира)\s+\S+/giu, ' ');
+  if (DATE_SIGNAL_RE.test(said)) return c;
+  console.log(`[TrelloVoice] due date ${c.dueDate} dropped: no date in what she said`);
+  return { ...c, dueDate: null, dueTime: null, subtaskDueDates: null };
+}
+
 function reconcileUrgency(c: CardClassification): CardClassification {
   if (!c.dueDate) {
     // If NLP said 'dated' but there's no extracted date, push to todo_flow
@@ -1095,7 +1134,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
     const cleaned = text.replace(/```json|```/g, '').trim();
     const block = cleaned.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(block ? block[0] : cleaned) as CardClassification;
-    return applyCategoryColor(reconcileUrgency(parsed));
+    return applyCategoryColor(reconcileUrgency(groundDueDate(parsed, cleanedText)));
   } catch {
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] classify parse failed, using fallback. Raw:', text.slice(0, 400));
