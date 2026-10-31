@@ -40,6 +40,13 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**✅ 31 Oct — EspaLuz STEP 1 of Elena's 9-day "one step at a time" plan: Telegram memory works again, $0 (Family bot `f942219`, WhatsApp `9c02ae3`, both live 11:25 UTC, live md5 = commit).**
+- RAG had been dead since OpenAI's credit ran out 23 Oct (last vector 22 Oct, log lied "saved"). Now a local multilingual model (fastembed `paraphrase-multilingual-MiniLM-L12-v2`, ES/EN/RU, 5 ms) in BOTH bots; new column `espaluz_embeddings.embedding_local vector(384)` + `model`; 531 OpenAI rows untouched. Backfill (`EspaLuzWhatsApp/rag_backfill.py`, reused): 586 turns, 0 failed. Proof from live venv: "toucan in the park" → her 30 Oct question 77%.
+- Translation + adult photo reading were OpenAI-only → now paid first, free fallback (translation via `llm_chain` order claude,openai,gemini,groq,grok; photo gpt-4o → Grok). Proof: "¿Dónde vive este tucán?" via groq in 0.7 s, openai+gemini skipped.
+- Elena's onboarding restored from `json_store_snapshots` id 11 (14 Aug): step complete, role parent. Backups `*.bak-20261031-rag`, `user_onboarding.json.bak-20261031-restore`.
+- ⚠️ WA server copy of `espaluz_rag.py` was the pre-scrub one with a hardcoded local DB password fallback → replaced by git's (URL resolved at call time). The password itself is still valid on the box: Elena's call to rotate.
+- **NEXT = STEP 2 (with Alisa):** kids responsiveness — sentence-check false positive (W1), unclear speech-to-text (W2), child-led rule (W3) + deploy ascent `729de4b`. Findings: `docs/espaluz/PROD_LOG_ANALYSIS_2026-10-31.md`. Kids mode still gets no RAG on purpose (parent's history); Alisa's own memory = later step.
+
 **📐 31 Oct — EspaLuz one family memory: PLAN only, awaiting Elena's go-ahead per phase** → `docs/espaluz/ONE_FAMILY_MEMORY_PLAN_2026-10-31.md`. Key facts: 3 separate memories (Supabase web / Oracle unified DB both bots / JSON); 0 users linked across Telegram+WhatsApp; 🔴 `submit-progress` trusts the public anon key. Private-docs `docs/plans/` lives on branch `docs` (402 ahead of `main`).
 
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
@@ -68,7 +75,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 11:35 | EspaLuz step 1: free-first/paid-when-funded for translation, photo, RAG (local embeddings); restore Elena onboarding | EspaLuzFamilybot `main.py` `espaluz_rag.py` + venv (fastembed); EspaLuzWhatsApp `espaluz_rag.py`; unified DB `espaluz_embeddings`; both bot services | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
