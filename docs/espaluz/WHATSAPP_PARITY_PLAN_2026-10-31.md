@@ -25,7 +25,7 @@ also be possible in **EspaLuz WhatsApp** — in LATAM, WhatsApp is the winner. M
    kids-memory/report functions take a WhatsApp identity. Without this, nothing below can share memory.
 2. **Kids mode on WhatsApp** — a `/kids`-style trigger ("Alisa" / "kids") that reuses the SAME rules as Telegram:
    copy the kids block of `EspaLuzFamilybot/main.py` (steps, stories, `kids_heard`, filters, memory card, emergency/
-   stop, sit-still) into one shared module, so both bots import it instead of drifting twins. Fix "preschooler" → 6–7.
+   stop, sit-still, and the 31 Oct 18:36 "talk less" rule = espaluz-chat `KIDS_QUIET`) into one shared module, so both bots import it instead of drifting twins. Fix "preschooler" → 6–7.
 3. **Hero voices** — Pere and Titi as WhatsApp voice notes (same MiniMax voices via Replicate, gTTS fallback).
 4. **Photos** — her photo → Grok vision → the heroes talk about it (same prompt as the web).
 5. **Parent report** — the existing report loop sends to the parent's WhatsApp when the family's link is WhatsApp.
