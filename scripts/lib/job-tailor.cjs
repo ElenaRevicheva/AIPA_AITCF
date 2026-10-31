@@ -97,9 +97,9 @@ const hits = (text, tags) => tags.filter((t) => hasTag(text, t)).length;
 /** The posting's title, safe to use as a CV headline: no location noise, no ' — ' (the builder splits on it). */
 function cleanTitle(title) {
   let t = String(title || '').replace(/\s+—\s+/g, ' - ');
-  t = t.replace(/\((?:[^)]*\b(remote|latam|americas|worldwide|anywhere|hybrid|on-?site|contract|full[- ]time)\b[^)]*)\)/gi, ' ');
+  t = t.replace(/\((?:[^)]*\b(remote|latam|americas|worldwide|anywhere|hybrid|on-?site|contract|freelance|part[- ]time|full[- ]time)\b[^)]*)\)/gi, ' ');
   t = t.split(/\s[|•]\s/)[0];
-  t = t.replace(/\s+-\s+(remote|latam|americas|worldwide|anywhere|contract|full[- ]time)\b.*$/i, '');
+  t = t.replace(/\s+-\s+(remote|latam|americas|worldwide|anywhere|contract|freelance|part[- ]time|full[- ]time)\b.*$/i, '');
   t = t.replace(/\s{2,}/g, ' ').trim();
   return t.length > 70 ? t.slice(0, 70).replace(/\s+\S*$/, '') : t;
 }

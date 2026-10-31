@@ -182,10 +182,14 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   // Title first, company second: a NEW file name, so HubSpot never silently re-serves an older CV of the
   // same name (uploadOutreachFile reuses by name), and it reads cleanly to a recruiter.
   const shapedName = `CV_Elena_Revicheva_${tailor.slugOf(head, company).replace(/^_+/, '')}.pdf`;
-  let why = '';
+  // 31 Oct 2026 (INDG "Generative AI Artist Fashion"): cv-bank.json holds engineering/ops lines only, so for a creative
+  // posting the composer put job-hunter bullets under "artist" headings — its own reviewer said so, and a fit note never
+  // stops a CV. A creative posting gets the curated Creative Technologist lane CV (films first) under the posting's title.
+  const curated = lane === 'creative';
+  let why = curated ? 'creative posting — built on your curated Creative Technologist CV (films first); the line bank has no creative lines' : '';
   // Already built for THIS deal (a dry run, or a run whose HubSpot write failed): reuse it — the model is paid once.
   const cachedJson = path.join(AUTO_DIR, shapedName.replace(/\.pdf$/, '.json'));
-  try {
+  if (!curated) try {
     const prev = JSON.parse(fs.readFileSync(cachedJson, 'utf8'));
     if (String(prev._deal) === String(d.id) && prev._composed && prev._composed.shape === CV_SHAPE
       && fs.existsSync(path.join(AUTO_DIR, shapedName))) {
@@ -195,8 +199,8 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   } catch { /* not built yet */ }
   // A crash here must still end in a CV and a 🛡️ note — otherwise cron would pay for the composer again every
   // 10 minutes for the same deal (code review, 11 Oct 2026).
-  let c;
-  try {
+  let c = { spec: null, reason: why };
+  if (!curated) try {
     c = await composeCv({ title: head, company, jd, lane, pitch: summary, cvName: shapedName, log: (m) => console.log(m) });
   } catch (e) {
     c = { spec: null, reason: `compose crashed: ${String(e.message || e).slice(0, 120)}` };
@@ -215,7 +219,7 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   } else {
     why = c.reason;
   }
-  if (shapedOnly) return { cvPath: null, name: '', shaped: false, why };
+  if (shapedOnly && !curated) return { cvPath: null, name: '', shaped: false, why };
 
   let job = tailor.tailorJob({ title, company, jd, lane, laneHeadline: headline, summary });
   const jobPath = path.join(AUTO_DIR, job.cv.replace(/\.pdf$/, '.json'));
@@ -229,7 +233,7 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
       runBuilder(jobPath, job, { _deal: d.id, _jd_chars: jd.length });
     }
     const cvPath = path.join(AUTO_DIR, job.cv);
-    if (fs.existsSync(cvPath)) return { cvPath, name: job.cv, shaped: false, why, info: job.order.join('/') };
+    if (fs.existsSync(cvPath)) return { cvPath, name: job.cv, shaped: false, curated, why, info: job.order.join('/') };
     return { cvPath: null, name: '', shaped: false, why: `${why}; builder wrote no file` };
   } catch (e) {
     return { cvPath: null, name: '', shaped: false, why: `${why}; ${String((e.stderr && e.stderr.toString()) || e.message).trim().split('\n').pop().slice(0, 100)}` };
@@ -243,7 +247,7 @@ function cvLineHtml(cv) {
   // an honest kit decision from a missing CV. It now travels with the line (the audit reads "Not shaped to this posting:").
   if (!cv.shaped) {
     return `<p>📎 <strong>Tailored CV attached to this note — use this one:</strong> ${esc(cv.name)}`
-      + (cv.why ? `<br><em>Not shaped to this posting: ${esc(String(cv.why).slice(0, 220))} — your verified facts do not cover enough of it; say the gap before they find it.</em>` : '')
+      + (cv.why ? `<br><em>Not shaped to this posting: ${esc(String(cv.why).slice(0, 220))}${cv.curated ? '' : ' — your verified facts do not cover enough of it; say the gap before they find it'}.</em>` : '')
       + '</p>';
   }
   // 12 Oct 2026: the independent reviewer's doubt (cv-compose `fit_note`) used to live only in the JSON on Oracle while
