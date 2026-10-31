@@ -34,6 +34,12 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - **RISK:** Replicate balance $3.56 (MiniMax ≈ $0.10 / 1k chars ≈ 1-2 ¢ per classroom turn). Oracle `~/EspaLuzFamilybot` disk: 16 tracked files differ from git (others' work) — copy `main.py` only.
 - Earlier today (all live): 10 new Runway shots (629 credits left), one picture per line in bot `1c8b222` + `espaluz-chat` v191; creatives on laptop + OneDrive 185/185 md5.
 
+**✅ 31 Oct — EspaLuz Family bot: three bugs from Elena's 30 Oct Telegram test, fixed + LIVE on Oracle 10:11 UTC (bot `7d26fc0`, live md5 `71c03c98` = commit, backup `main.py.bak-20261031-start-connect`).**
+- `/start` reset onboarding EVERY time → returning user lost country/name/role and her next message (web code `138B75`) was read as "not a country". Now a complete profile gets "welcome back"; `/start new` re-runs setup.
+- `/connect` + progress sync were stubbed out in Jan with "Supabase project is NXDOMAIN" — FALSE, `euyidvolwqmzijkfrplh` is live (web + classroom). Her code was valid (created 21:07, sent 21:08, expires 21:17, `used_at` still null). Now calls `connect-bot`; `submit-progress` + `update-bot-activity` run in a background thread. Probe from Oracle with the bot's key: fake code → `404 Invalid or expired` (auth passes). **NOT YET PROVEN end to end:** needs Elena to generate a new code on the web and send `/connect CODE`.
+- Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
+- Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
+
 **⏸️ 22 Oct — Pere + Titi kids SaaS PAUSED by Elena.** Telegram kids mode stays LIVE. Creatives live LOCALLY (Elena): `D:/aideazz/ascent-saas-builder/creatives/pere-titi-20261021/` (gitignored, md5 manifest) + OneDrive; Oracle copies removed (677 MB freed) — Oracle keeps only the bot's `~/EspaLuzFamilybot/heroes/` (7.8 MB); classroom on ascent branch `classroom-pere-titi` (not main). Resume steps: private-docs `ALISA_BUDDY_ESPALUZ_KIDS_2026-10-21.md` § PAUSED.
 
 **22 Oct (2) — fixed after Elena's test:** /kids greeting now voiced (`heroes/kids-greeting.mp4`, cached; delete it to rebuild); unlabeled video scripts no longer give every line to Pere (the reply's Pere:/Titi: lines are used); each turn plays a mix of all 14 approved shots (+ titi-cheer-2, titi-dance). Voices pinned: Pere A Rudolph, Titi A Anime. Commit EspaLuzFamilybot `44869f8`.
@@ -60,7 +66,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 10:15 | EspaLuz Family bot: /start wipes profile, /connect to SaaS stubbed, kids steps ignore her questions | EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
