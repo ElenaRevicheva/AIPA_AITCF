@@ -31,6 +31,7 @@ const SHAPE = 'one-role-2026-10-11';
 // Floor for a shaped CV (13 Oct 2026): below this the kit falls back to the generic lane CV. The prompt aims higher.
 const MIN_SECTIONS = 2;
 const MIN_LINES = 5;
+const ATTEMPTS = 3;
 // A heading is a claim that she did that work, so a requirement she may lack can never be one.
 // Language words count only as a LEVEL ("English C1", "native speaker"): "AI-native operations" is a duty.
 const REQUIREMENT_RE = /\b\d+\s*\+?\s*years?\b|\byears? of\b|\bexperience (in|with)\b|\bdegree\b|\bbachelor|\bmaster'?s\b|\bcertif|\bproficien|\bbackground in\b|\bfamiliar(ity)? with\b|\bnative (speaker|english|spanish|portuguese|level)\b|\b(english|spanish|portuguese)\s+(fluen|proficien|level|native|[abc][12])/i;
@@ -149,13 +150,18 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
     'CHIPS: scale figures only (products, services, tests, postings screened, executive years); never a chip that reads as a loss or a small count on its own (lost sign-ups, a ten-day audit count) — those belong in their bullets.',
     'Return one JSON object only.',
   ].join('\n');
+  const lessons = pastWarnings(lane, cvName);
+  if (lessons.length) log(`  ⓘ compose: ${lessons.length} past reviewer warning(s) for lane ${lane} in the prompt`);
   const user = [
     `JOB: ${title} at ${company}`, '', 'POSTING:', posting, '', 'BANK:', catalog, '',
+    ...(lessons.length ? ['LESSONS — the independent reviewer said these earlier CVs for this kind of role did NOT read as the job. Do not repeat the pattern:',
+      ...lessons.map((l) => `- ${l}`), ''] : []),
     'Return {"sections":[{"heading":"verbatim piece of a posting duty line","ids":["b-…"]}],"summary":[],"chips":[],"intro":"","live":[],"omnibazaar":[],"egov":[]}',
   ].join('\n');
 
   let lastReason = '';
-  for (let attempt = 0; attempt < 3; attempt++) {
+  let warned = null; // the latest complete CV the reviewer warned about — shipped if no attempt reads as the role
+  for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
     let pick, provider;
     try {
       const out = await ask(system, attempt ? `${user}\n\nYour previous choice was rejected: ${lastReason}. Fix exactly that.` : user,
@@ -283,11 +289,41 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       education: bank.education,
       languages: bank.languages,
       note: bank.figures_note,
-      _composed: { shape: SHAPE, provider, reviewer, ids: kept.map((s) => s.ids), fit_note: fitNote },
+      _composed: { shape: SHAPE, provider, reviewer, ids: kept.map((s) => s.ids), fit_note: fitNote, attempt: attempt + 1 },
     };
+    // 31 Oct 2026 (Elena: "the reviewer's warning is written down and appropriate actions should follow"). INDG got a
+    // job-hunter CV for a fashion-artist role while this note said so. A warning is now a retry in the reviewer's own
+    // words; the warned CV is kept, so a role far from her evidence still gets the short honest CV of 13 Oct.
+    if (fitNote && attempt < ATTEMPTS - 1) {
+      warned = { spec, provider: `${provider} + review ${reviewer}` };
+      lastReason = `the independent reviewer said the CV does not read as one for "${title}": ${fitNote}. Choose headings and lines a hiring manager for this job would recognise as its work, and leave out lines that only show other kinds of work`;
+      log(`  ↺ compose attempt ${attempt + 1}: reviewer warning — retrying with it`);
+      continue;
+    }
     return { spec, provider: `${provider} + review ${reviewer}` };
   }
-  return { spec: null, reason: lastReason || 'no usable choice' };
+  return warned || { spec: null, reason: lastReason || 'no usable choice' };
 }
 
-module.exports = { composeCv, loadBank, bankProblem, fitHeading, headingOf, overlap, REQUIREMENT_RE, BANK, SHAPE };
+/**
+ * The reviewer's warnings on earlier CVs of the same lane (newest first, distinct). They live in the built CVs' JSON
+ * (`_composed.fit_note`) — the loop's memory needs no new store. Never this deal's own file.
+ */
+function pastWarnings(lane, cvName, max = 4) {
+  const dir = path.join(ROOT, 'docs', 'applications', 'cv-by-job', 'auto');
+  const own = String(cvName || '').replace(/\.pdf$/, '.json');
+  let files = [];
+  try { files = fs.readdirSync(dir).filter((f) => f.endsWith('.json') && f !== own); } catch { return []; }
+  const out = [];
+  for (const f of files.map((f) => ({ f, t: fs.statSync(path.join(dir, f)).mtimeMs })).sort((a, b) => b.t - a.t)) {
+    try {
+      const d = JSON.parse(fs.readFileSync(path.join(dir, f.f), 'utf8'));
+      const note = String((d._composed && d._composed.fit_note) || '').trim();
+      if (d.base_lane === lane && note && !out.includes(note)) out.push(note.slice(0, 240));
+    } catch { /* a half-written file is skipped */ }
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+module.exports = { composeCv, loadBank, bankProblem, fitHeading, headingOf, overlap, pastWarnings, REQUIREMENT_RE, BANK, SHAPE };

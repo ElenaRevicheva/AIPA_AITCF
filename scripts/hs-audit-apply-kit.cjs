@@ -74,7 +74,7 @@ async function auditDeal(d) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId);
   let letter = false, cv = false, cvName = '', link = false, defense = false, role = false, comet = false, shaped = false, handBuilt = '';
-  let tailored = false, tailoredWhy = '';
+  let tailored = false, tailoredWhy = '', warning = '';
   const notes = [];
   for (const id of ids) notes.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`));
   if (!isJobDeal(d.properties.dealname, notes.map((n) => n.properties?.hs_note_body))) return null;
@@ -84,7 +84,12 @@ async function auditDeal(d) {
     // it is neither the letter nor the apply link. Checked FIRST so no other test ever sees it.
     if (stripHtml(html).includes(COMET_MARK)) { comet = true; continue; }
     if (APPLY_LINK_RE.test(html)) link = true;
-    if (html.includes('TECHNICAL DEFENSE')) defense = true;
+    if (html.includes('TECHNICAL DEFENSE')) {
+      defense = true;
+      // 31 Oct 2026: the reviewer's warning on the CV this note says to use (its FIRST 📎 line) is read, not filed away.
+      const top = stripHtml(html).split('📎')[1] || '';
+      warning = (top.match(/Its reviewer's note:\s*(.+?)(?: — read the CV|$)/) || [])[1] || '';
+    }
     if (html.includes('🎯 ROLE DEFENSE')) role = true;
     const body = stripHtml(html);
     if (body.includes(CV_MARK)) shaped = true;
@@ -116,7 +121,7 @@ async function auditDeal(d) {
       : tailored ? `${cvName} (tailored — the kit could not shape it to this posting)`
       : `${cvName} (generic — not shaped to the posting)`;
   }
-  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt || tailored || legacy), cvName, link, defense, role, comet };
+  return { id: d.id, name: String(d.properties.dealname).replace(/^\[[^\]]*\]\s*/, ''), notes: ids.length, letter, cv: cv && (shaped || !!handBuilt || tailored || legacy), cvName, link, defense, role, comet, warning };
 }
 
 async function telegram(text) {
@@ -164,5 +169,11 @@ async function telegram(text) {
       const lines = gaps.map((g) => `• ${String(g.name).slice(0, 70)} — ${g.error ? 'audit error' : [!g.letter && 'no letter', !g.cv && 'no CV'].filter(Boolean).join(' + ')}`.replace(/ — .*$/, ` — ${g.error ? 'audit error' : missing(g).join(' + ')}`));
       await telegram(`⚠️ Apply kit gap: ${gaps.length} of ${rows.length} ACT TODAY job deals are not fully stuffed\n\n${lines.join('\n')}`);
     }
+  }
+  // A complete kit can still carry a CV its own reviewer doubted: not a gap, but a reason to read it before sending.
+  const warned = rows.filter((r) => r.warning);
+  for (const r of warned) console.log(`  ⚠️ CV warning  ${String(r.name).slice(0, 60)} — ${r.warning.slice(0, 160)}`);
+  if (warned.length && TELEGRAM) {
+    await telegram(`🔎 ${warned.length} CV(s) its own reviewer doubted — read before sending:\n\n${warned.map((r) => `• ${String(r.name).slice(0, 70)} — ${r.warning.slice(0, 200)}`).join('\n')}`);
   }
 })().catch((e) => { console.error(e.message); process.exit(1); });
