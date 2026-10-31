@@ -40,6 +40,14 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**✅ 31 Oct 12:47 UTC — EspaLuz STEP 2 live: Pere/Titi react to what the child actually says (web `espaluz-chat` v218 + `voice-to-text` v174 = ascent `3a0c4b4`; Telegram bot `1324499`, live md5 = commit).**
+- Every kids turn opens with THE CHILD JUST SAID "<words>" + what the first line does (answer → whole sentence and practise it; her idea/refusal → follow it; nonsense → "No te escuché bien" and stop); the turn instruction is now the LAST part of the prompt on both surfaces.
+- Sentence check only after the heroes asked her to repeat, non-stopword words, 3+ shared, 70%+.
+- Web model order paid first: Claude (stops at once on "credit balance") → Gemini → Groq 120b → **Grok** → small Groq. Grok needs `XAI_API_KEY` in Supabase secrets — **Elena's paste, pending**; skipped silently until then.
+- voice-to-text: verbose_json; non-ES/EN/RU detection re-transcribed as es + en, most confident wins.
+- Eval before deploy, prod models, her 3 real turns: gpt-oss-20b + grok both → "¡Tu fruta favorita es la fresa!", "No te escuché bien…", followed the bicycle. NOT yet proven with Alisa live.
+- X Premium ($8) ≠ xAI API: Premium is Grok in the X app; the bots' xAI API key is separate, works, ~$0.0002/reply.
+
 **🔄 31 Oct 11:45 UTC — full EspaLuz sync, proven file by file (Elena: "updated everywhere, then I publish Lovable").**
 - Oracle Family bot: 107/107 tracked files = git `f942219` (`git hash-object --no-filters` vs `ls-files -s`).
 - Oracle WhatsApp: was 41 differ + 2 missing = the PRE-SCRUB copies (customer emails/phones/a PayPal sub id hardcoded; git's cleaned versions of 6 Sep never deployed). Synced to git `9c02ae3` → 133/133; env vars for the moved values were already in `.env`; old copies in `~/_session-backups/wa-preclean-20261031.tgz` (chmod 600, contains PII — never share). Restarted 11:39:47, HTTP 200.
@@ -82,7 +90,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-10-31 12:50 | CRM kit: CV/attachments downloadable (signed HubSpot link on click; file stays in HubSpot) | `scripts/queue-hiring-keep-act-today.cjs` `src/queue-routes.ts` `src/queue-page.ts` → Oracle + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
-| Claude Code | 2026-10-31 12:30 | EspaLuz step 2: kids turns anchored on the child's words, paid-first model order + Grok (web), unclear speech, sentence check | ascent `supabase/functions/espaluz-chat` + `voice-to-text`; EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
