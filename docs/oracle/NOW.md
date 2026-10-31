@@ -68,6 +68,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 11:35 | EspaLuz step 1: free-first/paid-when-funded for translation, photo, RAG (local embeddings); restore Elena onboarding | EspaLuzFamilybot `main.py` `espaluz_rag.py` + venv (fastembed); EspaLuzWhatsApp `espaluz_rag.py`; unified DB `espaluz_embeddings`; both bot services | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
