@@ -98,6 +98,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 14:45 | EspaLuz kids: intro clip only on the first lesson (web page + Telegram /kids) | ascent `src/pages/Classroom.tsx` (needs Lovable Publish); EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
