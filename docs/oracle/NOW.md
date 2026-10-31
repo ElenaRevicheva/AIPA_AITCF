@@ -40,6 +40,8 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**✅ 31 Oct 14:40 UTC — EspaLuz kids: the recorded introduction ("Soy Pere, hablo despacito") only on a child's FIRST lesson.** Telegram `/kids` → short "¡Hola de nuevo, Alisa!" when any kids marker exists (bot `12ec322`, live md5 = commit, restarted 14:36). Web: `Classroom.tsx` checks the account for any earlier classroom lesson (DB, any device) and skips the intro clip (ascent `e58902b`, tsc/eslint/build clean). **Web part needs Elena's Lovable Publish → Update** — page change, not a function.
+
 **✅ 31 Oct 14:35 UTC — EspaLuz "hear her better" (web `voice-to-text` v179 = ascent `61cafee`; bot `e18f6fc`, live md5 = commit).** Whisper now gets a hint: during a lesson, the heroes' last question; otherwise "Spanish and English, sometimes Russian". Measured on Groq whisper-large-v3-turbo: 3 s silence → "Thank you." (no hint), noise → "I'm not sure." (hint); `no_speech_prob` is always 0 on Groq, so phantoms are dropped by text (list) + hint-echo guard → page says "No te escuché bien". Hint neutral on clear speech, raised certainty on the expected answer (−1.03 → −0.69). Tested and NOT shipped: second listen for one-word answers ("Bici" stays "BC"). Real gain on a child's voice unproven until Alisa's next lesson. Live check also confirmed step 3: lesson 14:11 opened with a real memory from the previous lesson, both heroes, Halloween.
 - ⚠️ FOUND: bot's primary voice **edge-tts returns 403** (Microsoft endpoint), bot silently on gTTS fallback. Likely fix = upgrade `edge-tts` in the venv; not done (one step at a time).
 
@@ -98,7 +100,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 14:45 | EspaLuz kids: intro clip only on the first lesson (web page + Telegram /kids) | ascent `src/pages/Classroom.tsx` (needs Lovable Publish); EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
