@@ -100,6 +100,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 17:50 | EspaLuz WhatsApp parity step 1: connect WhatsApp to the family | ascent `supabase/functions/connect-bot`, `src/pages/ConnectBot.tsx`; EspaLuzWhatsApp `espaluz_bridge.py`; Oracle `espaluz-whatsapp` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
