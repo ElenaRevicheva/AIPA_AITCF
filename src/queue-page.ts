@@ -372,7 +372,16 @@ function cp(id){
 function act(id,status){
   q('api/act',{method:'POST',
     headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; RECORD=null; load(); }).catch(function(){});
+    body:JSON.stringify({id:id,status:status})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ OPEN=null; RECORD=null; load(); toast(d&&d.hubspot&&d.hubspot!=='not touched'?'Saved · '+d.hubspot:'Saved in your CRM'); })
+    .catch(function(e){ toast('Not saved — '+e.message); });
+}
+// 31 Oct 2026: every click says what happened (it used to fail silently).
+function toast(msg){
+  var t=document.createElement('div'); t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f1b2e;color:#fff;padding:10px 16px;border-radius:10px;font:14px system-ui;z-index:99;max-width:90vw';
+  document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 6000);
 }
 load(); loadEspaluz();
 </script></body></html>`;

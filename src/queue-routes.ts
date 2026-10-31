@@ -127,7 +127,15 @@ export function registerQueueRoutes(app: Express): void {
     try {
       const ok = await setQueueStatus(id, status as QueueStatus);
       console.log(`[queue] ${id.slice(0, 8)} -> ${status} (${ok ? 'updated' : 'not found'})`);
-      return res.json({ ok });
+      // 31 Oct 2026 — JOB lane only (Elena: "for job search Skip means forget about it forever"):
+      // her click also moves the deal in HubSpot, so the 08:15 apply queue, the VJH judge and the
+      // sweep see her decision. The client lane is NOT written back until she says what Skip means there.
+      let hubspot = 'not touched';
+      if (ok && (status === 'done' || status === 'skipped')) {
+        const item = await getQueueItemById(id);
+        if (item?.lane === 'hiring' && item.hubspotDealId) hubspot = await writeBackJob(item.hubspotDealId, status);
+      }
+      return res.json({ ok, hubspot });
     } catch (e) {
       console.error('[queue] act failed:', e);
       return res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
@@ -135,6 +143,40 @@ export function registerQueueRoutes(app: Express): void {
   });
 
   console.log('[queue] routes registered at /queue/ (behind nginx basic auth)');
+}
+
+/**
+ * One deal, one stage move — only if it is STILL in I Act TODAY (a move she made in HubSpot
+ * herself always wins). Creates nothing, deletes nothing. The previous stage + Closed Lost Reason
+ * are appended to ~/_session-backups/crm-writeback.jsonl BEFORE the change, so any click can be
+ * put back exactly. Returns a line the page shows her — never a silent failure.
+ */
+async function writeBackJob(dealId: string, status: 'done' | 'skipped'): Promise<string> {
+  const HS = 'https://api.hubapi.com';
+  const H = { Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`, 'Content-Type': 'application/json' };
+  try {
+    const g = await fetch(`${HS}/crm/v3/objects/deals/${dealId}?properties=dealstage,closed_lost_reason`, { headers: H });
+    if (!g.ok) return `HubSpot not updated (read ${g.status}) — move it there by hand`;
+    const p = ((await g.json()) as { properties?: { dealstage?: string; closed_lost_reason?: string } }).properties || {};
+    if (p.dealstage !== 'qualifiedtobuy') return 'HubSpot already moved — left as it is';
+    const today = new Date().toISOString().slice(0, 10);
+    const props: Record<string, string> = status === 'done'
+      ? { dealstage: 'decisionmakerboughtin' }
+      : { dealstage: 'closedlost', closed_lost_reason: `Elena skipped it in her CRM ${today} — forget forever (her own verdict)` };
+    const dir = path.join(process.env.HOME || '.', '_session-backups');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.appendFileSync(path.join(dir, 'crm-writeback.jsonl'), JSON.stringify({
+      at: new Date().toISOString(), dealId, click: status,
+      previous: { dealstage: p.dealstage, closed_lost_reason: p.closed_lost_reason || '' }, set: props,
+    }) + '\n');
+    const u = await fetch(`${HS}/crm/v3/objects/deals/${dealId}`, { method: 'PATCH', headers: H, body: JSON.stringify({ properties: props }) });
+    if (!u.ok) return `HubSpot not updated (${u.status}) — move it there by hand`;
+    console.log(`[queue] write-back deal ${dealId}: qualifiedtobuy -> ${props.dealstage}`);
+    return status === 'done' ? 'HubSpot moved to ⏳ Sent — passive wait' : 'HubSpot moved to ❌ Closed (your verdict)';
+  } catch (e) {
+    console.error('[queue] write-back failed:', e);
+    return 'HubSpot not updated (no answer) — move it there by hand';
+  }
 }
 
 export const _esc = esc;
