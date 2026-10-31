@@ -60,6 +60,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 10:15 | EspaLuz Family bot: /start wipes profile, /connect to SaaS stubbed, kids steps ignore her questions | EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
