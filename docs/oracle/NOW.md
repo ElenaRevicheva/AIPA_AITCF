@@ -100,7 +100,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (desktop) | 31 Oct 19:45 | EspaLuz WhatsApp parity step 2 (kids mode, shared module) + WhatsApp menu | EspaLuzWhatsApp/espaluz_bridge.py, new shared kids module, EspaLuzFamilybot/main.py (import only), espaluz-whatsapp service | 79b91ca7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -225,6 +224,11 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 ### ✅ 31 Oct ~19:20 UTC — Alisa's 18:31-18:41 web test: she asked 3× for less talk ("ya paro de hablar", "Titi no paran de hablar… que no hablen") and got 3-4 lines + "¿Por qué te gusta parar de hablar?". espaluz-chat v235 (ascent `69dc33d`, deployed via MCP): `KIDS_QUIET` → that turn = ONE line, no question; rest of the lesson capped at 1 line + 1 question. Parent line 18:39 was caught ("¡Gracias, mamá!"). Report sent (`📒 … 18:31-18:41 UTC, 8 answers`, in `/var/log/espaluz-familybot.log` — not journalctl). All turns answered by Grok (Claude: credit too low; Groq 120b: 429). Telegram has no bye/quiet code twin yet → goes into parity step 2's shared module. **Still waiting on Elena's Lovable Publish** (stars/stickers/photo/WhatsApp button); her last Publish was before 17:26.
+### ✅ 31 Oct ~20:15 UTC — WhatsApp parity steps 2/3/5 (Claude Code) · claim released
+**DONE:** kids mode on EspaLuz WhatsApp ("kids" / "adult", 2 h idle → adult) as a THIN CLIENT of SaaS `espaluz-chat` v237 (bot secret + hashed WhatsApp id; one kids brain for web + WhatsApp). Voice notes (Groq Whisper) + photos work in kids mode. Step 3: hero voices via `generate-voice`, one joined note. Step 5: report on WhatsApp, one channel per lesson (kids-memory v9). Menu: kids + family section is its OWN message — `send_whatsapp_message` cuts at 1500 chars (msg 1 is 1480; it silently dropped Translate + Motivational at 19:46-20:00).
+**VERIFIED BY:** live md5 bridge `a65c5191…`, kids_lessons `563705b0…` = EspaLuzWhatsApp `2bcaa3d`, restarted 20:09:44, health 200, 0 original lines removed vs `~/_session-backups/wa-pre-kids-1946`; first real lesson rows 20:03/20:04 (source whatsapp); voice path on Oracle → 11 s MiniMax note; Telegram report 0 turns vs WhatsApp 2.
+**NEXT:** a real kids lesson with a voice reply + the first WhatsApp report (needs her next kids turn to record the phone). Widen `KIDS_ADULT` with "it is … mother" / "mother of Alisa" in espaluz-chat, kids-memory, main.py (done only in kids_lessons.py). Then step 6 (stars line) and the EspaLuz favicon (Elena: the translate "AZ" icon is wrong — unique mark like Atlas).
+**RISK:** the bridge logs at WARNING level only — kids lines use logging.warning on purpose. Bridge access log prints full phone numbers (pre-existing).
 ### ✅ 31 Oct 19:34 UTC — WhatsApp parity step 1 DONE: Elena published + linked ("✅ ¡Conectado!" in WhatsApp; connected_bots whatsapp row, hashed id). Dashboard button renamed "Connect Telegram / WhatsApp" (ascent, needs next Publish). Bridge logs the bot's own reply echo as "WEBHOOK LOOP" — harmless. Next: step 2 (kids mode, shared module).
 - DONE: connect-bot v218 (ascent `6134b9b`) takes `whatsapp_user_id` = `wa_` + sha256("espaluz-wa:"+digits)[:32] (phone never stored); ConnectBot.tsx gets Telegram + WhatsApp buttons (WhatsApp opens wa.me/…3757 with "connect CODE"). EspaLuzWhatsApp `071e38d` live md5 `38332ff2…`, restarted 17:48, health 200: `connect <6 hex>` handled before access checks. Oracle WA `.env` got SUPABASE_ANON_KEY + ESPALUZ_BOT_SECRET copied from the Familybot `.env` (backup `~/_session-backups/wa-env-pre-connect`, 600).
 - VERIFIED BY: connect-bot from the WA env with a fake code → 404 "Invalid or expired". NOT yet a real link.
