@@ -40,6 +40,12 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**🔄 31 Oct 11:45 UTC — full EspaLuz sync, proven file by file (Elena: "updated everywhere, then I publish Lovable").**
+- Oracle Family bot: 107/107 tracked files = git `f942219` (`git hash-object --no-filters` vs `ls-files -s`).
+- Oracle WhatsApp: was 41 differ + 2 missing = the PRE-SCRUB copies (customer emails/phones/a PayPal sub id hardcoded; git's cleaned versions of 6 Sep never deployed). Synced to git `9c02ae3` → 133/133; env vars for the moved values were already in `.env`; old copies in `~/_session-backups/wa-preclean-20261031.tgz` (chmod 600, contains PII — never share). Restarted 11:39:47, HTTP 200.
+- Supabase `espaluz-chat` v216 = ascent `729de4b` (question-first kids rule), `verify_jwt` on (no-login → 401). Lovable Publish will redeploy the same code from `main`.
+- Laptop: EspaLuzFamilybot, EspaLuzWhatsApp, ascent-saas-builder, cto-aipa all `0/0` with origin.
+
 **✅ 31 Oct — EspaLuz STEP 1 of Elena's 9-day "one step at a time" plan: Telegram memory works again, $0 (Family bot `f942219`, WhatsApp `9c02ae3`, both live 11:25 UTC, live md5 = commit).**
 - RAG had been dead since OpenAI's credit ran out 23 Oct (last vector 22 Oct, log lied "saved"). Now a local multilingual model (fastembed `paraphrase-multilingual-MiniLM-L12-v2`, ES/EN/RU, 5 ms) in BOTH bots; new column `espaluz_embeddings.embedding_local vector(384)` + `model`; 531 OpenAI rows untouched. Backfill (`EspaLuzWhatsApp/rag_backfill.py`, reused): 586 turns, 0 failed. Proof from live venv: "toucan in the park" → her 30 Oct question 77%.
 - Translation + adult photo reading were OpenAI-only → now paid first, free fallback (translation via `llm_chain` order claude,openai,gemini,groq,grok; photo gpt-4o → Grok). Proof: "¿Dónde vive este tucán?" via groq in 0.7 s, openai+gemini skipped.
