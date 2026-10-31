@@ -100,7 +100,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 16:35 | EspaLuz two-way kids memory (web → Telegram) | ascent `supabase/functions/kids-memory`, `supabase/config.toml`, `src/pages/Classroom.tsx`; EspaLuzFamilybot `main.py`; Oracle `espaluz-familybot` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -223,6 +222,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 31 Oct ~16:35 UTC — EspaLuz two-way kids memory (Telegram reads web lessons) · built + deployed · WAITS on one Supabase secret (Elena) · claim released
+- DONE: new function `kids-memory` v1 (ascent `ed4da69`, pinned `verify_jwt = true` in config.toml): bot secret → `connected_bots` → her classroom turns, same filters as espaluz-chat. Bot `ca6f005` live md5 `f734682f…`, restarted 16:29: at each `/kids` hello it fetches the web card once per lesson (4 s timeout, fail-soft). `ESPALUZ_BOT_SECRET` generated in Oracle `~/EspaLuzFamilybot/.env` (backup `~/_session-backups/familybot-env-pre-botsecret`, 600).
+- NEXT (Elena): add the same value as Supabase secret `ESPALUZ_BOT_SECRET`. Then agent: call from Oracle with the secret → expect `linked:true`; then a Telegram `/kids` hello should mention a web fact (bunny costume / Halloween). Bot log line: `🧠 kids web memory: linked=True lines=N`.
+- VERIFIED BY: no auth → 401; anon key without/with wrong secret → `{"error":"unauthorized"}` 401. NOT yet verified with the real secret.
+- RISK: until the secret exists the bot logs `⚠️ kids web memory: HTTP 401` once per lesson and runs on Telegram memory only (no user-visible change).
 
 ### ✅ 31 Oct ~16:15 UTC — EspaLuz web lesson 15:54 (earthquake + "ciao"): stop/emergency handled in code · LIVE · no claim open
 - DONE: espaluz-chat v228 (ascent `627a26e`): `KIDS_EMERGENCY` → two calm lines (stay close to mom / we'll be here), `KIDS_BYE` → two goodbye lines; both have question lines stripped in code. A reply whose first line is "No te escuché bien" is cut to that line only (it had "¡Salta tres veces!" after it). voice-to-text v182: a transcript with ð/þ/æ/ø/å = not heard ("Man, að mér kom úr teléfón", icelandic at -0.82, got past the -1.0 cut).
