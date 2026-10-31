@@ -81,6 +81,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 12:30 | EspaLuz step 2: kids turns anchored on the child's words, paid-first model order + Grok (web), unclear speech, sentence check | ascent `supabase/functions/espaluz-chat` + `voice-to-text`; EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
