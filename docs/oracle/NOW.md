@@ -93,6 +93,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 14:00 | EspaLuz kids: both heroes every turn, story only at hello/story step, refusal≠sad, today's date/holidays | ascent `espaluz-chat`; EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
