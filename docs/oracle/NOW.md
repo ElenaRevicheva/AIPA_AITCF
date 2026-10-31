@@ -89,7 +89,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 12:50 | CRM kit: CV/attachments downloadable (signed HubSpot link on click; file stays in HubSpot) | `scripts/queue-hiring-keep-act-today.cjs` `src/queue-routes.ts` `src/queue-page.ts` → Oracle + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -313,6 +312,11 @@ git log keeps the record.
 - **NEXT (acceptance, whoever is next):** the first real voice note through the new path is the test — e.g. "find the card about SOAP HTML in Kira noviembre and add there …" → reply "📝 added to the description", no new card; grep `[TrelloVoice] actions: update(` and `matched on the named board by sound` in `~/.pm2/logs/cto-aipa-out-9.log`. A note saying "Claude" must come back spelled Claude.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
+
+### ✅ 31 Oct ~12:55 UTC — CRM kit: "⬇ Download CV" works · CV stays PRIVATE in HubSpot (her rule) · claim released
+- **Elena:** the CV in "Your copy of the kit" was not clickable. Rule [[feedback_cv_delivery_hubspot_only]]: CVs live on the deal note, never copied elsewhere → no copy made.
+- **How (cto-aipa `dcefa608`, aideazz `5bea9a8`):** hourly sync records each note's attachments as id + name only; `GET /queue/api/file/:id` (same nginx auth) checks the id is inside a live row's `kit_notes`, then asks HubSpot `files/v3/files/{id}/signed-url?expirationSeconds=300` and returns the link. HubSpot calls = READ ONLY. Page: "⬇ Download CV" next to Copy draft + a button per file inside each kit note.
+- **VERIFIED BY:** Truelogic record → file 226021966777 → route 200 → signed link `200 application/pdf 49474 bytes`, body starts `%PDF-`; unknown id → 404 "not a file on your live deals"; bad id → 400; public without password → 401; preflight from aideazz.xyz → 204; aideazz.xyz/ops/ serves "Download CV". Oracle md5 = build: queue-page `97bf55f4`, queue-routes `4bf6f608`, daily-queue `280884bd`, sync `a13d7835`; cto-aipa started 12:49:39 UTC after the copy. Backup `~/_session-backups/crm-cv-download-20261031/`.
 
 ### ⏸️ 30 Oct ~20:35 UTC — own-CRM Phase A LIVE: her own copy of the apply kit · PAUSED by Elena ("sync everything so we can pause") · claim released
 - **DONE:** `scripts/queue-hiring-keep-act-today.cjs` (hourly :41, already read every note) now keeps ALL notes of each live hiring deal (batch read, labelled 📌🔎🎯🛡️✅📋) in `daily_queue.kit_notes` + `kit_synced_at` (idempotent ALTER in `initDailyQueueTable`); record page shows "Your copy of the kit" under the buttons; footer now true ("copied from HubSpot hourly; your clicks stay here"). cto-aipa `4bae2778` + `621b54af`; aideazz face `60cb671`. HubSpot read only; no writer / kit step / VJH touched.
