@@ -223,7 +223,9 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⏳ 31 Oct ~16:35 UTC — EspaLuz two-way kids memory (Telegram reads web lessons) · built + deployed · WAITS on one Supabase secret (Elena) · claim released
+### ✅ 31 Oct ~16:45 UTC — Supabase secret added by Elena: kids-memory returns `linked:true`, 6 web lines for her Telegram id (tested from Oracle with the bot's own env). Titi voice speed 1.15 → 0.9 on web (generate-voice v219, ascent `b780a0d`) and bot (`b6ecdea`, md5 `0bb59f2b…`, restarted 16:39) after Alisa: "Titi habla muy rápido". Still to see: a Telegram `/kids` hello using a web fact (log `🧠 kids web memory: linked=True`). Open: Alisa says she sees "solo un poquitito" of the screen — device/layout unknown, ask Elena.
+
+### ✅ 31 Oct ~16:35 UTC — EspaLuz two-way kids memory (Telegram reads web lessons) · built + deployed · claim released
 - DONE: new function `kids-memory` v1 (ascent `ed4da69`, pinned `verify_jwt = true` in config.toml): bot secret → `connected_bots` → her classroom turns, same filters as espaluz-chat. Bot `ca6f005` live md5 `f734682f…`, restarted 16:29: at each `/kids` hello it fetches the web card once per lesson (4 s timeout, fail-soft). `ESPALUZ_BOT_SECRET` generated in Oracle `~/EspaLuzFamilybot/.env` (backup `~/_session-backups/familybot-env-pre-botsecret`, 600).
 - NEXT (Elena): add the same value as Supabase secret `ESPALUZ_BOT_SECRET`. Then agent: call from Oracle with the secret → expect `linked:true`; then a Telegram `/kids` hello should mention a web fact (bunny costume / Halloween). Bot log line: `🧠 kids web memory: linked=True lines=N`.
 - VERIFIED BY: no auth → 401; anon key without/with wrong secret → `{"error":"unauthorized"}` 401. NOT yet verified with the real secret.
