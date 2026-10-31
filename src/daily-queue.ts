@@ -52,6 +52,8 @@ export interface KitNote {
   kind: 'posting' | 'brief' | 'role' | 'defense' | 'letter' | 'comet' | 'note';
   at: string;
   text: string;
+  /** The note's attachments (the CV) — id + name only; the file stays PRIVATE in HubSpot. */
+  files?: { id: string; name: string }[] | undefined;
 }
 
 let initialised = false;

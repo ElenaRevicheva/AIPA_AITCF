@@ -19,6 +19,7 @@ import type { Express, Request, Response } from 'express';
 import { getQueue, setQueueStatus, getQueueCounts, getQueueItemById, type QueueStatus } from './daily-queue';
 import { getRecordTimeline } from './record-timeline';
 import { QUEUE_PAGE } from './queue-page';
+import { getPoolConnection } from './database';
 
 const ALLOWED: QueueStatus[] = ['new', 'working', 'done', 'skipped'];
 const ESPALUZ_SNAPSHOT = path.resolve(__dirname, '..', 'data', 'espaluz-truth.json');
@@ -85,6 +86,36 @@ export function registerQueueRoutes(app: Express): void {
       return res.set('cache-control', 'no-store').json({ item, timeline });
     } catch (e) {
       console.error('[queue] record failed:', e);
+      return res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
+    }
+  });
+
+  // 31 Oct 2026: download a kit file (the CV) — the PDF stays PRIVATE in HubSpot (her rule: CVs live on
+  // the deal note). Two READ calls only: is this id on one of HER live deals (our DB), then a 5-minute
+  // signed link from HubSpot. Nothing is written to HubSpot, nothing is stored here.
+  app.get('/queue/api/file/:fileId', async (req: Request, res: Response) => {
+    const fileId = String(req.params.fileId || '');
+    if (!/^\d{6,20}$/.test(fileId)) return res.status(400).json({ error: 'bad id' });
+    try {
+      const c = await getPoolConnection();
+      let known = 0;
+      try {
+        const r = await c.execute(
+          `SELECT COUNT(*) AS n FROM daily_queue
+            WHERE kit_notes IS NOT NULL AND DBMS_LOB.INSTR(kit_notes, :needle) > 0`,
+          { needle: `"id":"${fileId}"` });
+        known = Number(((r.rows as unknown[][]) || [[0]])[0]?.[0] || 0);
+      } finally {
+        await c.close();
+      }
+      if (!known) return res.status(404).json({ error: 'not a file on your live deals' });
+      const s = await fetch(`https://api.hubapi.com/files/v3/files/${fileId}/signed-url?expirationSeconds=300`,
+        { headers: { Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}` } });
+      const j = await s.json() as { url?: string };
+      if (!s.ok || !j.url) return res.status(502).json({ error: `HubSpot ${s.status}` });
+      return res.set('cache-control', 'no-store').json({ url: j.url });
+    } catch (e) {
+      console.error('[queue] file failed:', e);
       return res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
     }
   });

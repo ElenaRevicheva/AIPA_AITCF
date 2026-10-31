@@ -52,6 +52,20 @@ function kindOf(body) {
   return 'note';
 }
 
+const FILE_NAMES = new Map();
+/** "CV_….pdf" for a HubSpot file id (one GET per file per run). */
+async function fileName(id) {
+  if (!FILE_NAMES.has(id)) {
+    let name = `file ${id}`;
+    try {
+      const f = await hsGet(`/files/v3/files/${id}`);
+      name = f.extension ? `${f.name}.${f.extension}` : String(f.name || name);
+    } catch { /* keep the id-based name: a download still works by id */ }
+    FILE_NAMES.set(id, name);
+  }
+  return FILE_NAMES.get(id);
+}
+
 /** Posting URL, the kit's ✅ letter, and Elena's own copy of EVERY note on the deal (read only). */
 async function dealPacket(dealId) {
   const a = await hsGet(`/crm/v4/objects/deals/${dealId}/associations/notes?limit=100`);
@@ -59,7 +73,7 @@ async function dealPacket(dealId) {
   const notes = [];
   for (let i = 0; i < ids.length; i += 100) {
     const r = await fetch(`${HS}/crm/v3/objects/notes/batch/read`, { method: 'POST', headers: H(), body: JSON.stringify({
-      properties: ['hs_note_body', 'hs_timestamp'], inputs: ids.slice(i, i + 100).map((id) => ({ id })) }) });
+      properties: ['hs_note_body', 'hs_timestamp', 'hs_attachment_ids'], inputs: ids.slice(i, i + 100).map((id) => ({ id })) }) });
     if (!r.ok) throw new Error(`HubSpot notes batch ${r.status}`);
     notes.push(...((await r.json()).results || []));
   }
@@ -71,7 +85,13 @@ async function dealPacket(dealId) {
     url = url || (body.match(/JOB POSTING:\s*<code>([^<]+)<\/code>/)
       || body.match(/href="(https?:[^"]+)"[^>]*>(?:\s*<[^>]+>)*\s*👉\s*APPLY/) || [])[1] || '';
     if (!letter && body.includes('✅ READY TO SEND — cover letter')) letter = text(body);
-    kit.push({ kind: kindOf(body), at: String(n.properties?.hs_timestamp || ''), text: text(body) });
+    // 31 Oct 2026: the note's files (the CV) by id + name only — the PDF itself stays in HubSpot
+    // (her rule: CVs live on the deal note). The CRM fetches a 5-minute link when she clicks.
+    const files = [];
+    for (const fid of String(n.properties?.hs_attachment_ids || '').split(';').filter(Boolean)) {
+      files.push({ id: fid, name: await fileName(fid) });
+    }
+    kit.push({ kind: kindOf(body), at: String(n.properties?.hs_timestamp || ''), text: text(body), ...(files.length ? { files } : {}) });
   }
   return { url: url.replace(/&amp;/g, '&'), letter, kit };
 }

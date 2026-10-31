@@ -298,8 +298,29 @@ function kitHtml(){
   return '<div class="sec">Your copy of the kit · '+k.length+' notes · copied from HubSpot '+E(RECORD.item.kitSyncedAt||'')+' UTC</div>'+
     k.map(function(n){
       return '<details class="kit" onclick="event.stopPropagation()"><summary>'+E(KIT_LABEL[n.kind]||'Note')+
-        ' <span class="quiet">'+E((n.at||'').slice(0,10))+'</span></summary><pre>'+E(n.text)+'</pre></details>';
+        ' <span class="quiet">'+E((n.at||'').slice(0,10))+'</span></summary>'+filesHtml(n.files)+'<pre>'+E(n.text)+'</pre></details>';
     }).join('');
+}
+
+// 31 Oct 2026: a kit file (the CV) downloads from HubSpot — the file stays there, private; the server
+// fetches a 5-minute link on click. The tab is opened first so the browser does not block it.
+function filesHtml(fs){
+  if(!fs||!fs.length){ return ''; }
+  return '<div class="row">'+fs.map(function(f){
+    return '<button onclick="event.stopPropagation();dl(\\''+E(f.id)+'\\')">⬇ '+E(f.name)+'</button>';
+  }).join('')+'</div>';
+}
+function cvFile(){
+  var k=(RECORD&&RECORD.item&&RECORD.item.kitNotes)||[], best=null;
+  k.forEach(function(n){ (n.files||[]).forEach(function(f){ if(/^CV_/i.test(f.name)){ best=f; } }); });
+  return best;
+}
+function dl(id){
+  var w=window.open('about:blank','_blank');
+  q('api/file/'+id).then(function(r){ return r.json(); }).then(function(d){
+    if(d&&d.url){ if(w){ w.location=d.url; } else { location.href=d.url; } }
+    else { if(w){ w.close(); } alert('Download failed: '+((d&&d.error)||'unknown')); }
+  }).catch(function(e){ if(w){ w.close(); } alert('Download failed: '+e.message); });
 }
 
 function row(lane,x){
@@ -327,6 +348,7 @@ function row(lane,x){
       '<div class="row">'+
       (x.actionUrl?'<a class="btn primary" target="_blank" rel="noopener" href="'+E(x.actionUrl)+'">'+verb+'</a>':'')+
       (x.draft?'<button onclick="event.stopPropagation();cp(\\''+x.id+'\\')">Copy draft</button>':'')+
+      (cvFile()?'<button onclick="event.stopPropagation();dl(\\''+E(cvFile().id)+'\\')">⬇ Download CV</button>':'')+
       '<button onclick="event.stopPropagation();act(\\''+x.id+'\\',\\'done\\')">Did it</button>'+
       '<button onclick="event.stopPropagation();act(\\''+x.id+'\\',\\'skipped\\')">Skip</button>'+
       (x.hubspotDealId?'<a class="btn" target="_blank" rel="noopener" href="https://app.hubspot.com/contacts/51409153/record/0-3/'+E(x.hubspotDealId)+'">HubSpot record</a>':'')+
