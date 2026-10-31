@@ -175,6 +175,9 @@ function runBuilder(jobPath, spec, extra) {
  * `shapedOnly` (backfill), where a deal that cannot be shaped keeps what it has. Returns
  * { cvPath, name, shaped, why, info }.
  */
+// Lanes whose evidence lives in a hand-checked specialist CV, not in cv-bank.json (31 Oct 2026).
+const CURATED_LANES = new Set(['creative', 'geo', 'exec_support', 'language']);
+
 async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   const { lane, headline } = laneFor(title);
   fs.mkdirSync(AUTO_DIR, { recursive: true });
@@ -185,8 +188,10 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   // 31 Oct 2026 (INDG "Generative AI Artist Fashion"): cv-bank.json holds engineering/ops lines only, so for a creative
   // posting the composer put job-hunter bullets under "artist" headings — its own reviewer said so, and a fit note never
   // stops a CV. A creative posting gets the curated Creative Technologist lane CV (films first) under the posting's title.
-  const curated = lane === 'creative';
-  let why = curated ? 'creative posting — built on your curated Creative Technologist CV (films first); the line bank has no creative lines' : '';
+  // Same day, same shape found in the reviewer's own notes: SEO/GEO Operator (Scale Army ×2) and Executive Assistant (Pasito)
+  // got engineering bullets while hand-checked GEO / Exec-Support CVs sat unused. Specialist lanes use their curated CV.
+  const curated = CURATED_LANES.has(lane);
+  let why = curated ? `${lane} posting — built on your curated ${lane} CV; the composer's line bank holds engineering/ops lines only` : '';
   // Already built for THIS deal (a dry run, or a run whose HubSpot write failed): reuse it — the model is paid once.
   const cachedJson = path.join(AUTO_DIR, shapedName.replace(/\.pdf$/, '.json'));
   if (!curated) try {
