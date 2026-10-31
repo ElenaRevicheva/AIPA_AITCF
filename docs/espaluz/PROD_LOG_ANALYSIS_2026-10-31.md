@@ -52,3 +52,22 @@ Contributing causes:
   keep the better; if still unclear, tell the tutor to say "No te escuché bien, ¿otra vez?" — never guess.
 - **W3** Child-led rule in both prompts: if she refuses the step or proposes her own idea, the step becomes her idea
   (bicycle → "¡Vamos en bici!"), then continue. Deploy with `729de4b`.
+
+## Re-test after the sync (web classroom v216, 31 Oct 12:05–12:08 UTC)
+
+| Alisa (speech-to-text) | Pere/Titi | Verdict |
+|---|---|---|
+| (start) | "¡Hola! / Hello!" + toucan story + "how was your day?" | ok, thin hello |
+| "Ana, Ana, me viene perezoso." (garbled) | "Ana, Ana, I feel sleepy! … you say it perfectly!" → "Jump, jump, jump!" | ❌ praised a garbled transcript as perfect, then the scheduled jump step |
+| "donde vive el perezoso" | "Sloths live in the trees of the tropical jungle…" → "Do you know what your favourite fruit is?" | ✅ question answered with a true fact (the 729de4b fix works); ⚠️ question back not about what she asked |
+| "Starberry" (strawberry) | new sentence "El perezoso es lento pero muy amable", 4 lines | ❌ ignored her answer to their own question; ran the NEW SENTENCE step |
+
+Function logs, every turn: `Groq openai/gpt-oss-120b: 429 … tokens per day` → answered by **`openai/gpt-oss-20b`**, the smallest model in
+the chain. Gemini has no secret in Supabase (and is 402 anyway), Claude's org is dry, and **Grok — which the bots
+use and which works on our key — is not in the web chain at all.** The classroom ran all day on the weakest model.
+
+Causes, in order of weight:
+1. The per-turn instruction ("Do ONLY this step: …") comes last in the prompt and never names her words, so a small
+   model follows the step and forgets the general "answer the child first" rule written far above it.
+2. Model quality: 120b's free daily tokens are spent by midday; nothing stronger is reachable.
+3. No "I didn't hear you": a garbled transcript is treated as a real sentence (and praised).
