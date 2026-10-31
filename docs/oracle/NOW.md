@@ -223,6 +223,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 31 Oct ~15:52 UTC — EspaLuz web lesson 15:38 (Alisa in the car): 3 fixes LIVE · no claim open
+- DONE: espaluz-chat v227 (ascent `c3ce818`): `KIDS_STILL` (car/can't jump in this lesson → sit-still games only), adult voice ("mi hija") answered as the parent and kept out of the child's memory, `KIDS_HARD` += blood/injury. voice-to-text v181: foreign language detected + best retry avg_logprob < -1.0 → treated as not heard (was "A couple of menes have a guest of Elin Láttú", icelandic, -1.17). Bot `b5f2e9e` (KIDS_HARD twin) live md5 `9a79b815…`, restarted 15:48.
+- NEXT: read the next classroom lesson; confirm no jump request after a car mention. Note: Lovable Publish redeploys ALL functions from git — an MCP deploy that is not pushed would be overwritten.
+- VERIFIED BY: function versions + OPTIONS 200; regex test on the real 15:39–15:43 transcripts. Not yet by a live lesson.
+- RISK: the -1.0 cut may drop a real but mumbled answer → the child just hears "¿Me lo dices otra vez?".
+
 ### ✅ 30 Oct ~20:30 UTC — EspaLuz kids items 1-8 built (Elena: "do all except the parent report") · bot LIVE, web tutor LIVE, page on Publish · claim released
 - **Both surfaces, same design** (bot `main.py` KIDS_STEPS/KIDS_STORIES/kids_sentence_check ⇄ `espaluz-chat` kidsTurnContext): (1) lesson-step tracker — 8 steps from the turn count (bot: session `kids_turn`, new lesson after 3 h quiet or /kids; web: the page sends `kids.turn`); (2) dialogue rules — 2-3 lines + ONE question, her words back, HER topic, correct only real mistakes, remember what she said; (3) gentle sentence check — target sentence from the last reply vs what Whisper heard → "¡Casi! Se dice mucho"; (4) stars — every 5 → Titi's dance (bot: `titi-dance.mp4` sent after the heroes' video; web: full-screen dance + banner + browser voice); (5) both ways (prompt + dashboard card); (7) mission remembered, asked about in the next day's hello (bot: prefs; web: localStorage); (8) a weekly Panama story with a feeling + a checked fact (7 stories, ISO week; this week = the shy toucan).
 - **(6) photos — Telegram only:** a kids-mode photo → Grok vision (`XAI_API_KEY`, verified describes images) → becomes her message in the normal lesson flow. The old photo path used OpenAI gpt-4o, DRY since 23 Oct → every photo failed for everyone (adult OCR path still on gpt-4o — not fixed here). Web has no free vision model (Groq lists none; Gemini 402) → no photo button on the web.
