@@ -108,7 +108,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 13:20 | CRM write-back, JOB lane only: Did it → HubSpot ⏳ Sent, Skip → ❌ Closed (Elena: Skip = forget forever); only if deal still in I Act TODAY; prior stage+reason logged | `src/queue-routes.ts` `src/queue-page.ts` → Oracle + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -369,6 +368,13 @@ git log keeps the record.
 - **NEXT (acceptance, whoever is next):** the first real voice note through the new path is the test — e.g. "find the card about SOAP HTML in Kira noviembre and add there …" → reply "📝 added to the description", no new card; grep `[TrelloVoice] actions: update(` and `matched on the named board by sound` in `~/.pm2/logs/cto-aipa-out-9.log`. A note saying "Claude" must come back spelled Claude.
 - **VERIFIED BY:** the deploy proof above (Oracle tests 127/127, md5 = git, start time > file, 0 error lines) + the three card read-backs above. NOT yet verified: a real voice note through the new path (see NEXT). NOT verified: the live bot (still runs the pre-change code until step 1).
 - **RISK:** the archived duplicate still exists in Trello's archive — do not restore it; the SOAP card holds the merged note. Sync state at close: laptop = GitHub `main` (0/0), Oracle `cto-aipa` live files = git `6b4bc72a`. The repair table's own rule stands: add a mishearing only after SEEING it in a transcript — "clod/clawed" were NOT added (not seen). `rankCardsForQuery` returns ties together, so a board with two "…HTML…" cards asks instead of guessing — expected, not a bug. The learning loop (`trello-corrections.json`) still records only date/title/colour; a wrong CREATE-vs-UPDATE is caught by code, not learned — if it recurs with a new phrasing, extend `isAddToCardRequest`, do not add a module.
+
+### ✅ 31 Oct ~21:00 UTC — CRM write-back LIVE, JOB lane only: Did it → HubSpot ⏳ Sent, Skip → ❌ Closed (Elena: "for job search Skip means forget about it forever") · claim released
+- **Why:** CRM clicks reached only her CRM → 08:15 Telegram apply queue (reads HubSpot I Act TODAY) kept pushing skipped jobs; the VJH judge learns only from stages she moves by hand.
+- **How (cto-aipa `3cf6ca12`, aideazz `9005cf3`):** `/queue/api/act` → for a hiring row with a deal: GET deal; only if still `qualifiedtobuy` → append previous stage + Closed Lost Reason to Oracle `~/_session-backups/crm-writeback.jsonl`, then ONE PATCH (`decisionmakerboughtin`, or `closedlost` + "Elena skipped it in her CRM <date> — forget forever (her own verdict)"). Creates/deletes nothing. Page toast after every click (the old code swallowed errors). **Client lane NOT written back** — Elena has not said what Skip means there.
+- **VERIFIED BY:** guard test on a dead swept job (Puente Chief of Staff, already closedlost): response `"HubSpot already moved — left as it is"`, HubSpot `hs_lastmodifieddate` unchanged (2026-10-30T14:48), no jsonl line. Oracle md5 = build: queue-page `c6f159a6`, queue-routes `99443d66`; cto-aipa started 20:52:53 UTC after the copy; aideazz.xyz/ops/ serves the toast.
+- **NOT yet verified live:** the moving PATCH itself (would have moved a real job). Her first real click is the proof → check `crm-writeback.jsonl` + pm2 line `[queue] write-back deal …`.
+- **Undo a click:** move the deal back in HubSpot to 🔥 I act TODAY (stage + reason in the jsonl); her CRM row stays done/skipped (her click).
 
 ### ✅ 31 Oct ~12:55 UTC — CRM kit: "⬇ Download CV" works · CV stays PRIVATE in HubSpot (her rule) · claim released
 - **Elena:** the CV in "Your copy of the kit" was not clickable. Rule [[feedback_cv_delivery_hubspot_only]]: CVs live on the deal note, never copied elsewhere → no copy made.
