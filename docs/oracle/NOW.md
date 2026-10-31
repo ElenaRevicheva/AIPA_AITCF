@@ -100,6 +100,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 16:35 | EspaLuz two-way kids memory (web → Telegram) | ascent `supabase/functions/kids-memory`, `supabase/config.toml`, `src/pages/Classroom.tsx`; EspaLuzFamilybot `main.py`; Oracle `espaluz-familybot` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
