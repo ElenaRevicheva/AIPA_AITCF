@@ -223,6 +223,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 31 Oct ~16:15 UTC — EspaLuz web lesson 15:54 (earthquake + "ciao"): stop/emergency handled in code · LIVE · no claim open
+- DONE: espaluz-chat v228 (ascent `627a26e`): `KIDS_EMERGENCY` → two calm lines (stay close to mom / we'll be here), `KIDS_BYE` → two goodbye lines; both have question lines stripped in code. A reply whose first line is "No te escuché bien" is cut to that line only (it had "¡Salta tres veces!" after it). voice-to-text v182: a transcript with ð/þ/æ/ø/å = not heard ("Man, að mér kom úr teléfón", icelandic at -0.82, got past the -1.0 cut).
+- VERIFIED BY: OPTIONS 200, regexes tested on the 15:54–16:00 transcripts. Not yet by a live lesson.
+
 ### ✅ 31 Oct ~15:52 UTC — EspaLuz web lesson 15:38 (Alisa in the car): 3 fixes LIVE · no claim open
 - DONE: espaluz-chat v227 (ascent `c3ce818`): `KIDS_STILL` (car/can't jump in this lesson → sit-still games only), adult voice ("mi hija") answered as the parent and kept out of the child's memory, `KIDS_HARD` += blood/injury. voice-to-text v181: foreign language detected + best retry avg_logprob < -1.0 → treated as not heard (was "A couple of menes have a guest of Elin Láttú", icelandic, -1.17). Bot `b5f2e9e` (KIDS_HARD twin) live md5 `9a79b815…`, restarted 15:48.
 - NEXT: read the next classroom lesson; confirm no jump request after a car mention. Note: Lovable Publish redeploys ALL functions from git — an MCP deploy that is not pushed would be overwritten.
