@@ -40,6 +40,8 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**✅ 31 Oct 13:17 UTC — EspaLuz kids: FEELINGS FIRST (web `espaluz-chat` v221 = ascent `1b25734`; bot `4676ef7`, live md5 = commit).** From Alisa's live turn ("mi mamá está pegando porque estoy chupando una paleta" → heroes echoed "paletas no son dulces" and started Simon says). First-line rules now ordered: 1 feeling → name it, ask, NO game/step that turn, never repeat "pegar"; 2 answer → whole sentence; 3 her idea → follow; 4 only if NO part makes sense → "No te escuché bien". Always correct a wrong fact; answer the child's part of a two-voice clip. Eval grok + gpt-oss-20b: lollipop passes on both; Starberry/bicycle unchanged; garbled "me viene perezoso" now read as "feeling lazy" (deliberate: answer the part that makes sense). Grok live since Elena added `XAI_API_KEY` (logs 12:57: claude refused once → groq 429 → "answered by grok"). xAI credit $11.36, **auto top-up $10 ON — Elena's call to switch off.**
+
 **✅ 31 Oct 12:47 UTC — EspaLuz STEP 2 live: Pere/Titi react to what the child actually says (web `espaluz-chat` v218 + `voice-to-text` v174 = ascent `3a0c4b4`; Telegram bot `1324499`, live md5 = commit).**
 - Every kids turn opens with THE CHILD JUST SAID "<words>" + what the first line does (answer → whole sentence and practise it; her idea/refusal → follow it; nonsense → "No te escuché bien" and stop); the turn instruction is now the LAST part of the prompt on both surfaces.
 - Sentence check only after the heroes asked her to repeat, non-stopword words, 3+ shared, 70%+.
@@ -89,7 +91,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 13:10 | EspaLuz kids: feelings-first + never repeat a wrong fact | ascent `espaluz-chat`; EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
