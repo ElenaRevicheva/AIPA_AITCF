@@ -40,6 +40,8 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 - Kids: "Do ONLY this step" beat her questions (park question → toucan hello; "where does it live?" → Simon says). A question now gets a real answer on her topic and the step waits a turn. Kids replies: no "🤖 Espaluz:" header, 🦥 Pere / 🐒 Titi badges, transcript "Alisa said".
 - Web twin `espaluz-chat` (ascent `729de4b`, pushed) is **NOT DEPLOYED** — classifier refused the MCP deploy; live is v214 (= ascent before `729de4b`). Needs Elena's "deploy" in chat.
 
+**✅ 31 Oct 14:00 UTC — EspaLuz kids: both heroes every turn, story only at hello/its step, refusal ≠ sadness, today's date + Panama holidays (web `espaluz-chat` v225 = ascent `9892b85`; bot `fb1145f`, live md5 = commit).** From Alisa's lesson 13:46–13:51 (Titi silent 3 replies; toucan in every turn; "no quiero jugar… Halloween" → "pareces triste"). Eval grok: Halloween followed with Pere+Titi, toucan in 0/8 replies, Starberry/lollipop unchanged. gpt-oss-20b (last fallback) still sometimes drops Titi / labels refusal "frustrada". Memory between lessons (step 3) still untested live: needs two lessons.
+
 **✅ 31 Oct 13:45 UTC — EspaLuz STEP 3: memory between lessons (web `espaluz-chat` v223 = ascent `f864c9d`; bot `05329ce`, live md5 = commit).** Each new lesson's hello brings back ONE happy thing she told the heroes before. Web: card from `learning_sessions` (classroom + Telegram kids turns synced with family_role 'alisa'), only turns after 12:47 UTC (earlier replies misread her). Bot: `kids_said` per lesson in her session. Code filters on both: hard moments (hitting/shouting/crying/fear), "didn't hear", echoes. Evals: unfiltered card opened with "tu mamá está pegando" (blocked now); clean data → grok "La última vez me dijiste que tu gata se llama Luna y es blanca". Live test with Alisa pending. Note: on the web, only memories made from 12:47 UTC count, so the first lesson after this deploy has an empty card.
 
 **✅ 31 Oct 13:17 UTC — EspaLuz kids: FEELINGS FIRST (web `espaluz-chat` v221 = ascent `1b25734`; bot `4676ef7`, live md5 = commit).** From Alisa's live turn ("mi mamá está pegando porque estoy chupando una paleta" → heroes echoed "paletas no son dulces" and started Simon says). First-line rules now ordered: 1 feeling → name it, ask, NO game/step that turn, never repeat "pegar"; 2 answer → whole sentence; 3 her idea → follow; 4 only if NO part makes sense → "No te escuché bien". Always correct a wrong fact; answer the child's part of a two-voice clip. Eval grok + gpt-oss-20b: lollipop passes on both; Starberry/bicycle unchanged; garbled "me viene perezoso" now read as "feeling lazy" (deliberate: answer the part that makes sense). Grok live since Elena added `XAI_API_KEY` (logs 12:57: claude refused once → groq 429 → "answered by grok"). xAI credit $11.36, **auto top-up $10 ON — Elena's call to switch off.**
@@ -93,7 +95,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 14:00 | EspaLuz kids: both heroes every turn, story only at hello/story step, refusal≠sad, today's date/holidays | ascent `espaluz-chat`; EspaLuzFamilybot `main.py`; espaluz-familybot service | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
