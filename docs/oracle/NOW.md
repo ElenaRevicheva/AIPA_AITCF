@@ -106,6 +106,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-31 13:20 | CRM write-back, JOB lane only: Did it → HubSpot ⏳ Sent, Skip → ❌ Closed (Elena: Skip = forget forever); only if deal still in I Act TODAY; prior stage+reason logged | `src/queue-routes.ts` `src/queue-page.ts` → Oracle + `pm2 restart cto-aipa`; aideazz `public/ops/index.html` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
