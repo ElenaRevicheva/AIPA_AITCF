@@ -100,7 +100,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 16:55 | EspaLuz web stars/stickers + classroom photos, then parent report | ascent `src/pages/Classroom.tsx`, `supabase/functions/espaluz-chat`; EspaLuzFamilybot `main.py`; Oracle `espaluz-familybot` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -223,6 +222,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 31 Oct ~17:20 UTC — EspaLuz stars/stickers + classroom photos (page waits on Lovable Publish) · parent report LIVE · claim released
+- DONE: ascent `4611e52` Classroom.tsx — stars = her saved classroom turns (server count, same on every device), a Panama sticker (es/en name) every 5 stars, 📷 Foto button (photo shrunk to 1024 px, sent once, never stored). espaluz-chat v230 deployed by MCP = git (`describePhoto`: Claude → Grok vision; tested Grok on a drawn test image: "a red circle above a green rectangle"). NOTE: Lovable bumped espaluz-chat to v229 WITHOUT the new code — always check the deployed sha/content, not the version number.
+- DONE: parent report — kids-memory v3 `mode:"lessons"` (ascent `5bd6ca3`); bot `6cb7411` live md5 `a38eb2c0…`, restarted 17:17: every 10 min, a lesson that ended 20 min ago (or the next Empezar) gets one Telegram report to the parent, assembled by code (her 3 richest sentences as heard, practise sentence, mission, photos). Sent: `📒 parent report sent (web lesson 16:15-16:39 UTC, 17 answers)` (+ one earlier merged 15:38-16:39 before the lesson-boundary fix). Telegram /kids lessons: first run marks the current lesson as reported, so only new ones are sent.
+- NEXT (Elena): Lovable Publish → Update for the page. Agent: after her test, check a 📷 turn (`photo read by grok`) and the star/sticker bar.
+- RISK: if the child herself says "quiero empezar la clase", the report splits the lesson there (cosmetic).
 
 ### ✅ 31 Oct ~16:45 UTC — Supabase secret added by Elena: kids-memory returns `linked:true`, 6 web lines for her Telegram id (tested from Oracle with the bot's own env). Titi voice speed 1.15 → 0.9 on web (generate-voice v219, ascent `b780a0d`) and bot (`b6ecdea`, md5 `0bb59f2b…`, restarted 16:39) after Alisa: "Titi habla muy rápido". Still to see: a Telegram `/kids` hello using a web fact (log `🧠 kids web memory: linked=True`). Open: Alisa says she sees "solo un poquitito" of the screen — device/layout unknown, ask Elena.
 
