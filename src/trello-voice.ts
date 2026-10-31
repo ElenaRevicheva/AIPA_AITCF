@@ -964,6 +964,26 @@ export function groundDueDate(c: CardClassification, spoken: string): CardClassi
   return { ...c, dueDate: null, dueTime: null, subtaskDueDates: null };
 }
 
+/**
+ * The column she NAMED wins, even when Whisper spelled it in Latin letters (31 Oct 2026).
+ * She said "Надо сделать"; the transcript read "N'ada zdjela'c'", the model returned no listNameHint, and the card
+ * went to Cita. Apostrophes and "j" softeners are stripped, then both alphabets are matched.
+ */
+export function spokenColumn(text: string): string | null {
+  const t = String(text || '').toLowerCase().replace(/['’ʼ`]/g, '').replace(/(?<=[a-z])j(?=[aeiou])/g, '');
+  if (/надо\s*с?делать|\bn[ao]d[ao]\s*[sz]?d[ei]la|поток|\bpotok\b/u.test(t)) return 'Надо сделать';
+  if (/в\s*приоритете|\bv\s*prioritete\b|just for today/u.test(t)) return 'В приоритете';
+  return null;
+}
+
+export function groundListHint(c: CardClassification, spoken: string): CardClassification {
+  if (c.listNameHint?.trim()) return c;
+  const col = spokenColumn(spoken);
+  if (!col) return c;
+  console.log(`[TrelloVoice] column "${col}" heard in her words — model missed it`);
+  return { ...c, listNameHint: col };
+}
+
 function reconcileUrgency(c: CardClassification): CardClassification {
   if (!c.dueDate) {
     // If NLP said 'dated' but there's no extracted date, push to todo_flow
@@ -1134,7 +1154,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
     const cleaned = text.replace(/```json|```/g, '').trim();
     const block = cleaned.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(block ? block[0] : cleaned) as CardClassification;
-    return applyCategoryColor(reconcileUrgency(groundDueDate(parsed, cleanedText)));
+    return applyCategoryColor(reconcileUrgency(groundListHint(groundDueDate(parsed, cleanedText), cleanedText)));
   } catch {
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] classify parse failed, using fallback. Raw:', text.slice(0, 400));

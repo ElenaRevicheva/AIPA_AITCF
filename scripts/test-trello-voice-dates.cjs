@@ -223,6 +223,12 @@ check('"el viernes" kept', g('llamar al banco el viernes') === '2026-11-28');
 check('"в субботу" kept', g('сходить в парк в субботу') === '2026-11-28');
 check('"by end of November" kept', g('finish the deck by end of November') === '2026-11-28');
 check('no date → nothing to ground', v.groundDueDate({ dueDate: null }, PARK).dueDate === null);
+check('"N\'ada zdjela\'c\'" (her park note) → column Надо сделать', v.groundListHint({ listNameHint: null }, PARK).listNameHint === 'Надо сделать');
+check('Cyrillic "надо сделать" → Надо сделать', v.spokenColumn('Kira Noviembre, надо сделать, купить молоко') === 'Надо сделать');
+check('"nado sdelat" → Надо сделать', v.spokenColumn('Kira noviembre nado sdelat kupit moloko') === 'Надо сделать');
+check('"поток" → Надо сделать', v.spokenColumn('Кира ноябрь, в поток: позвонить врачу') === 'Надо сделать');
+check('a column the model already heard is kept', v.groundListHint({ listNameHint: 'Cita' }, PARK).listNameHint === 'Cita');
+check('no column spoken → no hint', v.spokenColumn('Kira Noviembre cita con el dentista 28 de noviembre') === null);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
