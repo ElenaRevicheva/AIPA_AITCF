@@ -100,6 +100,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (desktop) | 31 Oct 19:45 | EspaLuz WhatsApp parity step 2 (kids mode, shared module) + WhatsApp menu | EspaLuzWhatsApp/espaluz_bridge.py, new shared kids module, EspaLuzFamilybot/main.py (import only), espaluz-whatsapp service | 79b91ca7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
