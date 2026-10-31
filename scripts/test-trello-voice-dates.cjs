@@ -158,8 +158,10 @@ check('her Trello edit of a bot card is recorded', v.recordCorrections('c1', { d
 check('the same edit is never counted twice (snapshot moved forward)', v.recordCorrections('c1', { due: v.toTrelloDue('2026-11-28'), name: snap.name, colour: 'red' }, 'trello') === 0);
 const corrs = JSON.parse(fsx.readFileSync(path.join(LEARN_TMP, 'trello-corrections.json'), 'utf8'));
 const lb = v.learnedBlock(corrs, []);
-check('the lesson reaches the prompt with what was heard, set and changed', /heard "next cycle from 28 Nov" → you set date "2026-10-28 12:00" → she changed it to "2026-11-28 12:00"/.test(lb));
-check('the lesson names the card the bot made (its title carries the pattern)', /card "Start medication cycle 2", heard/.test(lb));
+// 31 Oct 2026 (Elena): a lesson describes the BEHAVIOUR, never a date to copy.
+check('the lesson reaches the prompt as a shape: heard + "moved it to a LATER day"', /heard "next cycle from # Nov" → you set a due date → she moved it to a LATER day/.test(lb));
+check('no digit from a past card reaches the prompt', !/\d/.test(lb));
+check('the lesson names the card the bot made (its title carries the pattern)', /card "Start medication cycle #", heard/.test(lb));
 check('a PROPOSED rule never reaches the prompt', !/Never guess/.test(v.learnedBlock([], [{ id: 'R1', text: 'Never guess', field: 'date', status: 'proposed', examples: 2, ts: '' }])));
 check('an APPROVED rule does', /Rules she approved:\n- Each cycle card is due/.test(v.learnedBlock([], [{ id: 'R2', text: 'Each cycle card is due on its own start date.', field: 'date', status: 'approved', examples: 2, ts: '' }])));
 check('no lessons → nothing added to the prompt', v.learnedBlock([], []) === '');
@@ -167,6 +169,25 @@ fsx.writeFileSync(path.join(LEARN_TMP, 'trello-rules.json'), JSON.stringify([{ i
 check('approve: a proposed rule becomes approved', v.decideRule('R9', true)?.status === 'approved');
 check('an answered rule cannot be flipped by a second tap', v.decideRule('R9', false)?.status === 'approved');
 check('unknown rule id → null, nothing written', v.decideRule('nope', true) === null);
+// ── 31 Oct 2026 — the column she moved a card to is a lesson (first move only, never into progress) ─────────────
+const CS = { id: 'k1', name: 'Park with Alisa', due: null, colour: 'red', heard: 'Kira Noviembre nado sdelat park', ts: new Date().toISOString(), column: 'Датировано / "Cita"' };
+check('first move Cita → Надо сделать is a column correction', v.diffSnapshot(CS, { column: 'Надо сделать / "Поток"' })[0]?.her === 'Надо сделать / "Поток"');
+check('moving it on to "В процессе" is progress, not a correction', v.diffSnapshot(CS, { column: 'В процессе. Мяч на моей стороне.' }).length === 0);
+check('moving it to "Сделано" is progress, not a correction', v.diffSnapshot(CS, { column: 'Сделано!!! / Gane!!!!' }).length === 0);
+check('a card already compared once teaches nothing on a later move', v.diffSnapshot({ ...CS, columnChecked: true }, { column: 'Надо сделать / "Поток"' }).length === 0);
+check('an old snapshot with no column teaches nothing', v.diffSnapshot({ ...CS, column: undefined }, { column: 'Надо сделать / "Поток"' }).length === 0);
+v.rememberCreated([{ id: 'k2', name: 'Park', due: null, url: '', shortUrl: '' }], 'Kira Noviembre nado sdelat park', 'red', 'Датировано / "Cita"');
+check('a bot card moved by hand is recorded as column', v.recordCorrections('k2', { name: 'Park', due: null, colour: 'red', column: 'Надо сделать / "Поток"' }, 'trello') === 1);
+check('the next night the same column is not counted again', v.recordCorrections('k2', { name: 'Park', due: null, colour: 'red', column: 'Reglas / NB' }, 'trello') === 0);
+v.rememberCreated([{ id: 'k3', name: 'Milk', due: null, url: '', shortUrl: '' }], 'buy milk', 'red', 'Надо сделать / "Поток"');
+check('first look with no move marks it checked (no correction)', v.recordCorrections('k3', { name: 'Milk', due: null, colour: 'red', column: 'Надо сделать / "Поток"' }, 'trello') === 0);
+check('…so a move a week later is her workflow, not a lesson', v.recordCorrections('k3', { name: 'Milk', due: null, colour: 'red', column: 'Reglas / NB' }, 'trello') === 0);
+check('column lesson reads as a shape the model can follow', /you set column "Датировано \/ \"Cita\"" → she changed it to "Надо сделать/.test(v.correctionShape({ field: 'column', bot: 'Датировано / "Cita"', her: 'Надо сделать / "Поток"' })));
+check('a removed date is told as REMOVED, no value', v.correctionShape({ field: 'date', bot: '2026-11-28 12:00', her: 'none' }) === 'you set a due date → she REMOVED it (no date was wanted)');
+check('a rule naming a date is not sent to her', v.ruleCarriesValues('Cycle cards are due on the 28th'));
+check('a rule naming a month is not sent to her', v.ruleCarriesValues('Put November tasks in Cita'));
+check('a behaviour rule passes', !v.ruleCarriesValues('When she names a column, file the card there; set a due date only if she says one.'));
+check('an approved rule is masked too', !/\d/.test(v.learnedBlock([], [{ id: 'R3', text: 'due on day 28', field: 'date', status: 'approved', examples: 2, ts: '' }])));
 fsx.rmSync(LEARN_TMP, { recursive: true, force: true });
 
 

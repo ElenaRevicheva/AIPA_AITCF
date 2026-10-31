@@ -459,20 +459,30 @@ export function subtaskDue(c: Pick<CardClassification, 'dueDate' | 'subtaskDueDa
 // (repeated mistakes → a rule she approves before it applies). Two doors capture a correction: the `update` action
 // below (she corrects by voice/text) and a nightly read-only sweep (she fixed the card by hand in Trello). The files
 // live in data/ (gitignored, Oracle only), so her family detail never reaches the public repo.
-// Only date, title and colour are learned: moving a card between lists or boards is her workflow, not a correction.
+// Date, title, colour — and since 31 Oct the COLUMN, but only her first move (the nightly sweep's first look at a card)
+// and never into a progress column: moving a card on to "В процессе" or "Сделано" later is her workflow, not a correction.
+// Lessons teach BEHAVIOUR, never values (Elena, 31 Oct): a past correction "28 Oct → 28 Nov" in the prompt is the likely
+// source of a "28 November" the model put on a card with no date. Digits are masked in every lesson line and a
+// proposed rule that carries a date or number is not sent to her.
 const LEARN_DIR = process.env.TRELLO_LEARN_DIR || path.join(__dirname, '..', 'data');  // tests point it at a temp dir
 const CREATED_PATH = path.join(LEARN_DIR, 'trello-created.json');   // what the bot set on each card it made
 const CORR_PATH = path.join(LEARN_DIR, 'trello-corrections.json');  // what she changed it to
 const RULES_PATH = path.join(LEARN_DIR, 'trello-rules.json');       // rules she approved or rejected
 
-export interface CardSnapshot { id: string; name: string; due: string | null; colour: string | null; heard: string; ts: string }
+export interface CardSnapshot {
+  id: string; name: string; due: string | null; colour: string | null; heard: string; ts: string;
+  column?: string | null; columnChecked?: boolean;  // the column the bot chose; true once the sweep has compared it
+}
 export interface Correction {
-  ts: string; cardId: string; field: 'date' | 'title' | 'colour'; bot: string; her: string; heard: string;
+  ts: string; cardId: string; field: 'date' | 'title' | 'colour' | 'column'; bot: string; her: string; heard: string;
   door: 'voice' | 'trello'; ruled?: string;
   card?: string;  // the card's title when the bot made it — it often carries the pattern ("cycle 2 (Nov 28 - Dec 7)")
 }
 export interface LearnedRule { id: string; text: string; field: string; status: 'proposed' | 'approved' | 'rejected'; examples: number; ts: string }
-type LiveCard = { name?: string; due?: string | null; colour?: string | null };
+type LiveCard = { name?: string; due?: string | null; colour?: string | null; column?: string | null };
+
+/** Moving a card on through her pipeline is progress, not a correction of where the bot put it. */
+const PROGRESS_COLUMN_RE = /в процессе|сделано|gane|in process|done/i;
 
 function readJson<T>(p: string, fallback: T): T {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')) as T; } catch { return fallback; }
@@ -496,15 +506,18 @@ export function diffSnapshot(s: CardSnapshot, live: LiveCard): { field: Correcti
   if (live.due !== undefined && dueKey(live.due) !== dueKey(s.due)) out.push({ field: 'date', bot: dueKey(s.due) || 'none', her: dueKey(live.due) || 'none' });
   if (live.name !== undefined && live.name.trim() !== s.name.trim()) out.push({ field: 'title', bot: s.name, her: live.name });
   if (live.colour !== undefined && (live.colour ?? '') !== (s.colour ?? '')) out.push({ field: 'colour', bot: s.colour || 'none', her: live.colour || 'none' });
+  if (live.column && s.column && !s.columnChecked && live.column !== s.column && !PROGRESS_COLUMN_RE.test(live.column)) {
+    out.push({ field: 'column', bot: s.column, her: live.column });
+  }
   return out;
 }
 
 /** Remember what the bot set on the cards it just made (the "bot" side of every later correction). */
-export function rememberCreated(cards: TrelloCard[], heard: string, colour: string | null): void {
+export function rememberCreated(cards: TrelloCard[], heard: string, colour: string | null, column: string | null = null): void {
   try {
     const all = readJson<CardSnapshot[]>(CREATED_PATH, []);
     const ts = new Date().toISOString();
-    for (const c of cards) all.push({ id: c.id, name: c.name, due: c.due ?? null, colour, heard: heard.slice(0, 240), ts });
+    for (const c of cards) all.push({ id: c.id, name: c.name, due: c.due ?? null, colour, column, heard: heard.slice(0, 240), ts });
     writeJson(CREATED_PATH, all.slice(-400));
   } catch (e) { console.warn('[TrelloVoice/learn] remember failed:', (e as Error).message); }
 }
@@ -516,6 +529,11 @@ export function recordCorrections(cardId: string, live: LiveCard, door: Correcti
     const s = snaps.find((x) => x.id === cardId);
     if (!s) return 0;  // not a card the bot made: nothing of the bot's to learn from
     const diffs = diffSnapshot(s, live);
+    if (live.column !== undefined && !s.columnChecked) {  // the column is compared once: the first look after creation
+      s.column = live.column ?? s.column ?? null;
+      s.columnChecked = true;
+      if (!diffs.length) writeJson(CREATED_PATH, snaps);
+    }
     if (!diffs.length) return 0;
     const corr = readJson<Correction[]>(CORR_PATH, []);
     const ts = new Date().toISOString();
@@ -537,11 +555,11 @@ export async function sweepManualEdits(): Promise<number> {
   let n = 0;
   for (const s of readJson<CardSnapshot[]>(CREATED_PATH, []).filter((x) => Date.parse(x.ts) >= since)) {
     try {
-      const c = await trelloGet<{ name: string; due: string | null; closed: boolean; labels?: { color: string }[] }>(
-        `/cards/${s.id}`, { fields: 'name,due,closed,labels' });
+      const c = await trelloGet<{ name: string; due: string | null; closed: boolean; labels?: { color: string }[]; list?: { name: string } }>(
+        `/cards/${s.id}`, { fields: 'name,due,closed,labels', list: 'true' });
       if (c.closed) continue;  // archiving is not a correction
       const colour = (c.labels ?? []).map((l) => l.color).find((x) => sphere.has(x)) ?? null;
-      n += recordCorrections(s.id, { name: c.name, due: c.due, colour }, 'trello');
+      n += recordCorrections(s.id, { name: c.name, due: c.due, colour, ...(c.list?.name ? { column: c.list.name } : {}) }, 'trello');
     } catch { /* deleted card or a network blip: skip, the next night tries again */ }
   }
   return n;
@@ -549,13 +567,34 @@ export async function sweepManualEdits(): Promise<number> {
 
 /** The lessons the classifier reads: her approved rules, then her latest corrections (VJH's few-shot pattern). */
 export function learnedBlock(corrections: Correction[], rules: LearnedRule[]): string {
-  const approved = rules.filter((r) => r.status === 'approved').map((r) => `- ${r.text}`);
-  const recent = corrections.slice(-12).map((c) =>
-    `- ${c.card ? `card "${c.card.slice(0, 80)}", ` : ''}heard "${c.heard.slice(0, 200)}" → you set ${c.field} "${c.bot}" → she changed it to "${c.her}"`);
+  const approved = rules.filter((r) => r.status === 'approved').map((r) => `- ${maskValues(r.text)}`);
+  const recent = corrections.slice(-12).map((c) => `- ${maskValues(
+    `${c.card ? `card "${c.card.slice(0, 80)}", ` : ''}heard "${c.heard.slice(0, 200)}" → ${correctionShape(c)}`)}`);
   if (!approved.length && !recent.length) return '';
   return `\n═══ LEARNED FROM ELENA'S OWN CORRECTIONS (follow these) ═══\n`
     + (approved.length ? `Rules she approved:\n${approved.join('\n')}\n` : '')
-    + (recent.length ? `Her latest corrections to cards you made (avoid repeating these mistakes):\n${recent.join('\n')}\n` : '');
+    + (recent.length ? `Her latest corrections to cards you made (learn the BEHAVIOUR; # hides values — never copy a date or number from here):\n${recent.join('\n')}\n` : '');
+}
+
+/** Every digit becomes "#": a lesson carries the behaviour, never a date or number the model could copy. */
+export function maskValues(s: string): string {
+  return String(s || '').replace(/\d+/g, '#');
+}
+
+/** A date correction told as its SHAPE ("removed the date", "moved it N days later") — the values never reach the prompt. */
+export function correctionShape(c: Pick<Correction, 'field' | 'bot' | 'her'>): string {
+  if (c.field !== 'date') return `you set ${c.field} "${c.bot}" → she changed it to "${c.her}"`;
+  if (c.her === 'none') return 'you set a due date → she REMOVED it (no date was wanted)';
+  if (c.bot === 'none') return 'you set no due date → she ADDED one';
+  const [bd, bt] = c.bot.split(' '), [hd, ht] = c.her.split(' ');
+  const days = Math.round((Date.parse(hd ?? '') - Date.parse(bd ?? '')) / 86_400_000);
+  if (!days) return bt !== ht ? 'you set the right day → she changed only the TIME' : 'she adjusted the date';
+  return `you set a due date → she moved it to a ${days > 0 ? 'LATER' : 'EARLIER'} day`;
+}
+
+/** A proposed rule that names a date, month or number is about one card, not a behaviour — she never sees it. */
+export function ruleCarriesValues(text: string): boolean {
+  return /\d|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|январ|феврал|апрел|июн|июл|август|сентябр|октябр|ноябр|декабр/i.test(text);
 }
 function learnedBlockFromDisk(): string {
   return learnedBlock(readJson<Correction[]>(CORR_PATH, []), readJson<LearnedRule[]>(RULES_PATH, []));
@@ -567,22 +606,24 @@ export async function proposeRules(): Promise<LearnedRule[]> {
   const rules = readJson<LearnedRule[]>(RULES_PATH, []);
   const { completeWithProfileDetailed } = await import('./llm-resilience');
   const proposed: LearnedRule[] = [];
-  for (const field of ['date', 'title', 'colour'] as const) {
+  for (const field of ['date', 'title', 'colour', 'column'] as const) {
     const group = corr.filter((c) => c.field === field && !c.ruled);
     if (group.length < 2) continue;
     // Whole heard text + the card's title (28 Oct 2026): cut at 140 chars, "…the next mon" made the model invent a rule
     // about audio cut off mid-word instead of the real pattern visible in the titles.
-    const examples = group.slice(-8).map((c) => `${c.card ? `card "${c.card}": ` : ''}heard "${c.heard}" → assistant set "${c.bot}" → she changed it to "${c.her}"`).join('\n');
+    const examples = group.slice(-8).map((c) => `${c.card ? `card "${c.card}": ` : ''}heard "${c.heard}" → ${correctionShape(c).replace(/^you/, 'assistant')}`).join('\n');
     try {
       const r = await completeWithProfileDetailed('classify', null,
         `A voice assistant turns Elena's voice notes into Trello cards. She corrected the card ${field} like this:\n${examples}\n\n`
         + `Write ONE short general instruction (max 30 words) that would have got these right. Describe the pattern, not `
-        + `these cards: no people's names, no medicines or diagnoses. If there is no common pattern, answer exactly NONE.`,
+        + `these cards: no people's names, no medicines or diagnoses, and NO dates, months or numbers — describe the behaviour, `
+        + `never a value to copy. If there is no common pattern, answer exactly NONE.`,
         120, 'trello-voice/rule');
       const text = r.text.trim().replace(/^["'-\s]+|["'\s]+$/g, '');
       const id = `R${Date.now().toString(36)}${field[0]}`;
       for (const c of group) c.ruled = id;  // used either way: a NONE or a rejected rule is never re-proposed from them
       if (!text || /^none\b/i.test(text)) continue;
+      if (ruleCarriesValues(text)) { console.log(`[TrelloVoice/learn] ${field} rule dropped, it carries a value: ${text.slice(0, 120)}`); continue; }
       const rule: LearnedRule = { id, text: text.slice(0, 240), field, status: 'proposed', examples: group.length, ts: new Date().toISOString() };
       rules.push(rule);
       proposed.push(rule);
@@ -1397,7 +1438,7 @@ export async function handleVoiceToTrello(
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
-  rememberCreated([card], transcript, labelId ? labelColor : null);  // the bot's side of any later correction
+  rememberCreated([card], transcript, labelId ? labelColor : null, targetList.name);  // the bot's side of any later correction
 
   console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}`);
 
@@ -1538,7 +1579,7 @@ export async function createTrelloCardFromTranscript(
     if (createdCards.length === 0) {
       return { success: false, transcript, classification, error: 'All subtask card creations failed' };
     }
-    rememberCreated(createdCards, transcript, labels.length ? classification.labelColor : null);
+    rememberCreated(createdCards, transcript, labels.length ? classification.labelColor : null, targetList.name);
     return {
       success: true,
       transcript,
@@ -1556,7 +1597,7 @@ export async function createTrelloCardFromTranscript(
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
-  rememberCreated([card], transcript, labels.length ? classification.labelColor : null);
+  rememberCreated([card], transcript, labels.length ? classification.labelColor : null, targetList.name);
 
   console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}${classification.dueDate ? ` (due: ${classification.dueDate})` : ''}`);
 
