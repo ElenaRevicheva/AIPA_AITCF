@@ -21,7 +21,7 @@ also be possible in **EspaLuz WhatsApp** — in LATAM, WhatsApp is the winner. M
 
 ## Order (each step shippable, verified from logs before the next; surgical, no rebuild)
 
-1. **Link WhatsApp to the family** — `connected_bots.platform='whatsapp'`, WhatsApp accepts `connect CODE`; the
+1. ⏳ (built 31 Oct 17:48, waits on a real link) **Link WhatsApp to the family** — `connected_bots.platform='whatsapp'`, WhatsApp accepts `connect CODE`; the
    kids-memory/report functions take a WhatsApp identity. Without this, nothing below can share memory.
 2. **Kids mode on WhatsApp** — a `/kids`-style trigger ("Alisa" / "kids") that reuses the SAME rules as Telegram:
    copy the kids block of `EspaLuzFamilybot/main.py` (steps, stories, `kids_heard`, filters, memory card, emergency/

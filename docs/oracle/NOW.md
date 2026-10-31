@@ -100,7 +100,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-31 17:50 | EspaLuz WhatsApp parity step 1: connect WhatsApp to the family | ascent `supabase/functions/connect-bot`, `src/pages/ConnectBot.tsx`; EspaLuzWhatsApp `espaluz_bridge.py`; Oracle `espaluz-whatsapp` restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -223,6 +222,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 31 Oct ~17:50 UTC — WhatsApp parity step 1 (connect WhatsApp to the family) · built + deployed · waits on Elena's Publish + one real link · claim released
+- DONE: connect-bot v218 (ascent `6134b9b`) takes `whatsapp_user_id` = `wa_` + sha256("espaluz-wa:"+digits)[:32] (phone never stored); ConnectBot.tsx gets Telegram + WhatsApp buttons (WhatsApp opens wa.me/…3757 with "connect CODE"). EspaLuzWhatsApp `071e38d` live md5 `38332ff2…`, restarted 17:48, health 200: `connect <6 hex>` handled before access checks. Oracle WA `.env` got SUPABASE_ANON_KEY + ESPALUZ_BOT_SECRET copied from the Familybot `.env` (backup `~/_session-backups/wa-env-pre-connect`, 600).
+- VERIFIED BY: connect-bot from the WA env with a fake code → 404 "Invalid or expired". NOT yet a real link.
+- NEXT: Elena Publish → Connect page → WhatsApp → Send; agent checks `connected_bots` has a `whatsapp` row; then parity step 2 (kids mode, shared module).
 
 ### ✅ 31 Oct ~17:45 UTC — Alisa's 17:26 web test (chat only, photo not yet tried): parent voice ("It's Alisa's mom now… Alisa doesn't want to brush her teeth") was NOT caught → would have entered her memory and the report as her words. KIDS_ADULT widened on all three twins: bot `e6cc764` (md5 `14e983e7…`, restarted 17:40, before the report ran), espaluz-chat v232 + kids-memory v4 (ascent `1cd3399`); the web turn now also tells the heroes "this message is from the parent: thank mom, never tell her how she feels". Next: WhatsApp parity step 1 (docs/espaluz/WHATSAPP_PARITY_PLAN_2026-10-31.md).
 
