@@ -248,6 +248,7 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 1 Nov ~19:50 UTC — tracing pad 💬 Frases LIVE (ascent `e0a608d`, bundle `index-BoifkN_X.js`): 5 ES→EN meaning pairs (Te quiero / I love you …), text shrinks to fit (longest 840/900 px, ~98 px letters). Modes now 🔤 Letras / 🔢 Números / 💬 Frases. Not yet traced by Alisa.
 ### ✅ 1 Nov ~19:37 UTC — waterfalls LIVE everywhere (Elena published 19:34: espaluz-chat v259, generate-voice v241, both new hashes). Live guest class call: logs `claude failed (credit)` → `groq failed 429` → `answered by grok`, HTTP 200 in 2.0 s, trace [a..u]; voices `gemini-pere` 3.8 s / `gemini-titi` 3.0 s.
 ### (detail) 1 Nov ~19:35 UTC — waterfalls: "the next available option answers at once" (Elena)
 - Gaps found: no provider call had a timeout (a HANGING provider froze the turn ~150 s); OpenAI missing from the web chat chain (top-up never used); WA + Telegram threw away any voice that was not Gemini/MiniMax; web Gemini default `gemini-2.5-flash` = 404 for new users.
