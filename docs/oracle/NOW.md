@@ -124,7 +124,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 1 Nov ~14:40 | EspaLuz payment truth Phase 3 (trials + reminders + early PF renewal) | Familybot `espaluz_paypal_system.py`, `main.py`; WhatsApp `user_trial_system.py`, `espaluz_paguelofacil_wa.py`, `espaluz_bridge.py`; `espaluz_unified.user_trials`; both bot services | `7a8ab5bf` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -247,6 +246,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 1 Nov ~15:05 UTC — payment truth Phase 3 LIVE · claim released
+- **DONE:** Telegram trials now in `espaluz_unified.user_trials` as `tg:<id>` (2 imported from `telegram_trials.json`, file kept as archive + DB-down fallback). Both bots run the EXISTING reminder texts (2 d / 24 h before trial or PF month ends, `/pagar` + $11 PayPal link, once-only flags) every 10 min instead of only on the next message; PayPal payers skipped. WhatsApp sends only inside the 24 h window (`whatsapp_users.last_seen` < 23 h, a conservative lower bound — kids turns don't update it); otherwise the reminder still comes with the next message and the flag is not spent. Early PágueloFácil renewal allowed (both `/pagar` used to refuse). Familybot `9f1bf20` (main `7851ec9d`, paypal_system `1461f321`), WhatsApp `f5dacb1` (bridge `10c08696`, pf_wa `18801a98`); both restarted, WA / 200, no tracebacks; backups `*bak-20261101-phase3`.
+- **VERIFIED BY:** candidate run on Oracle → "Telegram trials now in the shared table: 2" (both expired); dry-run: 0 WA trials ending ≤3 d → no reminder due (correct). Wipe check: 0 files deleted in any repo today; big deletions are intended (Telegram twin kids rules −332, approved "one brain"; Premium card/old prices −43); old payment JSON files all still present on Oracle.
+- **NEXT:** Phase 4 (web `user_subscriptions` written from the truth, RLS self-grant closed, classroom `FeatureGate`, Publish), Phase 5 (archive dead stores after comparison). PágueloFácil webhook verification still open.
 
 ### ✅ 1 Nov ~14:15 UTC — payment truth Phase 2 LIVE + web pricing LIVE (Elena published; bundle `index-DG1NWa4w.js`: "EspaLuz Family" ×5, "14 days free" ×3, P-6GR9 ×1, 7.77 ×0, Premium promises ×0; functions untouched)
 - **DONE:** Telegram + WhatsApp gates read `subscribers.paid_until` first (`espaluz_payment_truth.access`); WhatsApp trial 14 d, `$11` plan link, both plans accepted, PF beats a cancelled PayPal. Familybot `029e11a` (truth `c7691779`, paypal_system `5649f009`), WhatsApp `542974b` (bridge `5d7b0480`, trial `b0e3924d`, linking `fe9e913d`); 3 services restarted, health 200, no errors; backups `*bak-20261101-phase2`. Web: ascent `d0e0a0c` pricing ($11 Family, 14 days, PF line, Premium removed) — tsc 0 / eslint 0 / build ok.

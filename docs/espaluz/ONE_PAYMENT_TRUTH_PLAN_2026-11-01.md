@@ -73,7 +73,10 @@ Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
 - **Web pricing ✅ committed** (ascent `d0e0a0c`, needs Lovable Publish): 14 days free, "EspaLuz Family $11/month"
   (`P-6GR9…`, verified the web's PayPal app = same merchant), "First PayPal charge 2 weeks after you subscribe",
   PágueloFácil line, real features (kids classroom, parent report, daily game, one family), Premium card removed.
-- **Next:** Phase 3 (Telegram trials into `user_trials`; reminders 2 d / 24 h on the loop with both links), Phase 4 (web
+- **Phase 3 ✅ LIVE 1 Nov ~15:05 UTC** — Telegram trials in `user_trials` (`tg:<id>`); existing reminders sent on time by both
+  bots' 10-minute loops (WhatsApp only inside its 24 h window); early PágueloFácil renewal allowed. Familybot `9f1bf20`,
+  WhatsApp `f5dacb1`.
+- **Next:** Phase 4 (web
   `user_subscriptions` written from the truth + RLS self-grant closed + classroom `FeatureGate`), Phase 5 (archive).
 - **Decided 1 Nov:** new PayPal subscribers on every channel → `P-6GR9…` $11/month (2 PayPal weeks); PágueloFácil $11/30 days.
 
