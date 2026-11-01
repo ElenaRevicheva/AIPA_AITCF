@@ -23,6 +23,7 @@ import { getPoolConnection } from './database';
 
 const ALLOWED: QueueStatus[] = ['new', 'working', 'done', 'skipped'];
 const ESPALUZ_SNAPSHOT = path.resolve(__dirname, '..', 'data', 'espaluz-truth.json');
+const TEAM_SNAPSHOT = path.resolve(__dirname, '..', 'data', 'agents-team.json');
 
 function esc(s: string): string {
   return s
@@ -65,6 +66,18 @@ export function registerQueueRoutes(app: Express): void {
       res.set('cache-control', 'no-store').json({ ...snap, ageMin });
     } catch (e) {
       res.status(503).json({ error: 'EspaLuz snapshot not available', detail: (e as Error).message?.slice(0, 120) });
+    }
+  });
+
+  // 1 Nov 2026: the Team tab — every agent, alive or not, what it handed over and what waits for her.
+  // scripts/agents-team-snapshot.cjs (every 10 min) writes the snapshot; this route only reads it.
+  app.get('/queue/api/team', (_req: Request, res: Response) => {
+    try {
+      const snap = JSON.parse(fs.readFileSync(TEAM_SNAPSHOT, 'utf8'));
+      const ageMin = Math.round((Date.now() - Date.parse(snap.checked_at)) / 60000);
+      res.set('cache-control', 'no-store').json({ ...snap, ageMin });
+    } catch (e) {
+      res.status(503).json({ error: 'Team snapshot not available', detail: (e as Error).message?.slice(0, 120) });
     }
   });
 
