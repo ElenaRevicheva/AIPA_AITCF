@@ -282,9 +282,10 @@ function cvLineHtml(cv) {
  */
 async function uploadCv(cvPath, name, dealId) {
   const up = await uploadOutreachFile(cvPath, name);
-  if (!up.reused) return { id: up.id, name };
+  if (!up.reused) return { id: up.id, name: up.name || name };   // the name HubSpot stored (it may add "-1")
   const alt = name.replace(/\.pdf$/, `_${String(dealId).slice(-4)}.pdf`);
-  return { id: (await uploadOutreachFile(cvPath, alt)).id, name: alt };
+  const up2 = await uploadOutreachFile(cvPath, alt);
+  return { id: up2.id, name: up2.name || alt };
 }
 
 /**
@@ -302,8 +303,9 @@ async function handBuiltCv(notes) {
   for (const n of notes) {
     for (const id of (await cvIdsOn(n)).cv) {
       const name = String(fileNames.get(id) || '').toLowerCase();
-      // uploadCv may have added "_<last 4 of the deal id>" to a kit CV's name — still the kit's.
-      const base = name.replace(/_\d{4}\.pdf$/, '.pdf');
+      // uploadCv may have added "_<last 4 of the deal id>" to a kit CV's name, and HubSpot renames a clash to
+      // "<name>-1.pdf" (1 Nov 2026, Sapling: a kit CV was then read as hand-built and the rebuild skipped) — still the kit's.
+      const base = name.replace(/-\d+\.pdf$/, '.pdf').replace(/_\d{4}\.pdf$/, '.pdf');
       if (name && !LANE_CV_NAMES.has(name) && !kit.has(name) && !kit.has(base)) return fileNames.get(id);
     }
   }

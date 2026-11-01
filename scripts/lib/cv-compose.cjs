@@ -36,6 +36,9 @@ const ATTEMPTS = 3;
 // Language words count only as a LEVEL ("English C1", "native speaker"): "AI-native operations" is a duty.
 const REQUIREMENT_RE = /\b\d+\s*\+?\s*years?\b|\byears? of\b|\bexperience (in|with)\b|\bdegree\b|\bbachelor|\bmaster'?s\b|\bcertif|\bproficien|\bbackground in\b|\bfamiliar(ity)? with\b|\bnative (speaker|english|spanish|portuguese|level)\b|\b(english|spanish|portuguese)\s+(fluen|proficien|level|native|[abc][12])/i;
 
+// Industries her bank lines do not show; a heading clause naming one would claim that domain (1 Nov 2026).
+const DOMAIN_RE = /\b(clinic\w*|patients?|medical|health\w*|care plans?|pharma\w*|fashion|apparel|garments?|footwear|insurance|banking|lending|legal cases?|retail)\b/i;
+
 /** A broken bank must fall back before any model is paid (code review, 11 Oct 2026). */
 function bankProblem(bank) {
   const has = (x) => Array.isArray(x) && x.length > 0;
@@ -63,7 +66,12 @@ function headingOf(s) {
  * (First Oracle dry run, 11 Oct 2026: all four of a Chief of Staff posting's duty headings were whole sentences.)
  */
 function fitHeading(h) {
-  const t = String(h || '').trim();
+  let t = String(h || '').trim();
+  // 1 Nov 2026 (Sapling): "Build and ship AI agents that support clinical documentation" headed her blog and CRM lines —
+  // a healthcare claim. A relative clause naming an industry is where a posting puts its domain, so a heading stops
+  // before it ("…infrastructure that makes agents dependable" names none and stays whole).
+  const rel = t.search(/\s(that|which|who)\s/i);
+  if (rel >= 12 && DOMAIN_RE.test(t.slice(rel))) t = t.slice(0, rel).trim();
   if (t.length <= 70) return t;
   const head = t.slice(0, 71);
   // A cut inside brackets leaves "(adoption, accuracy/quality" with no ")" (SIPEngines, 11 Oct): never break
@@ -73,7 +81,7 @@ function fitHeading(h) {
     .filter((i) => i >= 12 && (open < 0 || i <= open));
   if (breaks.length) return t.slice(0, breaks[breaks.length - 1]).trim();
   const words = head.slice(0, head.lastIndexOf(' ')).trim().split(' ');
-  while (words.length && /^(the|a|an|and|or|to|of|for|with|that|in|on|by|from|as|so|your|our)$/i.test(words[words.length - 1])) words.pop();
+  while (words.length && /^(the|a|an|and|or|to|of|for|with|that|in|into|on|by|from|as|so|your|our)$/i.test(words[words.length - 1])) words.pop();
   return words.join(' ');
 }
 
@@ -206,7 +214,7 @@ async function composeCv({ title, company, jd, lane, pitch = '', cvName, bank, l
       const revSys = [
         'You review a CV assembled for one job. Every line under a heading claims the candidate did that heading\'s work.',
         'For EACH line: supported=true only if the line itself shows her doing the work its heading names. A related skill, or the same tool used for something else, is NOT support.',
-        'For EACH heading: ok=false if it is a requirement (years, degree, language level, credential) rather than a duty of the job, or if it names a way of working that its lines do not show — e.g. "with engineering and design", "with customers", "cross-functional" teams, "stakeholders", or team rituals such as "standups" and "sprint/release planning" when no line shows her doing that WITH OTHER PEOPLE. Her lines describe work with AI agents, not with a human team: a heading that implies a human team is ok=false unless a line shows one.',
+        'For EACH heading: ok=false if it is a requirement (years, degree, language level, credential) rather than a duty of the job, or if it names a way of working that its lines do not show — e.g. "with engineering and design", "with customers", "cross-functional" teams, "stakeholders", or team rituals such as "standups" and "sprint/release planning" when no line shows her doing that WITH OTHER PEOPLE. Her lines describe work with AI agents, not with a human team: a heading that implies a human team is ok=false unless a line shows one. A heading that names an industry or domain (clinical, patients, healthcare, fashion, finance, legal cases…) is ok=false unless a line under it shows work in that domain. Industry experience the posting says is NOT required is never, by itself, a reason for reads_as=false.',
         `Finally: does the whole CV read as a CV for "${title}"? Answer reads_as true/false with one short reason. This is a note for the candidate, not a verdict on her: gaps in her experience are covered by her honest-gap answers elsewhere.`,
         'Return JSON only.',
       ].join('\n');

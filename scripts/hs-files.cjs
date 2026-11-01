@@ -152,7 +152,10 @@ async function uploadOutreachFile(absPath, displayName, access = 'PRIVATE') {
   if (!r.ok) throw new Error(`upload failed ${r.status}: ${r.text.slice(0, 200)}`);
   const id = r.json?.id;
   if (!id) throw new Error(`upload returned no id: ${r.text.slice(0, 160)}`);
-  return { id: String(id), name, reused: false, url: r.json?.url };
+  // HubSpot renames a clash to "<name>-1.pdf" (1 Nov 2026, Sapling: the 🛡️ line said "use …Sapling.pdf" — the OLD file —
+  // while the new one was stored as …Sapling-1.pdf). Report the name HubSpot actually stored.
+  const stored = r.json?.name ? `${r.json.name}${r.json.extension ? `.${r.json.extension}` : ''}` : name;
+  return { id: String(id), name: stored, reused: false, url: r.json?.url };
 }
 
 /** Union file ids onto a note. Returns { before, after, added }. */
