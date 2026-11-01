@@ -247,6 +247,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 1 Nov ~16:40 UTC — kids brain: spaced repetition of the child's OWN sentences (espaluz-chat v248, ascent `c25e869`+next)
+- **Why:** her 31 Oct lessons — 18 of 18 "repeat after me" prompts answered with her own ideas; drills don't work, her own sentences do.
+- **What:** `kidsDueMemory()` builds items from her saved happy statements about herself (no questions, no complaints/refusals, ≥3 content words), clusters same ideas (≥60 % shared words), returns after 1-3-7-14-30 days by distinct days she said it; top 3 by richness rotate daily. At the hello (prompt END): Titi gets it wrong on purpose, she corrects him; hint once if stuck; never a drill. `no quiero hablar sobre X` → X dropped from the week's story for 7 days. No new table.
+- **VERIFIED BY:** node test on real history (19 usable of 24 sentences; picks rotate; recall moves next return out); live hello as Elena's WhatsApp family ×2 → `Titi [silly]: ¿Me dijiste que te encantan los tiburones…?`, no toucan; 3 test rows deleted (mine).
+- **NOTE:** the model reuses the prompt's example wrong detail ("tiburones") — fine as a running joke; vary later if Elena wants.
+
 ### ✅ 1 Nov ~15:50 UTC — payment truth Phase 4 LIVE: web reads the truth, browser self-grant closed, classroom paywall (Elena published; bundle `index-Dm837Z6t.js` has `kids_classroom` gate + honest upgrade card; payment-mirror 401 without secret, 9 users / 3 links / 0 pending with it; RPC Elena paid on both links, 0 UPDATE policies, trigger on)
 - **DONE:** new function `payment-mirror` (bot secret; v1, pinned verify_jwt) = the truth's only door into `user_subscriptions`. Oracle `mirror_web()` every 10 min (reconcile every 6 h) matches each web account by login email / Telegram link (+ bot email map) / WhatsApp family hash / PayPal-confirmed browser claim → writes paid-until. Migration `payment_truth_web` (ascent `supabase/migrations/20261101180000_…`): browser INSERT → `pending_verification` (trigger), browser UPDATE policy dropped, RPC trial = 14 d from account creation. Web: `/classroom` behind `FeatureGate`; upgrade card honest ($11 PayPal / PágueloFácil). Familybot `631811e` (truth `bc751ce2`, pws `5e216811`), ascent `7876748`.
 - **VERIFIED BY:** rolled-back SQL as an `authenticated` user: insert 'active' → `pending_verification`, end not in future; update to +1 y → 0 rows; 0 leftover rows. Elena's linked web account `get_user_subscription_status` → `is_subscription_active: true` (both links). Service log `web mirror wrote 2 of 9 account(s)`. tsc 0 / build ok.
