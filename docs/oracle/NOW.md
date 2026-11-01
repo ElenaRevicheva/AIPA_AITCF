@@ -108,6 +108,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 1 Nov ~10:40 | EspaLuz one-brain: Telegram kids = thin client of espaluz-chat (plan phases 1-3) | ascent `espaluz-chat`, `kids-memory`; EspaLuzFamilybot `main.py`; `espaluz-familybot` service | `aca0de02` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
