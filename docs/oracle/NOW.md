@@ -252,6 +252,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 1 Nov ~22:55 UTC — CAMERA everywhere on web (ascent `0f8777c`, waits for Lovable Publish): classroom 📷 Foto = `capture` (camera opens at once) + 🖼️ gallery; grown-up web chat got 📷 + 🖼️, photo sent at once as `body.image` → espaluz-chat `ADULT_PHOTO_PROMPT` (copies text first, then describes; Claude → Grok vision; never stored). Shared `src/lib/shrinkPhoto.ts`. Pen 3-9 px (Elena: "a little thicker"). WA/Telegram already send camera photos natively. VERIFY after Publish: espaluz-chat logs `photo read by` on her first chat photo.
+
 ### ✅ 1 Nov ~22:35 UTC — HEARING: voice-to-text v212 (ascent `c5cf491`, via Lovable Publish). The echo filter dropped Alisa's CORRECT answer ("I love you!" after "¡Lo escribiste: I love you! ¡Ahora dilo!") because every word was in the Whisper hint. Now an echo must reproduce ≥60% of the question's words. Pen line 2-6 px (live bundle index-uX3tokNg). Not yet confirmed by Alisa on the tablet.
 
 ### ✅ 1 Nov ~22:25 UTC — voice ORDER = Replicate MiniMax FIRST again (Elena topped up, loves those voices) → free Gemini (Pere D/Titi D, model waterfall) → OpenAI → device. generate-voice v251 (MCP = ascent `aa97ead`). Live: `minimax-pere` 2.5 s, `minimax-titi` 2.1 s. No failure memory: every line retries every provider, so a top-up is used on the next line. Tracing pad pen line now thin + pressure-sensitive (`e423011`, needs Lovable Publish). Lenovo pen: "Double press → paint brush" set to Do nothing (Alisa toggled the brush).
