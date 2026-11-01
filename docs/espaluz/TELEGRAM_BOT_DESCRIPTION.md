@@ -7,13 +7,13 @@ sentences, voice/text/photo, one family memory across Telegram/WhatsApp/web, 14-
 
 ☀️ EspaLuz — Spanish & English for the whole family.
 
-👧 Kids 6–8: Pere the calm sloth 🦥 and Titi the cheeky monkey 🐒 teach through play, stories and real classes (/clase) on a first-grade bilingual path. Her own sentences come back as games.
-
 👩 Parents: everyday Spanish for life in Panama & Latin America — by voice, text or photo.
+
+👧 Kids 6–8: Pere the calm sloth 🦥 and Titi the cheeky monkey 🐒 teach through play, stories and real classes (/clase) on a first-grade bilingual path. Her own sentences come back as games.
 
 One family memory on Telegram, WhatsApp and web.
 🎁 14 days free, then $11/month (PayPal or PágueloFácil).
 
 ## About (BotFather /setabouttext, max 120 — this is 101)
 
-Spanish & English for families: Pere 🦥 & Titi 🐒 teach kids 6–8, parents learn by voice. 14 days free.
+Spanish & English for families: parents learn by voice, Pere 🦥 & Titi 🐒 teach kids 6–8. 14 days free.
