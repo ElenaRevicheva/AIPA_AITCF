@@ -247,6 +247,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 1 Nov — Premium back on the pricing page as an honest roadmap (ascent `d146ff7`, Elena published; live bundle `index-piIB1LMK.js`: 5 roadmap lines ×1 each, old promises ×0, 7.77 ×0). Only features built on what works; no dates, no price, button disabled. Lovable project: lovable.dev/projects/3b682175-09ab-40e0-997e-64596f70a6ea
+
 ### ✅ 1 Nov ~15:05 UTC — payment truth Phase 3 LIVE · claim released
 - **DONE:** Telegram trials now in `espaluz_unified.user_trials` as `tg:<id>` (2 imported from `telegram_trials.json`, file kept as archive + DB-down fallback). Both bots run the EXISTING reminder texts (2 d / 24 h before trial or PF month ends, `/pagar` + $11 PayPal link, once-only flags) every 10 min instead of only on the next message; PayPal payers skipped. WhatsApp sends only inside the 24 h window (`whatsapp_users.last_seen` < 23 h, a conservative lower bound — kids turns don't update it); otherwise the reminder still comes with the next message and the flag is not spent. Early PágueloFácil renewal allowed (both `/pagar` used to refuse). Familybot `9f1bf20` (main `7851ec9d`, paypal_system `1461f321`), WhatsApp `f5dacb1` (bridge `10c08696`, pf_wa `18801a98`); both restarted, WA / 200, no tracebacks; backups `*bak-20261101-phase3`.
 - **VERIFIED BY:** candidate run on Oracle → "Telegram trials now in the shared table: 2" (both expired); dry-run: 0 WA trials ending ≤3 d → no reminder due (correct). Wipe check: 0 files deleted in any repo today; big deletions are intended (Telegram twin kids rules −332, approved "one brain"; Premium card/old prices −43); old payment JSON files all still present on Oracle.
