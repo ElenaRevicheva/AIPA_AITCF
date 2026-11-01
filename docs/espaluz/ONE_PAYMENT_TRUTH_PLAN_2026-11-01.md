@@ -1,70 +1,56 @@
 # EspaLuz — one payment truth for Telegram, WhatsApp and the web (plan, 1 Nov 2026)
 
-**Status: PLAN — awaiting Elena's go-ahead.** Elena, 1 Nov: "if the free trial ends he is reminded beforehand, offered
-PágueloFácil or PayPal, if he pays it is exactly detected and recorded everywhere in one brain … PágueloFácil is paid
-once every month (no recurring approved), PayPal is a monthly subscription … the source of truth is always one, no
-duplicates — this is idempotency."
+**Status: PLAN — awaiting Elena's go-ahead.** Elena, 1 Nov: "reminded before the trial ends, offered PágueloFácil or
+PayPal, if he pays it is exactly detected and recorded everywhere in one brain … PágueloFácil is paid once every month,
+PayPal is a monthly subscription … one source of truth, no duplicates (idempotency) … no bicycles: it is all wired, plumb
+it correctly and clean up the stale, dead information that serves nobody. Check all the facts."
 
-## What is true today (read from code + live Oracle data, 1 Nov)
-- **Payment state lives in ~14 places:** Telegram JSON files (`telegram_subscribers.json`, `telegram_trials.json`, the
-  phone↔email map…), WhatsApp Postgres `user_trials`/`subscribers` + JSON fallbacks, one shared PágueloFácil JSON file
-  (`paguelofacil_payments.json`, written by 3 processes with no lock), the web's Supabase `user_subscriptions`, and an
-  `espaluz_unified.subscriptions` table (12 rows, all `expired`, untouched since 20 Jan).
-- **PayPal renewals are never recorded:** no channel stores a "paid until" date; "active" stays active until a cancel.
-  WhatsApp drops renewal (sale) events (plan-id filter); Telegram ignores EXPIRED/FAILED. The web was written once by
-  the browser (`now+30 days`) and never again → Elena, a paying family, reads "expired" there since 17 Sep 2025.
-- **No webhook is verified** (PayPal or PágueloFácil). A forged PágueloFácil POST grants 30 days.
-- **No idempotency except PF `processed[codOper]`** in a lock-free JSON file (a race can double-grant or lose a grant).
-- **Reminders exist** (2 days / 24 h before the trial ends, 3 days / 24 h before a PF month ends) but only fire when the
-  user writes; there is no scheduler. `/pagar` refuses to sell an early renewal although the text invites it.
-- **Trials:** Telegram 14 days, WhatsApp 7 days, web "7 days" forever (never expires).
-- **Two PayPal plans** (Telegram `P-6GR9…`, WhatsApp/web `P-38A7…`) and two subscriber stores: a payer on one channel is
-  unknown on the other.
+## The facts (measured on Oracle + Supabase, 1 Nov 2026; emails shown only as hashes)
 
-## The design — one writer, one ledger, everyone reads
-**The ledger lives in Oracle's `espaluz_unified` Postgres** (both bots and the payment webhook already run on that box
-and already use that database; no new service). Two tables:
+| Store | Who uses it | Rows | Newest write | Verdict |
+|---|---|---|---|---|
+| `espaluz_unified.subscribers` (email + `telegram_id` + `whatsapp_id` + status + `subscription_data`) | WhatsApp gate (`user_trial_system.py`) | 2, both `active` (`a96407`, `d33cea`, both channels linked) | 26 Jul | **LIVE — this is already the one-brain table** |
+| `espaluz_unified.user_trials` | WhatsApp gate | 32 (3 say `active` but newest end 6 Oct) | 29 Sep | **LIVE**, statuses stale |
+| `paguelofacil_payments.json` (+ `pf_payment_snapshots` backup) | PF webhook, both bots | 2 payers, both `paid_until` 29 Jul; 2 processed | 14 Aug | live mechanism, **no current payer** |
+| Telegram JSON: `telegram_subscribers.json`, `telegram_trials.json`, phone↔email map, reminders | Telegram gate | 3 subs (`a96407`, `d33cea` + `567159` only here) | 19 Jul | **duplicate of `subscribers`** |
+| `espaluz_unified.subscriptions` | nobody | 12, all `expired` | 20 Jan | **DEAD** (migration leftover) |
+| `espaluz_whatsapp.subscribers` / `.user_trials` | nobody (WA reads unified) | 5 / 19 | Jan | **DEAD** (pre-unified copies) |
+| WA JSON `subscribers.json`, `user_trials.json`, maps | fallbacks only | — | Feb–Jul | **duplicate / fallback** |
+| `telegram_subscriptions` (Telegram DB) | analytics writer only | 2 | Jan | **write-only copy** |
+| Telegram `subscribers.json`, `discovered_subscription*.json`, `user_trials.json` | legacy fallbacks | — | Jan–Jun | **DEAD** |
+| Supabase `user_subscriptions` (web) | web UI only; written once by the browser | Elena: 3 rows, paid-to 17 Sep 2025 | Aug 2025 | **stale** (renewals never arrive) |
 
-```
-payment_events   one row per provider event — UNIQUE (provider, event_id)   ← idempotency lives here
-                 provider: paypal | paguelofacil ; kind: activated | renewed | paid | cancelled | expired | failed
-                 payer keys: tg:<id> / wa:<phone> / email / paypal sub id ; amount ; raw payload hash ; received_at
-access           one row per payer key — paid_until, source (trial|paypal|paguelofacil), status, paypal_subscription_id
-```
+Also measured: PayPal webhook events are never signature-checked although `PAYPAL_WEBHOOK_ID` is configured; renewals
+(`PAYMENT.SALE.COMPLETED`) never set a "paid until" date; WhatsApp drops them; reminders fire only when the user writes;
+`/pagar` refuses early renewal; trials are 14 days (Telegram) / 7 (WhatsApp) / never-ending (web).
 
-- **Every payment goes through ONE door:** the existing `espaluz-payments-webhook` (`webhook.aideazz.xyz` → :5000).
-  It verifies the event (PayPal: `verify-webhook-signature` with the existing `PAYPAL_WEBHOOK_ID`; PágueloFácil: the
-  transaction is re-read from PágueloFácil before it counts), then `INSERT … ON CONFLICT (provider, event_id) DO
-  NOTHING`. Only a NEW row moves `paid_until`. The same event delivered 1 or 10 times = one paid month.
-- **PayPal (monthly subscription):** each `PAYMENT.SALE.COMPLETED` sets `paid_until` = PayPal's `next_billing_time`
-  (read from the PayPal API) + 3 days grace. Cancel/expire do NOT cut a month already paid; they stop the next one.
-- **PágueloFácil (one payment = 30 days, bought again each month):** `paid_until = max(now, paid_until) + 30 days`, per
-  new `codOper`. Early renewal allowed (stacks).
-- **Trial:** recorded in the same `access` table (`source = trial`), one length for every channel.
-- **The gates READ the ledger:** Telegram `is_user_allowed` and WhatsApp `is_user_allowed` ask `access` first (their
-  existing trial/reminder code stays; the JSON files stop being written, kept as read-only backup).
-- **The web reads a mirror the ledger writes:** for a family linked with `connect CODE`, the webhook upserts its
-  `paid_until` into Supabase `user_subscriptions` through a bot-secret edge function. The browser stops inserting
-  "active" itself (today any logged-in user can write `status='active'` via RLS). Then `/classroom` gets the existing
-  `FeatureGate`.
-- **One family pays once:** a payment on any linked identity (Telegram, WhatsApp, web) counts for the whole family
-  (`connected_bots` already maps them to one account).
+## The design — no new system: plumb what exists, retire the rest
+1. **The source of truth = the existing `espaluz_unified.subscribers` + `user_trials`** (already keyed by email with
+   both channel ids, already the WhatsApp gate's store). Telegram's gate switches from its JSON files to the SAME rows —
+   it reuses WhatsApp's `user_trial_system` the way WhatsApp already reuses Telegram's PágueloFácil module.
+2. **The one door = the existing `espaluz-payments-webhook`** (PayPal + PágueloFácil, `webhook.aideazz.xyz`). Fixed, not
+   replaced: PayPal events verified with the existing `PAYPAL_WEBHOOK_ID`; PF grants only after the transaction is
+   re-read from PágueloFácil; every payment writes to `subscribers` (PF grants move off the JSON file).
+3. **Idempotency — the only additions:** a `paid_until` column on `subscribers`, and one unique-keyed list of processed
+   payment ids `(provider, event_id)` in the same database. A payment delivered 1 or 10 times counts once. PF's own
+   `processed[codOper]` check already does this — it moves from the lock-free file to that list.
+4. **PayPal monthly:** each renewal sets `paid_until` = PayPal's next billing date (+3 days grace); a cancel never takes
+   back a month already paid. **PágueloFácil:** each payment = `max(now, paid_until) + 30 days`; early renewal allowed.
+5. **Reminders:** the existing messages (2 days / 24 h before the trial or the PF month ends, with `/pagar` + the PayPal
+   link) run on the existing 10-minute loop instead of waiting for the user to write.
+6. **The web:** its `user_subscriptions` row is written by the webhook (through a bot-secret function) for families
+   linked with `connect CODE`, never by the browser; then `/classroom` gets the existing `FeatureGate`.
+7. **Clean-up (snapshot first, nothing deleted):** stop writing and archive the DEAD/duplicate stores above after their
+   contents are compared with `subscribers`; `567159` (only in Telegram's JSON) is checked against PayPal before it moves.
 
-## Reminders and links (Elena's flow)
-A scheduled pass (existing report loop pattern, every 10 min) on `access`: **2 days and 24 h before `paid_until`**
-(trial or PF month), once each, in the channel the family uses: "Your free trial ends in … — pay $11 for 30 days with
-PágueloFácil: <link> or subscribe monthly with PayPal: <link>". PF link = the existing `create_payment_link`; PayPal link
-= the existing subscribe link. PayPal subscribers get no reminder (it renews by itself) unless a payment FAILS.
+## Phases (each verified before the next; Elena + her mom must read `allowed` before every switch)
+1. Facts → `subscribers`: add `paid_until` + processed-ids list; backfill from PayPal API for the 3 subscription holders;
+   the webhook verifies and writes there; replay the same event twice → one row, one month.
+2. Telegram gate reads `subscribers`/`user_trials`; Telegram JSON stops being written.
+3. Reminders on the loop; early PF renewal; one trial length.
+4. Web mirror + RLS self-grant closed + classroom paywall (Lovable Publish).
+5. Archive the dead stores (snapshots kept).
+Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
 
-## Phases (each one shippable and verified before the next)
-1. **Ledger + one door + idempotency** — the two tables; the webhook verifies and records; replay test: the same event
-   POSTed twice → one row, one month. Backfill from today's stores (snapshot first, nothing deleted).
-2. **Bots read the ledger** — both gates; Elena + her mom (deliberate family subs) verified `allowed` before restart.
-3. **Reminders + links on a schedule**, early PF renewal unblocked.
-4. **Web mirror + classroom paywall** — edge function, RLS self-grant closed, `FeatureGate`, Lovable Publish.
-
-## Risks / rules
-- Never lock out a payer: every phase starts by checking known paying accounts (Elena, her mom) read `allowed`.
-- Nothing deleted: old JSON/tables are snapshotted and kept read-only.
-- Money flows: test with PayPal sandbox / PF sandbox (`PAGUELOFACIL_SANDBOX` exists) before live.
-- Open for Elena: one trial length for all channels (Telegram 14 vs WhatsApp 7 today)?
+## Open for Elena
+- One trial length for every channel: 7 or 14 days?
