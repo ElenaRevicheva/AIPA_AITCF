@@ -90,6 +90,13 @@ Pere/Titi context: the Telegram kids bot only plays stored `heroes/` clips; new 
 
 **22 Oct — EspaLuz Alisa mode: Pere + Titi talk in their own voices (LIVE).** DONE: per-hero MiniMax voices (Replicate, `REPLICATE_API_TOKEN` added to the bot `.env`) over 4 new talking clips in `heroes/`; gTTS voice note skipped for Alisa. NEXT (Elena): pick voices from the samples → set `PERE_VOICE` / `TITI_VOICE` in the bot `.env` + restart. VERIFIED BY: Oracle dry run built a 17 s Pere→Titi→Pere video in 31 s; sample sent to CTO Telegram; bot active 14:55 UTC. RISK: adds ~30 s per Alisa reply; a Replicate failure falls back to the old gTTS video. Steps 3–4 (exact lip-sync, live rig) deferred by Elena.
 
+**👥 1 Nov — Team tab LIVE on aideazz.xyz/ops (same login as the CRM): 6 agent cards + the hand-off feed.**
+- HOW: `scripts/agents-team-snapshot.cjs` (Oracle cron `7-59/10`, log `~/logs/agents-team.log`) reads pm2/systemd/`systemctl --user` status, `crm_event_log` (every agent hand-off with its real outcome), `daily_queue` (what waits for Elena) and three reliable log signals → `data/agents-team.json` → `GET /queue/api/team` (cto-aipa `20582b81`) → Team tab (aideazz `e202438`). Read only: no HubSpot call, no table write. Emails are stripped from feed items.
+- VERIFIED BY: snapshot `6/6 up, 80 feed events, unmapped=none`; route 200 locally, 401 publicly without the password; 0 email addresses in the JSON; cto-aipa started 10:41:09 > file 10:41:07; rendered in Chrome with real data, 0 JS errors. Backup `dist/queue-routes.js.bak-team-20261101`, crontab `/tmp/cron.bak-team-20261101`.
+- FINDINGS it shows: Atlas no hand-off in 7 days (Monday run: watch 2 Nov); Algom X cycles `new:0 liked:0`; EspaLuz 38 users, 0 active this month, 0 paying.
+- COLLAB EVALUATION: `docs/oracle/2026-11-01_AGENTS_COLLAB_EVALUATION.md`. Do NOT build direct agent chat, a broker or A2A. The money gap is VJH precision 0.0 in 3 of 4 weeks (re-verified). NEXT, Elena's call: (1) a $0 table — does the kit's fit verdict predict her rejections? (2) if yes, `apply-queue.cjs` sinks kit-flagged jobs (sort only, never close). Decision: may one agent's verdict re-ORDER what another shows her?
+- RISK: if a new agent writes a new `source` into `crm_event_log`, the snapshot lists it under `unmapped`; add it to `AGENTS` in the script.
+
 **✅ 30 Oct — fleet cost order LIVE on Oracle (20:20 UTC): free first, Claude LAST while `MODEL_TIER=free`, Claude FIRST when credit lands. Model ids come from `.env`.**
 - HOW IT WORKS: `scripts/model-tier.cjs` (cron 15:30 UTC) reads Elena's Anthropic billing mail and writes `MODEL_TIER` into cto-aipa + VJH + EspaLuz WA/Family/Influencer + Algom `.env`; every Claude call checks it first (cto-aipa `freeTier()`, VJH `free_tier()` in `model_config.py`, EspaLuz `llm_chain.free_tier()`, Algom `llm-chain.mjs freeTier()`), re-read per call, no restart. Sonnet id: `CLAUDE_SONNET_MODEL` (cto-aipa, VJH, Algom) / `CLAUDE_MODEL_NAME` (EspaLuz) = `claude-sonnet-4-6`.
 - GUARD: `scripts/pii-guard.cjs` (pre-commit in every fleet repo) blocks an ADDED direct Claude call unless it carries `tier-gated`. Rule in CLAUDE.md §4 + Cursor rule. Cursor Cloud runs no local hooks: read the rule.
@@ -110,7 +117,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-11-01 | Team tab on aideazz.xyz/ops (all 7 agents: cards + hand-off feed) + agent-collab evaluation doc | NEW scripts/agents-team-snapshot.cjs, src/queue-routes.ts (+1 route), aideazz-ops-dashboard (+Team tab), Oracle cron | b7631cdf |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
