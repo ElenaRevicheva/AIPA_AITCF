@@ -123,3 +123,24 @@ Scored on your rule: *which paying human does it move closer?*
 - Current `/api/crm-event` call volume (no per-call stdout line; 245 is the 15 Oct count).
 - Whether OpenClaw's plugin system exposes MCP.
 - The step-1 2×2 table itself — not run in this read-only pass.
+
+---
+
+## 5. Result of step 1 (run 1 Nov 2026, read only, $0) — step 2 NOT built
+
+`VibeJobHunterAIPA_AIMCF/scripts/kit_verdict_vs_decision.py` (imports the judge's own ledger and rules), VJH-found jobs
+Elena decided since 1 Sep, n = 59:
+
+| Kit verdict | Applied | Rejected | Reject rate |
+|---|---|---|---|
+| Flagged (fit_note 2, not shaped 1) | 0 | 3 | 100% |
+| Clean | 1 | 13 | 93% |
+| No kit | 10 | 32 | 76% |
+
+**Verdict:** the kit's flag is right but rare (3 of 59); its "clean" does not predict her yes. Sorting by it would move
+3 cards, so step 2 was not wired. The kit judges "can an honest CV be written", not "would Elena want this job".
+
+**What does predict her no (her own written reasons, 33 of 48 rejections):** posting excludes Panama/LATAM (6),
+classic SWE seat — manual coding / CS degree / 5+ yrs SWE (6), a tool or specialty she lacks (5), relay listing (2),
+closed (1), pay (1). Decisions per week fell 15 → 2 (21 Sep → 26 Oct); applied 0 for 4 weeks.
+The judge already learns these lessons; the open question is whether VJH's source gate stops them before they reach her.
