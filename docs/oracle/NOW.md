@@ -248,6 +248,7 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 1 Nov ~20:07 UTC — hero voices = Elena's choice "Pere D / Titi D" (cartoon kids-TV styles, `gemini-3.8-flash-tts` first). generate-voice v250 (MCP = ascent `62136a1`): free step is a WAVEFALL OF MODELS — 3.8-flash → 3.8-flash-lite → 3.1-preview → 2.5-preview (3.1/2.5: style as text, raw PCM wrapped to WAV) — because Google's free tier = **10 voice lines per DAY per model** (`429 … limit: 10 requests per day on Free Tier`); one lesson needs 20-30. Then Replicate (dry) → OpenAI (dry) → device voice. Private voice lab (bot secret): `{voiceLab:'list'|'try'}`. Library: 108 Spanish voices, all adult/business, no child voices. Live: `gemini-pere` 4.3 s. RISK: ~40 free lines/day max; after that the tablet voice. Cheapest real fix if needed: Gemini PAID tier ≈ $0.0015/10 s (~$2-5/month).
 ### ✅ 1 Nov ~19:50 UTC — tracing pad 💬 Frases LIVE (ascent `e0a608d`, bundle `index-BoifkN_X.js`): 5 ES→EN meaning pairs (Te quiero / I love you …), text shrinks to fit (longest 840/900 px, ~98 px letters). Modes now 🔤 Letras / 🔢 Números / 💬 Frases. Not yet traced by Alisa.
 ### ✅ 1 Nov ~19:37 UTC — waterfalls LIVE everywhere (Elena published 19:34: espaluz-chat v259, generate-voice v241, both new hashes). Live guest class call: logs `claude failed (credit)` → `groq failed 429` → `answered by grok`, HTTP 200 in 2.0 s, trace [a..u]; voices `gemini-pere` 3.8 s / `gemini-titi` 3.0 s.
 ### (detail) 1 Nov ~19:35 UTC — waterfalls: "the next available option answers at once" (Elena)
