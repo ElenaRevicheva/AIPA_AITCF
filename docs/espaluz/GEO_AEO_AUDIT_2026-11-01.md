@@ -39,3 +39,20 @@ So EspaLuz has **no page anywhere that an answer engine can read and quote.** Wh
 6. **The blog**: daily posts already run; EspaLuz posts link to the new page (internal links = authority).
 
 Nothing here claims a user, a number or a result we have not measured.
+
+## Done 1 Nov ~23:45 UTC
+- **https://aideazz.xyz/espaluz LIVE: 100/100 A+** (was: no page at all; the Lovable app is 60/C). Standalone static page
+  (aideazz `5330cd2` + `ef7340d`), 549 crawler-visible words, SoftwareApplication + FAQPage JSON-LD, $11/14-days-free,
+  web/WhatsApp/Telegram buttons, EN + ES, own share image (`espaluz-og.jpg`, verified with the WhatsApp crawler UA),
+  sitemap + both llms.txt. Phone width: no horizontal scroll, 1 H1, 6 working buttons.
+- Weekly tracking: `scripts/visibility-self-audit.cjs` enforces /espaluz (>= B) and reports the Lovable app (cto-aipa `3099aabe`).
+
+## The plumbing gap (Elena 1 Nov: "connect all the pieces into one funnel")
+Machines already running daily at $0: EspaLuz Influencer (Telegram channel + Make.com), LinkedIn CMO agent, daily blog,
+Atlas/marketing engine (Mondays), the GEO/AEO engine. Measured: the Influencer's posts link to `wa.me/...` and
+`aideazz.xyz/portfolio` - **none points parents to one EspaLuz door, and no click is counted anywhere.**
+Proposal (needs Elena's OK, channel by channel):
+1. ONE door for every family-facing post: `https://aideazz.xyz/espaluz?utm_source=<channel>`.
+2. Count arrivals: a tiny counter on the page (or the existing visibility-lead logger) so each channel's families show up.
+3. Weekly one-line report to Elena: visits per channel -> trials -> paid (the payment truth already knows paid).
+4. Then let the numbers decide which machine gets more of its daily output pointed at families.
