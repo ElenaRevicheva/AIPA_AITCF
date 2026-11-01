@@ -110,6 +110,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-01 | Team tab on aideazz.xyz/ops (all 7 agents: cards + hand-off feed) + agent-collab evaluation doc | NEW scripts/agents-team-snapshot.cjs, src/queue-routes.ts (+1 route), aideazz-ops-dashboard (+Team tab), Oracle cron | b7631cdf |
 | Claude Code | 1 Nov ~10:40 | EspaLuz one-brain: Telegram kids = thin client of espaluz-chat (plan phases 1-3) | ascent `espaluz-chat`, `kids-memory`; EspaLuzFamilybot `main.py`; `espaluz-familybot` service | `aca0de02` |
 
 **Rules**
