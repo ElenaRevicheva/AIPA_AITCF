@@ -29,7 +29,7 @@ also be possible in **EspaLuz WhatsApp** — in LATAM, WhatsApp is the winner. M
 3. ✅ (real lesson 31 Oct 23:12; 2/4 lines until the Replicate burst fix `ae0f928`, then a full 4-line test note) **Hero voices** — each line via SaaS `generate-voice` (Pere 0.82, Titi 0.9), joined by ffmpeg into ONE voice note after the text; waits on a real lesson. Old text: — Pere and Titi as WhatsApp voice notes (same MiniMax voices via Replicate, gTTS fallback).
 4. ⏳ (rides on step 2: a photo in kids mode goes to the same espaluz-chat photo path) **Photos** — her photo → Grok vision → the heroes talk about it (same prompt as the web).
 5. ✅ (31 Oct 23:44:02 UTC "📒 parent report sent on WhatsApp (lesson 23:12-23:20 UTC, 2 answers)"; Telegram sent no duplicate) **Parent report** — `kids_lessons.report_once` every 10 min; kids-memory v9 `platform:whatsapp`; ONE channel per lesson (WhatsApp lesson → WhatsApp; web lesson → Telegram, or WhatsApp if no Telegram) — proven: last 30 min Telegram 0 turns / WhatsApp 2. Phone kept only in the bot's gitignored `kids_report.json`, recorded on `connect` or a kids turn (Elena's first report comes after her next kids turn). Old text: — the existing report loop sends to the parent's WhatsApp when the family's link is WhatsApp.
-6. **Stars/stickers** — a short "⭐ 23 · 🦥🐒🦜🐸" line at the end of a lesson (text, no page needed).
+6. ✅ (1 Nov 00:25 UTC; same count as the web, verified 57 = 57; celebration + dance clip every 5 stars waits on a real 60th star) **Stars/stickers** — a short "⭐ 23 · 🦥🐒🦜🐸" line at the end of a lesson (text, no page needed).
 
 Phase 3 of ONE_FAMILY_MEMORY_PLAN (one kids brain behind all three surfaces) is the end state; step 2's shared module
 is the first piece of it.

@@ -108,7 +108,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (desktop) | 1 Nov 00:30 | EspaLuz WhatsApp parity step 6 (stars + stickers) | SaaS kids-memory, EspaLuzWhatsApp/kids_lessons.py, espaluz-whatsapp service | (this claim) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -233,6 +232,9 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 ### ✅ 31 Oct ~19:20 UTC — Alisa's 18:31-18:41 web test: she asked 3× for less talk ("ya paro de hablar", "Titi no paran de hablar… que no hablen") and got 3-4 lines + "¿Por qué te gusta parar de hablar?". espaluz-chat v235 (ascent `69dc33d`, deployed via MCP): `KIDS_QUIET` → that turn = ONE line, no question; rest of the lesson capped at 1 line + 1 question. Parent line 18:39 was caught ("¡Gracias, mamá!"). Report sent (`📒 … 18:31-18:41 UTC, 8 answers`, in `/var/log/espaluz-familybot.log` — not journalctl). All turns answered by Grok (Claude: credit too low; Groq 120b: 429). Telegram has no bye/quiet code twin yet → goes into parity step 2's shared module. **Still waiting on Elena's Lovable Publish** (stars/stickers/photo/WhatsApp button); her last Publish was before 17:26.
+### ✅ 1 Nov 00:18 UTC — voice notes DELIVERED (Twilio `read`, Elena confirmed) after the AIGC strip
+### ✅ 1 Nov 00:26 UTC — WhatsApp parity step 6 (stars + stickers) · claim released
+Same star count as the web (kids-memory v11 `mode:"stars"`): bot 57 = web query 57. Every 5 stars → sticker message (16 Panama stickers, identical list to Classroom.tsx) + Titi's dance clip; stars line on "adult" and in the WhatsApp report. EspaLuzWhatsApp `3d88897`, kids_lessons md5 `7efbf808…`, restarted 00:25:35, health 200. First celebration fires at 60 stars (🐬 el delfín) — needs a real lesson to see it delivered (check Twilio status, not our log).
 ### ⏳ 1 Nov 00:15 UTC — WhatsApp kids voice notes were NEVER delivered (fixed, waits on a real turn)
 Twilio: all 3 notes of the 23:12 lesson `undelivered`, error 63021; adult audio same minute `read`. Same codec/rate/channels; the only difference: MiniMax's huge `AIGC` signature tag carried into the Ogg. Fix EspaLuzWhatsApp `d5cd503` (`-map_metadata -1`; kids_lessons md5 `5a21667d…`, restarted 00:14:46): test note now has only `TAG:encoder`. "voice note sent" in OUR log ≠ delivered — check Twilio message status. Telegram hero videos also carry MiniMax audio (delivered fine so far).
 ### ✅ 31 Oct 23:25 UTC — first real WhatsApp kids lesson (23:12-23:20) + voice fix
