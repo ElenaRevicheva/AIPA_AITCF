@@ -57,6 +57,17 @@ const OUT = argOf('--out', path.join(process.env.USERPROFILE || process.env.HOME
 
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+/** The apply kit's doubts, from the same three markers hs-fill-apply-kit.cjs writes (checked 1 Nov on 59 decisions). */
+function kitFlags(bodies) {
+  const all = (bodies || []).join(' ');
+  const f = [];
+  if (all.includes("Its reviewer's note")) f.push('reviewer: far from your evidence');
+  if (all.includes('Not shaped to this posting')) f.push('CV could not be shaped to it');
+  const roles = (bodies || []).filter((b) => b.includes('ROLE DEFENSE'));
+  if (roles.length && !roles.some((b) => b.includes('Why you, in one line'))) f.push('no honest pitch');
+  return f.length ? f : null;
+}
+
 async function hs(url, init = {}) {
   const res = await fetch(url, {
     ...init,
@@ -128,6 +139,7 @@ async function hs(url, init = {}) {
       created: (d.properties.createdate || '').slice(0, 10),
       defense,
       brief,
+      kitFlags: kitFlags(bodies),
       ...note,
     });
   }
@@ -210,9 +222,12 @@ async function hs(url, init = {}) {
     r.closed = !!(r.posting && r.posting.state === 'closed');
     r.waitingDays = r.created ? Math.max(0, Math.round((Date.parse(today) - Date.parse(r.created)) / 86400000)) : null;
   }
-  const rank = (r) => (r.closed ? 2 : r.isNew ? 0 : 1);
+  // 1 Nov 2026 (Elena: one agent's judgment informs another): a job the apply kit doubts sinks below new and waiting
+  // jobs, above closed ones. Sort only — still on the page, still in HubSpot, nothing closed.
+  const rank = (r) => (r.closed ? 3 : r.kitFlags ? 2 : r.isNew ? 0 : 1);
   rows.sort((a, b) => rank(a) - rank(b) || String(b.created).localeCompare(String(a.created)));
   const nNew = rows.filter((r) => rank(r) === 0).length;
+  const nSunk = rows.filter((r) => rank(r) === 2).length;
   const nWaiting = rows.filter((r) => rank(r) === 1).length;
   const nClosed = rows.filter((r) => r.closed).length;
   const nDupes = rows.reduce((s, r) => s + (r.dupes || []).length, 0);
@@ -321,6 +336,7 @@ async function hs(url, init = {}) {
         ${r.brief ? '<span class="pill">🔎 brief in HubSpot</span>' : ''}
       </div>
     </div>
+    ${r.kitFlags && !r.closed ? `<p class="flag">⬇ Sorted down — the apply kit doubts this one: ${esc(r.kitFlags.join(' · '))}. Still yours to apply to.</p>` : ''}
     ${r.closed ? `<p class="flag">⛔ This posting looks closed — ${esc(r.posting.why)}. Open it once to be sure; if it is, move the HubSpot deal to <b>Lost</b>.</p>` : ''}
     ${r.boilerplate ? `<p class="flag">⚠️ The draft letter is <b>boilerplate</b>${r.thin ? ` — the job page gave only ${esc(r.thin)} characters` : ''}. Rewrite it before sending.</p>` : ''}
     ${r.dupes && r.dupes.length ? `<p class="dup">↳ The same job is also in HubSpot as ${r.dupes.map((d) => `<a href="${dealLink(d.id)}" target="_blank" rel="noopener">${esc(d.company)} deal ↗</a>`).join(', ')}. Apply once, then move the extra deal to Lost.</p>` : ''}
@@ -467,6 +483,7 @@ ${cards}
   } else if (!PPLX) {
     console.log('  ! PERPLEXITY_API_KEY not found — company briefs skipped');
   }
+  console.log(`  sunk by kit verdict: ${nSunk}`);
   console.log(`  ${nNew} new · ${nWaiting} still waiting · ${nClosed} look closed · ${nDupes} duplicate deal(s) folded`
     + (args.includes('--no-liveness') ? '' : ` · links: ${liveness.open} open / ${liveness.closed} closed / ${liveness.unknown} unknown`));
   console.log('  HubSpot was only read. VJH untouched.');

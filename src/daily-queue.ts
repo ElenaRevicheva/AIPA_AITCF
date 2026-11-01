@@ -43,6 +43,8 @@ export interface QueueItem {
   status: QueueStatus;
   hubspotDealId?: string | undefined;
   createdAt?: string | undefined;
+  /** The apply kit's doubts about this job (list view); a flagged job sorts to the bottom. */
+  kitFlags?: string[] | undefined;
   /** Record page only: her copy of the deal's HubSpot notes, oldest first. */
   kitNotes?: KitNote[] | undefined;
   kitSyncedAt?: string | undefined;
@@ -190,10 +192,11 @@ export async function getQueue(lane: QueueLane, limit = 5): Promise<QueueItem[]>
       `SELECT * FROM (
          SELECT RAWTOHEX(id) AS id, lane, external_key, title, company, action_url, draft,
                 draft_tailored, draft_provider, draft_reason, score, status,
-                hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at
+                hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
+                ${KIT_FLAG_SQL}
            FROM daily_queue
           WHERE lane = :lane AND status = 'new'
-          ORDER BY draft_tailored DESC, NVL(score, 0) DESC, created_at DESC
+          ORDER BY kit_flagged ASC, draft_tailored DESC, NVL(score, 0) DESC, created_at DESC
        ) WHERE ROWNUM <= :lim`,
       { lane, lim: limit },
       { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: FETCH_DRAFT },
@@ -213,10 +216,35 @@ export async function getQueue(lane: QueueLane, limit = 5): Promise<QueueItem[]>
       status: String(r.STATUS) as QueueStatus,
       hubspotDealId: r.HUBSPOT_DEAL_ID ? String(r.HUBSPOT_DEAL_ID) : undefined,
       createdAt: r.CREATED_AT ? String(r.CREATED_AT) : undefined,
+      kitFlags: kitFlags(r),
     }));
   } finally {
     await connection.close();
   }
+}
+
+/**
+ * 1 Nov 2026 (Elena: "one agent's judgment informs another"): the apply kit's verdict, read from HER copy of
+ * the deal's notes, sorts a job to the bottom of her list. Sort only — never hidden, closed or deleted.
+ * The same three markers hs-fill-apply-kit.cjs writes, checked against 59 decided deals on 1 Nov
+ * (VJH scripts/kit_verdict_vs_decision.py): flagged jobs were rejected 3 of 3.
+ */
+const KIT_FLAG_SQL = `CASE WHEN DBMS_LOB.INSTR(kit_notes, 'Its reviewer''s note') > 0 THEN 1 ELSE 0 END AS kit_fit,
+                CASE WHEN DBMS_LOB.INSTR(kit_notes, 'Not shaped to this posting') > 0 THEN 1 ELSE 0 END AS kit_shape,
+                CASE WHEN DBMS_LOB.INSTR(kit_notes, 'ROLE DEFENSE') > 0
+                      AND DBMS_LOB.INSTR(kit_notes, 'Why you, in one line') = 0 THEN 1 ELSE 0 END AS kit_pitch,
+                CASE WHEN DBMS_LOB.INSTR(kit_notes, 'Its reviewer''s note') > 0
+                       OR DBMS_LOB.INSTR(kit_notes, 'Not shaped to this posting') > 0
+                       OR (DBMS_LOB.INSTR(kit_notes, 'ROLE DEFENSE') > 0
+                           AND DBMS_LOB.INSTR(kit_notes, 'Why you, in one line') = 0) THEN 1 ELSE 0 END AS kit_flagged`;
+
+function kitFlags(r: Record<string, unknown>): string[] | undefined {
+  const f = [
+    Number(r.KIT_FIT) === 1 ? 'reviewer: far from your evidence' : '',
+    Number(r.KIT_SHAPE) === 1 ? 'CV could not be shaped to it' : '',
+    Number(r.KIT_PITCH) === 1 ? 'no honest pitch' : '',
+  ].filter(Boolean);
+  return f.length ? f : undefined;
 }
 
 /** One record by id, for the record page. Returns null when it does not exist. */
