@@ -247,6 +247,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 1 Nov — web class mode: tablet TRACING PAD (ascent `e671aa7`, pushed; WAITS ON ELENA'S LOVABLE PUBLISH)
+- **DONE:** espaluz-chat returns `trace` (the class unit's 3-5 letters/syllables/words, Cambridge path order) in class mode; `src/components/kids/TracePad.tsx` = finger tracing over a big grey dotted letter (coverage ≥ 60 % on a 6-px grid, a scribble over the whole pad does not count, nothing stored); "✏️ Trazar" button in `/classroom` class mode → on success the turn `✏️ Tracé "X"` goes to the heroes (+1 star) and Pere/Titi ask her to SAY it (Elena: expression first, one step at a time — "Next" opens only after this one is traced).
+- **NEXT:** Elena publishes (lovable.dev/projects/3b682175-09ab-40e0-997e-64596f70a6ea) → verify bundle has `Trazar` + brain answers with `trace` → Alisa tries on the tablet. Then: Phase 5 archive, bots' anon key → bot secret, parent linking.
+- **VERIFIED BY:** tsc 0 / eslint 0 / brain esbuild parse ok / vite build ok. NOT yet seen live or traced by a finger.
+- **RISK:** coverage thresholds are a first guess; tune from Alisa's test.
+
 ### ✅ 1 Nov ~16:40 UTC — kids brain: spaced repetition of the child's OWN sentences (espaluz-chat v248, ascent `c25e869`+next)
 - **Why:** her 31 Oct lessons — 18 of 18 "repeat after me" prompts answered with her own ideas; drills don't work, her own sentences do.
 - **What:** `kidsDueMemory()` builds items from her saved happy statements about herself (no questions, no complaints/refusals, ≥3 content words), clusters same ideas (≥60 % shared words), returns after 1-3-7-14-30 days by distinct days she said it; top 3 by richness rotate daily. At the hello (prompt END): Titi gets it wrong on purpose, she corrects him; hint once if stuck; never a drill. `no quiero hablar sobre X` → X dropped from the week's story for 7 days. No new table.
