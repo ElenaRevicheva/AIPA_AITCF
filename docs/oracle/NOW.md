@@ -247,7 +247,7 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⏳ 1 Nov ~14:15 UTC — payment truth Phase 2 LIVE + web pricing committed (waits on Elena's Lovable Publish)
+### ✅ 1 Nov ~14:15 UTC — payment truth Phase 2 LIVE + web pricing LIVE (Elena published; bundle `index-DG1NWa4w.js`: "EspaLuz Family" ×5, "14 days free" ×3, P-6GR9 ×1, 7.77 ×0, Premium promises ×0; functions untouched)
 - **DONE:** Telegram + WhatsApp gates read `subscribers.paid_until` first (`espaluz_payment_truth.access`); WhatsApp trial 14 d, `$11` plan link, both plans accepted, PF beats a cancelled PayPal. Familybot `029e11a` (truth `c7691779`, paypal_system `5649f009`), WhatsApp `542974b` (bridge `5d7b0480`, trial `b0e3924d`, linking `fe9e913d`); 3 services restarted, health 200, no errors; backups `*bak-20261101-phase2`. Web: ascent `d0e0a0c` pricing ($11 Family, 14 days, PF line, Premium removed) — tsc 0 / eslint 0 / build ok.
 - **VERIFIED BY:** candidate gates run on Oracle against the live table before deploy: family phones → `True subscription ✅ Paid until 03 Dec / 28 Nov 2026`; Elena's Telegram → same; unknown number → no row (old path).
 - **NEXT:** Elena: Lovable Publish → Update. Then Phase 3-5 (plan doc).
