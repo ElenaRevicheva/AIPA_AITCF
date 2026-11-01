@@ -123,7 +123,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 1 Nov ~11:10 | EspaLuz kids paywall + Leaply daily ritual | ascent `espaluz-chat`, `kids-memory`, classroom page; EspaLuzWhatsApp `espaluz_bridge.py`, `kids_lessons.py`; EspaLuzFamilybot `main.py`; both bot services | `c34fa47a` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -246,6 +245,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 1 Nov ~11:40 UTC — kids paywall (WhatsApp) + Leaply daily ritual · claim released
+- **DONE:** WhatsApp kids block moved AFTER `trial_system.is_user_allowed` (was before → linked families had kids free forever); Telegram was already gated (`enforce_learning_access`). Leaply Kids (getleaply.com/en/kds): kids-memory **v16** `TOGETHER` = 7 parent+child 2-min games, one per Panama day, returned as `together_today/tomorrow` + `has_telegram` per family; both reports end "🧠 Tomorrow, 2 minutes together: …"; daily ritual message from 17:00 Panama to families with a lesson in the last 48 h — Telegram if linked, else WhatsApp only inside the 24 h window (last WA turn < 23 h). espaluz-chat **v244**: Titi's wake-up adds "rojo salta, azul congela" and the lazy 8. Commits: ascent `69879e5`, EspaLuzWhatsApp `8f8316c` (bridge `4f62e535`, kids_lessons `366b87df`), Familybot `40cd0fc` (main.py `ca0491ac`); both restarted 11:32:03 UTC; backups `~/_session-backups/*bak-20261101-paywall-ritual`.
+- **VERIFIED BY:** live md5 = commit ×3; WhatsApp root 200; no errors in either log after restart; live file order trial check l.4668 < kids l.4712; kids-memory lessons → 1 family each platform, `has_telegram:true`, today = balloon breaths, tomorrow = flamingo; Elena's WA number logs `allowed=True reason=subscription` (not locked out).
+- **🔴 NOT DONE ON PURPOSE — web classroom paywall:** `user_subscriptions` for Elena's account = 3 PayPal rows, `current_period_end` 2025-09-17, never renewed though PayPal still charges → `get_user_subscription_status` says `is_subscription_active:false` for a PAYING family. Wrapping `/classroom` in the existing `FeatureGate` today would lock paying families out. Fix first: PayPal renewal events → `user_subscriptions.current_period_end` (the Oracle `espaluz-payments-webhook` already receives PayPal). Then `<FeatureGate feature="kids_classroom">` + Lovable Publish.
+- **NEXT:** first ritual fires today ≥ 22:00 UTC on Telegram (Elena's family has Telegram) — check `🧠 kids daily ritual sent (Telegram)` in `/var/log/espaluz-familybot.log`.
 
 ### ⏳ 1 Nov ~10:45 UTC — ONE kids brain: Telegram Pere/Titi = thin client of espaluz-chat (plan phases 1-3) · claim released
 - **DONE:** espaluz-chat **v242** (ascent `ec86cf6`): bot path takes `telegram_user_id`; unlinked + `guest:true` = same brain, no memory, nothing saved; saved rows get `source:'telegram'`; response carries `linked`; KIDS_ADULT widened ("it is … mother", "mother of Alisa"). kids-memory **v13**: stars by `telegram_user_id`, Telegram lessons = sources `['telegram','web']`, turns carry `src`. Bot `cecbc1e` (main.py md5 `e803935d…`, restarted 10:35:25 UTC, backup `~/_session-backups/familybot-main.py.bak-20261101-onebrain`): `ask_claude_with_mcp` → `kids_brain_reply` in kids mode; photos go to the brain as an image; **deleted twins** (KIDS_STEPS/STORIES, sentence check, kids_heard, holidays, memory card, turn context, photo reader, Alisa prompt branch); linked families: server stars + no local duplicate report; kids turns no longer posted to submit-progress (would double rows). `family_members`: Alisa (child, 6) added to Elena's account.
