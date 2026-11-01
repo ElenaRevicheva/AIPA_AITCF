@@ -111,7 +111,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 2026-11-01 | Team tab on aideazz.xyz/ops (all 7 agents: cards + hand-off feed) + agent-collab evaluation doc | NEW scripts/agents-team-snapshot.cjs, src/queue-routes.ts (+1 route), aideazz-ops-dashboard (+Team tab), Oracle cron | b7631cdf |
-| Claude Code | 1 Nov ~10:40 | EspaLuz one-brain: Telegram kids = thin client of espaluz-chat (plan phases 1-3) | ascent `espaluz-chat`, `kids-memory`; EspaLuzFamilybot `main.py`; `espaluz-familybot` service | `aca0de02` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -234,6 +233,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 1 Nov ~10:45 UTC — ONE kids brain: Telegram Pere/Titi = thin client of espaluz-chat (plan phases 1-3) · claim released
+- **DONE:** espaluz-chat **v242** (ascent `ec86cf6`): bot path takes `telegram_user_id`; unlinked + `guest:true` = same brain, no memory, nothing saved; saved rows get `source:'telegram'`; response carries `linked`; KIDS_ADULT widened ("it is … mother", "mother of Alisa"). kids-memory **v13**: stars by `telegram_user_id`, Telegram lessons = sources `['telegram','web']`, turns carry `src`. Bot `cecbc1e` (main.py md5 `e803935d…`, restarted 10:35:25 UTC, backup `~/_session-backups/familybot-main.py.bak-20261101-onebrain`): `ask_claude_with_mcp` → `kids_brain_reply` in kids mode; photos go to the brain as an image; **deleted twins** (KIDS_STEPS/STORIES, sentence check, kids_heard, holidays, memory card, turn context, photo reader, Alisa prompt branch); linked families: server stars + no local duplicate report; kids turns no longer posted to submit-progress (would double rows). `family_members`: Alisa (child, 6) added to Elena's account.
+- **VERIFIED BY:** from Oracle with the bot secret — guest turn 200 `linked:false` provider grok, Pere+Titi lines; no guest flag 403; WhatsApp unlinked still 403; kids-memory without secret 401; 0 classroom rows written by the tests. The bot's own `kids_brain_reply` run against live: lesson 1, history 2, hero segments `pere/hello, titi/hello, titi/cheer`.
+- **NEXT (waits on Elena):** one real Telegram `/kids` turn → expect a `learning_sessions` row `source=telegram, session_type=classroom` and log `🦥🐒 kids turn 0 answered by the kids brain (…, linked)`. No Telegram message has reached the bot since the 31 Oct 10:49 link.
+- **RISK:** Telegram unlinked families lost their local memory card (by design: one brain); Phase 1 security (submit-progress/connect-bot anon key) still open; WhatsApp report still labels web lessons "WhatsApp" (cosmetic).
 
 ### ✅ 31 Oct ~19:20 UTC — Alisa's 18:31-18:41 web test: she asked 3× for less talk ("ya paro de hablar", "Titi no paran de hablar… que no hablen") and got 3-4 lines + "¿Por qué te gusta parar de hablar?". espaluz-chat v235 (ascent `69dc33d`, deployed via MCP): `KIDS_QUIET` → that turn = ONE line, no question; rest of the lesson capped at 1 line + 1 question. Parent line 18:39 was caught ("¡Gracias, mamá!"). Report sent (`📒 … 18:31-18:41 UTC, 8 answers`, in `/var/log/espaluz-familybot.log` — not journalctl). All turns answered by Grok (Claude: credit too low; Groq 120b: 429). Telegram has no bye/quiet code twin yet → goes into parity step 2's shared module. **Still waiting on Elena's Lovable Publish** (stars/stickers/photo/WhatsApp button); her last Publish was before 17:26.
 ### 🌙 1 Nov ~00:45 UTC — session closed, synced everywhere (Claude Code)

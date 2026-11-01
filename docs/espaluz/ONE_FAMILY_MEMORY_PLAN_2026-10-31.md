@@ -1,6 +1,18 @@
 # EspaLuz — one family memory across Telegram, WhatsApp and the web (plan, 31 Oct 2026)
 
-**Status: PLAN — nothing built.** Elena asked "plan it" on 31 Oct. Build only after her go-ahead, phase by phase.
+**Status 1 Nov 2026 (Elena: "it should be one brain", "fully make 1-3"):**
+- **Phase 0 ✅** link made 31 Oct 10:49 UTC. **Phase 1 ✅** except the bot-secret security fix (Elena: after 1-3).
+- **Phase 2 ✅ (as built, not as first drawn):** no new `family_memory` table — `learning_sessions` classroom rows ARE the
+  family record (web, WhatsApp, and now Telegram as source `telegram`), read by espaluz-chat `kidsMemoryCard`. A
+  second store would be a second source of truth. `family_members`: Alisa (child, 6) added to Elena's own account
+  (the 2025 rows sit on an older test account, untouched).
+- **Phase 3 ✅** Telegram kids = thin client of espaluz-chat (bot `cecbc1e`, espaluz-chat v242, kids-memory v13). Unlinked
+  Telegram families are guests (`guest: true`): same brain, no memory, nothing saved. Telegram's twin rules (steps,
+  stories, memory card, sentence check, holidays, photo reader, the Alisa prompt) are deleted. Stars for a linked
+  family = server count; reports say which channel the lesson was on.
+- ⏳ Live proof waits on one real Telegram kids turn (no Telegram message has reached the bot since the 31 Oct link).
+- Still open: Phase 1 security (submit-progress / connect-bot anon key → bot secret); adult (parent) memory across
+  channels is not in Phases 0-3.
 
 ## Why (Elena's product, in one line)
 EspaLuz is not an app the family goes to; it is a family tutor that follows them into real life on every channel.
