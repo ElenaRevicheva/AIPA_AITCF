@@ -124,6 +124,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 1 Nov ~12:30 | EspaLuz one payment truth, Phase 1 (docs/espaluz/ONE_PAYMENT_TRUTH_PLAN_2026-11-01.md) | `espaluz_unified` subscribers/payment_events; EspaLuzFamilybot `paypal_webhook_server.py`, `espaluz_paguelofacil.py`; service `espaluz-payments-webhook` | `fab6baf7` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
