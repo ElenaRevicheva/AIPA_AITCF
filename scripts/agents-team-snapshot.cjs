@@ -46,7 +46,10 @@ const AGENTS = [
 const BY_SOURCE = {};
 for (const a of AGENTS) for (const s of a.sources) BY_SOURCE[s] = a.id;
 
-const sh = (cmd, args) => { try { return execFileSync(cmd, args, { encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return ''; } };
+// From cron there is no login session, so `systemctl --user` cannot find the user's bus and reports OpenClaw as
+// down while it runs (seen 1 Nov: 6/6 by hand, 5/6 from cron). Point it at the user's runtime dir explicitly.
+const ENV = { ...process.env, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || `/run/user/${process.getuid ? process.getuid() : 1000}` };
+const sh = (cmd, args) => { try { return execFileSync(cmd, args, { encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'ignore'], env: ENV }); } catch { return ''; } };
 const iso = (ms) => (Number.isFinite(ms) && ms > 0 ? new Date(ms).toISOString() : null);
 
 function processes() {
