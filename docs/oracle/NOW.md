@@ -248,9 +248,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⏳ 1 Nov ~19:35 UTC — waterfalls: "the next available option answers at once" (Elena)
+### ✅ 1 Nov ~19:37 UTC — waterfalls LIVE everywhere (Elena published 19:34: espaluz-chat v259, generate-voice v241, both new hashes). Live guest class call: logs `claude failed (credit)` → `groq failed 429` → `answered by grok`, HTTP 200 in 2.0 s, trace [a..u]; voices `gemini-pere` 3.8 s / `gemini-titi` 3.0 s.
+### (detail) 1 Nov ~19:35 UTC — waterfalls: "the next available option answers at once" (Elena)
 - Gaps found: no provider call had a timeout (a HANGING provider froze the turn ~150 s); OpenAI missing from the web chat chain (top-up never used); WA + Telegram threw away any voice that was not Gemini/MiniMax; web Gemini default `gemini-2.5-flash` = 404 for new users.
-- ascent `5c30bd6` (WAITS ON PUBLISH): espaluz-chat every call `AbortSignal.timeout(25 s)` (`PROVIDER_TIMEOUT_MS`), OpenAI last (`OPENAI_CHAIN_MODEL` default gpt-4o = bots' llm_chain parity), Gemini default `gemini-flash-latest`; generate-voice 20 s timeouts (`VOICE_TIMEOUT_MS`). Nothing remembers a failure → a top-up is used on the next message.
+- ascent `5c30bd6` (LIVE since Publish 19:34): espaluz-chat every call `AbortSignal.timeout(25 s)` (`PROVIDER_TIMEOUT_MS`), OpenAI last (`OPENAI_CHAIN_MODEL` default gpt-4o = bots' llm_chain parity), Gemini default `gemini-flash-latest`; generate-voice 20 s timeouts (`VOICE_TIMEOUT_MS`). Nothing remembers a failure → a top-up is used on the next message.
 - LIVE: WhatsApp `c05a375` md5 `33dc13d9` restarted 19:33:35; Familybot `4d9e720` md5 `5b4f31e4` restarted 19:33:41; both active, 0 errors; backups `*.bak-20261101-anyvoice`. Bots' llm_chain already 60 s timeout + any failure advances.
 - Proof of mechanism: scratch chain test (dry 400 → no-key skip → HANG cut by timeout → next answered in 537 ms).
 - OPEN DECISION (Elena): web chat has NO Gemini leg (`GEMINI_API_KEY` absent in Supabase); the free key could serve it, but that sends Alisa's chat text to Google's free tier.
