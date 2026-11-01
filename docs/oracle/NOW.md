@@ -252,6 +252,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 1 Nov ~22:35 UTC — HEARING: voice-to-text v212 (ascent `c5cf491`, via Lovable Publish). The echo filter dropped Alisa's CORRECT answer ("I love you!" after "¡Lo escribiste: I love you! ¡Ahora dilo!") because every word was in the Whisper hint. Now an echo must reproduce ≥60% of the question's words. Pen line 2-6 px (live bundle index-uX3tokNg). Not yet confirmed by Alisa on the tablet.
+
 ### ✅ 1 Nov ~22:25 UTC — voice ORDER = Replicate MiniMax FIRST again (Elena topped up, loves those voices) → free Gemini (Pere D/Titi D, model waterfall) → OpenAI → device. generate-voice v251 (MCP = ascent `aa97ead`). Live: `minimax-pere` 2.5 s, `minimax-titi` 2.1 s. No failure memory: every line retries every provider, so a top-up is used on the next line. Tracing pad pen line now thin + pressure-sensitive (`e423011`, needs Lovable Publish). Lenovo pen: "Double press → paint brush" set to Do nothing (Alisa toggled the brush).
 
 ### ✅ 1 Nov ~20:07 UTC — hero voices = Elena's choice "Pere D / Titi D" (cartoon kids-TV styles, `gemini-3.8-flash-tts` first). generate-voice v250 (MCP = ascent `62136a1`): free step is a WATERFALL OF MODELS — 3.8-flash → 3.8-flash-lite → 3.1-preview → 2.5-preview (3.1/2.5: style as text, raw PCM wrapped to WAV) — because Google's free tier = **10 voice lines per DAY per model** (`429 … limit: 10 requests per day on Free Tier`); one lesson needs 20-30. Then Replicate (dry) → OpenAI (dry) → device voice. Private voice lab (bot secret): `{voiceLab:'list'|'try'}`. Library: 108 Spanish voices, all adult/business, no child voices. Live: `gemini-pere` 4.3 s. RISK: ~40 free lines/day max; after that the tablet voice. Cheapest real fix if needed: Gemini PAID tier ≈ $0.0015/10 s (~$2-5/month).
