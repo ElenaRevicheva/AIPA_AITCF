@@ -124,7 +124,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 1 Nov ~12:30 | EspaLuz one payment truth, Phase 1 (docs/espaluz/ONE_PAYMENT_TRUTH_PLAN_2026-11-01.md) | `espaluz_unified` subscribers/payment_events; EspaLuzFamilybot `paypal_webhook_server.py`, `espaluz_paguelofacil.py`; service `espaluz-payments-webhook` | `fab6baf7` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -247,6 +246,13 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 1 Nov 13:23 UTC — EspaLuz ONE PAYMENT TRUTH, Phase 1 live · claim released
+- **DONE:** `espaluz_unified.subscribers` (the table the WhatsApp gate already reads) is the truth: + `paid_until`, + `payment_events` PK (provider, event_id) = idempotency. `espaluz_payment_truth.py` (Familybot `c864e12`, md5 `14e97e44`) called from payments webhook (`295efdf1`), PágueloFácil `process_webhook` (`4609e72f`), WhatsApp `/paypal-webhook` (`4ea4489`, bridge `75e72c4c`). PayPal events verified with each app's own `PAYPAL_WEBHOOK_ID`; paid_until = PayPal next_billing_time + 3 d; 6-hourly reconcile (known ids + PayPal transactions type `RP`, 31 d). Backups `~/_session-backups/*bak-20261101-paymenttruth`, table dump `unified-payments-20261101.sql`.
+- **VERIFIED BY:** `idempotency: True False`; forged POST → `PayPal event NOT verified (TEST.EVENT) - ignored`; startup log `reconcile synced 18 PayPal subscription(s)`; all 3 services active, payments /health 200, WhatsApp / 200; md5 = commit ×4.
+- **FACTS:** 17 EspaLuz PayPal subscriptions in 12 months, ALL on the 2 family emails (deliberate family subs — never suggest cancelling); 0 outside PayPal payers; 0 current PágueloFácil payers. Two PayPal apps; Telegram app webhook lacks `PAYMENT.SALE.COMPLETED` (reconcile covers it). The 26 Oct renewal had been dropped by WhatsApp ("No email found").
+- **NEXT:** Phase 2 gates read `paid_until` (Telegram JSON → table); web pricing page ($11 `P-6GR9…`, 14-day trial, Premium card out); reminders on the loop; web mirror + classroom paywall; archive dead stores. Plan: `docs/espaluz/ONE_PAYMENT_TRUTH_PLAN_2026-11-01.md`.
+- **RISK:** gates still read the old stores (no behaviour change yet); PágueloFácil webhook still unverified.
 
 ### ⏳ 1 Nov ~11:40 UTC — kids paywall (WhatsApp) + Leaply daily ritual · claim released
 - **DONE:** WhatsApp kids block moved AFTER `trial_system.is_user_allowed` (was before → linked families had kids free forever); Telegram was already gated (`enforce_learning_access`). Leaply Kids (getleaply.com/en/kds): kids-memory **v16** `TOGETHER` = 7 parent+child 2-min games, one per Panama day, returned as `together_today/tomorrow` + `has_telegram` per family; both reports end "🧠 Tomorrow, 2 minutes together: …"; daily ritual message from 17:00 Panama to families with a lesson in the last 48 h — Telegram if linked, else WhatsApp only inside the 24 h window (last WA turn < 23 h). espaluz-chat **v244**: Titi's wake-up adds "rojo salta, azul congela" and the lazy 8. Commits: ascent `69879e5`, EspaLuzWhatsApp `8f8316c` (bridge `4f62e535`, kids_lessons `366b87df`), Familybot `40cd0fc` (main.py `ca0491ac`); both restarted 11:32:03 UTC; backups `~/_session-backups/*bak-20261101-paywall-ritual`.

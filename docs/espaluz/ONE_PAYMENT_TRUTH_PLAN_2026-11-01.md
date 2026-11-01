@@ -52,6 +52,21 @@ Also measured: PayPal webhook events are never signature-checked although `PAYPA
 5. Archive the dead stores (snapshots kept).
 Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
 
+## Progress
+- **Phase 1 ✅ LIVE 1 Nov 13:23 UTC** — `espaluz_payment_truth.py` (Familybot `c864e12`), hooked into the 3 existing
+  doors (payments webhook PayPal + PágueloFácil, WhatsApp `/paypal-webhook` `4ea4489`). `subscribers.paid_until` +
+  `payment_events (provider, event_id)` PK. Replay test: same id → `True False`. Forged event → "NOT verified - ignored".
+  6-hourly reconcile also reads PayPal's last-31-day transactions (type `RP`). Backfill: **17 PayPal subscriptions, all on
+  the 2 family emails** (Elena's family subs — deliberate, internal; 0 outside PayPal payers); `a96407` paid to 3 Dec,
+  `d33cea` to 28 Nov.
+- **Found:** two PayPal REST apps (Telegram app webhook → `/paypal-webhook` :5000, NOT subscribed to
+  `PAYMENT.SALE.COMPLETED`; WhatsApp app webhook → `/espaluz/paypal-webhook` :8081, sale events only). The reconcile makes
+  the missing subscription harmless; adding the event in the PayPal dashboard is optional.
+- **PágueloFácil verification:** not added — the module has no transaction-query call; idempotency by `codOper` now in
+  the DB. Open: confirm PF's query API before trusting a PF webhook alone.
+- Next: Phase 2 (gates read `paid_until`), web pricing page ($11, 14 days, Premium card removed), Phase 3-5.
+- **Decided 1 Nov:** new PayPal subscribers on every channel → `P-6GR9…` $11/month (2 PayPal weeks); PágueloFácil $11/30 days.
+
 ## Decided / measured
 - **App free trial = 14 days on every channel** (Elena, 1 Nov 2026).
 - **PayPal plans, read live from PayPal 1 Nov:** `P-6GR9…` "EspaLuz Monthly" (Telegram) = PayPal trial **2 weeks**, then
