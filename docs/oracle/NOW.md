@@ -247,6 +247,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 1 Nov ~14:15 UTC — payment truth Phase 2 LIVE + web pricing committed (waits on Elena's Lovable Publish)
+- **DONE:** Telegram + WhatsApp gates read `subscribers.paid_until` first (`espaluz_payment_truth.access`); WhatsApp trial 14 d, `$11` plan link, both plans accepted, PF beats a cancelled PayPal. Familybot `029e11a` (truth `c7691779`, paypal_system `5649f009`), WhatsApp `542974b` (bridge `5d7b0480`, trial `b0e3924d`, linking `fe9e913d`); 3 services restarted, health 200, no errors; backups `*bak-20261101-phase2`. Web: ascent `d0e0a0c` pricing ($11 Family, 14 days, PF line, Premium removed) — tsc 0 / eslint 0 / build ok.
+- **VERIFIED BY:** candidate gates run on Oracle against the live table before deploy: family phones → `True subscription ✅ Paid until 03 Dec / 28 Nov 2026`; Elena's Telegram → same; unknown number → no row (old path).
+- **NEXT:** Elena: Lovable Publish → Update. Then Phase 3-5 (plan doc).
+
 ### ✅ 1 Nov 13:23 UTC — EspaLuz ONE PAYMENT TRUTH, Phase 1 live · claim released
 - **DONE:** `espaluz_unified.subscribers` (the table the WhatsApp gate already reads) is the truth: + `paid_until`, + `payment_events` PK (provider, event_id) = idempotency. `espaluz_payment_truth.py` (Familybot `c864e12`, md5 `14e97e44`) called from payments webhook (`295efdf1`), PágueloFácil `process_webhook` (`4609e72f`), WhatsApp `/paypal-webhook` (`4ea4489`, bridge `75e72c4c`). PayPal events verified with each app's own `PAYPAL_WEBHOOK_ID`; paid_until = PayPal next_billing_time + 3 d; 6-hourly reconcile (known ids + PayPal transactions type `RP`, 31 d). Backups `~/_session-backups/*bak-20261101-paymenttruth`, table dump `unified-payments-20261101.sql`.
 - **VERIFIED BY:** `idempotency: True False`; forged POST → `PayPal event NOT verified (TEST.EVENT) - ignored`; startup log `reconcile synced 18 PayPal subscription(s)`; all 3 services active, payments /health 200, WhatsApp / 200; md5 = commit ×4.

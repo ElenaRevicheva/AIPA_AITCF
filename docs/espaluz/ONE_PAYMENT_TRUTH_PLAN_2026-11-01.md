@@ -64,7 +64,17 @@ Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
   the missing subscription harmless; adding the event in the PayPal dashboard is optional.
 - **PágueloFácil verification:** not added — the module has no transaction-query call; idempotency by `codOper` now in
   the DB. Open: confirm PF's query API before trusting a PF webhook alone.
-- Next: Phase 2 (gates read `paid_until`), web pricing page ($11, 14 days, Premium card removed), Phase 3-5.
+- **Phase 2 ✅ LIVE 1 Nov ~14:10 UTC** — both gates ask `espaluz_payment_truth.access()` first (Telegram by its link file +
+  telegram id; WhatsApp by phone digits). Paid → allowed ("Paid until …"); paid time ended → the old JSON "active" no
+  longer counts, PágueloFácil/trial still can; no row or DB down → old checks (never lock out). WhatsApp: 14-day trial,
+  PF beats a cancelled PayPal, `$11` plan link everywhere, both plans accepted. Verified on Oracle before deploy: both
+  family phones + Elena's Telegram → "Paid until 03 Dec / 28 Nov"; unknown number → no row. Familybot `029e11a`,
+  WhatsApp `542974b`.
+- **Web pricing ✅ committed** (ascent `d0e0a0c`, needs Lovable Publish): 14 days free, "EspaLuz Family $11/month"
+  (`P-6GR9…`, verified the web's PayPal app = same merchant), "First PayPal charge 2 weeks after you subscribe",
+  PágueloFácil line, real features (kids classroom, parent report, daily game, one family), Premium card removed.
+- **Next:** Phase 3 (Telegram trials into `user_trials`; reminders 2 d / 24 h on the loop with both links), Phase 4 (web
+  `user_subscriptions` written from the truth + RLS self-grant closed + classroom `FeatureGate`), Phase 5 (archive).
 - **Decided 1 Nov:** new PayPal subscribers on every channel → `P-6GR9…` $11/month (2 PayPal weeks); PágueloFácil $11/30 days.
 
 ## Decided / measured
