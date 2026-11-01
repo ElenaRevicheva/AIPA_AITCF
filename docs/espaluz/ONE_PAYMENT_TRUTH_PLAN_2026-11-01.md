@@ -52,5 +52,14 @@ Also measured: PayPal webhook events are never signature-checked although `PAYPA
 5. Archive the dead stores (snapshots kept).
 Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
 
+## Decided / measured
+- **App free trial = 14 days on every channel** (Elena, 1 Nov 2026).
+- **PayPal plans, read live from PayPal 1 Nov:** `P-6GR9…` "EspaLuz Monthly" (Telegram) = PayPal trial **2 weeks**, then
+  **$11.00/month**; `P-38A7…` "EspaLuz Standard" (WhatsApp + web) = PayPal trial **1 week**, then **$7.77/month**.
+  PágueloFácil = **$11 / 30 days**. So price and free time differ by channel, and PayPal's own trial stacks on top of the
+  app's 14 days. During a PayPal trial, `paid_until` = PayPal's first billing date (from the API), so the extra week is
+  honoured exactly and ends exactly.
+
 ## Open for Elena
-- One trial length for every channel: 7 or 14 days?
+- One PayPal plan for new subscribers on every channel ($11 Monthly with 2 free weeks, or $7.77 Standard with 1)?
+  Existing subscribers keep the plan they are on.
