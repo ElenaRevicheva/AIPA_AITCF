@@ -247,6 +247,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 1 Nov ~15:50 UTC — payment truth Phase 4: web reads the truth, browser self-grant closed, classroom paywall (page waits on Elena's Publish)
+- **DONE:** new function `payment-mirror` (bot secret; v1, pinned verify_jwt) = the truth's only door into `user_subscriptions`. Oracle `mirror_web()` every 10 min (reconcile every 6 h) matches each web account by login email / Telegram link (+ bot email map) / WhatsApp family hash / PayPal-confirmed browser claim → writes paid-until. Migration `payment_truth_web` (ascent `supabase/migrations/20261101180000_…`): browser INSERT → `pending_verification` (trigger), browser UPDATE policy dropped, RPC trial = 14 d from account creation. Web: `/classroom` behind `FeatureGate`; upgrade card honest ($11 PayPal / PágueloFácil). Familybot `631811e` (truth `bc751ce2`, pws `5e216811`), ascent `7876748`.
+- **VERIFIED BY:** rolled-back SQL as an `authenticated` user: insert 'active' → `pending_verification`, end not in future; update to +1 y → 0 rows; 0 leftover rows. Elena's linked web account `get_user_subscription_status` → `is_subscription_active: true` (both links). Service log `web mirror wrote 2 of 9 account(s)`. tsc 0 / build ok.
+- **NEXT:** Elena: Lovable Publish (lovable.dev/projects/3b682175-09ab-40e0-997e-64596f70a6ea) → verify bundle has FeatureGate on classroom. Then Phase 5 (archive dead stores). RISK: a browser claiming SOMEONE ELSE's real PayPal id would inherit that payer's status (needs their private I- id).
+
 ### ✅ 1 Nov — Premium back on the pricing page as an honest roadmap (ascent `d146ff7`, Elena published; live bundle `index-piIB1LMK.js`: 5 roadmap lines ×1 each, old promises ×0, 7.77 ×0). Only features built on what works; no dates, no price, button disabled. Lovable project: lovable.dev/projects/3b682175-09ab-40e0-997e-64596f70a6ea
 
 ### ✅ 1 Nov ~15:05 UTC — payment truth Phase 3 LIVE · claim released
