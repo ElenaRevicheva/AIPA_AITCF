@@ -177,6 +177,8 @@ function runBuilder(jobPath, spec, extra) {
  */
 // Lanes whose evidence lives in a hand-checked specialist CV, not in cv-bank.json (31 Oct 2026).
 const CURATED_LANES = new Set(['creative', 'geo', 'exec_support', 'language']);
+// Lanes where Elena's own hand-made CV is attached unchanged (1 Nov 2026).
+const HANDMADE_CVS = { creative: path.join(__dirname, '..', 'docs', 'applications', 'cv-by-lane', 'CV_Elena_Revicheva_creative_handmade.pdf') };
 
 async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   const { lane, headline } = laneFor(title);
@@ -191,7 +193,18 @@ async function buildCv({ d, title, company, jd, summary, shapedOnly = false }) {
   // Same day, same shape found in the reviewer's own notes: SEO/GEO Operator (Scale Army ×2) and Executive Assistant (Pasito)
   // got engineering bullets while hand-checked GEO / Exec-Support CVs sat unused. Specialist lanes use their curated CV.
   const curated = CURATED_LANES.has(lane);
-  let why = curated ? `${lane} posting — built on your curated ${lane} CV; the composer's line bank holds engineering/ops lines only` : '';
+  // 1 Nov 2026: Elena's own 22 June Creative Technologist CV beat both the composer and the lane builder for creative
+  // postings — her layout and wording, facts re-measured. Attached as is, never regenerated (source: the .html beside it).
+  const handmade = HANDMADE_CVS[lane];
+  if (handmade && fs.existsSync(handmade)) {
+    const name = `CV_Elena_Revicheva_${tailor.slugOf('Creative Technologist', company).replace(/^_+/, '')}.pdf`;
+    const cvPath = path.join(AUTO_DIR, name);
+    fs.copyFileSync(handmade, cvPath);
+    fs.writeFileSync(cvPath.replace(/\.pdf$/, '.json'), JSON.stringify({ _deal: d.id, _handmade: path.basename(handmade), title, company }, null, 2));
+    return { cvPath, name, shaped: false, curated: true, info: 'handmade',
+      why: `${lane} posting — your own Creative Technologist CV (22 June format, facts re-measured 1 Nov), attached as is` };
+  }
+  let why = curated ?`${lane} posting — built on your curated ${lane} CV; the composer's line bank holds engineering/ops lines only` : '';
   // Already built for THIS deal (a dry run, or a run whose HubSpot write failed): reuse it — the model is paid once.
   const cachedJson = path.join(AUTO_DIR, shapedName.replace(/\.pdf$/, '.json'));
   if (!curated) try {
