@@ -247,9 +247,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⏳ 1 Nov — web class mode: tablet TRACING PAD (ascent `e671aa7`, pushed; WAITS ON ELENA'S LOVABLE PUBLISH)
+### ✅ 1 Nov ~17:40 UTC — SYNC PROOF before Alisa's test: tracing pad LIVE (Elena published; bundle `index-Bffg-7mE.js` has `Trazar` ×1, `Ahora dilo` ×1, `kids_classroom` ×1); live espaluz-chat guest class hello → HTTP 200, classUnit 1, trace `[a,e,i,o,u]` (guest = nothing saved). Repos ascent `e671aa7`, cto-aipa, Familybot `e9be76c`, WhatsApp `2248b7a` all ahead/behind 0/0. Oracle = git for all 10 bot files touched today (LF md5), familybot + whatsapp started 17:15:08, payments-webhook 15:43:10, all active. Trap: bot calls must send `telegram_user_id` as a STRING (a number → "Unauthorized" 500).
+### ✅ 1 Nov — web class mode: tablet TRACING PAD (ascent `e671aa7`)
 - **DONE:** espaluz-chat returns `trace` (the class unit's 3-5 letters/syllables/words, Cambridge path order) in class mode; `src/components/kids/TracePad.tsx` = finger tracing over a big grey dotted letter (coverage ≥ 60 % on a 6-px grid, a scribble over the whole pad does not count, nothing stored); "✏️ Trazar" button in `/classroom` class mode → on success the turn `✏️ Tracé "X"` goes to the heroes (+1 star) and Pere/Titi ask her to SAY it (Elena: expression first, one step at a time — "Next" opens only after this one is traced).
-- **NEXT:** Elena publishes (lovable.dev/projects/3b682175-09ab-40e0-997e-64596f70a6ea) → verify bundle has `Trazar` + brain answers with `trace` → Alisa tries on the tablet. Then: Phase 5 archive, bots' anon key → bot secret, parent linking.
+- **NEXT:** Alisa tries (tablet or Android phone + pen). Then: Phase 5 archive, bots' anon key → bot secret, parent linking.
 - **VERIFIED BY:** tsc 0 / eslint 0 / brain esbuild parse ok / vite build ok. NOT yet seen live or traced by a finger.
 - **RISK:** coverage thresholds are a first guess; tune from Alisa's test.
 
