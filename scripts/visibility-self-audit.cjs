@@ -42,6 +42,10 @@ const DEFAULT_TARGETS = [
   { url: 'https://aideazz.xyz/atlas', enforce: true },
   { url: 'https://aideazz.xyz/atlas/finder', enforce: true },
   { url: 'https://atuona.xyz', enforce: false },
+  // EspaLuz (1 Nov 2026): the shop-window page is enforced like the money pages; the Lovable app itself is a JS-only
+  // shell (60/C, 8 crawler-visible words on first audit) and is tracked report-only until its own head is fixed.
+  { url: 'https://aideazz.xyz/espaluz', enforce: true },
+  { url: 'https://espaluz-ai-language-tutor.lovable.app/', enforce: false },
 ];
 
 const PASS_SCORE = 70; // grade B — our own properties must not slip below this
