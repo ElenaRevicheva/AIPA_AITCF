@@ -200,7 +200,7 @@ export function withEspaluzDoor(title: string, markdown: string): string {
   if (markdown.includes("aideazz.xyz/espaluz")) return markdown;
   const mentions = (markdown.match(/espaluz/gi) ?? []).length;
   if (!/espaluz/i.test(title) && mentions < 2) return markdown;
-  return `${markdown.trimEnd()}\n\n*EspaLuz is the AI Spanish & English tutor for families (web, WhatsApp, Telegram; 14 days free): [aideazz.xyz/espaluz](${ESPALUZ_DOOR})*\n`;
+  return `${markdown.trimEnd()}\n\n*EspaLuz: live your new country in Spanish. Confidence, belonging and independence for international families in Latin America (web, WhatsApp, Telegram; 14 days free): [aideazz.xyz/espaluz](${ESPALUZ_DOOR})*\n`;
 }
 
 /** Convert article title to URL-safe slug for aideazz.xyz/blog/{slug} canonical. */
