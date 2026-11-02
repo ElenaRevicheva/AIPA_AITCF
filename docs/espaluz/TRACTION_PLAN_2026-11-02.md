@@ -49,3 +49,19 @@ for expats in Panama. Those gatekeepers already have the families' trust and wan
 ## Measure
 `scripts/espaluz-funnel-weekly.mjs` already reports visits → doors → payments per source every Monday. Add
 `utm_source=partner-<name>` and `utm_source=invite` to see which move brings families.
+
+## Make.com "What's new 2026" — what is usable (read 2 Nov, help.make.com/2026, 97 items Jan 9 – Oct 30)
+- **No new free audience channel.** No TikTok, Instagram, YouTube, Pinterest or Threads item in 2026. Facebook items are
+  Conversions API (paid-ads tracking) and Messenger format changes. Bluesky media posting (May 6) and LinkedIn Live
+  events (Aug 13) are the only new social pieces — Bluesky suits Elena's AI-builder brand, not parents.
+- **Usable, and her Core plan already has it** (license: `mcpVHosts: -1`, `makeAITools: 1`):
+  - **MCP toolboxes (Feb 10)** + **Claude built-in connector (Mar 24)** + **Make Skills (May 25)**: her scenarios become
+    tools an AI assistant can call. Claude Code could then post an EspaLuz reel or trigger a scenario directly, without
+    Elena, instead of only reading Make by API.
+  - **Maia (Aug 12, Oct 30)**: an AI co-worker inside Make that builds scenarios from a sentence — e.g. "when the
+    Influencer webhook fires, also post to my EspaLuz Facebook Page" — after Elena connects Facebook once.
+  - **Calendly modules (Aug 21)**: booking → CRM/Telegram for the $100 diagnostic calls of her AI Growth Operator service.
+  - **Make AI Agents with sub-agents and MCP (Feb 11, Jun 3, Jul 27, Oct 9)**: agent fallback connections match her
+    waterfall rule; useful later, not a traction channel by itself.
+- **Cost watch**: AI token pricing split input/output (Aug 25); OpenAI Sora/video modules retired (Sep 18); Gemini video
+  module changed (Oct 2) — video generation in Make costs credits; her X Premium Grok Imagine stays the free route.
