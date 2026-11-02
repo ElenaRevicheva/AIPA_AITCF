@@ -98,6 +98,9 @@ export const DEFAULT_PROMPTS = [
   'Who builds production AI agents for small businesses in Latin America?',
   'Fractional CTO who ships AI automation for early-stage startups',
   'Elena Revicheva AI portfolio',
+  // 2 Nov 2026: EspaLuz, asked the way a parent asks. Tracked against aideazz.xyz/espaluz (its shop window).
+  'What is a good AI app to help my child learn Spanish and English at home?',
+  'AI Spanish tutor for expat families moving to Panama',
 ];
 
 const FETCH_TIMEOUT_MS = 45_000;
@@ -126,7 +129,7 @@ const trackedDomain = (): string => (process.env.CITATION_DOMAIN || 'aideazz.xyz
  * Comma-separated so a page can be added without a code change.
  */
 const primaryPaths = (): string[] =>
-  (process.env.CITATION_PRIMARY_PATH || '/portfolio,/api,/ai-ops-wiki.html')
+  (process.env.CITATION_PRIMARY_PATH || '/portfolio,/api,/ai-ops-wiki.html,/espaluz')
     .split(',')
     .map((p) => p.trim().toLowerCase())
     .filter(Boolean);
@@ -134,7 +137,7 @@ const primaryPaths = (): string[] =>
 const primaryPath = (): string => primaryPaths().join(', ');
 
 /** Brand strings an engine may name without linking. Mention without a link is still signal. */
-const brandPattern = (): RegExp => new RegExp(`\\bAIdeazz\\b|${escapeRegex(trackedDomain())}|\\bElena\\s+Revicheva\\b`, 'i');
+const brandPattern = (): RegExp => new RegExp(`\\bAIdeazz\\b|\\bEspaLuz\\b|${escapeRegex(trackedDomain())}|\\bElena\\s+Revicheva\\b`, 'i');
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

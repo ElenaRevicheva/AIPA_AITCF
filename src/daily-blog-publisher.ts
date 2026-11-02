@@ -190,6 +190,19 @@ export function dailyBlogDevToOnly(): boolean {
   return false;
 }
 
+/**
+ * 2 Nov 2026 (Elena: one funnel, without re-aiming the other products): an article that is ABOUT
+ * EspaLuz ends with the one door families use. Deterministic, appended after the quality gates, and
+ * a no-op for every other article. "About" = named in the title or at least twice in the body.
+ */
+export const ESPALUZ_DOOR = "https://aideazz.xyz/espaluz?utm_source=blog";
+export function withEspaluzDoor(title: string, markdown: string): string {
+  if (markdown.includes("aideazz.xyz/espaluz")) return markdown;
+  const mentions = (markdown.match(/espaluz/gi) ?? []).length;
+  if (!/espaluz/i.test(title) && mentions < 2) return markdown;
+  return `${markdown.trimEnd()}\n\n*EspaLuz is the AI Spanish & English tutor for families (web, WhatsApp, Telegram; 14 days free): [aideazz.xyz/espaluz](${ESPALUZ_DOOR})*\n`;
+}
+
 /** Convert article title to URL-safe slug for aideazz.xyz/blog/{slug} canonical. */
 function titleToSlug(title: string): string {
   return title
@@ -1607,6 +1620,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   }
 
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
+  parsed.markdown = withEspaluzDoor(finalTitle, parsed.markdown);
 
   // Own site FIRST (13 Oct 2026): the article is recorded and shipped to aideazz.xyz before Dev.to
   // is tried. Until then a Dev.to failure threw here and silenced the site for 11–13 Oct.
