@@ -4555,5 +4555,261 @@
     ],
     "emailDraft": "docs/selling/drafts/bayne-consulting-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/bayne-consulting-atlas-fu.txt"
+  },
+  "tamarindo-real-estate-atlas": {
+    "company": "Tamarindo Real Estate",
+    "email": "info@tamarindorealestate.com",
+    "score": 94,
+    "dealId": "67332151374",
+    "phone": "50688006070",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/tamarindo-real-estate-atlas-email.txt",
+    "draft": "docs/selling/drafts/tamarindo-real-estate-atlas.txt"
+  },
+  "tamarindo-real-estate-atlas-fu": {
+    "company": "Tamarindo Real Estate",
+    "email": "info@tamarindorealestate.com",
+    "score": 94,
+    "dealId": "67332151374",
+    "phone": "50688006070",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/tamarindo-real-estate-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/tamarindo-real-estate-atlas-fu.txt"
+  },
+  "sol-realty-investment-consulting-atlas": {
+    "company": "Sol Realty & Investment Consulting",
+    "email": "prsinvestca@gmail.com",
+    "score": 97,
+    "dealId": "67333226660",
+    "phone": "50689183592",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/sol-realty-investment-consulting-atlas-email.txt",
+    "draft": "docs/selling/drafts/sol-realty-investment-consulting-atlas.txt"
+  },
+  "sol-realty-investment-consulting-atlas-fu": {
+    "company": "Sol Realty & Investment Consulting",
+    "email": "prsinvestca@gmail.com",
+    "score": 97,
+    "dealId": "67333226660",
+    "phone": "50689183592",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/sol-realty-investment-consulting-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/sol-realty-investment-consulting-atlas-fu.txt"
+  },
+  "josh-roistacher-real-estate-group-guanacaste-cos-atlas": {
+    "company": "Josh Roistacher Real Estate Group | Guanacaste, Costa Rica",
+    "email": "josh@jroistacherrealestate.com",
+    "score": 95,
+    "dealId": "67333180455",
+    "phone": "50670455967",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/josh-roistacher-real-estate-group-guanacaste-cos-atlas-email.txt",
+    "draft": "docs/selling/drafts/josh-roistacher-real-estate-group-guanacaste-cos-atlas.txt"
+  },
+  "josh-roistacher-real-estate-group-guanacaste-cos-atlas-fu": {
+    "company": "Josh Roistacher Real Estate Group | Guanacaste, Costa Rica",
+    "email": "josh@jroistacherrealestate.com",
+    "score": 95,
+    "dealId": "67333180455",
+    "phone": "50670455967",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/josh-roistacher-real-estate-group-guanacaste-cos-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/josh-roistacher-real-estate-group-guanacaste-cos-atlas-fu.txt"
+  },
+  "luxury-costa-rica-homes-atlas": {
+    "company": "Luxury Costa Rica Homes",
+    "email": "will@luxurycostaricahomes.com",
+    "score": 84,
+    "dealId": "67332155815",
+    "phone": "50688615362",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-costa-rica-homes-atlas-email.txt",
+    "draft": "docs/selling/drafts/luxury-costa-rica-homes-atlas.txt"
+  },
+  "luxury-costa-rica-homes-atlas-fu": {
+    "company": "Luxury Costa Rica Homes",
+    "email": "will@luxurycostaricahomes.com",
+    "score": 84,
+    "dealId": "67332155815",
+    "phone": "50688615362",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-costa-rica-homes-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/luxury-costa-rica-homes-atlas-fu.txt"
+  },
+  "casa-1537-atlas": {
+    "company": "Casa 1537",
+    "email": "info@casa1537.com",
+    "score": 78,
+    "dealId": "67327141793",
+    "phone": "573175785572",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/casa-1537-atlas-email.txt",
+    "draft": "docs/selling/drafts/casa-1537-atlas.txt"
+  },
+  "casa-1537-atlas-fu": {
+    "company": "Casa 1537",
+    "email": "info@casa1537.com",
+    "score": 78,
+    "dealId": "67327141793",
+    "phone": "573175785572",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/casa-1537-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/casa-1537-atlas-fu.txt"
+  },
+  "dventique-atlas": {
+    "company": "DVEntique",
+    "email": "info@dventique.com",
+    "score": 77,
+    "dealId": "67309623598",
+    "phone": "573216910181",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/dventique-atlas-email.txt",
+    "draft": "docs/selling/drafts/dventique-atlas.txt"
+  },
+  "dventique-atlas-fu": {
+    "company": "DVEntique",
+    "email": "info@dventique.com",
+    "score": 77,
+    "dealId": "67309623598",
+    "phone": "573216910181",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/dventique-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/dventique-atlas-fu.txt"
+  },
+  "casa-pestagua-atlas": {
+    "company": "Casa Pestagua",
+    "email": "reservas@casapestagua.com",
+    "score": 92,
+    "dealId": "67332170805",
+    "phone": "576056649510",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/casa-pestagua-atlas-email.txt",
+    "draft": "docs/selling/drafts/casa-pestagua-atlas.txt"
+  },
+  "casa-pestagua-atlas-fu": {
+    "company": "Casa Pestagua",
+    "email": "reservas@casapestagua.com",
+    "score": 92,
+    "dealId": "67332170805",
+    "phone": "576056649510",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/casa-pestagua-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/casa-pestagua-atlas-fu.txt"
+  },
+  "eliana-gonzalez-destination-events-atlas": {
+    "company": "Eliana Gonzalez Destination Events",
+    "email": "info@elianagonzalezevents.com",
+    "score": 75,
+    "dealId": "67314266641",
+    "phone": "573147991777",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas-email.txt",
+    "draft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas.txt"
+  },
+  "eliana-gonzalez-destination-events-atlas-fu": {
+    "company": "Eliana Gonzalez Destination Events",
+    "email": "info@elianagonzalezevents.com",
+    "score": 75,
+    "dealId": "67314266641",
+    "phone": "573147991777",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas-fu.txt"
   }
 }
