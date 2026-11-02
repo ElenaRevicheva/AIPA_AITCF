@@ -13,8 +13,12 @@ helps with today (doctor + voice interpreter, public office, school note photo, 
    (`aideazz.xyz/espaluz-classroom.jpg`) and animate it (prompt 7).
 6. Every post that uses these says: *"People in this video are AI-generated."* (honest, and Meta asks for it).
 
+## Brand direction (Elena, 2 Nov): a PREMIUM LIFESTYLE brand for international families building a life in Latin
+America — confidence, belonging, independence. Never a classroom, never a language-app look. Think editorial travel
+magazine: elegant, warm, aspirational and still real. Families are attractive, stylish and at ease, never posed stock.
+
 ## Shared style block (paste at the end of every prompt)
-> Photorealistic, shot on a full-frame cinema camera, 35mm lens, natural soft daylight, true-to-life skin texture
+> Editorial luxury lifestyle photography, refined and understated, photorealistic, shot on a full-frame cinema camera, 35mm lens, natural soft daylight, true-to-life skin texture
 > with pores and fine lines, real fabric, gentle film grain, shallow depth of field, warm tropical Latin American
 > color, calm documentary feel, no text, no logos, no watermarks.
 

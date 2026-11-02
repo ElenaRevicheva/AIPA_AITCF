@@ -45,6 +45,9 @@ const DEFAULT_TARGETS = [
   // EspaLuz (1 Nov 2026): the shop-window page is enforced like the money pages; the Lovable app itself is a JS-only
   // shell (60/C, 8 crawler-visible words on first audit) and is tracked report-only until its own head is fixed.
   { url: 'https://aideazz.xyz/espaluz', enforce: true },
+  // One page per country since 2 Nov 2026 (aideazz scripts/build-espaluz-countries.py); two enforced as the canaries.
+  { url: 'https://aideazz.xyz/espaluz/panama', enforce: true },
+  { url: 'https://aideazz.xyz/espaluz/mexico', enforce: true },
   { url: 'https://espaluz-ai-language-tutor.lovable.app/', enforce: false },
 ];
 
