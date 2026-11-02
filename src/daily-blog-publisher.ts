@@ -1156,7 +1156,7 @@ A: [answer]
 
 (continue for 3–5 total Q&A pairs)
 
-- End with: "— Elena Revicheva · [AIdeazz](https://aideazz.xyz) · [Portfolio](https://aideazz.xyz/portfolio)"
+- End with: "— Elena Revicheva · [AIdeazz AI Lab](https://aideazz.xyz/sop-ai-ops.html) · [Portfolio](https://aideazz.xyz/portfolio) · [Professional Outlook (PDF)](https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026.pdf)"
 - Output EXACTLY in this envelope (XML tags, no text outside):
 
 <TITLE>Your compelling title here (under 100 chars)</TITLE>
