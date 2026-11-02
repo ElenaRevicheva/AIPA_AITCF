@@ -56,3 +56,14 @@ Proposal (needs Elena's OK, channel by channel):
 2. Count arrivals: a tiny counter on the page (or the existing visibility-lead logger) so each channel's families show up.
 3. Weekly one-line report to Elena: visits per channel -> trials -> paid (the payment truth already knows paid).
 4. Then let the numbers decide which machine gets more of its daily output pointed at families.
+
+## Machine map — what changes, what never changes (1 Nov, explained to Elena before any change)
+| Machine | Today (measured) | Change = only the EspaLuz link/text | Never touched |
+|---|---|---|---|
+| EspaLuz Influencer (`~/EspaLuz_Influencer`) | 1 post/day: odd days EspaLuz, even days marketing engine / CTO milestone / GEO API; Telegram @EspaLuz + Make.com | odd-day EspaLuz CTA `wa.me/…` → `aideazz.xyz/espaluz?utm_source=influencer`; **fix stale "7 days FREE, $7.77/mo" → 14 days, $11** | even-day rotation, Make.com router, images, milestones |
+| LinkedIn CMO (VibeJobHunter `linkedin_cmo_v4.py`) | career / AIdeazz positioning; lists EspaLuz links among products | where it already names EspaLuz, the link → `/espaluz?utm_source=linkedin` | its topics, schedule, job-search focus |
+| Daily blog (cto-aipa) | engineering posts, all products | only posts ABOUT EspaLuz end with the `/espaluz?utm_source=blog` link | every other post |
+| Atlas / marketing engine (Mondays) | creative-angle board for media buying | nothing | everything |
+| GEO/AEO engine | `/espaluz` now 100/100, weekly audit | add parents' questions to the AI-citation check | all other properties |
+| New: arrival counter | none | one tiny log line per visit/button on `/espaluz` (source + button), weekly 1-line report | — |
+Open question for Elena: Influencer line ~753 is a first-person parent "story" — confirm it is a real family's words, else label it as an example.
