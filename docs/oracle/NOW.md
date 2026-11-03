@@ -137,7 +137,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-11-03 21:55 | EspaLuz WA: translation+emotion onto free chain; country whole-word match + phone prefix; Marina country reset | EspaLuzWhatsApp `espaluz_bridge.py`; Oracle `espaluz-whatsapp` restart; unified DB users row | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -266,6 +265,12 @@ git log keeps the record.
 ### ⏳ 3 Nov ~20:00 UTC — Leaply method inside EspaLuz (`docs/espaluz/LEAPLY_INSIDE_2026-11-03.md`; Elena sent getleaply.com/en/kds on 19 Oct)
 - **LIVE + verified:** kids-memory **v50** (read back): parent game +"Manos calientitas", +"Estatua y gelatina", `turn.unit` pass-through · grown-up one-minute reset in both bots (19:36 UTC, tested on the free chain) · Pere's calm turn (live probe turn 5: warm hands on the cheeks + three slow breaths ✅).
 - **Live probe FAILED → fixed in code, WAITS ON ONE MORE PUBLISH** (ascent HEAD): turn 4 the free model skipped Titi's brain break; a stuck "no sé" got "No te escuché bien". Now: ready bilingual break lines appended when a due break is missing; Titi's fresh idea (now ES/EN pairs) replaces a missed stuck switch; "no sé / sí / no / ok" are answers, never "not heard". After Publish: re-run the 3-case probe (turn 4 "Pausa de energía", turn 5 Pere calm, stuck → "¿Sabías que…?").
+
+### ✅ 3 Nov 21:44 UTC — EspaLuz WhatsApp: side steps on the free waterfall + country fix (WhatsApp `d4ec580`, LIVE)
+- **Found from a real user's replies:** the 26 Oct waterfall covered the MAIN reply only. `translate_to_es_en_only` + `analyze_emotional_intelligence_with_gpt5` were still OpenAI-only (retired gpt-4/3.5 → 404, gpt-5 no credit) → every message "ALL … MODELS FAILED", every mood "neutral". A +507 user was stored `current_country='argentina'` (keyword `che` matched as a SUBSTRING of "check"/"teacher") → Rioplatense slang ("che", "quilombo", "boluda").
+- **DONE:** both side steps → `_SIDE_STEP_ORDER` (gemini, groq, grok, openai) via `llm_chain`, one provider at a time, bad format/non-JSON → next. Country: LatAm/Spain phone prefix decides; keywords only for unknown/+1, whole words only (also `process_country_response`). That user's DB country reset → panama (1 row).
+- **VERIFIED BY:** isolated test on Oracle venv with real keys — RU question translated (via groq), furious msg → `frustrated`, +507 "check my teacher, che" → panama, +1 "check my teacher" → None (was argentina). Live md5 `91a016af` = commit (LF); restarted 21:43:47 > file 21:43:46; Flask on :8081, webhook GET 200, 0 tracebacks. Backup `~/_session-backups/espaluz_bridge.py.bak-20261103-waterfall`.
+- **NEXT / RISK:** (1) prove from the NEXT real WA message: no "ALL TRANSLATION MODELS FAILED", no "ALL EMOTIONAL ANALYSIS MODELS FAILED". (2) **Gemini returns HTTP 402 Payment Required** — first free provider is dead; groq carries it. (3) 3 other +507 users have a non-Panama `current_country` — NOT changed (could be real typed answers); Elena to decide. (4) Unrelated: "Unified memory error: cannot access local variable 'threading'" every turn; reply videos ~21 MB need compression.
 
 ### 📍 3 Nov ~19:00 UTC — EspaLuz STATE AUDIT (Elena pausing): **read `docs/espaluz/STATE_2026-11-03.md` first.** Proven vs live-unproven vs planned vs quit, each with its evidence. Headline: product used daily by ONE family (web classroom 62/98/25/39 turns 31 Oct–3 Nov; 25 parent reports); **0 new people in 30 days** on all channels; funnel 0 visits. Sync proved 3 Nov: 7 repos 0/0 (private repo on its own `docs` branch = origin/docs), 26 recently changed bot files Oracle = git (2 WhatsApp files differ only by CRLF), 4 services active. NEXT when she returns: one Lovable Publish → video autopilot samples (@AIdeazz) → funnel stages.
 
