@@ -5,8 +5,9 @@ research (`COMPANION_PLAN_2026-11-03.md`) and our own usage data. This sets what
 leads with. Nothing is rebuilt: existing features are re-ordered behind this pain.
 
 ## The pain, in plain words
-Families who live **real local life** in a Spanish-speaking country **without the luxury extras** — no private
-international school, no private clinic, no paid tutor or translator:
+Families who live **real local life** in a Spanish-speaking country **on an ordinary family budget** — they can live,
+but they cannot buy their way around the hard parts: no private international school, no private clinic, no paid tutor
+or translator:
 - **The child** goes to a local, Spanish-first school ("bilingual" on paper, Spanish in reality). Every day she has to keep
   up in Spanish, and the parent cannot teach her while working and running the house.
 - **The parent** has to live in Spanish herself: the public hospital, public offices, the school meeting, the neighbours.
