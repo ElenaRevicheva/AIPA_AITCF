@@ -255,5 +255,21 @@ check('"Датировано" hint grounded by Latin "datirovano"', v.hintWasSpo
 check('an invented hint with no column spoken → no hint (code picks the column)', v.groundListHint({ listNameHint: 'Cita' }, 'Kira Noviembre купить молоко').listNameHint === null);
 check('no column spoken → no hint', v.spokenColumn('Kira Noviembre cita con el dentista 28 de noviembre') === null);
 
+// ── 3 Nov 2026 — "Cancel Lavable Pro" came back family/red; "The color of this card to business" became an IDEA ──
+const LOV = 'Set a task in Kira noviembre. Датировано. Cita. Cancel. Lavable Pro. Put a date on 25 of November.';
+const FIX = "The color of this card to business. It's not family.";
+check('"Cancel Lavable Pro" (her 3 Nov note) family → business', v.groundCategory({ category: 'family', title: 'Cancel Lavable Pro' }, LOV).category === 'business');
+check('"Pay make.com" hobby → business', v.groundCategory({ category: 'hobby', title: 'Pay make.com' }, 'pay make.com').category === 'business');
+check('a real family task stays family', v.groundCategory({ category: 'family', title: 'Сходить с дочкой в парк' }, PARK).category === 'family');
+check('a health task is never touched', v.groundCategory({ category: 'health', title: 'Cita con Claude Aguilar' }, 'cita').category === 'health');
+check('her colour fix with no verb reaches the edit path', v.isManagementCommand(FIX));
+check('Spanish "el color de esta tarjeta a negocio" reaches it', v.isManagementCommand('El color de esta tarjeta a negocio'));
+check('Russian "цвет этой карточки бизнес" reaches it', v.isManagementCommand('Цвет этой карточки бизнес, не семья'));
+check('a plain new task without colour words still does not', !v.isManagementCommand(LOV));
+check('"It\'s not family" → business, not family', v.resolveSphere(null, FIX) === 'business');
+check('"не семья, а бизнес" → business', v.resolveSphere(null, 'Цвет: не семья, а бизнес') === 'business');
+check('"make it family" still family', v.resolveSphere(null, 'make it family') === 'family');
+check('"Cancel Lavable Pro" → "Cancel Lovable Pro"', v.repairNames('Cancel Lavable Pro') === 'Cancel Lovable Pro');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

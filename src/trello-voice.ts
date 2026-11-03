@@ -957,6 +957,22 @@ export function echo80(s: string | undefined): string {
   return chars.slice(0, 80).join('') + (chars.length > 80 ? '...' : '');
 }
 
+/**
+ * Her work tools and subscriptions are BUSINESS (3 Nov 2026). "Cancel Lavable Pro" — Lovable, misheard — came back
+ * family/red: nothing told the model that Lovable is what she builds EspaLuz with. A subscription to a tool she
+ * works with is a business cost whatever verb comes with it (pay, cancel, renew, upgrade). Spellings Whisper produces
+ * are included ("lavable", "make com").
+ */
+const WORK_TOOL_RE = /(?<![\p{L}])(lovable|lavable|lovabl|cursor|claude|anthropic|openai|chatgpt|make\.?\s?com|hubspot|supabase|replicate|runway|luma|elevenlabs|perplexity|groq|xai|grok|bright\s?data|4everland|resend|vercel|github|oracle cloud|oci|aws|zoho|buffer|dev\.to|speechmatics|minimax|deepseek|gemini|venice|trello premium|domain|dominio|домен|хостинг|hosting|api key|api credits?)(?![\p{L}])/iu;
+
+export function groundCategory(c: CardClassification, spoken: string): CardClassification {
+  if (c.category !== 'family' && c.category !== 'hobby') return c;
+  const hit = `${c.title ?? ''} ${spoken ?? ''}`.match(WORK_TOOL_RE);
+  if (!hit) return c;
+  console.log(`[TrelloVoice] category ${c.category} -> business: "${hit[1]}" is one of her work tools`);
+  return { ...c, category: 'business' };
+}
+
 function applyCategoryColor(c: CardClassification): CardClassification {
   const derived = CATEGORY_COLOR_MAP[c.category];
   if (!derived) return c;
@@ -1213,7 +1229,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
     const cleaned = text.replace(/```json|```/g, '').trim();
     const block = cleaned.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(block ? block[0] : cleaned) as CardClassification;
-    return applyCategoryColor(reconcileUrgency(groundListHint(groundDueDate(parsed, cleanedText), cleanedText)));
+    return applyCategoryColor(groundCategory(reconcileUrgency(groundListHint(groundDueDate(parsed, cleanedText), cleanedText)), cleanedText));
   } catch {
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] classify parse failed, using fallback. Raw:', text.slice(0, 400));
@@ -1282,6 +1298,8 @@ const HEARD_AS: [RegExp, string | ((...m: string[]) => string)][] = [
   [/\bespa\s*luz\b/gi, "EspaLuz"],
   [/\bvibe\s*job\b/gi, "VibeJob"],
   [/\ba\s*tuona\b/gi, "Atuona"],
+  // "Cancel Lavable Pro" (3 Nov 2026) — the tool she builds EspaLuz with; "lavable" is not an English word.
+  [/\b(?:lavable|lovabel)\b/gi, "Lovable"],
   [/\balg[oa]m\b/gi, "Algom"],
   // "Clean up golden rules of cloud agent memory" (29 Oct 2026) — she said Claude, Whisper wrote the weather word, and
   // it became the card's title. "cloud" is repaired ONLY in front of a Claude noun (agent, code, memory, desktop, app,
@@ -1803,9 +1821,20 @@ const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|arch
 // Russian "описани", so a typed or spoken edit in English or Spanish never reached the update path. Not "describe"
 // (a question) and not "attach" (a new task can say it): link requests reach the classifier via isLinkAttachRequest.
 
+/**
+ * A colour change with no verb (3 Nov 2026): "The color of this card to business. It's not family." — Whisper dropped
+ * "Change", MGMT_RE saw no verb, and the correction was saved as an IDEA. A colour/sphere word plus a sphere or colour
+ * name is an edit on its own.
+ */
+const COLOUR_WORD_RE = /(colou?r|цвет|сфер|sphere|esfera|label|etiqueta|метк)/iu;
+const SPHERE_NAME_RE = /(orange|naranja|оранж|business|negocio|бизнес|red|rojo|красн|family|familia|семь|purple|violet|morado|фиолет|spiritual|духов|green|verde|зелен|health|salud|здоров|lime|лайм|hobby|хобби)/iu;
+export function isColourChange(transcript: string): boolean {
+  return COLOUR_WORD_RE.test(transcript) && SPHERE_NAME_RE.test(transcript);
+}
+
 /** True when a transcript must go to the action classifier (move / archive / update) first. */
 export function isManagementCommand(transcript: string): boolean {
-  return MGMT_RE.test(transcript);
+  return MGMT_RE.test(transcript) || isColourChange(transcript);
 }
 
 // ── Links on cards (12 Oct 2026) ──────────────────────────────────────────────
@@ -1968,7 +1997,8 @@ export function resolveSphere(modelSphere: string | null | undefined, transcript
   const valid: CardCategory[] = ['family', 'business', 'spiritual', 'health', 'hobby'];
   const m = (modelSphere ?? '').toLowerCase().trim();
   if ((valid as string[]).includes(m)) return m as CardCategory;
-  const t = transcript.toLowerCase();
+  // "It's not family" names the sphere she is REMOVING — cut every "not X" before reading the sphere (3 Nov 2026).
+  const t = transcript.toLowerCase().replace(/(?<![\p{L}])(?:not|isn'?t|no es|no|не)\s+(?:es\s+|a\s+|an\s+)?\p{L}+/gu, ' ');
   if (!/(colou?r|цвет|сфер|sphere|esfera|make it|paint it|ponlo|hazlo|сделай)/.test(t)) return null;
   const words: Array<[CardCategory, RegExp]> = [
     ['business', /(orange|naranja|оранж|business|negocio|бизнес|работ)/],
@@ -2219,7 +2249,7 @@ export async function processMultiAction(
 ): Promise<{ handled: boolean; results: MultiActionItem[] }> {
   // A link request that names a card ("add this link to the dentist card …") must reach the classifier too.
   // 29 Oct 2026: "find the card about … and add there …" (no link, no move word) must reach it too.
-  if (!MGMT_RE.test(transcript) && !isLinkAttachRequest(transcript) && !isAddToCardRequest(transcript)) return { handled: false, results: [] };
+  if (!isManagementCommand(transcript) && !isLinkAttachRequest(transcript) && !isAddToCardRequest(transcript)) return { handled: false, results: [] };
 
   const classified = await classifyMultiAction(transcript);
   if (!classified.length) return { handled: false, results: [] };
