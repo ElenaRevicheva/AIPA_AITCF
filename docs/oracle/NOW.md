@@ -137,6 +137,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 3 Nov 16:40 | EspaLuz memory (fact writer WA+TG, WA history, web label) + kids variety + parent-report name | Familybot `main.py`; WhatsApp `espaluz_bridge.py`; ascent `espaluz-chat/index.ts`, `ChatWithEspaluz.tsx`; restarts espaluz-familybot, espaluz-whatsapp | a4e62d17 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
