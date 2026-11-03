@@ -137,6 +137,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-11-03 21:55 | EspaLuz WA: translation+emotion onto free chain; country whole-word match + phone prefix; Marina country reset | EspaLuzWhatsApp `espaluz_bridge.py`; Oracle `espaluz-whatsapp` restart; unified DB users row | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
