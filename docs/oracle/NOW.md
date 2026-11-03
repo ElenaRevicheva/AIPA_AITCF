@@ -137,7 +137,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 3 Nov 16:05 | espaluz-chat: parent-coaching bridge + Gemini 6 s wait | ascent `supabase/functions/espaluz-chat/index.ts`, edge fn deploy | 4d86b0a0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -260,6 +259,8 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 3 Nov ~16:25 UTC — Elena PUBLISHED: paint pad side palette LIVE (bundle `index-CWvEnQ92.js` has the vertical strips) + espaluz-chat **v271** = coaching bridge + Gemini 6 s wait (`e1940ef`). The app now lives at **app.espaluz.lat** (lovable.app 302 → there). Live probes from Oracle (guest, bot secret): Mamá-switch turn → "Mamá tiene una idea genial… Alisa, explícales…" ✅; coaching INSIDE the child clip → Mamá's words no longer taken as hers, but the warm bridge line was skipped (first-line rule won) → re-ordered in ascent `f4e1b32`, **WAITS ON NEXT PUBLISH**. Proof still to see: a real lesson log with a ≤10 s answer when Gemini is slow. Found: the parent report header is hardcoded "📒 Alisa's lesson" (`Familybot/main.py:3593`) — every family would get Alisa's name.
 
 ### ⏳ 3 Nov ~15:50 UTC — Alisa's web lesson 15:08–15:25 read from Supabase logs · paint pad palette moved · claim released
 - **Paint pad**: palette now a column RIGHT of the canvas on tablet/laptop (≥768 px), below on phones (ascent `9539ecb`, build ok, checked in headless Chrome at 1280×800 / 800×1280 / 390×844). **WAITS ON ELENA'S LOVABLE PUBLISH.**
