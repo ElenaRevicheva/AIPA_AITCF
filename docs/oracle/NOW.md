@@ -260,6 +260,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⏳ 3 Nov ~20:00 UTC — Leaply method inside EspaLuz (`docs/espaluz/LEAPLY_INSIDE_2026-11-03.md`; Elena sent getleaply.com/en/kds on 19 Oct)
+- **LIVE + verified:** kids-memory **v50** (read back): parent game +"Manos calientitas", +"Estatua y gelatina", `turn.unit` pass-through · grown-up one-minute reset in both bots (19:36 UTC, tested on the free chain) · Pere's calm turn (live probe turn 5: warm hands on the cheeks + three slow breaths ✅).
+- **Live probe FAILED → fixed in code, WAITS ON ONE MORE PUBLISH** (ascent HEAD): turn 4 the free model skipped Titi's brain break; a stuck "no sé" got "No te escuché bien". Now: ready bilingual break lines appended when a due break is missing; Titi's fresh idea (now ES/EN pairs) replaces a missed stuck switch; "no sé / sí / no / ok" are answers, never "not heard". After Publish: re-run the 3-case probe (turn 4 "Pausa de energía", turn 5 Pere calm, stuck → "¿Sabías que…?").
+
 ### 📍 3 Nov ~19:00 UTC — EspaLuz STATE AUDIT (Elena pausing): **read `docs/espaluz/STATE_2026-11-03.md` first.** Proven vs live-unproven vs planned vs quit, each with its evidence. Headline: product used daily by ONE family (web classroom 62/98/25/39 turns 31 Oct–3 Nov; 25 parent reports); **0 new people in 30 days** on all channels; funnel 0 visits. Sync proved 3 Nov: 7 repos 0/0 (private repo on its own `docs` branch = origin/docs), 26 recently changed bot files Oracle = git (2 WhatsApp files differ only by CRLF), 4 services active. NEXT when she returns: one Lovable Publish → video autopilot samples (@AIdeazz) → funnel stages.
 
 ### ⏳ 3 Nov ~18:45 UTC — Pere & Titi FRESH IDEAS (Elena: "switch the child off the glued, stale conversation"; "Titi is the battery") — pushed ascent, **WAITS ON LOVABLE PUBLISH** (same Publish carries `dea3fa7` class label)
