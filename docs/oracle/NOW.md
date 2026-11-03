@@ -260,6 +260,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 3 Nov ~20:15 UTC — after Elena's Publish: Leaply method VERIFIED LIVE (3-case probe on espaluz-chat): turn 4 → "Titi [jump]: ¡Pausa de energía, 20 segundos! Mano derecha a la rodilla izquierda…"; turn 5 → Pere warm hands + three slow breaths; stuck "no sé" → "¡Oye, oye! ¿Sabías que…? En Panamá, para que el bus pare, se grita «¡Parada!»". Header/footer logo: the 🇪🇸 emoji rendered as "ES" on Windows → EspaLuz globe icon (ascent HEAD, **waits on next Publish**; tab favicon was already the globe, live 200).
+
 ### ⏳ 3 Nov ~20:00 UTC — Leaply method inside EspaLuz (`docs/espaluz/LEAPLY_INSIDE_2026-11-03.md`; Elena sent getleaply.com/en/kds on 19 Oct)
 - **LIVE + verified:** kids-memory **v50** (read back): parent game +"Manos calientitas", +"Estatua y gelatina", `turn.unit` pass-through · grown-up one-minute reset in both bots (19:36 UTC, tested on the free chain) · Pere's calm turn (live probe turn 5: warm hands on the cheeks + three slow breaths ✅).
 - **Live probe FAILED → fixed in code, WAITS ON ONE MORE PUBLISH** (ascent HEAD): turn 4 the free model skipped Titi's brain break; a stuck "no sé" got "No te escuché bien". Now: ready bilingual break lines appended when a due break is missing; Titi's fresh idea (now ES/EN pairs) replaces a missed stuck switch; "no sé / sí / no / ok" are answers, never "not heard". After Publish: re-run the 3-case probe (turn 4 "Pausa de energía", turn 5 Pere calm, stuck → "¿Sabías que…?").
