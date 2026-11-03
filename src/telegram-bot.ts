@@ -4,6 +4,7 @@ dotenv.config({ override: true });
 import { Bot, Context, InputFile } from 'grammy';
 import { registerConciergeCallbacks } from './concierge';
 import { registerCommunityCallbacks } from './community-notify';
+import { registerPhotosToPdf } from './photos-to-pdf';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
@@ -824,6 +825,10 @@ export function initTelegramBot(): Bot | null {
   // collide with the concierge's cz:.
   registerCommunityCallbacks(bot);
 
+  // Photos to PDF (3 Nov 2026): while she is sending photos for one PDF they are pages, not questions, so this sits
+  // before the photo, document and chat handlers. Outside a collection it only answers "pdf" / "/pdf" said alone.
+  registerPhotosToPdf(bot);
+
   // ==========================================================================
   // COMMANDS
   // ==========================================================================
@@ -1041,6 +1046,7 @@ Type /menu for all commands! 🚀
         { cmd: '/ask', desc: 'Ask me anything', usage: '/ask How do I fix this error?' },
         { cmd: '🎤 Voice', desc: 'Send a voice message', usage: 'Just record and send! I transcribe and understand.' },
         { cmd: '📸 Photo', desc: 'Send a screenshot', usage: 'Send any image - I\'ll analyze it!' },
+        { cmd: '/pdf', desc: 'Many photos → one PDF (pages in the order sent)', usage: 'Say pdf, send the photos (30, 40, more), then say done / listo / готово' },
       ]
     },
   };
