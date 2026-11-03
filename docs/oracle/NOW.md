@@ -137,7 +137,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 3 Nov 16:40 | EspaLuz memory (fact writer WA+TG, WA history, web label) + kids variety + parent-report name | Familybot `main.py`; WhatsApp `espaluz_bridge.py`; ascent `espaluz-chat/index.ts`, `ChatWithEspaluz.tsx`; restarts espaluz-familybot, espaluz-whatsapp | a4e62d17 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -260,6 +259,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏸️ 3 Nov ~17:45 UTC — EspaLuz MEMORY + Pere/Titi variety + child's name: BUILT + PUSHED, **NOT DEPLOYED to Oracle** (the session's permission check refused the Oracle copy + restart; Elena decides)
+- **DONE (git only):** Familybot `6576edd` (main.py, espaluz_memory.py, espaluz_enhancements.py), WhatsApp `cb60e20` (espaluz_bridge.py, espaluz_memory.py, espaluz_enhancements.py), ascent `319e674` (espaluz-chat).
+  - Memory root cause (verified): no LangGraph anywhere; LangChain IS installed on Oracle (the old evaluation doc is stale); RAG saves/searches turns (30 saves logged, WA "5 recent turns retrieved"); `get_memory_context` READS user_memories into every reply — but the only WRITER was onboarding (13 rows, 7 tests). NEW `EspaLuzMemory.remember_facts()` = free chain (Claude excluded) notes 0-3 lasting facts per grown-up message, background thread, dedup, never IDs/phones; read-back 5 → 10. Tested on Oracle's chain: "Mateo (8) Colegio Balboa Monday / Clayton / Migración tomorrow" ✓, lesson question → NONE ✓, phone number skipped ✓.
+  - Kids (espaluz-chat): "¿Quién tiene razón?" ONCE per lesson enforced in code; 7 rotating tracing praises; fresh, specific questions; web grown-up chat memory (wrote `chat`, read `dashboard_chat`; history reversed). Rides the next **Lovable Publish** with `a336859` pages + `f4e1b32` coaching.
+  - Child's name: report/ritual/stars/hello used "Alisa" for every family → `_child_name()`; Elena's onboarding record stores the name as **"Daughter"** (age 5) so she will see "Your child" until that record says Alisa (not edited: customer-data file, needs her OK).
+- **NEXT:** live md5 = previous commit was VERIFIED MATCH for the 3 Familybot files at 17:40 → copy `git show HEAD:<f>` of the 6 bot files, backups `~/_session-backups/*bak-20261103-memory`, restart espaluz-familybot + espaluz-whatsapp; proof = `🧠 remembered N new fact(s)` in the logs after a grown-up message.
+- **RISK:** none live yet — Oracle still runs `5427a06` / `61dbd9e`.
 
 ### 🔎 3 Nov ~17:10 UTC — EspaLuz COMPANION plan (read-only research + measurements) + paint/trace content pushed
 - **Read `docs/espaluz/COMPANION_PLAN_2026-11-03.md`** (market mechanics with sources in `COMPANION_MECHANICS_2026-11-03.md`). Measured: adult replies 61% "¡Hola <name>", avg 1,229 chars, 70% push practice (prompts demand 1500-2000 chars + 10-15 emojis); kids 18.5% end "¿Quién tiene razón?"; web adult chat has NO memory (writes `chat`, reads `dashboard_chat`); WhatsApp sends the model only the new message. ⚠️ WhatsApp Business API bans general-purpose AI companions since 15 Jan 2026 → keep WA framed as language + relocation help. **NEXT = Elena's OK on Batch A.**
