@@ -13,8 +13,21 @@ English, no private clinic, no paid tutor or translator:
 - It is **not** "a new life in one year". It is years of rebuilding a life in a new language, and many people still feel
   like a foreigner long after they arrive. That gap is the pain nobody talks about.
 
-**Who:** working and modest-income families (any shape of family) in Panama first, then the other Spanish-speaking
-countries — not the wealthy expat with private everything.
+**Who:** families living **real life on real-life terms** — working parents, any shape of family, in Panama first and
+then the other Spanish-speaking countries. Not luxury and not "premium"; not charity either. People who use the local
+school and the public hospital and want their children to grow up with a strong education anyway.
+
+## The second half of the pain (founder, 3 Nov 2026)
+Parents whose child attends a local Spanish-first school fear that the child will **fall behind**: never really acquire
+English, never reach the level an international bilingual school gives. Meanwhile the parent works and runs the house,
+and the child's free time goes to cartoons instead of learning. So Pere & Titi are not entertainment: they are **real
+learning at international bilingual-school level**, at home, ten minutes a day, while the parent works.
+- This is already what the class path is built on (`KIDS_CLASS_PATH_1ST_GRADE_DRAFT.md`, espaluz-chat `KIDS_CLASS_UNITS`):
+  Cambridge Primary English and Mathematics Stage 1, Cambridge English Pre A1 Starters (ages ~6-8), the IB PYP language
+  strands, and first-grade Spanish reading by syllables as local schools teach it. Ages 6-8 first.
+- Allowed public wording: "built on the frameworks international bilingual schools use (Cambridge Primary, Cambridge
+  English Pre A1 Starters)". NOT allowed: "Cambridge certified / official / accredited", or any claim about the quality of
+  local schools.
 
 ## Why this pain (evidence)
 - It **repeats every day** (school), so it can carry retention. The once-only pains (one doctor visit, one form) end and
@@ -25,8 +38,9 @@ countries — not the wealthy expat with private everything.
   directions, local places and holidays, or "no app — it lives in WhatsApp".
 
 ## The promise (working copy, plain words)
-**EspaLuz walks the long road with your family.** Pere & Titi help your child keep up at a Spanish-first school, ten
-minutes a day, and you read what she learned in one minute. EspaLuz is your own friend for the public hospital, the
+**EspaLuz walks the long road with your family.** Pere & Titi give your child an international bilingual-school
+program in Spanish and English — real school skills, ten minutes a day, while you work — and you read what she learned
+in one minute. EspaLuz is your own friend for the public hospital, the
 school meeting and the office — in your words, at your pace, for as long as it takes.
 - Brand line stays: *"EspaLuz: live your new country in Spanish."* The **tone** is real life, warm and honest — not
   glossy or "premium lifestyle" (the 2 Nov visual style can stay; the words lead with this pain).
@@ -35,8 +49,9 @@ school meeting and the office — in your words, at your pace, for as long as it
 ## What changes (surgical, each needs the founder's go)
 1. **Companion rules** (bots + web twin): one line — understand the long road (never "you'll be fluent in no time");
    practical help points to PUBLIC and low-cost options first (public hospital, public school, Migración) before private ones.
-2. **Kids**: Pere & Titi already lead in Spanish; the class path is first grade (`KIDS_CLASS_PATH_1ST_GRADE_DRAFT.md`) —
-   add "today's school words" as a lesson start the parent can pick.
+2. **Kids**: make the learning visible — the parent report names the class unit and the skill practised (reading
+   syllables, numbers to 20, the English words of the unit), so the parent sees school progress, not just "she chatted".
+   "Today's school words" as a lesson start the parent can pick.
 3. **Promotion videos** (Make 6869112 autopilot): lead with the kid + the parent's real day — homework in Spanish, a note
    from the teacher, a visit to the public clinic — not tourist Spanish.
 4. **Measure the pain, don't guess it**: the friend rules already ask once "what is hardest for your family right now?";
