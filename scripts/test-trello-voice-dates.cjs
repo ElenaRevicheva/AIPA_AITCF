@@ -271,5 +271,25 @@ check('"не семья, а бизнес" → business', v.resolveSphere(null, '
 check('"make it family" still family', v.resolveSphere(null, 'make it family') === 'family');
 check('"Cancel Lavable Pro" → "Cancel Lovable Pro"', v.repairNames('Cancel Lavable Pro') === 'Cancel Lovable Pro');
 
+// ── 3 Nov 2026 — "make the agent learn that next time when I say change, it will not save it as an idea" ──
+check('cue words of her fix: behaviour only (no sphere, no verb)', JSON.stringify(v.cueWords(FIX)) === JSON.stringify(['color', 'card']));
+check('cue words drop dates, numbers and names', JSON.stringify(v.cueWords('Move the due of the Marshall card to 25 November tomorrow')) === JSON.stringify(['due', 'card']));
+check('"this card" points at a card', v.refersToCard('The due of this card to Friday') && v.refersToCard('esta tarjeta para mañana') && v.refersToCard('эту карточку на завтра'));
+check('"card games night" is not a pointer', !v.refersToCard('Idea: card games night with Alisa'));
+check('soft edit only while a card is fresh', v.isSoftEdit('The due of this card to Friday', true) && !v.isSoftEdit('The due of this card to Friday', false));
+const IDEA = 'The deadline to Friday, sorry';
+check('before learning: a verbless "deadline" note is not an edit', !v.isSoftEdit(IDEA, true) && !v.matchesLearnedCue('The deadline to Monday, sorry'));
+check('a one-word note is too thin to learn', v.learnEditCue('Friday please', 'button') === null);
+const cue = v.learnEditCue(IDEA, 'button');
+check('the idea that was an edit is learned as a cue', !!cue && JSON.stringify(cue.words) === JSON.stringify(['deadline', 'sorry']));
+const valued = v.learnEditCue('Deadline 28 sorry, wrong one', 'repeat');
+check('the cue keeps no value (digits masked, no date)', !!valued && !/\d/.test(valued.heard + valued.words.join(' ')));
+check('after learning: the same shape with another day IS an edit', v.matchesLearnedCue('The deadline to Monday, sorry') && v.isSoftEdit('the deadline to Monday, sorry', true));
+check('learning twice keeps one cue', v.learnEditCue(IDEA, 'repeat').ts === cue.ts);
+check('a cue never routes without a fresh card', !v.isSoftEdit('The deadline to Monday, sorry', false));
+check('an unrelated idea is not caught by the cue', !v.matchesLearnedCue('Idea: a podcast about Panama deadlines'));
+check('re-said as "Change the color of this card to business" = same request', v.sameRequest(FIX, 'Change the color of this card to business'));
+check('a different edit is not the same request', !v.sameRequest(FIX, 'Move the dentist card to Friday'));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

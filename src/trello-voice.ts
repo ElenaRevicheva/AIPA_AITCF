@@ -1837,6 +1837,78 @@ export function isManagementCommand(transcript: string): boolean {
   return MGMT_RE.test(transcript) || isColourChange(transcript);
 }
 
+// ── Learned edit cues (3 Nov 2026) ────────────────────────────────────────────
+// Elena: "make the agent learn that the next time when I say change, it will not save it as an idea." A verb Whisper
+// drops cannot be listed in advance, so the bot learns from its own misses: when something it saved as an IDEA turns
+// out to be an edit (she taps "✏️ It was an edit", or re-says it as an edit within minutes), the words of that message
+// become a cue, and the next message carrying them goes to the edit path while a card she just made is still fresh.
+// A cue holds BEHAVIOUR words only ("color", "card") — never a sphere, date, number or name — the 31 Oct rule.
+const EDIT_CUES_PATH = path.join(LEARN_DIR, 'trello-edit-cues.json');
+export interface EditCue { words: string[]; heard: string; ts: string; door: 'button' | 'repeat' }
+
+/** "this card", "esta tarjeta", "эту карточку": a message pointing at a card that exists is an edit, not an idea. */
+const CARD_REF_RE = /(?<![\p{L}])(?:this|that|the)\s+(?:card|task|one)(?![\p{L}])|(?<![\p{L}])(?:esta|esa|la)\s+(?:tarjeta|tarea)|(?<![\p{L}])(?:эт[уоа]|т[уо])\s+(?:карточк|задач)\p{L}*/iu;
+export function refersToCard(transcript: string): boolean {
+  return CARD_REF_RE.test(transcript);
+}
+
+const CUE_STOP = new Set(("the a an of to it its it's is are be this that these those and or but not no for on in at by with from my me "
+  + 'please just now also make set put el la los las de del al en es y o por para con esta este eso esa lo le se un una '
+  + 'и в во на не а но что это эта эту этой этот то та ту по к ко с со за из у о об мне мой моя пожалуйста').split(' '));
+// Whole words only, so "money", "maybe" or "domain" stay behaviour words.
+const CUE_VALUE_RE = /\d|^(?:january|february|march|april|may|june|july|august|september|october|november|december|monday|tuesday|wednesday|thursday|friday|saturday|sunday|today|tomorrow|tonight|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo|hoy|ma[nñ]ana|январ\p{L}*|феврал\p{L}*|март\p{L}*|апрел\p{L}*|ма[йя]|июн\p{L}*|июл\p{L}*|август\p{L}*|сентябр\p{L}*|октябр\p{L}*|ноябр\p{L}*|декабр\p{L}*|сегодня|завтра|понедельник\p{L}*|вторник\p{L}*|сред\p{L}|четверг\p{L}*|пятниц\p{L}*|суббот\p{L}*|воскресень\p{L}*)$/iu;
+const SPHERE_WORD_RE = new RegExp(`^${SPHERE_NAME_RE.source}`, 'iu');
+
+/** The behaviour words of a message: no stopwords, no sphere or colour names, no dates, numbers, names or edit verbs. */
+export function cueWords(transcript: string): string[] {
+  const text = String(transcript || '').normalize('NFC');
+  const out = new Set<string>();
+  for (const m of text.matchAll(/[\p{L}\p{N}'’]+/gu)) {
+    const raw = m[0];
+    const sentenceStart = /(^|[.!?]\s*)$/.test(text.slice(0, m.index ?? 0));
+    if (!sentenceStart && /^\p{Lu}/u.test(raw)) continue;  // a name ("Lovable", "Marshall") is a value, not a behaviour
+    const w = raw.toLowerCase().replace(/[’']s$/, '');
+    if (w.length < 3 || CUE_STOP.has(w) || CUE_VALUE_RE.test(w) || SPHERE_WORD_RE.test(w) || MGMT_RE.test(w)) continue;
+    out.add(w);
+  }
+  return [...out].slice(0, 6);
+}
+
+/** True when the message carries every word of a cue she taught (two words at least, so one common word never routes). */
+export function matchesLearnedCue(transcript: string, cues: EditCue[] = readJson<EditCue[]>(EDIT_CUES_PATH, [])): boolean {
+  const have = new Set(cueWords(transcript));
+  return cues.some((c) => c.words.length >= 2 && c.words.every((w) => have.has(w)));
+}
+
+/** Remember a message that was an edit although the bot saved it as an idea. Returns the cue, or null if too thin to learn. */
+export function learnEditCue(transcript: string, door: EditCue['door']): EditCue | null {
+  const words = cueWords(transcript);
+  if (words.length < 2) return null;
+  try {
+    const cues = readJson<EditCue[]>(EDIT_CUES_PATH, []);
+    const key = [...words].sort().join(' ');
+    if (cues.some((c) => [...c.words].sort().join(' ') === key)) return cues.find((c) => [...c.words].sort().join(' ') === key) ?? null;
+    const cue: EditCue = { words, heard: maskValues(transcript).slice(0, 200), ts: new Date().toISOString(), door };
+    writeJson(EDIT_CUES_PATH, [...cues, cue].slice(-60));
+    console.log(`[TrelloVoice/learn] edit cue learned via ${door}: ${words.join(' + ')}`);
+    return cue;
+  } catch (e) { console.warn('[TrelloVoice/learn] cue save failed:', (e as Error).message); return null; }
+}
+
+/** The same request said twice: the idea she re-says as an edit shares at least two behaviour words with it. */
+export function sameRequest(idea: string, edit: string): boolean {
+  const a = new Set(cueWords(idea));
+  return cueWords(edit).filter((w) => a.has(w)).length >= 2;
+}
+
+/**
+ * An edit with no verb (3 Nov 2026): only when a card she just made is fresh — a pointer at "this card", or a cue the bot
+ * learned from an idea that was really an edit. Without a fresh card there is nothing to edit, so it stays an idea.
+ */
+export function isSoftEdit(transcript: string, hasFreshCard: boolean): boolean {
+  return hasFreshCard && !isManagementCommand(transcript) && (refersToCard(transcript) || matchesLearnedCue(transcript));
+}
+
 // ── Links on cards (12 Oct 2026) ──────────────────────────────────────────────
 // Elena: "if I ask 'wire this link to the task' and then send a link, it should be put in the description."
 // That evening "Wire this link into this task …" was saved as an internal note and the Google Meet link for
@@ -2246,12 +2318,16 @@ export async function processMultiAction(
   transcript: string,
   recentCards: TrelloCard[] = [],
   source: 'voice' | 'text' = 'voice',
+  forceEdit = false,
 ): Promise<{ handled: boolean; results: MultiActionItem[] }> {
   // A link request that names a card ("add this link to the dentist card …") must reach the classifier too.
   // 29 Oct 2026: "find the card about … and add there …" (no link, no move word) must reach it too.
-  if (!isManagementCommand(transcript) && !isLinkAttachRequest(transcript) && !isAddToCardRequest(transcript)) return { handled: false, results: [] };
+  // 3 Nov 2026: a verbless edit of a fresh card ("this card", or a cue learned from an idea that was an edit), or her
+  // "✏️ It was an edit" tap (forceEdit). These only EDIT: a create the model reads into them is dropped.
+  const soft = forceEdit || isSoftEdit(transcript, recentCards.length > 0);
+  if (!soft && !isManagementCommand(transcript) && !isLinkAttachRequest(transcript) && !isAddToCardRequest(transcript)) return { handled: false, results: [] };
 
-  const classified = await classifyMultiAction(transcript);
+  const classified = (await classifyMultiAction(transcript)).filter((a) => !(soft && a.type === 'create'));
   if (!classified.length) return { handled: false, results: [] };
   // 27 Oct 2026: "Change the color in the card Prepare for Spanish exam … to family" came back as TWO updates —
   // the named card plus "__recent__" — so the card made just before ("Explore the hipodromo") turned red too.

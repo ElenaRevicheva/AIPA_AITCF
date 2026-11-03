@@ -101,6 +101,9 @@ import {
   sweepManualEdits,
   proposeRules,
   decideRule,
+  isSoftEdit,
+  learnEditCue,
+  sameRequest,
 } from './trello-voice';
 import { synthesizeBriefingMp3 } from './sprint-briefing/tts-openai';
 import {
@@ -237,6 +240,17 @@ interface LastTrelloSession {
 }
 const lastTrelloSession = new Map<number, LastTrelloSession>();
 const TRELLO_SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+// An idea saved while a card she made was still fresh (3 Nov 2026). If it was really an edit — she taps "✏️ It was an
+// edit", or says it again as an edit within 15 minutes — its words become a learned cue (learnEditCue), so the next
+// message like it goes to the card, not to the ideas.
+interface IdeaAfterCard { key: string; text: string; ts: number }
+const ideaAfterCard = new Map<number, IdeaAfterCard>();
+const IDEA_REPEAT_WINDOW_MS = 15 * 60 * 1000;
+
+function learnedReply(words: string[]): string {
+  return `📚 Learned: «${words.join(' + ')}» means editing the card you just made — next time it goes to the card, not to ideas.`;
+}
 
 /** The cards she made in the last 30 minutes — what "this task" / "it" refers to. */
 function freshTrelloCards(uid: number): TrelloCard[] {
@@ -398,14 +412,14 @@ async function answerFromMail(ctx: Context, request: string): Promise<boolean> {
 }
 
 async function routeToTrello(ctx: Context, text: string, source: 'voice' | 'text',
-    opts: { allowCreate?: boolean; savesToTasks?: boolean } = {}): Promise<boolean> {
-  const { allowCreate = true, savesToTasks = false } = opts;
+    opts: { allowCreate?: boolean; savesToTasks?: boolean; forceEdit?: boolean } = {}): Promise<boolean> {
+  const { allowCreate = true, savesToTasks = false, forceEdit = false } = opts;
   const uid = ctx.from?.id || 0;
   const recentCards = freshTrelloCards(uid);
   const tags = source === 'voice' ? 'voice,trello' : 'text,trello';
   const prefix = source === 'voice' ? 'Voice: ' : 'Text: ';
 
-  const multiResult = await processMultiAction(text, recentCards, source);
+  const multiResult = await processMultiAction(text, recentCards, source, forceEdit);
   if (multiResult.handled) {
     const newlyCreated = multiResult.results
       .filter(r => r.type === 'create' && r.success)
@@ -418,6 +432,14 @@ async function routeToTrello(ctx: Context, text: string, source: 'voice' | 'text
       if (s) s.ts = Date.now(); // a second correction to the same card still finds it
     }
     await replyMarkdownSafe(ctx, formatMultiActionReply(multiResult.results));
+    // She said again, as an edit, what the bot had just saved as an idea: that idea's words were an edit — learn them.
+    const idea = ideaAfterCard.get(uid);
+    if (idea && !forceEdit && Date.now() - idea.ts <= IDEA_REPEAT_WINDOW_MS
+        && multiResult.results.some(r => r.type === 'update' && r.success) && sameRequest(idea.text, text)) {
+      ideaAfterCard.delete(uid);
+      const cue = learnEditCue(idea.text, 'repeat');
+      if (cue) await ctx.reply(learnedReply(cue.words)).catch(() => {});
+    }
     // Save the note to knowledge_base so the Sprinter morning briefing picks it up
     const cardTitles = newlyCreated.map((c: { name?: string }) => c.name || '').filter(Boolean);
     saveKnowledge(uid, 'voice_note', text.substring(0, 100),
@@ -1295,6 +1317,26 @@ Or just ask me anything - I understand natural language!`;
     await ctx.answerCallbackQuery({ text: !r ? 'That rule no longer exists.' : r.status === 'approved' ? 'Learned ✅' : 'Dropped' });
     await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
     if (r) await ctx.reply(r.status === 'approved' ? `✅ Learned. From now on: ${r.text}` : '❌ Dropped — it will not be proposed again.');
+  });
+
+  // "✏️ It was an edit" under an idea (3 Nov 2026): apply it to the fresh card now, and learn its words for next time.
+  bot.callbackQuery(/^tvedit:/, async (ctx) => {
+    const uid = ctx.from?.id || 0;
+    const key = (ctx.callbackQuery?.data || '').slice('tvedit:'.length);
+    const idea = ideaAfterCard.get(uid);
+    await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    if (!idea || idea.key !== key) { await ctx.answerCallbackQuery({ text: 'That note is too old — say the change again.' }); return; }
+    ideaAfterCard.delete(uid);
+    if (!freshTrelloCards(uid).length) {
+      await ctx.answerCallbackQuery({ text: 'The card is older than 30 minutes — say which card.' });
+      return;
+    }
+    await ctx.answerCallbackQuery({ text: 'Editing the card…' });
+    const cue = learnEditCue(idea.text, 'button');
+    const done = await routeToTrello(ctx, idea.text, 'text', { allowCreate: false, forceEdit: true });
+    if (!done) await ctx.reply('⚠️ I could not read a change for the card from that note — say it once more with "change …".');
+    else if (cue) await ctx.reply(learnedReply(cue.words));
+    else await ctx.reply('✅ Applied. That note was too short to learn a pattern from, so say "change …" next time.');
   });
 
   bot.callbackQuery(/^rdrall:/, async (ctx) => {
@@ -7872,7 +7914,8 @@ Ready to commit? Use:
         // A task → Trello, like voice. Anything else reaches Trello only as an EDIT of a card made in the last
         // 30 minutes (never a new card), and a question never does: "Can you describe how the apply kit works?"
         // is answered, not filed.
-        const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '') || isAddToCardRequest(message || '');
+        const editLike = isManagementCommand(message || '') || isLinkAttachRequest(message || '') || isAddToCardRequest(message || '')
+          || isSoftEdit(message || '', true);  // freshness is checked just below
         if (textIntent.type === 'task') {
           if (await routeToTrello(ctx, message || '', 'text', { savesToTasks: true })) { syncContextToDb(textUid); return; }
         } else if (textIntent.type !== 'question' && freshTrelloCards(textUid).length > 0 && editLike) {
@@ -12129,7 +12172,14 @@ async function handlePersonalAIAction(
     case 'idea':
       const ideaId = await saveKnowledge(userId, 'idea', intent.title || text.substring(0, 100), text, intent.tags, intent.project, source);
       if (ideaId) {
-        await ctx.reply(`💡 *Idea saved!*\n\n"${(intent.title || text).substring(0, 100)}..."\n\n_Use /know to search your ideas_`, { parse_mode: 'Markdown' });
+        // A card she made is still fresh: this "idea" may be an edit of it whose verb got lost. One tap fixes and teaches.
+        const fresh = freshTrelloCards(userId);
+        const key = Date.now().toString(36);
+        if (fresh.length) ideaAfterCard.set(userId, { key, text, ts: Date.now() });
+        await ctx.reply(`💡 *Idea saved!*\n\n"${(intent.title || text).substring(0, 100)}..."\n\n_Use /know to search your ideas_`, {
+          parse_mode: 'Markdown',
+          ...(fresh.length ? { reply_markup: { inline_keyboard: [[{ text: `✏️ It was an edit of «${(fresh[0]?.name || 'the card').slice(0, 30)}»`, callback_data: `tvedit:${key}` }]] } } : {}),
+        });
         return true;
       }
       break;
