@@ -260,6 +260,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔎 3 Nov ~17:10 UTC — EspaLuz COMPANION plan (read-only research + measurements) + paint/trace content pushed
+- **Read `docs/espaluz/COMPANION_PLAN_2026-11-03.md`** (market mechanics with sources in `COMPANION_MECHANICS_2026-11-03.md`). Measured: adult replies 61% "¡Hola <name>", avg 1,229 chars, 70% push practice (prompts demand 1500-2000 chars + 10-15 emojis); kids 18.5% end "¿Quién tiene razón?"; web adult chat has NO memory (writes `chat`, reads `dashboard_chat`); WhatsApp sends the model only the new message. ⚠️ WhatsApp Business API bans general-purpose AI companions since 15 Jan 2026 → keep WA framed as language + relocation help. **NEXT = Elena's OK on Batch A.**
+- ascent `a336859` (WAITS ON PUBLISH): 17 new coloring pages (Panama sea/rainforest set, iguana, Boquete orchid + bridge, unicorn/dinosaur/rainbow/castle, our own generic heroes — no studio characters) + 16 more tracing phrase pairs. Rides the same Publish as the coaching re-order `f4e1b32`.
+
 ### ✅ 3 Nov ~16:25 UTC — Elena PUBLISHED: paint pad side palette LIVE (bundle `index-CWvEnQ92.js` has the vertical strips) + espaluz-chat **v271** = coaching bridge + Gemini 6 s wait (`e1940ef`). The app now lives at **app.espaluz.lat** (lovable.app 302 → there). Live probes from Oracle (guest, bot secret): Mamá-switch turn → "Mamá tiene una idea genial… Alisa, explícales…" ✅; coaching INSIDE the child clip → Mamá's words no longer taken as hers, but the warm bridge line was skipped (first-line rule won) → re-ordered in ascent `f4e1b32`, **WAITS ON NEXT PUBLISH**. Proof still to see: a real lesson log with a ≤10 s answer when Gemini is slow. Found: the parent report header is hardcoded "📒 Alisa's lesson" (`Familybot/main.py:3593`) — every family would get Alisa's name.
 
 ### ⏳ 3 Nov ~15:50 UTC — Alisa's web lesson 15:08–15:25 read from Supabase logs · paint pad palette moved · claim released
