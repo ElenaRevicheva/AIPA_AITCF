@@ -137,7 +137,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 3 Nov 15:40 | EspaLuz web paint pad: palette beside the canvas (Elena) | ascent `src/components/kids/PaintPad.tsx` | a3c202ef |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -260,6 +259,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ⏳ 3 Nov ~15:50 UTC — Alisa's web lesson 15:08–15:25 read from Supabase logs · paint pad palette moved · claim released
+- **Paint pad**: palette now a column RIGHT of the canvas on tablet/laptop (≥768 px), below on phones (ascent `9539ecb`, build ok, checked in headless Chrome at 1280×800 / 800×1280 / 390×844). **WAITS ON ELENA'S LOVABLE PUBLISH.**
+- **Hearing** (11 clips): Alisa's own sentences mostly right with child grammar ("Estoy pintando un río", "¡Es Titi razón!"); 1 silence phantom dropped correctly. The real break: **ONE clip holds BOTH voices** — 15:11 "¿Qué tú vas a pintar, Lisa? Habla con Pere y Titi … Voy a pintar un pájaro", 15:13 "…говори. Estai pintando…": Mamá's coaching + Alisa in one recording while the switch says child; `KIDS_ADULT` (`espaluz-chat:378`) does not match coaching phrases, so the heroes answer Mamá's words as hers. ("Detected family member: Elena" is the grown-up detector, cosmetic in kids mode.)
+- **Slowness**: 4 of 10 answers took 22–28 s — Gemini step waits the shared `PROVIDER_TIMEOUT_MS` 25 s ("Signal timed out") or 503 before Groq 429 → Grok answers. Claude = no credit.
+- **PROPOSED, not built (Elena's go)**: (1) mixed-clip line in espaluz-chat: coaching phrases / the child's name as a call / "habla con Pere y Titi" / "говори|скажи" → "Mamá is helping; answer only the child's part"; (2) Gemini timeout in the chat chain 25 s → ~6 s (own env `GEMINI_TIMEOUT_MS`). Both = espaluz-chat deploy via MCP, no Publish.
 
 ### ✅ 3 Nov ~14:20 UTC — **app.espaluz.lat LIVE** = the Lovable EspaLuz app (Elena paid Lovable Pro $1 first month; GoDaddy Domain Connect added `app` only → A 185.158.133.1). https 200, title "EspaLuz - AI Spanish Language Tutor", cert Google Trust Services WE1 to 1 Feb 2027 (auto-renew by Lovable). Root **espaluz.lat UNCHANGED**: 301 → `aideazz.xyz/espaluz?utm_source=espaluz-lat` (funnel + counter intact). Supabase Auth redirect list += `https://app.espaluz.lat/**` (9 URLs; Site URL untouched). Payment return URLs use `window.location.origin` (OK on any domain); no origin allowlist in functions. **Downgrade Lovable to free before 3 Dec** ($25/mo after): Trello 28 Nov + LAST DAY 1 Dec; per Lovable docs connected domains keep serving after downgrade — padlock check card 15 Jan 2027. Supabase org is on the FREE plan (her own account, not Lovable's).
 
