@@ -135,6 +135,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-03 15:10 | voice→Trello: learn when an "idea" was really an edit | src/trello-voice.ts, src/telegram-bot.ts, test-trello-voice-dates.cjs, pm2 cto-aipa | 73e65135 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
