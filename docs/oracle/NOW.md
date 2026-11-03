@@ -260,6 +260,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 3 Nov 17:12 UTC — EspaLuz grown-ups talk like a friend who remembers: companion rules LIVE (WA + Telegram), web waits on Publish
+- **Why (Elena's Pitz case insight, `docs/interview/PITZ_SITE_DEEP_DIVE_2026-10-22.md` + HubSpot study pack):** Pitz loses people where the bot does not know WHO it talks to (31% log in; 29% of fault chats → "give me a human"). EspaLuz, measured: 8 grown-up people ever in chat history, 2 left after message 1, first reply median 977 chars; our "ask for a human" is silence.
+- **LIVE:** `ESPALUZ_COMPANION_RULES` (Familybot `acbd804`, WhatsApp `91c8d8b`, same `espaluz_enhancements.py` md5 `0276e23a` in both): their length, greet once a day, ≤1 learning moment, ≤3 emojis, use memory like a friend, ask how a passed appointment went, progressive profiling (one light question at a time, never a form), practical help (drafts, phone scripts), never invent local facts; WhatsApp scope line (Business-API general-chatbot ban). Removed "1500-2000 characters", "10-15 emojis", "ALWAYS address them as", stock empathy opener. md5 Oracle = git ×6; familybot 17:12:05, whatsapp 17:12:32; 0 tracebacks; both load the rules (2,301 chars). Backups `*bak-20261103-companion`.
+- **VERIFIED BY:** A/B on the bots' free chain, 4 messages: median 1,739 → **201** chars; emojis 7-12 → 1; "hi" → "¡Hola! ¿Qué tal el día? ¿En qué te ayudo hoy? 😊"; returning parent → asks about remembered facts.
+- **FIXED (found by the A/B):** WhatsApp `llm_chain` has no `PROFILE_FALLBACK` → the fact writer deployed 16:35 silently saved nothing on WhatsApp until 17:12. Now an explicit free order.
+- **WAITS ON LOVABLE PUBLISH (one click):** ascent `f17cba4` web companion rules + `319e674` Pere/Titi variety + web chat memory + `a336859` pages/phrases + `f4e1b32` coaching.
+- **NEXT:** after a week, re-measure real replies (opener repetition, length, `🧠 remembered`, `🔍 RAG recalled`); then Batch C (streak + invite line in the parent report).
+
 ### ✅ 3 Nov ~16:45 UTC (Oracle clock) — EspaLuz MEMORY really works now: LangChain + RAG + facts, LIVE on Telegram + WhatsApp
 - **Root cause (measured, production DB):** no LangGraph anywhere; LangChain installed and working (last 5 turns); RAG held **588** embedded turns but its cut **0.55** was left over from the OpenAI embedding model — the free local model scores real recalls ~0.40 → RAG silently returned nothing; facts table had a reader and no writer (**13 rows, 7 tests**).
 - **LIVE:** Familybot `6576edd`+`9cd89e2`, WhatsApp `cb60e20`+`c579041` (`espaluz_rag.py` cut 0.38, user turns only, skips the LangChain window, `🔍 RAG recalled N`; `EspaLuzMemory.remember_facts()` free chain, background, `🧠 remembered N new fact(s)`; read-back 10; child's real name in report/ritual/stars/hello). md5 Oracle = git for all 6 files; familybot started 16:40:29, whatsapp 16:40:51, 0 tracebacks. Backups `~/_session-backups/*bak-20261103-memory` and `*bak-20261103-rag`.
