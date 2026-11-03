@@ -133,6 +133,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (fork) | 03 Nov 12:41 | Telegram photos to PDF | `src/telegram-bot.ts`, `scripts/photos-to-pdf.cjs`, `scripts/test-photos-to-pdf.cjs` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
