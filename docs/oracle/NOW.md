@@ -256,6 +256,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📌 3 Nov — REMIND ELENA (her ask): squeeze MAX value from Make.com. She KEEPS her paid Make plan (Core, 10,000 credits/mo, ~19% used this cycle). Once EspaLuz web app + WhatsApp + Telegram testing is DONE, Make becomes the promotion engine for the EspaLuz story (Pere & Titi, the web app) aimed at the right audience (families settling in LATAM). Raise it in sessions until that happens.
+
 ### 📝 2 Nov ~20:30 UTC — CONSULTING lead (Elena's call today): HubSpot deal `[CONSULTING] … @ …` in 🔥 I act TODAY with the questionnaire answers note + filled .docx attached + HIGH task. Files live ONLY in the PRIVATE repo (`aideazz-private-docs` main, `docs/01-career-applications/consulting/2026-11-02_*`) — the engagement will be under NDA, so NOTHING about it goes into this public repo or any public page. SENT 2 Nov 17:54 Panama via Resend (Cc Elena, arrival confirmed in her Gmail); deal moved to ⏳ Sent, task closed. Next move is theirs (reply lands in aipa@).
 
 ### ⏸️ 2 Nov ~15:40 UTC — PAUSE (Elena resting). SYNC PROVED: 14 deployed files Oracle = GitHub (LF md5), dist blog/citation = local build, all 7 local repos 0/0 (cto-aipa's 4 dirty files pre-date the session, untouched), 6 services active + cto-aipa online, crontab 42 lines, 14 backups in `~/_session-backups/*20261102*`, nginx unchanged. Make: 8 scenarios, 6868765 + 6869112 ON. **DECISION PARKED (Elena's, do NOT start alone):** after the web app testing ends, evaluate hosting for EspaLuz under espaluz.lat — options incl. 4everland decentralized (like aideazz.xyz; quota trap: see 29 Oct outage) vs. staying on Lovable; certificates; crypto payment option. Compare carefully first; reuse, no new bicycles.
