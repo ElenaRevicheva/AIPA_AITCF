@@ -74,3 +74,13 @@ Opens as a window that shows 1½ of 6 steps (content 1505 px in a 511 px box). *
 5. **Invite family** — ✓ on the first referral.
 Plan line only for trial users ("14 days left → keep EspaLuz $11"); hidden for paying families. When all 5 are ✓ the card
 collapses to one line. Market pattern: onboarding checklist that completes itself (activation), as Duolingo/Notion do.
+
+## Co-founder check on the family map (4 Nov, after building it on `design/violet-sun` a09515a)
+Funnel across ALL web accounts (aggregate, SQL): **9 accounts** · family set up 3 · classroom 1 · web chat 5 ·
+WhatsApp 1 · Telegram 2 · invite 5 · **active in last 30 days: 1** · **new in last 60 days: 1**.
+- The map is right as product design (it explains a 4-channel product and is the activation funnel), and it is built.
+- It cannot be judged on strangers yet: n = 1 active family. Its business value starts only when new families arrive.
+- A stranger still cannot create a free account on the web (inspection finding 2) — they never reach the map.
+- Adjustment for later: when 6/6 are done, keep it visible but slim (one row of ticked icons), so the top of the
+  dashboard goes to "Today" (the child's classroom card + the parent's chat), like Lingokids/Khan parent areas.
+- **Next highest-value step: the free sign-up path** (trial with no card), then the homepage trust fixes (1, 3, 4, 5).
