@@ -407,14 +407,37 @@ function robotsAllows(robotsTxt: string, crawler: string): boolean {
 
 export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult> {
   const url = normalizeUrl(inputUrl);
-  const origin = new URL(url).origin;
+  const inputOrigin = new URL(url).origin;
 
-  const [page, robots, llms, sitemap] = await Promise.all([
+  let [page, robots, llms, sitemap] = await Promise.all([
     fetchDoc(url),
-    fetchDoc(`${origin}/robots.txt`),
-    fetchDoc(`${origin}/llms.txt`),
-    fetchDoc(`${origin}/sitemap.xml`),
+    fetchDoc(`${inputOrigin}/robots.txt`),
+    fetchDoc(`${inputOrigin}/llms.txt`),
+    fetchDoc(`${inputOrigin}/sitemap.xml`),
   ]);
+
+  // The site files must belong to the same host as the page we grade. When the
+  // input redirects to another host (a forwarding domain such as espaluz.lat →
+  // aideazz.xyz/espaluz), every page check below reads the DESTINATION's HTML, and a
+  // crawler that follows the 301 indexes the destination under the destination's
+  // robots.txt. Reading the files from the forwarder instead scored one site's page
+  // against another site's (missing) files.
+  let origin = inputOrigin;
+  try {
+    if (page.url) {
+      const finalOrigin = new URL(page.url).origin;
+      if (finalOrigin !== inputOrigin) {
+        origin = finalOrigin;
+        [robots, llms, sitemap] = await Promise.all([
+          fetchDoc(`${origin}/robots.txt`),
+          fetchDoc(`${origin}/llms.txt`),
+          fetchDoc(`${origin}/sitemap.xml`),
+        ]);
+      }
+    }
+  } catch {
+    /* unparsable final URL — keep the input origin */
+  }
 
   // Only a genuine connection failure (DNS/timeout/refused) is unauditable.
   // Every real HTTP response — including 403 bot-blocks and empty JS-only shells —

@@ -49,6 +49,10 @@ const DEFAULT_TARGETS = [
   { url: 'https://aideazz.xyz/espaluz/panama', enforce: true },
   { url: 'https://aideazz.xyz/espaluz/mexico', enforce: true },
   { url: 'https://espaluz-ai-language-tutor.lovable.app/', enforce: false },
+  // 4 Nov 2026: the short domain on every EspaLuz caption (GoDaddy 301 → aideazz.xyz/espaluz) and the app itself.
+  // espaluz.lat scored 93 until the engine read site files from the redirect TARGET's host, not the forwarder's.
+  { url: 'https://espaluz.lat', enforce: true },
+  { url: 'https://app.espaluz.lat', enforce: true },
 ];
 
 const PASS_SCORE = 70; // grade B — our own properties must not slip below this
