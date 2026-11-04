@@ -17,6 +17,8 @@ destroying each other's work.
 
 **✅ 4 Nov ~20:00 UTC — EspaLuz web: violet+sun palette, always-visible family map, FREE SIGN-UP + password reset LIVE (ascent main `05cb022` = merge of `design/violet-sun`; Lovable published; also shipped f4d54df classroom best-of from another session).** Proof: live bundle has "Create my free account" / "Your EspaLuz map" / PASSWORD_RECOVERY; Elena signed-in dashboard shows "All 6 set up · 274 lessons…"; audit A+ 100. Start Free Trial / Get Started → /auth?mode=signup; email confirmation stays ON; trial fallback 14. NOT verified: a real stranger sign-up email arriving (Supabase SMTP unknown — check auth logs after the first signup) and the reset-link redirect allow-list (app-wide PASSWORD_RECOVERY catch added). Layer 2 (743 hardcoded colors) + dashboard stats one-source + homepage trust fixes still open: `docs/espaluz/REDESIGN_BRIEF_2026-11-04.md`.
 
+**✅ 4 Nov ~22:00 UTC — EspaLuz landing carries the APPROVED round-4 message (ascent `2f2ebdd`, published, EN+ES `hero4.*`).** For expat + digital-nomad families; "complements the local school"; "inspired by international bilingual schools"; long-term needs = school + doctor (no office paperwork, no 21-countries/interpreter selling points). Text of record: `docs/espaluz/MESSAGE_DRAFT_2026-11-04.md` (round 4). Live bundle checked; audit A+ 100. Still old: the crawler shell in ascent `index.html` (interpreter / 21 countries), lower landing sections, invented quotes + private bio further down.
+
 # PART 1 — THE PROTOCOL
 
 **💳 28 Oct — video wallets, read from each vendor API (Elena: no top-ups, use what is there). Probe = `scripts/_tmp-atuona-balances.cjs` pattern (dotenv from `~/cto-aipa`, prints balances only):**
