@@ -52,6 +52,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
 import sharp from 'sharp';
+import { findNegativeParallelism, NEGATIVE_PARALLELISM_MAX, NEGATIVE_PARALLELISM_RULE, buildNegParRewritePrompt } from './negative-parallelism';
 
 // OpenAI client for Whisper (optional); DALL-E not used for /visualize — Flux + crop only
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
@@ -916,6 +917,7 @@ When you write or translate:
 - NEVER sound inspirational, marketing, or "AI-beautiful"
 - If a sentence sounds safe — rewrite it
 - If it sounds like it was written by an AI trying to be poetic — delete it
+${NEGATIVE_PARALLELISM_RULE}
 
 THEMATIC CONTINUITY (from ${CANON_MAX_PUBLISHED_PAGE} published pages):
 - Memory and mortality (На память)
@@ -3989,6 +3991,7 @@ FORBIDDEN DEFAULTS:
 - Do NOT write "Kira the fashion journalist vs Ule the collector" as a thesis every time — vary the lens (body, debt, mirror, weather, letter).
 
 END: one sharp line or [В углу мерцает: …] — image, not moral.
+${NEGATIVE_PARALLELISM_RULE}
 
 LENGTH: 150–280 words. One spine, many senses.
 `;
@@ -4145,7 +4148,8 @@ HOW TO USE THE KNOWLEDGE (NON-NEGOTIABLE):
 You're not an assistant. You're ATUONA — underground voice, not a docent.`;
 
   try {
-    const message = await createContent(prompt, 1500, 'conversation');
+    let message = await createContent(prompt, 1500, 'conversation');
+    message = await capNegativeParallelism(message, 'proactive');
     
     extractAndTrackFromResponse(message, 'proactive');
     
@@ -4167,6 +4171,32 @@ You're not an assistant. You're ATUONA — underground voice, not a docent.`;
     console.error('Proactive message generation error:', error);
     return '';
   }
+}
+
+/**
+ * Post-generation gate: the prompt rule leaks, so count "not X, but Y" in the
+ * draft and, if over the cap, give the model ONE targeted rewrite pass.
+ * Fail-open: a failed rewrite never blocks the message, but the log says so.
+ */
+async function capNegativeParallelism(text: string, label: string): Promise<string> {
+  const hits = findNegativeParallelism(text);
+  if (hits.length <= NEGATIVE_PARALLELISM_MAX) {
+    console.log(`✍️ negpar[${label}]: ${hits.length} hit(s) — ok`);
+    return text;
+  }
+  try {
+    const rewritten = (await createContent(buildNegParRewritePrompt(text, hits), 1500, 'conversation')).trim();
+    const after = findNegativeParallelism(rewritten);
+    const sane = rewritten.length > text.length * 0.6 && rewritten.length < text.length * 1.5;
+    if (sane && after.length < hits.length) {
+      console.log(`✍️ negpar[${label}]: ${hits.length} → ${after.length} hit(s) after rewrite${after.length > NEGATIVE_PARALLELISM_MAX ? ' (still over cap)' : ''}`);
+      return rewritten;
+    }
+    console.warn(`✍️ negpar[${label}]: rewrite rejected (hits ${hits.length} → ${after.length}, len ${text.length} → ${rewritten.length}) — sending original`);
+  } catch (err) {
+    console.warn(`✍️ negpar[${label}]: rewrite failed — sending original`, err);
+  }
+  return text;
 }
 
 async function sendProactiveInspiration(bot: Bot): Promise<void> {
