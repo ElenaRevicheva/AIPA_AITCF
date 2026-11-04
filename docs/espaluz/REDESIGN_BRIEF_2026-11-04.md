@@ -53,3 +53,24 @@ Colors: violet frame (layer 1 tokens), sun only inside the kids card; Baloo head
 3. Rebuild the dashboard top as "Today" (classroom card + Your Spanish card).
 4. Layer 2 colors (743 hardcoded classes) on the screens touched.
 5. Signed-out homepage + free sign-up path (inspection findings 1–5).
+
+## Roadmap walkthrough (signed in, every button clicked, nothing saved) — `LearningRoadmap.tsx`
+Opens as a window that shows 1½ of 6 steps (content 1505 px in a 511 px box). **No step can ever show as done:**
+`completed` is never set, so a family with members, both bots connected and hundreds of sessions still sees 6 open steps.
+| # | Step | Button does | Verdict |
+|---|---|---|---|
+| 1 | Set Up Your Family | scrolls down, opens "Add Family Member" form (name, age, role, level, tone, ES/EN sliders, interests, name variants) | **works**, form is good |
+| 2 | Connect to Telegram Bot | `/connect-bot` — clean page, Telegram + WhatsApp both Active | **works**; title says Telegram only, WhatsApp is the main channel |
+| 3 | Start Your First Lesson | opens a 2nd window (1686 px in 543 px): Telegram "⭐ Most Popular" · Classroom · Dashboard Web Chat | window-in-window; "Most Popular" unverified (this account: web 664, WA 7, TG 7); web chat lists "rich text, file sharing" (generic); "progress syncs across both platforms" false on the dashboard (TG panel = July 2025) |
+| 4 | Pere and Titi's Classroom | `/classroom` | **works, best screen**; card claims true (weekly Panama story rotates in `espaluz-chat` `KIDS_STORIES[isoWeek]`) |
+| 5 | Track Your Progress | scrolls to "0 lessons · 0m · 0 streak · 0 words" | **lands on false numbers** |
+| 6 | Unlock Full Features | scrolls to "Plan Standard · Active!" — no button | **dead end** for paying users; promises "unlimited lessons, voice" that Standard already includes; Premium is "Coming soon" |
+
+### Proposed roadmap: a checklist card at the top of the dashboard (not a window), ticks itself from data
+1. **Add your child** — ✓ when a child family member exists.
+2. **First lesson with Pere & Titi** — ✓ when a classroom session exists → button "Open the classroom".
+3. **EspaLuz on your phone** — ✓ when WhatsApp or Telegram is connected (WhatsApp first).
+4. **Your first real-life moment** — doctor / public office / school note photo / interpreter → ✓ on the first parent chat.
+5. **Invite family** — ✓ on the first referral.
+Plan line only for trial users ("14 days left → keep EspaLuz $11"); hidden for paying families. When all 5 are ✓ the card
+collapses to one line. Market pattern: onboarding checklist that completes itself (activation), as Duolingo/Notion do.
