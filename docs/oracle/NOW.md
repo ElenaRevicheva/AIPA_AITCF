@@ -137,6 +137,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-11-03 23:20 | Deploy 3-model Groq walk to both EspaLuz bots + WA 22efee7 | Oracle `EspaLuzWhatsApp/{llm_chain,espaluz_bridge}.py`, `EspaLuzFamilybot/llm_chain.py`; restart espaluz-whatsapp + espaluz-familybot | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
