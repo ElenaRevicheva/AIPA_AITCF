@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EspaLuz — palette board (4 Nov 2026)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--ink:#1f1640;--violet:#6d28d9;--violet2:#7c3aed;--sun:#facc15;--cream:#fffbf2;--lav:#f3efff;--leaf:#15803d;--leaf2:#a7f3d0;--muted:#5b5675}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,sans-serif;line-height:1.5}
+  main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+  h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;line-height:1.15;margin:.2em 0}
+  h1{font-size:2rem} h2{font-size:1.4rem;margin-top:1.6em}
+  p.note{color:var(--muted);font-size:.92rem}
+  .row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #e9e3f5}
+  .name{font-weight:600;font-size:.95rem}.name small{display:block;color:var(--muted);font-weight:400}
+  .sw{display:flex;gap:6px;flex-wrap:wrap}
+  .s{width:74px;height:46px;border-radius:10px;display:flex;align-items:flex-end;justify-content:center;font-size:.62rem;padding-bottom:3px;border:1px solid rgba(0,0,0,.08)}
+  .bad{background:repeating-linear-gradient(45deg,#fff,#fff 6px,#fde2e2 6px,#fde2e2 12px)}
+  .mock{margin-top:12px;border-radius:22px;overflow:hidden;border:1px solid #e9e3f5;background:#fff}
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;padding:30px;background:var(--lav)}
+  .hero h3{font-size:2.1rem;margin:0 0 8px}
+  .hero p{color:var(--muted);margin:0 0 18px}
+  .btn{display:inline-block;border-radius:999px;padding:12px 22px;font-weight:600;text-decoration:none}
+  .b1{background:var(--violet);color:#fff}.b2{color:var(--violet);margin-left:10px}
+  .tablet{background:var(--ink);border-radius:20px;padding:12px;min-height:200px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+  .bub{background:#fff;border-radius:16px;padding:10px 14px;font-family:"Baloo 2";font-size:1.05rem;max-width:85%}
+  .bub.sun{background:var(--sun);align-self:flex-end}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:22px 30px}
+  .card{background:var(--cream);border-radius:16px;padding:14px;border:1px solid #efe8d8}
+  .card b{font-family:"Baloo 2";font-size:1.05rem}
+  .kids{background:var(--sun);padding:20px 30px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{background:#fff;border-radius:999px;padding:8px 16px;font-family:"Baloo 2";font-weight:700}
+  .chip.leaf{background:var(--leaf2)}
+  @media (max-width:640px){.hero{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>EspaLuz palette board</h1>
+  <p class="note">Colors measured on each live homepage on 4 Nov 2026 (Chrome, computed styles). Not edited into the app — for Elena's decision.</p>
+
+  <h2>What the leaders use</h2>
+  <div class="row"><div class="name">Lingokids<small>kids 2–8 · 78M families (self-reported)</small></div><div class="sw">
+    <div class="s" style="background:#341e60;color:#fff">#341e60</div><div class="s" style="background:#ff9500">#ff9500</div><div class="s" style="background:#f8f2e9">#f8f2e9</div><div class="s" style="background:#634bf5;color:#fff">#634bf5</div></div></div>
+  <div class="row"><div class="name">Novakid<small>kids, live + AI</small></div><div class="sw">
+    <div class="s" style="background:#4221b8;color:#fff">#4221b8</div><div class="s" style="background:#a2ffa6">#a2ffa6</div><div class="s" style="background:#c6d2ff">#c6d2ff</div><div class="s" style="background:#2c2a33;color:#fff">#2c2a33</div></div></div>
+  <div class="row"><div class="name">Buddy.ai<small>kids voice AI</small></div><div class="sw">
+    <div class="s" style="background:#e2faf5">#e2faf5</div><div class="s" style="background:#5827e7;color:#fff">#5827e7</div><div class="s" style="background:#ff73df">#ff73df</div><div class="s" style="background:#4eb7ff">#4eb7ff</div></div></div>
+  <div class="row"><div class="name">Khan Academy Kids<small>kids 2–8, free</small></div><div class="sw">
+    <div class="s" style="background:#ebf9ff">#ebf9ff</div><div class="s" style="background:#fff9d7">#fff9d7</div><div class="s" style="background:#0a2a66;color:#fff">#0a2a66</div></div></div>
+  <div class="row"><div class="name">Duolingo<small>everyone</small></div><div class="sw">
+    <div class="s" style="background:#58cc02">#58cc02</div><div class="s" style="background:#1cb0f6">#1cb0f6</div><div class="s" style="background:#ddf4ff">#ddf4ff</div><div class="s" style="background:#4b4b4b;color:#fff">#4b4b4b</div></div></div>
+  <div class="row"><div class="name">Speak<small>adults · $100M+ ARR</small></div><div class="sw">
+    <div class="s" style="background:#1c49ff;color:#fff">#1c49ff</div><div class="s" style="background:#12205a;color:#fff">#12205a</div><div class="s" style="background:#f5f5f5">#f5f5f5</div></div></div>
+  <div class="row"><div class="name">Praktika<small>adults, AI avatars</small></div><div class="sw">
+    <div class="s" style="background:#7429ff;color:#fff">#7429ff</div><div class="s" style="background:#e6d8ff">#e6d8ff</div><div class="s" style="background:#1c1c1c;color:#fff">#1c1c1c</div></div></div>
+
+  <h2>EspaLuz today</h2>
+  <div class="row"><div class="name">app.espaluz.lat<small>66 gradients · 15 text colors · 24 CTAs</small></div><div class="sw">
+    <div class="s" style="background:#ff5724;color:#fff">#ff5724 ✗3.2</div><div class="s" style="background:#a855f7;color:#fff">#a855f7 ✗4.0</div><div class="s" style="background:#0088cc;color:#fff">#0088cc</div><div class="s" style="background:#ea580c;color:#fff">#ea580c</div><div class="s" style="background:#16a34a;color:#fff">#16a34a</div><div class="s" style="background:linear-gradient(90deg,#f97316,#ec4899,#a855f7);color:#fff">gradient text</div></div></div>
+
+  <h2>Proposed: grown from the EspaLuz globe (violet sea, sun land)</h2>
+  <div class="row"><div class="name">Golden middle<small>calm frame for parents, color in the kids' world</small></div><div class="sw">
+    <div class="s" style="background:#1f1640;color:#fff">ink #1f1640</div><div class="s" style="background:#6d28d9;color:#fff">violet 7.1</div><div class="s" style="background:#facc15">sun 11.0</div><div class="s" style="background:#fffbf2">cream</div><div class="s" style="background:#f3efff">lavender</div><div class="s" style="background:#15803d;color:#fff">leaf 5.0</div><div class="s" style="background:#a7f3d0">leaf light</div></div></div>
+  <p class="note">Numbers = contrast ratio of the text color used on that swatch (WCAG AA needs 4.5).</p>
+
+  <h2>How it could feel (mock, not the app)</h2>
+  <div class="mock">
+    <div class="hero">
+      <div>
+        <h3>Live your new country in Spanish</h3>
+        <p>The doctor, public offices and the school gate — for you. Pere and Titi for the kids. 14 days free.</p>
+        <a class="btn b1" href="#">Start free</a><a class="btn b2" href="#">See how it works</a>
+      </div>
+      <div class="tablet">
+        <div class="bub">🦥 Pere: ¿Qué hay en tu foto?</div>
+        <div class="bub sun">Mi perro Max 🐶</div>
+        <div class="bub">🐒 Titi: ¡Hola, Max! ¿De qué color es?</div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card"><b>🏥 At the doctor</b><br>Voice interpreter: say it in English, hear it in Spanish.</div>
+      <div class="card"><b>🏛️ Public offices</b><br>The phrases for your country's paperwork.</div>
+      <div class="card"><b>🏫 School gate</b><br>Photo of the school note, explained.</div>
+    </div>
+    <div class="kids"><b style="font-family:'Baloo 2';font-size:1.2rem">Pere & Titi's classroom</b>
+      <span class="chip">🎤 Talk</span><span class="chip">✏️ Trace</span><span class="chip leaf">🎨 Paint</span><span class="chip">🎵 Música</span></div>
+  </div>
+</main>
+</body>
+</html>
