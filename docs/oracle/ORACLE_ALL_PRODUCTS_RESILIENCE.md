@@ -196,7 +196,7 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 | **Microsoft Edge voices return 403** | Free Edge TTS has returned 403 everywhere since 14 Oct (a Microsoft-side change). It used to be the fallback for slow or failed OpenAI voice | Voice now depends on OpenAI `tts-1`. When OpenAI is empty, OpenClaw and CTO AIPA reply in text only. EspaLuz uses gTTS and is unaffected |
 | **Credits** | Anthropic is **EMPTY**: fallbacks carry the load, the failing `test_provider_chain[claude]` eval is deliberate, and `/research_*` falls back to Perplexity `sonar-pro` (a searched, sourced report) when Claude fails on its first call (`b7ba3f73`, 15 Oct; Groq only summarises what tools already gathered). A 1-token probe on 19 Oct still returns *credit balance is too low* **(updated 19 Oct 2026)**. OpenAI ran out 11 Oct ~22:40 UTC (answering again 12 Oct ~11:19) and 15 Oct ~11:00 UTC (Elena topped it up ~11:35; probes 200). Bright Data was suspended 7 Oct (unpaid); Elena topped it up $10 on 12 Oct. X API credits were $0 on 7 Oct, so Algom posting is blocked. The Luma wallet was empty at the 22 Sep audit | Probe the provider with a 1-token call; a key existing proves nothing. Topping up is Elena's call |
 | **A zero that looks like a quiet day** | A suspended Bright Data account produced 180/180 empty searches, each logged `Done — new jobs: 0` | Grep the *result* line and compare it with yesterday's |
-| **PM2 boot unit** | `pm2-ubuntu.service` has been `failed (Result: protocol)` since 28 Jul, and the running daemon was started by hand (9 Oct classification) | After any reboot, check `pm2 list` and bring the apps back by hand |
+| **PM2 boot unit** | `pm2-ubuntu.service` was `failed (Result: protocol)` from 28 Jul (9 Oct classification). **(updated 4 Nov 2026)** After the 4 Nov force reboot it came up `active` and resurrected all 8 saved apps + logrotate by itself | After any reboot still check `pm2 list` against `~/.pm2/dump.pm2`; bring back by hand only what is missing |
 | **Health-check blind spots** | `~/check_oracle_health.sh` (repo copy = live copy) watches cto-aipa, the 4 EspaLuz units, vibejobhunter, vibejobhunter-web and dragontrade-main/dashboard. It does **not** watch `whitespace`, `serpapi-jobs`, `algom-stream`, `algom-poll`, `openclaw-gateway`, `aw-portal` or `n8n` | Check those by hand after any incident |
 | **Oracle checkouts that lag on purpose** | cto-aipa (Oracle-only Atlas commits), EspaLuz ×2 (customer data is untracked there), dragontrade | Never `git pull` / `reset` / `clean` / `stash drop` there. Never `deploy-product.sh PRODUCT=cto_aipa` |
 | **CRLF** | The laptop checks out CRLF (`core.autocrlf=true`); on 13 Oct a CRLF source put 146 CRs into a dist file | Build deploy files from LF (`git show origin/main:<f>`) and compare md5 after stripping CRs |
@@ -214,6 +214,31 @@ What it is now: mock interviews, a LIVE mode for real interviews, and a Spanish 
 - *Dependency pinning:* OpenClaw is held at 2026.2.14 because the runtime cannot move.
 - *Acknowledgement is not completion:* a *Done* log line, an accepted email and a key that exists each proved nothing on their own.
 
+
+## 🧠 Memory: the 4 Nov freeze and the containment now in place (4 November 2026)
+
+**What happened.** 16:24 UTC an ad-hoc ssh one-liner from Claude Code defined a shell function named `cut` whose body ran
+`| cut -f1` — the function called itself forever. `~/health.log`: RAM 29 % (16:20) → 43 % (16:25) → 90 % (16:30). At the kernel
+OOM report (17:47) the table held **1,914 `bash`** in one chain. 12 GB RAM, **no swap** → SSH "banner exchange" timeouts, every
+bot down **16:31 → 19:30**, cleared only by Elena's OCI console *Force reboot* (the console said "Running" throughout). Disk was
+55 % — the 9 Oct disk prevention held; it never covered memory.
+
+**Named failure modes:** *runaway process / unbounded recursion* → *resource exhaustion* (one session starved every service:
+*noisy neighbour*); *alarm with no listener* again — `health_monitor.sh` logged "High memory usage: 90 %" at 16:30 into a file
+nobody reads (the 9 Oct fix gave Telegram to the disk branch only = *fixing the incident, not the class*); *power state is not
+health* (console "Running" vs SSH dead).
+
+**Prevention now in place (re-runnable: `scripts/oracle-resilience/memory-prevention-apply.sh`):**
+| Piece | What it does | Proof (4 Nov) |
+|---|---|---|
+| `/etc/systemd/system/session-.scope.d/50-aideazz-cap.conf` | EVERY ssh/login session (agents, Cursor, Elena) capped: `MemoryMax=3G`, `MemorySwapMax=512M`, `TasksMax=1500`. Bots (system services), PM2, cron, OpenClaw (user@1001) are NOT in a session scope → untouched | deliberate runaway tests in a fresh session: fork loop stopped at **1,496** (`BlockingIOError`); memory hog killed at **3.4 GB**, exit 137, kernel `Memory cgroup out of memory: Killed process … (python3)` scoped to `session-78.scope`; all EspaLuz units + 8 PM2 apps stayed online |
+| No `MemoryHigh` | on purpose: with `MemoryHigh=2560M` the hog was only THROTTLED and hung at 2.8 GB holding the RAM | first test, 4 Nov |
+| `/swapfile` 4 GB + `/etc/fstab` + `vm.swappiness=10` (`/etc/sysctl.d/60-aideazz-swap.conf`) | cushion: the box slows instead of freezing; survives reboot | `swapon --show` = `/swapfile 4G`; disk 55 % → 64 % |
+| `~/health_monitor.sh` memory branch (repo `docs/oracle/health_monitor.sh`) | Telegram when RAM crosses 85 / 95 % up, 1 h reminder at 95 %+, "back below 70 %"; names the biggest program and the one with most copies. State `~/.mem_alert_level` | test copy (state in /tmp, text marked 🧪 TEST) delivered both the 96 % alert and the recovery (`ALERT DELIVERED`, Telegram ok:true). Two fake `MEM: 96 %`/`30 %` lines at 19:51:35 in `~/health.log` are that test |
+| **Agent rule** | never name a shell function after a real command; anything multi-line on Oracle goes in a script file; after ad-hoc jobs check `free -m` | memory `feedback_shell_function_shadowing_froze_oracle` |
+
+Live md5 = repo (CR stripped): `health_monitor.sh` 67347129, `memory-prevention-apply.sh` d2829907. Backups:
+`~/_session-backups/memguard-20261104/` (old health_monitor, fstab, crontab). The cap applies to NEW sessions only.
 
 ## 🟢 Disk: why the 28 Sep fix did not hold, the 9 Oct cleanup (98% → 47%), and prevention that reaches a human (8–9 October 2026)
 

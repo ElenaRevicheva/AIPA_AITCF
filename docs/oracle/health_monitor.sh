@@ -73,6 +73,33 @@ elif [ "$LEVEL" -lt "$PREV" ] && [ "$LEVEL" -gt 0 ]; then
   echo "$LEVEL $LAST_AT" > "$STATE"   # went down a band but not below 80%: re-arm the higher bands quietly
 fi
 
+# ---- Memory alarm (4 Nov 2026) ---------------------------------------------------------------------------------------
+# The memory WARNING above went only to ~/health.log, like the disk one before 9 Oct. On 4 Nov a runaway shell recursion
+# (1,914 bash) took RAM 29% -> 99% in 10 min; the log said "High memory usage: 90%" at 16:30 and nobody heard it; the box
+# froze 16:31 -> 19:30 (force reboot). Now: Telegram once when RAM crosses 85 / 95 % going UP, again every 1 h while it
+# stays at 95 %+, once when it is back below 70 %. The message names the program holding the most memory and the one
+# with the most copies, so the cause is visible from the phone. State in ~/.mem_alert_level (stored only after delivery).
+MEMSTATE=/home/ubuntu/.mem_alert_level
+MLEVEL=0
+[ "$MEM_PERCENT" -ge 85 ] && MLEVEL=85
+[ "$MEM_PERCENT" -ge 95 ] && MLEVEL=95
+read -r MPREV MLAST_AT 2>/dev/null < "$MEMSTATE"; MPREV=${MPREV:-0}; MLAST_AT=${MLAST_AT:-0}
+if [ "$MLEVEL" -gt 0 ] || [ "$MPREV" -gt 0 ]; then
+  MTOP=$(ps -eo rss=,comm= | awk '{s[$2]+=$1; c[$2]++} END{for(n in s) printf "%d %s %d\n", s[n]/1024, n, c[n]}' | sort -rn | head -1 | awk '{print $2" "$1" MB ("$3" copies)"}')
+  MMANY=$(ps -eo comm= | sort | uniq -c | sort -rn | head -1 | awk '{print $2" x"$1}')
+  MWHY="Most memory: ${MTOP}. Most copies: ${MMANY}. Runbook: docs/oracle/NOW.md (4 Nov freeze)."
+fi
+if [ "$MLEVEL" -gt "$MPREV" ]; then
+  tg "🧠 <b>Oracle memory ${MEM_PERCENT}% used</b> (${MEM_FREE} MB free) — crossed ${MLEVEL}%. At 100% every bot freezes. ${MWHY}" \
+    && echo "$MLEVEL $NOW" > "$MEMSTATE"
+elif [ "$MLEVEL" -ge 95 ] && [ $((NOW - MLAST_AT)) -ge 3600 ]; then
+  tg "🧠 <b>Oracle memory still ${MEM_PERCENT}% used</b> — 1 h reminder. ${MWHY}" && echo "$MLEVEL $NOW" > "$MEMSTATE"
+elif [ "$MEM_PERCENT" -lt 70 ] && [ "$MPREV" -gt 0 ]; then
+  tg "✅ Oracle memory back to ${MEM_PERCENT}% used." && echo "0 $NOW" > "$MEMSTATE"
+elif [ "$MLEVEL" -lt "$MPREV" ] && [ "$MLEVEL" -gt 0 ]; then
+  echo "$MLEVEL $MLAST_AT" > "$MEMSTATE"
+fi
+
 # ---- Mail watch heartbeat (27 Oct 2026) --------------------------------------------------------------------------------
 # The VJH detector reads Gmail + Zoho aipa@ for employer/client replies about hourly. A crashed service is restarted by
 # check_oracle_health.sh, but a process that is alive and no longer SCANNING would be silent. So: no "Scanning
