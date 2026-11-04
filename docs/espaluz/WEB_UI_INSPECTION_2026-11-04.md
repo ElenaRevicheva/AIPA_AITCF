@@ -39,6 +39,18 @@ Not seen: the signed-in classroom / chat with a real account (needs her session)
 - i18n is wired (`react-i18next`), so copy changes can land in one place per language.
 - Pricing already says "Real features, no promises we can't keep" for the Coming Soon list — the right tone.
 
+## Waiting on Elena: signed-in walkthrough (she signs in on the laptop Chrome herself)
+Elena, 4 Nov: "it looks like a vibe-coded Lovable website, exactly as last year — but the story and the features are
+different now." When she is back at the laptop and signed in at app.espaluz.lat, walk (look only, change nothing):
+1. Dashboard: what a real family sees first; which blocks are live features vs leftovers (avatar video upload,
+   generic modules, "Upgrade Now", 7-day badge).
+2. Chat: one real exchange — voice, photo, interpreter, country knowledge — vs what the page promises.
+3. Pere & Titi classroom: every mode (talk, trace, paint, Figuras, Música, gallery), tablet and phone size.
+4. Connect Telegram/WhatsApp, Invite family, account/subscription screens.
+5. Structure: map every screen to the 3 Nov pain decision (kids lead, parent's public-services help) and the
+   claims table → a keep / rewrite / remove list and a new page structure. Deliverable: a redesign brief in
+   `docs/espaluz/`, decided by Elena before any edit.
+
 ## Suggested order (not done — Elena decides)
 1 → 5 first (trust + the free-trial path), then 10 (phone layout, one CSS class), then 6–9 (copy to the claims
 table), then 11–15.
