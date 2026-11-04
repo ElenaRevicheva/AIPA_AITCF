@@ -1,0 +1,41 @@
+# EspaLuz message — revised with Elena (4 Nov 2026) — DRAFT, waiting for her approval
+
+Elena's edits to the 2–3 Nov message:
+- **Drop** "local expressions for 21 countries" and "a voice interpreter at the doctor or the school" as selling points —
+  people get those from ChatGPT. **Drop** "Pere and Titi for the kids" as a standalone benefit.
+- **Keep** "practical guides for how things work there" and "EspaLuz walks the long road with your family".
+- **Lead with the pain:** a parent on an ordinary family budget works (often online) and runs the house; the child needs
+  to be busy with real learning — not cartoons, not just "useful apps", not coloring silly figures — learning shaped like
+  an international bilingual school.
+- "Program" sounds heavy → "real school skills, **based on** what international bilingual schools teach".
+- "She" → "your child" (boy or girl).
+- "Your own friend" → "your companion on the go, growing with you".
+Allowed wording rule (3 Nov) still holds: "built on / based on the frameworks international bilingual schools use
+(Cambridge Primary, Cambridge English Pre A1 Starters)"; never "certified / official / accredited"; never "AI tutor",
+"fluent in no time", invented testimonials or user counts.
+
+## Brand line (unchanged)
+**EspaLuz: live your new country in Spanish.**
+
+## The promise (revised)
+**EspaLuz walks the long road with your family.**
+While you work and run the house, Pere & Titi give your child real school skills — based on what international
+bilingual schools teach, in Spanish and English — ten minutes a day. In one minute you read what your child learned.
+And for you, EspaLuz is your companion on the go, growing with you through public institutions, school meetings and
+office paperwork, with practical guides for how things work in your new country — in your words, at your pace, for as
+long as it takes.
+
+## Landing page — first screen (proposed)
+- **Headline:** Real school skills for your child, while you work and run the house
+- **Line under it:** Spanish and English, based on what international bilingual schools teach — ten minutes a day with
+  Pere & Titi. Not cartoons: real learning, and a one-minute report for you.
+- **Button:** Start free: 14 days, no card · quiet link: Not ready? Try 20 messages without an account
+
+## Three cards under it
+1. **For your child** — Real school skills in Spanish and English, based on international bilingual school frameworks.
+   Ten minutes a day, by voice, with Pere & Titi.
+2. **For you, in one minute** — After every lesson, a short report: what your child learned and one thing to do together.
+3. **For your new life** — Your companion on the go for public institutions, school meetings and office paperwork, with
+   practical guides for how things work in your country — at your pace.
+
+Price line: 14 days free, then $11 a month — on the web, WhatsApp and Telegram.
