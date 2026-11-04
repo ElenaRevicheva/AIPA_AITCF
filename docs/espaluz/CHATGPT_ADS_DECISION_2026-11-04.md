@@ -84,6 +84,21 @@ the page already gets for free and converts at 0. **The bottleneck is proven to 
 and "US Expats in Panama" (16,500+, Sep 2025 self-reported), plus town groups (Boquete, Coronado, El Valle).
 A parent asking "which school / how does my child cope in Spanish" there is the exact pain, at $0.
 
+## Can posting in groups be automated? (Elena, 4 Nov)
+- **Facebook groups: no API.** Meta removed the Groups API in Graph API v19 (announced 23 Jan 2024, removed from
+  all versions ~22 Apr 2024), including the `publish_to_groups` permission. A bot driving her logged-in profile
+  would break Meta's terms on automated access, and her profile also runs the EspaLuz Page + Make scenarios —
+  one ban costs all of it.
+- **Reddit:** the API can post, but `community-listen.cjs` deliberately never posts: Reddit bans domains for
+  automated self-promotion, and Reddit is a top source in AI answers.
+- **What works without her time:** the listener already finds threads and drafts replies to Telegram. It only
+  searches AI-business topics today. An EspaLuz query set (r/Panama, r/expats, r/IWantOut: "moving to Panama with
+  kids", "Spanish school child", "colegio en español") would hand her a ready answer; one tap = she posts it
+  (or approves Claude posting that one reply in her Chrome). Facebook groups: a weekly pass in her Chrome reads
+  the groups she belongs to, drafts answers to real parent questions, and posts only the ones she approves.
+- **Admin route:** many expat groups allow promotion on a set day or by admin permission — one message to each
+  admin, once.
+
 ## Decision
 **Not now.** Fix the page on free traffic first; launch only when free visits show door clicks
 (target ≥ 3 door clicks per ~57 visits). Then: a $100 **total-budget** test in Panama is now a reasonable experiment — but only with: total budget (not daily),
