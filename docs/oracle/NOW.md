@@ -19,6 +19,8 @@ destroying each other's work.
 
 **✅ 4 Nov ~22:00 UTC — EspaLuz landing carries the APPROVED round-4 message (ascent `2f2ebdd`, published, EN+ES `hero4.*`).** For expat + digital-nomad families; "complements the local school"; "inspired by international bilingual schools"; long-term needs = school + doctor (no office paperwork, no 21-countries/interpreter selling points). Text of record: `docs/espaluz/MESSAGE_DRAFT_2026-11-04.md` (round 4). Live bundle checked; audit A+ 100. Still old: the crawler shell in ascent `index.html` (interpreter / 21 countries), lower landing sections, invented quotes + private bio further down.
 
+**⏳ 4 Nov ~23:50 UTC — "About the creator" light polish on ascent main `f331db3`; Lovable has BUILT it but the Publish click was refused to Claude (auto-mode classifier: production deploy) — NEEDS ELENA: Lovable → Publish → "Publish changes".** Same story, 4 cards, palette tokens; QR now opens aideazz.xyz/portfolio (new `src/assets/portfolio-qr.png`); button "Professional outlook (PDF)" → EN PDF, ES page → `_ES.pdf` (checked on the local build in both languages); footer: founder link → PDF, "© 2026 EspaLuz by AIdeazz, Panama", brand line instead of "AI-powered tutoring". 🏛️ replaces 🇷🇺 (Windows renders flag emoji as letters). Next: `docs/espaluz/LANDING_SURGICAL_PLAN_2026-11-04.md` (Elena's new standard: functional like ChatGPT/Claude, modern formatting, palette visible, nothing rebuilt) — step 1 = invented quotes → Q&A + pricing word trim, waiting for her OK.
+
 # PART 1 — THE PROTOCOL
 
 **💳 28 Oct — video wallets, read from each vendor API (Elena: no top-ups, use what is there). Probe = `scripts/_tmp-atuona-balances.cjs` pattern (dotenv from `~/cto-aipa`, prints balances only):**
