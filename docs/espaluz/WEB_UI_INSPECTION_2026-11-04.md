@@ -13,6 +13,8 @@ Not seen: the signed-in classroom / chat with a real account (needs her session)
 | 4 | **Dashboard opens signed out** and greets "Hello, ! ✨" (empty name), shows "Sign Out", "Upgrade Now", a "Sign In Required" panel next to a working demo chat. | live `/dashboard` |
 | 5 | **Private biography on a public page:** "Relocated to Panama in 2022 as a single mother… elderly parents (ages 62 & 70)… Started with zero". Elena's rule (3 Nov): personal details stay private; public = one dignified line "built from my own family's experience". | live "About the Creator" |
 
+| 5b | **The domain move signed everyone out.** `espaluz-ai-language-tutor.lovable.app` now 302s to `app.espaluz.lat`; browser sessions (localStorage) and saved passwords belong to the old address, so every returning family meets a sign-in form — with no password reset (see 2). Found when Elena's own Chrome had no session on 4 Nov. | `curl -I`, Chrome localStorage empty |
+
 ## Severity 2 — wrong message (contradicts the 2–3 Nov positioning)
 | # | Finding | Evidence |
 |---|---|---|
