@@ -13,6 +13,8 @@ destroying each other's work.
 
 **✅ 4 Nov 17:00 UTC — app.espaluz.lat C 60 → A+ 100/100 live (own `visibility-self-audit.cjs`); Lovable critical closed.** ascent `a310a8d`: static true-today shell inside `#root` (React replaces it), JSON-LD, canonical, sitemap, llms.txt; published in Lovable. `fcc200e` + live migration `tighten_open_insert_policies`: feedback/waitlist forms still open with DB-enforced rules, audit-log forging blocked (proven as anon, rolled back). Lovable "Build unsuccessful" shows on EVERY GitHub commit incl. live ones - judge by `curl` of the live site, not that label. OPEN: 10 SECURITY DEFINER functions callable by anon (e.g. `get_user_subscription_status(uuid)`, `copy_avatar_file`) + storage policies not tied to owner (warning). Plans: `docs/espaluz/AUDIENCE_PLAN_2026-11-04.md`, `CHATGPT_ADS_DECISION_2026-11-04.md` (no ads yet; page converts 0/57).
 
+**🎨 4 Nov 18:00 UTC — EspaLuz web redesign, layer 1 on BRANCH `design/violet-sun` (ascent `606b54f`), NOT on main, NOT published.** Elena approved violet + sun (from the globe icon). Layer 1 = central tokens in `src/index.css` only (ink/cream/violet/sun, feature colors coral/leaf/sky/orchid, Baloo 2 headings). Layer 2 = 743 hardcoded Tailwind color classes. Merge only after Elena reviews on her laptop; merging is safe (one file). Research: `docs/espaluz/COMPETITOR_UI_RESEARCH_2026-11-04.md` + board `.html`; findings: `WEB_UI_INSPECTION_2026-11-04.md`.
+
 # PART 1 — THE PROTOCOL
 
 **💳 28 Oct — video wallets, read from each vendor API (Elena: no top-ups, use what is there). Probe = `scripts/_tmp-atuona-balances.cjs` pattern (dotenv from `~/cto-aipa`, prints balances only):**
