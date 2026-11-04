@@ -68,6 +68,22 @@ promoted is not recorded, so this is a warning, not proof).
 statistical ceiling 5.3% → 1.3–1.8 conversations; paying users ≈ 0. The ad would add ~33 visits to the 57 a week
 the page already gets for free and converts at 0. **The bottleneck is proven to be the page, not traffic.**
 
+## Other AI platforms — can EspaLuz buy ads there? (searched 4 Nov 2026)
+| Platform | Ads you can buy today? | Panama? | Source quality |
+|---|---|---|---|
+| **ChatGPT** | Yes, self-serve, $25/day min or total budget | **Yes (home country)** | OpenAI Help Center |
+| **Claude** | **No.** Anthropic pledged ad-free (4 Feb 2026, "Claude is a space to think"); not legally binding | — | primary + press |
+| **Perplexity** | **No.** Sponsored questions stopped (new advertisers Oct 2025; removed by Feb 2026); no plans to return | — | several secondary, consistent |
+| **Google AI Mode** (ads inside the AI answer) | Yes in the US + 10 countries (Oct 2026); Brazil/Mexico planned Q4; **not Panama** | No | Google announcement via press |
+| **Google AI Overviews** (ads above/below) | Yes, regular Google Ads, 200+ countries | **Yes** | Google help via press |
+| **Microsoft Copilot** | Pilot inside Microsoft Advertising, English, retail-first; not fully self-serve | Unconfirmed | secondary |
+| **Meta AI** | No ads inside the chat; Meta uses AI chats to target ads on Facebook/Instagram | (FB/IG ads: yes) | secondary |
+| **Grok / X** | Ads in Grok answers announced, not launched | — | secondary |
+
+**Where Panama expats actually ask, for free:** Facebook groups "Expats in Panama" (20,000+ members, 2026 guide)
+and "US Expats in Panama" (16,500+, Sep 2025 self-reported), plus town groups (Boquete, Coronado, El Valle).
+A parent asking "which school / how does my child cope in Spanish" there is the exact pain, at $0.
+
 ## Decision
 **Not now.** Fix the page on free traffic first; launch only when free visits show door clicks
 (target ≥ 3 door clicks per ~57 visits). Then: a $100 **total-budget** test in Panama is now a reasonable experiment — but only with: total budget (not daily),
