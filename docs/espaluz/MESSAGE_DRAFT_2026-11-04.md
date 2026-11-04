@@ -14,6 +14,41 @@ Allowed wording rule (3 Nov) still holds: "built on / based on the frameworks in
 (Cambridge Primary, Cambridge English Pre A1 Starters)"; never "certified / official / accredited"; never "AI tutor",
 "fluent in no time", invented testimonials or user counts.
 
+## Second round of edits (Elena, 4 Nov)
+- It must NOT sound like a replacement for school (a child kept at home): EspaLuz comes **alongside the local school**,
+  for the hours when the parent is busy working online and running the house.
+- Accent the audience: **expat and digital-nomad families** — parents who truly work online all day.
+
+## Brand line (unchanged)
+**EspaLuz: live your new country in Spanish.**
+
+## The promise (round 2)
+**EspaLuz walks the long road with your family.**
+Your child goes to the local school; EspaLuz adds to it. While you work online and run the house, Pere & Titi give your
+child ten minutes a day of extra school skills in Spanish and English — based on what international bilingual schools
+teach. In one minute you read what your child learned.
+And for you, EspaLuz is your companion on the go, growing with you through public institutions, school meetings and
+office paperwork, with practical guides for how things work in your new country — in your words, at your pace, for as
+long as it takes.
+
+## Landing page — first screen (round 2)
+- **Eyebrow:** For expat and digital-nomad families in Latin America
+- **Headline:** Extra school skills for your child, while you work online
+- **Line under it:** Alongside the local school: ten minutes a day of Spanish and English with Pere & Titi, based on what
+  international bilingual schools teach. Real learning instead of cartoons — and a one-minute report for you.
+- **Button:** Start free: 14 days, no card · quiet link: Not ready? Try 20 messages without an account
+
+## Three cards (round 2)
+1. **For your child, after school** — Ten minutes a day, by voice, with Pere & Titi: Spanish and English school skills
+   that add to what the local school teaches.
+2. **For you, in one minute** — After every lesson, a short report: what your child learned and one thing to do together.
+3. **For your new life** — Your companion on the go for public institutions, school meetings and office paperwork, with
+   practical guides for how things work in your country — at your pace.
+
+Price line: 14 days free, then $11 a month — on the web, WhatsApp and Telegram.
+
+---
+### Round 1 (superseded)
 ## Brand line (unchanged)
 **EspaLuz: live your new country in Spanish.**
 
