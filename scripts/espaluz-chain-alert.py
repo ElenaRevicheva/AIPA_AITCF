@@ -14,6 +14,7 @@ Two signals, both from machinery that already exists:
 One alert per kind per 3 h. Sends through the cto-aipa bot (TELEGRAM_BOT_TOKEN + CONCIERGE_TG_CHAT, the chat the daily
 concierge drill already alerts). Cron: */10, run with the WhatsApp venv:
   */10 * * * * /home/ubuntu/EspaLuzWhatsApp/venv/bin/python /home/ubuntu/cto-aipa/scripts/espaluz-chain-alert.py
+  3. LISTEN — every 30 min one short Spanish clip through the live web voice-to-text (added 4 Nov 2026).
 Flags: --dry (print, send nothing), --probe-now (probe regardless of the 30 min rhythm).
 """
 import json
@@ -106,6 +107,44 @@ def probe(state):
           "WhatsApp, Telegram or the web gets 'resting'.\n" + "\n".join(e[:110] for e in errors))
 
 
+STT_CLIP = os.path.join(HOME, "logs", "espaluz-stt-probe.webm")
+STT_URL = "https://euyidvolwqmzijkfrplh.supabase.co/functions/v1/voice-to-text"
+
+
+def probe_listening(state):
+    """4 Nov 2026 (Alisa's voice message got no answer at 13:04 UTC: Groq, Gemini and OpenAI all refused): every 30 min
+    one 3-second Spanish clip goes through the live web voice-to-text in its normal order. 'unavailable', an HTTP
+    error or an empty transcript of a known sentence = families cannot be heard right now."""
+    if "--probe-now" not in sys.argv and time.time() - state.get("stt_probed", 0) < PROBE_EVERY_S:
+        return
+    state["stt_probed"] = time.time()
+    if not os.path.exists(STT_CLIP):  # made once: gTTS (free) -> opus webm, like a browser recording
+        mp3 = STT_CLIP[:-5] + ".mp3"
+        subprocess.run([os.path.join(WA_DIR, "venv", "bin", "python"), "-c",
+                        f"from gtts import gTTS; gTTS('Hola Pere, estoy pintando un unicornio.', lang='es').save({mp3!r})"],
+                       check=True, timeout=60)
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", mp3, "-c:a", "libopus", STT_CLIP], check=True, timeout=60)
+    import base64
+    key = env(os.path.join(WA_DIR, ".env")).get("SUPABASE_ANON_KEY", "")
+    with open(STT_CLIP, "rb") as f:
+        body = json.dumps({"audio": base64.b64encode(f.read()).decode(), "speaker": "parent"}).encode()
+    req = urllib.request.Request(STT_URL, data=body, method="POST", headers={
+        "Content-Type": "application/json", "Authorization": f"Bearer {key}", "apikey": key})
+    try:
+        out = json.loads(urllib.request.urlopen(req, timeout=60).read() or b"{}")
+        problem = ("every listening service refused" if out.get("unavailable")
+                   else "" if "unicornio" in str(out.get("text", "")).lower()
+                   else f"wrong/empty transcript: {str(out.get('text'))[:80]!r}")
+    except Exception as e:  # noqa: BLE001
+        problem = f"call failed: {str(e)[:120]}"
+    if not problem:
+        print("listening probe ok")
+        return
+    alert(state, "probe:stt-down",
+          f"🙉 EspaLuz web classroom cannot HEAR right now ({problem}). Children's voice messages get 'Pere y Titi están "
+          f"descansando los oídos'. Check Groq audio limit / Gemini quota / OpenAI credits.")
+
+
 def main():
     os.makedirs(os.path.dirname(STATE), exist_ok=True)
     try:
@@ -122,6 +161,10 @@ def main():
         probe(state)
     except Exception as e:  # noqa: BLE001
         print(f"probe error: {e}")
+    try:
+        probe_listening(state)
+    except Exception as e:  # noqa: BLE001
+        print(f"listening probe error: {e}")
     if not DRY:
         with open(STATE, "w", encoding="utf-8") as f:
             json.dump(state, f)
