@@ -143,6 +143,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-04 19:40 | audit engine: site files from redirect target host (espaluz.lat 93→100) | `src/visibility-audit.ts`, `scripts/visibility-self-audit.cjs`, Oracle `dist/visibility-audit.js` + pm2 cto-aipa | (this claim) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
