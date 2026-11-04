@@ -11,6 +11,8 @@ destroying each other's work.
 
 ---
 
+**⏳ 4 Nov 19:50 UTC — espaluz.lat 93 → 100 in the audit ENGINE, on `main` (`463010b`), NOT YET ON ORACLE.** espaluz.lat is a GoDaddy forwarder (301 → aideazz.xyz/espaluz) that 404s every path; the engine graded the destination's page against the forwarder's missing robots/llms/sitemap. Fix: when the final URL is on another host, read the three files from that host. Local build: espaluz.lat / www / http all 100; full self-audit unchanged. Deploy = the ONE file `dist/visibility-audit.js` (LF md5 `05a69db059f9f4d166a9c74f6b7a8e56`); live md5 at 19:45 was `c9cc3ebb…` and differs only by this change. Copy + `pm2 restart cto-aipa --update-env` was refused by the permission check → waits on Elena's OK. Don't "fix" by pointing espaluz.lat DNS at Oracle.
+
 **✅ 4 Nov 17:00 UTC — app.espaluz.lat C 60 → A+ 100/100 live (own `visibility-self-audit.cjs`); Lovable critical closed.** ascent `a310a8d`: static true-today shell inside `#root` (React replaces it), JSON-LD, canonical, sitemap, llms.txt; published in Lovable. `fcc200e` + live migration `tighten_open_insert_policies`: feedback/waitlist forms still open with DB-enforced rules, audit-log forging blocked (proven as anon, rolled back). Lovable "Build unsuccessful" shows on EVERY GitHub commit incl. live ones - judge by `curl` of the live site, not that label. OPEN: 10 SECURITY DEFINER functions callable by anon (e.g. `get_user_subscription_status(uuid)`, `copy_avatar_file`) + storage policies not tied to owner (warning). Plans: `docs/espaluz/AUDIENCE_PLAN_2026-11-04.md`, `CHATGPT_ADS_DECISION_2026-11-04.md` (no ads yet; page converts 0/57).
 
 **🎨 4 Nov 18:00 UTC — EspaLuz web redesign, layer 1 on BRANCH `design/violet-sun` (ascent `606b54f`), NOT on main, NOT published.** Elena approved violet + sun (from the globe icon). Layer 1 = central tokens in `src/index.css` only (ink/cream/violet/sun, feature colors coral/leaf/sky/orchid, Baloo 2 headings). Layer 2 = 743 hardcoded Tailwind color classes. Merge only after Elena reviews on her laptop; merging is safe (one file). Research: `docs/espaluz/COMPETITOR_UI_RESEARCH_2026-11-04.md` + board `.html`; findings: `WEB_UI_INSPECTION_2026-11-04.md`.
@@ -143,7 +145,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-11-04 19:40 | audit engine: site files from redirect target host (espaluz.lat 93→100) | `src/visibility-audit.ts`, `scripts/visibility-self-audit.cjs`, Oracle `dist/visibility-audit.js` + pm2 cto-aipa | (this claim) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
