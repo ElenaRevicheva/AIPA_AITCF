@@ -99,6 +99,20 @@ A parent asking "which school / how does my child cope in Spanish" there is the 
 - **Admin route:** many expat groups allow promotion on a set day or by admin permission — one message to each
   admin, once.
 
+## Where the right families are (facts, 4 Nov)
+Two groups, two places:
+- **Already in Panama** (child in a Spanish-first school, parent in public offices): Facebook "Expats in Panama"
+  20,000+ and "US Expats in Panama" 16,500+ (guide / self-reported); r/Panama ~225k (GummySearch, stale; many
+  members are Panamanians); ChatGPT ads in Panama with context hints.
+- **Planning the move** (US/Canada/EU): r/IWantOut ~2.0M and r/expats ~250k (GummySearch, stale); YouTube
+  relocation videos ("moving to Panama with kids", Panama Relocation Tours, Relo Firm). Google Ads can place ads on
+  chosen YouTube videos/channels in any country (placement + custom segments) — ChatGPT cannot reach outside Panama.
+- **Who already holds both groups:** relocation firms and immigration lawyers — they publish "moving to Panama with
+  kids" guides and meet every family. Offer: free EspaLuz family pass for their clients.
+- **Not the audience:** LinkedIn 1 visit and Instagram 2 visits in 7 days, 0 doors.
+- No source gives the number of expat families with children in Panama — nobody can, so precision must come from
+  targeting the *question* (school, Spanish, kids, moving), not the platform.
+
 ## Decision
 **Not now.** Fix the page on free traffic first; launch only when free visits show door clicks
 (target ≥ 3 door clicks per ~57 visits). Then: a $100 **total-budget** test in Panama is now a reasonable experiment — but only with: total budget (not daily),
