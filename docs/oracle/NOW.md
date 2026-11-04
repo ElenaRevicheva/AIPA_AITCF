@@ -11,6 +11,8 @@ destroying each other's work.
 
 ---
 
+**✅ 4 Nov 17:00 UTC — app.espaluz.lat C 60 → A+ 100/100 live (own `visibility-self-audit.cjs`); Lovable critical closed.** ascent `a310a8d`: static true-today shell inside `#root` (React replaces it), JSON-LD, canonical, sitemap, llms.txt; published in Lovable. `fcc200e` + live migration `tighten_open_insert_policies`: feedback/waitlist forms still open with DB-enforced rules, audit-log forging blocked (proven as anon, rolled back). Lovable "Build unsuccessful" shows on EVERY GitHub commit incl. live ones - judge by `curl` of the live site, not that label. OPEN: 10 SECURITY DEFINER functions callable by anon (e.g. `get_user_subscription_status(uuid)`, `copy_avatar_file`) + storage policies not tied to owner (warning). Plans: `docs/espaluz/AUDIENCE_PLAN_2026-11-04.md`, `CHATGPT_ADS_DECISION_2026-11-04.md` (no ads yet; page converts 0/57).
+
 # PART 1 — THE PROTOCOL
 
 **💳 28 Oct — video wallets, read from each vendor API (Elena: no top-ups, use what is there). Probe = `scripts/_tmp-atuona-balances.cjs` pattern (dotenv from `~/cto-aipa`, prints balances only):**
@@ -139,7 +141,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-11-04 17:00 | app.espaluz.lat GEO/SEO 60 to 100 (static shell, no app logic) | ascent-saas-builder `index.html`, `public/sitemap.xml`, `public/llms.txt`, `public/robots.txt` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
