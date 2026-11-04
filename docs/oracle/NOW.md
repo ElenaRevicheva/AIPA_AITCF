@@ -268,7 +268,7 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-**4 Nov — Atuona negative-parallelism cap: on `main` (`baaac8ae`), NOT on Oracle yet.** Built + tested (`node scripts/test-negative-parallelism.cjs`, 7/7; the real 4 Nov daily = 4 hits). Live `dist/atuona-creative-ai.js` diffed against the build: only our lines differ, safe to copy. Deploy was blocked by the permission gate, waiting on Elena's OK. NEXT: scp `dist/negative-parallelism.js` + `dist/atuona-creative-ai.js`, md5 check, `pm2 restart cto-aipa --update-env`, `/dailyinspire`, grep `negpar[proactive]`.
+**4 Nov — Atuona negative-parallelism cap LIVE on Oracle (`baaac8ae`).** md5 local = git = Oracle for `src/`+`dist/` `atuona-creative-ai`, `negative-parallelism`, test script; `cto-aipa` restarted 20:25:54 UTC, after the file (20:25:44); detector test 7/7 on Oracle. Oracle's `src/atuona-creative-ai.ts` was older than main (no 30 Oct free-tier lines) — replaced, backup `*.bak-negpar-20261104`. OPEN: proof of OUTPUT = first `negpar[proactive]` log line on the next daily send (or Elena taps `/dailyinspire`).
 
 ### ✅ 3 Nov ~20:15 UTC — after Elena's Publish: Leaply method VERIFIED LIVE (3-case probe on espaluz-chat): turn 4 → "Titi [jump]: ¡Pausa de energía, 20 segundos! Mano derecha a la rodilla izquierda…"; turn 5 → Pere warm hands + three slow breaths; stuck "no sé" → "¡Oye, oye! ¿Sabías que…? En Panamá, para que el bus pare, se grita «¡Parada!»". Header/footer logo: the 🇪🇸 emoji rendered as "ES" on Windows → EspaLuz globe icon (ascent HEAD, **waits on next Publish**; tab favicon was already the globe, live 200).
 
