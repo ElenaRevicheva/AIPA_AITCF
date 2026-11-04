@@ -14,7 +14,38 @@ Allowed wording rule (3 Nov) still holds: "built on / based on the frameworks in
 (Cambridge Primary, Cambridge English Pre A1 Starters)"; never "certified / official / accredited"; never "AI tutor",
 "fluent in no time", invented testimonials or user counts.
 
-## Third round (Elena, 4 Nov)
+## Fourth round (4 Nov — outside review pasted by Elena)
+- "adds to it" -> **"complements your child's education"**; "based on what international bilingual schools teach" ->
+  **"inspired by international bilingual schools"** (softer and safer: a direction, not a curriculum match).
+- The review mentioned "a polished version" but only these two choices were in the paste.
+
+## The promise (round 4 — current)
+**EspaLuz walks the long road with your family.**
+Your child goes to the local school, and EspaLuz complements your child's education. While you work online and run the
+house, Pere & Titi give your child ten minutes a day of extra school skills in Spanish and English, inspired by
+international bilingual schools. In one minute you read what your child learned.
+And for you, EspaLuz is your companion on the go for the places you will visit for years: your child's school and
+teachers, the doctor and the pharmacy — with practical guides for how things work in your new country, in your words,
+at your pace, for as long as it takes.
+
+## Landing page — first screen (round 4 — current)
+- **Eyebrow:** For expat and digital-nomad families in Latin America
+- **Headline:** Extra school skills for your child, while you work online
+- **Line under it:** It complements the local school: ten minutes a day of Spanish and English with Pere & Titi,
+  inspired by international bilingual schools. Real learning instead of cartoons — and a one-minute report for you.
+- **Button:** Start free: 14 days, no card · quiet link: Not ready? Try 20 messages without an account
+
+## Three cards (round 4 — current)
+1. **For your child, after school** — Ten minutes a day, by voice, with Pere & Titi: Spanish and English school skills,
+   inspired by international bilingual schools, that complement the local school.
+2. **For you, in one minute** — After every lesson, a short report: what your child learned and one thing to do together.
+3. **For the years ahead** — Your companion for the school and the doctor: teacher meetings, school notes, doctor and
+   pharmacy visits — with practical guides for how things work in your country, at your pace.
+
+Price line: 14 days free, then $11 a month — on the web, WhatsApp and Telegram.
+
+---
+### Round 3 (superseded)
 - Drop "office paperwork": expats rarely join the local job market (fluency takes years), so offices are not the
   long-term need. What never ends: **the school** (and other education) and **health care** — a tropical climate brings
   new health questions, so doctor and pharmacy visits are part of life for years.
