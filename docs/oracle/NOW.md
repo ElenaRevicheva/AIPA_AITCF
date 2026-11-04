@@ -145,7 +145,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-11-04 | Atuona daily inspiration: cap "not X, but Y" (negative parallelism) at 1/message | src/atuona-creative-ai.ts, pm2 cto-aipa | 854af67f |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -268,6 +267,8 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+**4 Nov — Atuona negative-parallelism cap: on `main` (`baaac8ae`), NOT on Oracle yet.** Built + tested (`node scripts/test-negative-parallelism.cjs`, 7/7; the real 4 Nov daily = 4 hits). Live `dist/atuona-creative-ai.js` diffed against the build: only our lines differ, safe to copy. Deploy was blocked by the permission gate, waiting on Elena's OK. NEXT: scp `dist/negative-parallelism.js` + `dist/atuona-creative-ai.js`, md5 check, `pm2 restart cto-aipa --update-env`, `/dailyinspire`, grep `negpar[proactive]`.
 
 ### ✅ 3 Nov ~20:15 UTC — after Elena's Publish: Leaply method VERIFIED LIVE (3-case probe on espaluz-chat): turn 4 → "Titi [jump]: ¡Pausa de energía, 20 segundos! Mano derecha a la rodilla izquierda…"; turn 5 → Pere warm hands + three slow breaths; stuck "no sé" → "¡Oye, oye! ¿Sabías que…? En Panamá, para que el bus pare, se grita «¡Parada!»". Header/footer logo: the 🇪🇸 emoji rendered as "ES" on Windows → EspaLuz globe icon (ascent HEAD, **waits on next Publish**; tab favicon was already the globe, live 200).
 
