@@ -137,6 +137,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 4 Nov ~01:30 | EspaLuz Phase 0 step 1: token METER on every reply | `llm_chain.py` (WA + Familybot), SaaS `espaluz-chat`; restarts espaluz-whatsapp, espaluz-familybot | d4742476 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
