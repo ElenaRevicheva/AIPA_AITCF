@@ -33,10 +33,20 @@ and its topic gate admits only AI-business threads. Low yield — not the first 
 | Make 6868765 + 6869112 (FB Page, Reels, Shorts) | keep; add `utm_source` per channel so the Monday funnel line separates them |
 | `espaluz-funnel-weekly.mjs` Monday | the scoreboard: visits → doors per source |
 
+## Elena, 4 Nov: drop outreach — the record agrees
+Outreach needs a stranger to say yes. Measured history: 117 manual client prospects → 1 reply (0.85%); 10
+EspaLuz chamber/school pilots (Aug) → no pilot; dental clinics silent. So step 4 below is **dropped**. Only windows
+that need **nobody's permission** remain:
+1. **The 57 visitors a week who already arrive** (0 door clicks) — fastest, measurable in 7 days.
+2. **AI answers via our own pages** — competitors cited are small blogs; slow (aideazz.xyz was cited 1 in 22
+   answers on 28 Oct after months of daily posts), measured weekly by the probe.
+3. **YouTube via the existing Make Shorts scenario 6869112** — Perplexity cited youtube.com for the
+   "moving to Panama with kids" question; titling Shorts as the family's own question needs no one's OK.
+
 ## The order (each step proven by its output line)
 1. **Page first screen** — one "Start free on WhatsApp" button + who it is for. Proof: door clicks > 0 in GA4.
 2. **Measure the target** — family questions into the Monday citation probe. Proof: Telegram line with 0/N baseline.
 3. **Answer the questions where engines read** — FAQ blocks on the EspaLuz page/country pages. Proof: probe cites.
-4. **Get onto the pages engines already cite** — letters to relofirm, panamaequity, insidepanama, jarniascyril,
+4. ~~Get onto the pages engines already cite~~ (dropped, see above) — letters to relofirm, panamaequity, insidepanama, jarniascyril,
    myspanishtravels … drafted into HubSpot, Elena approves each send.
 5. Only then: ChatGPT ads $100 total-budget test (see `CHATGPT_ADS_DECISION_2026-11-04.md`).
