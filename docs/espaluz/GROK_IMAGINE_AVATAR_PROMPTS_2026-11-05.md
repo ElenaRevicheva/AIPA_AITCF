@@ -71,3 +71,22 @@ Replika's pattern on EspaLuz: one panel in the hero that plays clip 1 → 2 → 
 under the eyebrow (*for the long road* / *in all your chats* / *in the kids classroom*), the still picture as fallback,
 and the chat note + kids card as real-text stickers beside it. Clips shrunk the way the Telegram QR video was
 (5.9 MB → 371 KB), silent, so the page stays light.
+
+---
+
+## What was actually made (5 Nov, Claude in Elena's Chrome) — supersedes prompts 1-3 above
+
+Elena's rule after prompt 1: **maximum realistic, highest quality, never toyish / generic-AI / old-fashioned.** The cartoon
+avatar (`brand-avatar-2.jpg`) was dropped as a base; the face reference became frame 0 of her "Warm Smile in Nine Frames.gif".
+Method per hero: Imagine **Image** mode + reference → photorealistic still (2:3, kids 3:2; "full-frame camera, 50 mm f/2,
+real skin texture… not a cartoon, not a 3D render") → **Make Video → Loop**, 10 s (image-to-video tops out at 720p) →
+motion prompt starting "Loop. Seamless, realistic, cinematic idle loop…".
+
+| Hero | Scene | Where on the page |
+|---|---|---|
+| web (adults) | at a laptop, Panama City skyline, golden light | top of the landing (replaces the cartoon circle) |
+| WhatsApp | green Casco Viejo balcony, phone in hand | Ways to start ▸ WhatsApp |
+| Telegram | blue sea at Amador Causeway, phone in hands | Ways to start ▸ Telegram, beside the QR |
+| kids | real three-toed sloth Pere (green scarf) + capuchin Titi (vest) in the jungle classroom | "For your child, after school" card → /classroom |
+
+Loop seams (first vs last frame): 1.6 / 2.2 / 1.9 / 1.5 out of 255. Shipped files 409–676 KB each (ascent `5cbf8af`).
