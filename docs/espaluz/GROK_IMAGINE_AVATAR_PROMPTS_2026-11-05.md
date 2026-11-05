@@ -90,3 +90,36 @@ motion prompt starting "Loop. Seamless, realistic, cinematic idle loop…".
 | kids | real three-toed sloth Pere (green scarf) + capuchin Titi (vest) in the jungle classroom | "For your child, after school" card → /classroom |
 
 Loop seams (first vs last frame): 1.6 / 2.2 / 1.9 / 1.5 out of 255. Shipped files 409–676 KB each (ascent `5cbf8af`).
+
+---
+
+## PENDING — "For the years ahead" re-shoot (Elena, 5 Nov, after the beach version)
+
+Elena: the beach scene "looks like they are going to heaven" and has no husband. Wanted: the WHOLE family - mother,
+husband, child, grandparents - celebrating at a busy restaurant (city or beachfront), palm trees visible, everyday life.
+**Not generated: Grok Imagine hit its weekly usage limit (resets 10 Nov 2026).** Buying credits is Elena's call.
+The live card keeps the beach clip until then.
+
+How to run (same method as the other heroes): Image mode, references = `espaluz-real-ref.png` (Warm Smile frame 0, kept in
+ascent `creatives/heroes-grok-20261105/reference-warm-smile-frame0.png`) + `sky-still-1792x1008.jpg`
+(`creatives/heroes-sky-grok-20261105/`), aspect **3:2**, then Make Video → Loop, 10 s; swap into
+`src/assets/heroes/hero-family.mp4` + `-poster.jpg` (720 px, crf 26, no audio).
+
+Image prompt:
+> Candid photorealistic lifestyle photo, wide shot, of a whole family celebrating together at a lively open-air restaurant
+> terrace in Panama City at golden hour: the woman from image 1 (same face, silver-blonde wavy shoulder-length hair, small
+> gold drop earrings, soft teal zip hoodie over a light grey top) sits at the table next to her husband (a warm, kind man in
+> his late thirties, short brown hair, light linen shirt) who has his arm around her, their little daughter (about 6, sandy
+> blonde hair, light summer dress) between them, and her parents, a grandmother and grandfather in their sixties in light
+> linen clothes, across the table. They raise glasses of fresh juice in a toast and laugh together over a table with plates
+> of food, a small birthday cake with a lit candle in the middle. Around them a busy, happy restaurant: other diners softly
+> out of focus, string lights, waiters, tall palm trees lining the terrace, Panama City towers in the background. The sky is
+> the same very light pastel sunset sky as image 2: pale lavender, cream gold, faint rose. Warm, joyful, everyday city life.
+> Airy, natural editorial photo, full-frame camera, 35mm lens at f/2.8, real skin texture. Not a cartoon, not a 3D render,
+> not a composite. No text, no logos.
+
+Loop prompt:
+> Loop. Seamless, realistic, cinematic idle loop. The family at the table laughs and clinks their glasses in a gentle toast,
+> the husband hugs his wife, the little girl smiles at the candle, the grandparents chat warmly. Around them diners move
+> softly out of focus, string lights twinkle, palm fronds sway in the evening breeze. Locked-off static camera, no zoom, no
+> cuts, natural real-world motion, photorealistic. Last frame identical to the first frame. No text, no logos.
