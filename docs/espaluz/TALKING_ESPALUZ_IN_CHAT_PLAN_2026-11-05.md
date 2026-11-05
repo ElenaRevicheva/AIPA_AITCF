@@ -49,6 +49,26 @@ user's audio to Runway. Adults and paying tier only, never in the kids classroom
 $0.01 per credit (NOW.md table, 28 Oct). A family with 30 talking replies of 30 s a month = 15 min = 120 credits measured,
 300 at list = $1.20-$3.00 out of $11. Wallet 379 = 47 min measured, 19 min list. Wire no spend for non-paying visitors.
 
+## Elena's decisions, later on 5 Nov
+- Non-paying users: pre-made clips only. Classroom role: "mentora amiga". She opens and closes the session, appears from time to
+  time to suggest a feature, and calms things and reconnects the child with Pere and Titi. Never noisy.
+- Elena: the old loop after every reply is "the past season".
+
+## Proposed paid-user flow (not yet approved)
+Every reply: text at once, voice note right after, as today. The old looping video stops completely.
+Her talking video only at moments that earn it: first reply of the day, when the bot detects a low mood, or when the user asks.
+Asking: web = existing "Generate Video" button; Telegram = button under the reply (the bot uses none today, new small work);
+WhatsApp = user types "video" (no buttons in the bridge today). Monthly cap per family.
+
+## Proposed classroom rules (not yet approved)
+Runs in the page from about 12 pre-made clips x 2 languages (about 120 s: 16 credits measured, 40 at list price). No live generation.
+- Open: start of lesson. Close: end of lesson. Middle: at most one appearance per lesson.
+- Suggestion: only after several turns, only for a feature not yet used in this lesson, never while the child or a hero is speaking.
+- Features found in `Classroom.tsx`: conversation, class with tracing, painting, showing a photo, activities (music, monkey, dice).
+  Vibe coding NOT found in that file on 5 Nov: confirm where it lives before she promises it.
+- Reconnect: child's words show upset (extends the existing `KIDS_QUIET` rule). She says one calm line, then Pere and Titi return gently.
+- Real distress is not handled by a clip: it goes into the parent report. Wording for this needs Elena's review.
+
 ## Order
 1. Web chat real clips on tap + wallet guard + fallback (test with Elena's own account).
 2. Classroom lines, tested by Alisa; measure whether she likes it.
