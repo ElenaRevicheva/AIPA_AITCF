@@ -183,6 +183,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (talking hello) | 2026-11-05 22:40 | Talking EspaLuz hello on landing + in web chat (Runway clips) | ascent NEW `src/components/landing/TalkingHello.tsx`, 1 insert each in `Index.tsx` hero + `ChatWithEspaluz.tsx` empty state, `src/assets/heroes/hello-*` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
