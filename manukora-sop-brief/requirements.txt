@@ -1,0 +1,4 @@
+# No third-party runtime dependencies.
+# The pipeline uses the Python 3.10+ standard library only (urllib for LLM calls).
+# Optional: pytest if you prefer it over unittest.
+# pytest>=8.0

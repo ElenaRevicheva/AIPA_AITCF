@@ -60,6 +60,9 @@ proper_working_fix.py
 
 # Runtime state - NEVER let git clean/stash cleanup touch this (films/music/shots wiped 01.07.2026)
 data/
+# Manukora practical-brief mock extract must ship with the deliverable.
+!manukora-sop-brief/data/
+!manukora-sop-brief/data/**
 
 # Trello card dumps (deleted-card backups) - THIS REPO IS PUBLIC and these carry
 # recruiter names/emails/message bodies. Keep the files, never publish them.
