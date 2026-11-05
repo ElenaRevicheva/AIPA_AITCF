@@ -3,6 +3,12 @@
 Elena: "they are positioned like real talk, real conversation — dig what our competitors have"; "dig deeper into 3D,
 a really talking head, I have no money"; "she must look like the EspaLuz on the website: light blonde, a little grey".
 
+## UPDATE 5 Nov ~22:20 UTC: the route changed
+Runway Characters (`gwm1_avatars`) makes a photoreal talking video from one photo plus our own audio. Tested with EspaLuz's
+website photo and the free Edge voice: same face, real lip shapes, 24 s to generate. The earlier claim below and in chat that
+a real-person talking face needs our own GPU money was too broad: this is pay-per-second at about 1 credit per 3 s (list price).
+3D v1 and photo projection were rejected by Elena as far from EspaLuz. Script: `scripts/espaluz-avatar/rw_avatar.py`.
+
 ## Competitors (web research 5 Nov 2026 — review sites + app listings; internals are NOT published by any of them)
 
 | App | Face on screen while talking | How (as far as public sources say) | Price |
