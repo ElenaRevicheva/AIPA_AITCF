@@ -93,12 +93,11 @@ Loop seams (first vs last frame): 1.6 / 2.2 / 1.9 / 1.5 out of 255. Shipped file
 
 ---
 
-## PENDING — "For the years ahead" re-shoot (Elena, 5 Nov, after the beach version)
+## DONE (ascent `bc61573`, needed one extra edit: far-right person -> grandfather) — "For the years ahead" re-shoot (Elena, 5 Nov, after the beach version)
 
 Elena: the beach scene "looks like they are going to heaven" and has no husband. Wanted: the WHOLE family - mother,
 husband, child, grandparents - celebrating at a busy restaurant (city or beachfront), palm trees visible, everyday life.
-**Not generated: Grok Imagine hit its weekly usage limit (resets 10 Nov 2026).** Buying credits is Elena's call.
-The live card keeps the beach clip until then.
+Grok's weekly limit was hit first; made with Elena's $5 credit top-up.
 
 How to run (same method as the other heroes): Image mode, references = `espaluz-real-ref.png` (Warm Smile frame 0, kept in
 ascent `creatives/heroes-grok-20261105/reference-warm-smile-frame0.png`) + `sky-still-1792x1008.jpg`
