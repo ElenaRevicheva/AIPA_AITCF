@@ -187,6 +187,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (talking web chat) | 2026-11-05 23:40 | Real EspaLuz video in web chat: special moments, paid only, caps | ascent `supabase/functions/generate-video`, `src/components/dashboard/ChatWithEspaluz.tsx`, Supabase secret RUNWAY_API_KEY | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
