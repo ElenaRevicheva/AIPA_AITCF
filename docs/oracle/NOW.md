@@ -198,6 +198,7 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 6 Nov | Classroom mentora amiga (EspaLuz opens, closes, one middle, reconnect) | ascent `src/pages/Classroom.tsx`, `public/`, Runway credits | - |
+| Claude Code | 6 Nov | EspaLuz app counting (GA4, no classroom data) + Monday funnel line | ascent `src/lib/track.ts`, `src/App.tsx`, `src/pages/Auth.tsx`, `src/components/dashboard/ChatWithEspaluz.tsx`; cto-aipa `scripts/espaluz-funnel-weekly.mjs` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
