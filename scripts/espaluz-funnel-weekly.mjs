@@ -12,6 +12,9 @@
  *   node scripts/espaluz-funnel-weekly.mjs --dry-run     # print, send nothing
  *   node scripts/espaluz-funnel-weekly.mjs
  * Cron: 30 13 * * 1 (after the Monday citation probe).
+ *
+ * 6 Nov 2026 (Elena: "not just publish but track who will actually watch this and click"): --films sends only the film
+ * scoreboard, for the daily cron. Views come from the public YouTube Shorts page; Facebook and Instagram views are not read.
  */
 import dotenv from 'dotenv';
 import { execFileSync } from 'node:child_process';
@@ -20,6 +23,8 @@ import { GA4_READONLY_SCOPE, getGoogleAccessToken } from './google-analytics-aut
 dotenv.config({ override: true });
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const FILMS_ONLY = process.argv.includes('--films');
+const YT_CHANNEL = 'UCMhNF55kLPSk-tv5CW13VHQ';
 const GA4_PROPERTY_ID = (process.env.GA4_PROPERTY_ID || '515154124').trim();
 const TG = process.env.TELEGRAM_BOT_TOKEN?.trim();
 const CHAT = (process.env.CONCIERGE_TG_CHAT || process.env.ATLAS_TELEGRAM_CHAT_ID || '').trim();
@@ -57,7 +62,84 @@ function paymentsLast7Days() {
   }
 }
 
+/** The newest Shorts on the channel with their public view text. No key needed; a page change only loses this line. */
+async function youtubeViews() {
+  try {
+    const res = await fetch(`https://www.youtube.com/channel/${YT_CHANNEL}/shorts`, { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en' } });
+    const html = await res.text();
+    const found = [...html.matchAll(/"accessibilityText":"([^"]{1,140}?), ([^",]*views?) - play Short"/g)].slice(0, 4);
+    return found.length ? found.map((m) => `${m[2]}: ${m[1].slice(0, 44)}`).join('\n') : 'no Shorts read from the page';
+  } catch (err) {
+    return `unreadable (${String(err.message).slice(0, 80)})`;
+  }
+}
+
+/** People who arrived in a bot by a film's link, per film and channel. Distinct people, counts only. */
+function botArrivals() {
+  const py = [
+    'import espaluz_talking as t',
+    'c=t._db(); cur=c.cursor()',
+    "cur.execute(\"SELECT event_data->>'reason', platform, COUNT(DISTINCT event_data->>'who') FROM event_log WHERE event_type='promo_arrival' GROUP BY 1,2 ORDER BY 1,2\")",
+    "print('; '.join(f'{f} {p} {n}' for f, p, n in cur.fetchall()) or 'none yet')",
+  ].join('\n');
+  try {
+    const out = execFileSync('bash', ['-c', `cd ${FAMILYBOT} && set -a && . ./.env && set +a && venv/bin/python -c "$PY"`], {
+      env: { ...process.env, PY: py }, encoding: 'utf8', timeout: 30_000,
+    });
+    return out.trim().split('\n').pop();
+  } catch (e) {
+    return `unreadable (${String(e.message).slice(0, 80)})`;
+  }
+}
+
+/** One block per film: views, then who came, then what they did. GA4 keeps utm_campaign on the session. */
+async function filmScoreboard() {
+  const appHost = { filter: { fieldName: 'hostName', stringFilter: { matchType: 'EXACT', value: 'app.espaluz.lat' } } };
+  const sessions = await ga4({
+    dimensions: [{ name: 'sessionCampaignName' }, { name: 'sessionSource' }],
+    metrics: [{ name: 'sessions' }],
+    dimensionFilter: appHost,
+  });
+  const steps = await ga4({
+    dimensions: [{ name: 'sessionCampaignName' }, { name: 'sessionSource' }, { name: 'eventName' }],
+    metrics: [{ name: 'eventCount' }],
+    dimensionFilter: { andGroup: { expressions: [appHost, { filter: { fieldName: 'eventName', stringFilter: { matchType: 'BEGINS_WITH', value: 'app_' } } }] } },
+  });
+  const tagged = (campaign, source) => /^f\d{8}/.test(campaign) || /^(espaluz-lat|video|youtube|instagram)$/.test(source);
+  const rows = new Map();
+  for (const r of sessions) {
+    const [campaign, source] = r.dimensionValues.map((d) => d.value);
+    if (tagged(campaign, source)) rows.set(`${campaign} ${source}`, { visits: Number(r.metricValues[0].value) || 0, events: {} });
+  }
+  for (const r of steps) {
+    const [campaign, source, name] = r.dimensionValues.map((d) => d.value);
+    const row = rows.get(`${campaign} ${source}`);
+    if (row) row.events[name] = Number(r.metricValues[0].value) || 0;
+  }
+  const lines = [...rows.entries()].map(([key, v]) => {
+    const n = (name) => v.events[name] || 0;
+    return `${key.replace('(not set) ', '').replace('(referral) ', '')}: ${v.visits} visits -> chat ${n('app_chat_first')} -> limit ${n('app_free_wall')} -> sign-up ${n('app_signup_sent')} -> class ${n('app_classroom_open')} -> doors ${n('app_door_whatsapp') + n('app_door_telegram')}`;
+  });
+  return `🎬 Films, last 7 days\nYouTube views:\n${await youtubeViews()}\n\nApp arrivals from films:\n${lines.join('\n') || 'none yet'}\n\nBot arrivals from films, all time: ${botArrivals()}\nFacebook and Instagram views: not read, see the platforms.\nPaid: see the payments line on Mondays.`;
+}
+
+async function sendTelegram(text) {
+  console.log(text);
+  if (DRY_RUN) return;
+  if (!TG || !CHAT) {
+    console.error('espaluz-funnel-weekly: TELEGRAM_BOT_TOKEN / CONCIERGE_TG_CHAT missing — nothing sent');
+    process.exit(1);
+  }
+  const r = await fetch(`https://api.telegram.org/bot${TG}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: CHAT, text, disable_web_page_preview: true }),
+  });
+  console.log(r.ok ? 'sent to Telegram' : `Telegram send failed: ${(await r.text()).slice(0, 200)}`);
+}
+
 async function main() {
+  if (FILMS_ONLY) return sendTelegram(await filmScoreboard());
   const visits = await ga4({
     dimensions: [{ name: 'sessionSource' }],
     metrics: [{ name: 'screenPageViews' }],
@@ -120,18 +202,7 @@ async function main() {
     `\n\n${appLine}` +
     `\n\npayments recorded: ${paymentsLast7Days()}`;
 
-  console.log(text);
-  if (DRY_RUN) return;
-  if (!TG || !CHAT) {
-    console.error('espaluz-funnel-weekly: TELEGRAM_BOT_TOKEN / CONCIERGE_TG_CHAT missing — nothing sent');
-    process.exit(1);
-  }
-  const r = await fetch(`https://api.telegram.org/bot${TG}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: CHAT, text, disable_web_page_preview: true }),
-  });
-  console.log(r.ok ? 'sent to Telegram' : `Telegram send failed: ${(await r.text()).slice(0, 200)}`);
+  await sendTelegram(`${text}\n\n${await filmScoreboard()}`);
 }
 
 main().catch((e) => {
