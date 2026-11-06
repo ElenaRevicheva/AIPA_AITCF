@@ -25,7 +25,7 @@ destroying each other's work.
 
 **✅ 6 Nov — Telegram clips = WhatsApp: a linked family paying on one channel reads as paying on all (`family_paying` in `kids-memory` facts_get, ascent `6c7961c`, Familybot `e012faa`, WhatsApp `4c5739f`, deployed). Surprise limit and monthly cap count per channel, not per family.**
 
-**🔴 6 Nov ~20:40 UTC — grown-up replies lost bilingual and emojis: stored replies 26-28 Oct 14/14 both languages, 12/14 emoji; 6 Nov 1/12, 3/12 (crude word count, small sample). Gemini 402 and `gpt-oss-120b` 429 push replies to `gpt-oss-20b`, which ignores the mid-prompt rule. Telegram also shows the raw video script. Fix pushed, Familybot `347b4ae`, WhatsApp `67783b9`, tested on Oracle with made-up text. NOT LIVE: copy and restart refused as Production Deploy, needs Elena's explicit go; files staged at `~/_scratch_*`, guard passed.**
+**🟡 6 Nov 20:23:45 UTC — bilingual and emoji fix LIVE on both bots, not proven by a real message yet (Familybot `347b4ae`, WhatsApp `67783b9`, md5 = git, 0 tracebacks at start). Why: stored replies 26-28 Oct 14/14 both languages, 12/14 emoji; 6 Nov 1/12, 3/12 (crude word count, small sample). Rule now goes last in the prompt; `polish_reply` checks the finished reply, one rewrite, original goes out if that fails; `display_reply` hides the video script. Proof to look for: `🌐 reply polish`. Still open: Gemini 402 since 3 Nov and `gpt-oss-120b` 429 leave replies on `gpt-oss-20b`; web has the same "at most 3 emojis" rule, its replies not measured.**
 
 **🟡 6 Nov 20:03 UTC — buttons on Telegram and WhatsApp LIVE on Oracle, not tapped yet; classroom button renamed `🏫 Kids Classroom` (Familybot `b432f86`, WhatsApp `dba0013`, restarted 20:03:44 UTC, md5 = git; old label still works; event `buttons_shown_v2`). Heroes-know-EspaLuz LIVE: `espaluz-chat` v301 source has the line, BUT it was already in v300: the push of `3d8f249` at 18:15:37 UTC redeployed every function at 18:16:56, so the earlier "NOT DEPLOYED" was wrong (a push to ascent `main` IS a production deploy). No child has tested it yet. Clip log: `classroom_clip` is in the live bundle `index-B9vYNJT_.js`, 0 rows so far, no clip played since (ascent `3d8f249`, Familybot `ff619f6`, WhatsApp `2249d70`).** Telegram: persistent keyboard, sent once. WhatsApp: Twilio quick-reply, at most once in 6 hours per person (cost/noise). Non-paying tap = pre-made hello. Grep `🔘 buttons shown`, rows `content.event=classroom_clip`. Not proven: a real tap on either bot, Twilio accepting the template outside a test.
 
@@ -227,7 +227,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 06 Nov 20:19 | Bilingual and emoji check on grown-up replies | `main.py`, `espaluz_bridge.py`, `espaluz_enhancements.py`; both bots | b432f86 / dba0013 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
