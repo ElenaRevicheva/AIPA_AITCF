@@ -83,3 +83,18 @@ So today's family memory reaches almost nobody who is not already linked. This i
 5. Measure: first useful reply, a remembered fact used on a later day, link tapped, a child's first lesson, day-7 return, payment.
 
 This changes sign-in, so Elena decides before anything is built. Success test stays: 5 real families, Panama first; at least 3 talking after 30 days, at least 1 paying.
+
+## One-tap classroom link: plan (Elena approved the idea 6 Nov; her trial policy does not change; not built)
+Policy stays: web 20 free messages, then sign up for 14 days; WhatsApp and Telegram 14 days with no sign-up; then subscribe.
+
+**One clock.** Today there are two: the bots keep their own `trial_end` (14 days from the first message), and a new web account gets its own `user_subscriptions.trial_end` (14 days from creation). A plain link would give 14 + 14 days. So the link copies the bot's end date to the web account: day 3 on WhatsApp means 11 days left in the classroom. A paying family stays paid through the existing `payment-mirror`.
+
+**How, using existing pieces**
+- `kids-memory` gets a mode `classroom_link`, bot secret only.
+- It finds the `connected_bots` link for this number. If none, it creates a web account with an internal address built from the hashed id (no phone number, nothing emailed), and the link row.
+- It sets `trial_end` to the bot's date and returns a one-time sign-in link to `app.espaluz.lat/classroom`.
+- The bot sends the link only in that person's own chat. If it expires, asking again makes a new one.
+
+**When she offers it, once:** when the person mentions a child or school, or asks for class ("clase", "classroom", "Pere y Titi"), after she has helped.
+
+**Open checks before building:** how long the sign-in link lasts; the page keeps someone signed in on a phone; one family with two phones; a person who already has a web account can still link by code as today.
