@@ -201,6 +201,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 6 Nov | EspaLuz one adult memory (bots + web chat) | Oracle `espaluz-familybot`, `espaluz-whatsapp` memory code; ascent `supabase/functions/espaluz-chat` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
