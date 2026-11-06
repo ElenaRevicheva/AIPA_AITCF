@@ -54,3 +54,15 @@ Privacy decision needed from Elena: within a family, is everything shared among 
 - Merge (recommended) or full return to the old tutor prompts.
 - The privacy rule above.
 - Which Alisa row is right. Not changed without her say.
+
+## Clips must bring something special (Elena, 6 Nov 2026)
+"If just this avatar, open mouth, with lips moving... repeating the same message, it is not precious. It will annoy and nobody will click."
+Today every clip repeats the reply's short line (`short_reply` on bots, the video script on web). That is the defect.
+Proposal: each clip gets its own line, never a copy of the message, written only from true notes:
+| Moment | What only she can bring |
+|---|---|
+| First reply of the day | Something she remembers and follows up: "the school is back on Monday; how are you both feeling?" |
+| Low mood | One personal, calm line from their own road, for example a step they already got through |
+| "See EspaLuz" / "video" | Her saying the most useful phrase slowly in Spanish, so they see and hear how the mouth makes it, then the English |
+| Milestone, monthly | The long-road clip: how far the family has come |
+Guards: no true note to use means no clip; never invent a memory; the line is checked against the reply so it cannot simply repeat it.
