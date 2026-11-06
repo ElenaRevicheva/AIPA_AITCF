@@ -203,6 +203,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 6 Nov | Real EspaLuz clips on Telegram + WhatsApp, memory proof | Oracle `espaluz-familybot`, `espaluz-whatsapp`; ascent `supabase/functions/generate-video` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
