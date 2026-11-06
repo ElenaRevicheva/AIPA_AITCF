@@ -23,6 +23,8 @@ destroying each other's work.
 
 **✅ 6 Nov — Telegram clips = WhatsApp: a linked family paying on one channel reads as paying on all (`family_paying` in `kids-memory` facts_get, ascent `6c7961c`, Familybot `e012faa`, WhatsApp `4c5739f`, deployed). Surprise limit and monthly cap count per channel, not per family.**
 
+**📋 6 Nov — classroom clips leave no log line (they play in the browser); which clip played is inferred from lesson turns in `learning_sessions`, read there, not copied here (a child's words stay out of this repo). Gap: Pere and Titi do not know who EspaLuz is when a child mentions her.**
+
 **✅ 6 Nov ~17:45 UTC — one-tap classroom link LIVE (migration applied, `kids-memory` deployed, Familybot `759c3ff` + WhatsApp `cf1f54e` on Oracle, restarted 17:42:42 UTC, files = git).** Door: no access = refused; linked family = sign-in link with `redirect_to` `/classroom` (link generated, not opened). Words `clase`/`class` send it; offered once when a parent mentions a child or school. Not proven: a new family's first tap, stays signed in on a phone, two phones. **Real result: Alisa saw EspaLuz appear in the web classroom and was delighted, clapped (Elena, 6 Nov).** Bots' kids lessons do NOT yet show mentora clips: web classroom only.
 
 **🟡 6 Nov ~17:00 UTC — classroom reconnect + button LIVE (Elena published, bundle `index-C-tLYXiN.js` has it, 3 new clips md5 = repo); Elena tests now.** Next-step proposal awaiting her: WhatsApp number = family identity, one-tap signed-in classroom link (`docs/espaluz/LONG_ROAD_COMPANION_POSITION_2026-11-06.md`, last section).
