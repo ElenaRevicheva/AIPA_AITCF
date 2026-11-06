@@ -11,6 +11,8 @@ destroying each other's work.
 
 ---
 
+**🟡 6 Nov — EspaLuz app counting BUILT, waits on Lovable Publish (ascent `f26c697`; Monday report cto-aipa, Oracle md5 `46f3adbc` = git, dry run prints the app block with 0s).** GA4 `G-TL5S8V23LT` on `app.espaluz.lat`: first chat, return day, free limit, sign-up sent/failed (with reason), unconfirmed, signed in, classroom open, WhatsApp/Telegram doors. Off on /classroom + /admin; no message text or email. `?internal=1` once per device stops counting that browser. Tested on localhost (no Google requests off the live host); chat events and the classroom count NOT yet seen on live: after Publish, prove in the GA4 realtime view. NOT changed: `espaluz.lat` still forwards to `aideazz.xyz/espaluz`; `app.espaluz.lat` in Lovable is correct. Moving the forward = Elena's decision in GoDaddy.
+
 **🔴 6 Nov — EspaLuz FIRST USERS plan, from production (`docs/espaluz/LAUNCH_FIRST_USERS_2026-11-06.md`; replaces the order in the same-day SEO plan). Nothing fixed yet.** Truth 10:53 UTC: 40 real people ever, 0 paid, 0 active in 30 days, 35/38 left same day; 7 days 81 visits → 3 doors → 0 signups. BLOCKERS: (1) confirm-email ON + custom SMTP OFF, so web sign-up mail should not reach strangers (from settings + Supabase docs, not tested with an outside address); needs Elena's Resend key in the dashboard. (2) `app.espaluz.lat` has no analytics. (3) `espaluz.lat` forwards to the OLD page. (4) 0 `remembered` / `RAG recalled` / `followup sent` lines in 14 days. Kids classroom is the only returning use (one family, 8 of 14 days). Do not launch or advertise before 1-3. NEXT: Elena's SMTP click, then GA4, forward, memory proof.
 
 **🟡 6 Nov — EspaLuz SEO/GEO plan from Replika's job posting, WAITING ON ELENA (`docs/espaluz/SEO_GEO_PLAN_BETTER_THAN_REPLIKA_DUOLINGO_2026-11-06.md`). Nothing built.** Found: (1) `/espaluz` and its llms.txt still sell doctor/hospital/offices, retired 5 Nov, which may explain 57 visits/week → 0 door clicks (GA4, 4 Nov; hypothesis). (2) ⚠️ "One memory" holds for kids on linked accounts; grown-up memory looks per channel from code (`espaluz_memory.py`, `espaluz-chat`), not yet probed in production: do not claim it publicly until proven. (3) App stores held until 10 paying strangers. Oracle read was denied by the permission check, so visit and citation numbers are from 3-5 Nov: refresh first. NEXT: her go on Batch 1 (she picks the new page opening; mechanical JSON-LD fixes).
@@ -198,7 +200,6 @@ agents keep it honest.
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
 | Claude Code | 6 Nov | Classroom mentora amiga (EspaLuz opens, closes, one middle, reconnect) | ascent `src/pages/Classroom.tsx`, `public/`, Runway credits | - |
-| Claude Code | 6 Nov | EspaLuz app counting (GA4, no classroom data) + Monday funnel line | ascent `src/lib/track.ts`, `src/App.tsx`, `src/pages/Auth.tsx`, `src/components/dashboard/ChatWithEspaluz.tsx`; cto-aipa `scripts/espaluz-funnel-weekly.mjs` | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push

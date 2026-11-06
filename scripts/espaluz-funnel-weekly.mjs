@@ -86,10 +86,39 @@ async function main() {
       const total = v.web + v.whatsapp + v.telegram;
       return `${src}: ${v.visits} visits -> ${total} doors (wa ${v.whatsapp}, tg ${v.telegram}, web ${v.web})`;
     });
+  // app.espaluz.lat (counting added 6 Nov 2026): where people stop inside the app. No classroom data beyond the open count.
+  const appFilter = { filter: { fieldName: 'hostName', stringFilter: { matchType: 'EXACT', value: 'app.espaluz.lat' } } };
+  const appVisits = await ga4({
+    dimensions: [{ name: 'sessionSource' }],
+    metrics: [{ name: 'sessions' }],
+    dimensionFilter: appFilter,
+  });
+  const appEvents = await ga4({
+    dimensions: [{ name: 'eventName' }],
+    metrics: [{ name: 'eventCount' }],
+    dimensionFilter: { andGroup: { expressions: [
+      appFilter,
+      { filter: { fieldName: 'eventName', stringFilter: { matchType: 'BEGINS_WITH', value: 'app_' } } },
+    ] } },
+  });
+  const appCount = new Map(appEvents.map((r) => [r.dimensionValues[0].value, Number(r.metricValues[0].value) || 0]));
+  const n = (name) => appCount.get(name) || 0;
+  const appSessions = appVisits.reduce((sum, r) => sum + (Number(r.metricValues[0].value) || 0), 0);
+  const appSources = appVisits
+    .slice(0, 5)
+    .map((r) => `${r.dimensionValues[0].value} ${r.metricValues[0].value}`)
+    .join(', ');
+  const appLine =
+    `app.espaluz.lat: ${appSessions} visits${appSources ? ` (${appSources})` : ''}\n` +
+    `-> first chat ${n('app_chat_first')} -> came back ${n('app_chat_return')} -> free limit ${n('app_free_wall')}\n` +
+    `-> sign-up sent ${n('app_signup_sent')}, failed ${n('app_signup_error')}, unconfirmed ${n('app_signin_unconfirmed')}, signed in ${n('app_signin')}\n` +
+    `-> classroom opened ${n('app_classroom_open')}, doors wa ${n('app_door_whatsapp')}, tg ${n('app_door_telegram')}`;
+
   const text =
     `🦥🐒 EspaLuz funnel, last 7 days\n` +
     (lines.length ? lines.join('\n') : 'no visits to aideazz.xyz/espaluz yet') +
-    `\npayments recorded: ${paymentsLast7Days()}`;
+    `\n\n${appLine}` +
+    `\n\npayments recorded: ${paymentsLast7Days()}`;
 
   console.log(text);
   if (DRY_RUN) return;

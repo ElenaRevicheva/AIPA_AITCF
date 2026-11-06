@@ -46,7 +46,7 @@ none matched to a counted stranger. So the pain below comes from the founder's l
 2. 🔴 **We are blind inside the app.** `app.espaluz.lat` has no analytics at all. Visitors, first messages, the sign-up
    wall: nothing is counted, and anonymous trials save nothing. **Fix:** GA4 tag (same property) + events: chat started,
    20-message wall reached, sign-up, first kid lesson.
-3. 🟠 **The address on every video goes to the old page.** `espaluz.lat` forwards to `aideazz.xyz/espaluz`, which still
+3. 🟠 **The address on every video skips the refreshed landing.** `app.espaluz.lat` in Lovable is correct and stays. Only the short address `espaluz.lat` (a GoDaddy forward) is in question. `espaluz.lat` forwards to `aideazz.xyz/espaluz`, which still
    sells doctor and offices, and its web button uses the old `lovable.app` address. 61 of 81 visits came this way.
    **Fix:** forward `espaluz.lat` to `app.espaluz.lat`. Country pages stay as the Google and AI-answer layer, and link in.
 4. 🟠 **"Remembers you" has no real proof.** 0 fact or RAG lines in 14 days despite the founder's own use. Only the
