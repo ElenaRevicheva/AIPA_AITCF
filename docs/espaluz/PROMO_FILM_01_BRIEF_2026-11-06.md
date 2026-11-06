@@ -1,7 +1,7 @@
 # EspaLuz promo film 01: 15-second vertical Reel / Short (6 Nov 2026)
 
 Elena: start the promotion, Grok Imagine shots, about 15 seconds, through the Influencer bot to YouTube, Instagram and Facebook.
-**Status: draft built, 14.1 s, 720x1280, 3.8 MB, not published. Nothing publishes before Elena has watched it and said yes.** File: ascent `creatives/promo-01-20261106/espaluz-promo-01-draft.mp4`, mirrored to OneDrive `AIdeazz-promo-01-20261106`.
+**Status: draft v3 built, 14.1 s, 720x1280, 3.8 MB, not published. Nothing publishes before Elena has watched it and said yes.** File: ascent `creatives/promo-01-20261106/espaluz-promo-01-draft.mp4`, mirrored to OneDrive `AIdeazz-promo-01-20261106`.
 
 **Who:** working parents raising a child around 6-8 in a Spanish-speaking country.
 **Door:** `espaluz.lat` (forwards to `app.espaluz.lat`). First screen: free chat, no sign-up.
@@ -10,7 +10,7 @@ Elena: start the promotion, Grok Imagine shots, about 15 seconds, through the In
 | Time | Picture | Voice (Emma) | Subtitle |
 |---|---|---|---|
 | 0-5 s | New Grok shot: newcomer family from abroad (Elena's correction: a local family does not need this): fair-haired mother cooking, daughter with a tablet, moving boxes, Panama City window | Her school is in Spanish. Home runs on work and dinner. | Su escuela es en español. En casa: trabajo y cena. |
-| 5-11 s | Existing Pere and Titi clips, never posted | Ten minutes a day, Pere and Titi keep her learning, in Spanish and English. | Diez minutos al día, en español e inglés. |
+| 5-11 s | EspaLuz standing with Pere and Titi, full-body shot from the web classroom (Elena), first 3.5 s of `public/mentora/open-first.mp4`, slowed to fit, no sound of its own | Ten minutes a day, Pere and Titi keep her learning, in Spanish and English. | Diez minutos al día, en español e inglés. |
 | 11-15 s | Same kitchen, end card | And you see what she practised. EspaLuz. Free to try. | Y tú ves lo que practicó. Pruébala gratis. espaluz.lat |
 
 End card small print: "Personas creadas con IA / AI-generated people".
