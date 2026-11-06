@@ -74,3 +74,23 @@ Runs in the page from about 12 pre-made clips x 2 languages (about 120 s: 16 cre
 2. Classroom lines, tested by Alisa; measure whether she likes it.
 3. Telegram, then WhatsApp, through the same door.
 4. Measure: do trial users who hear her start more chats, and does anyone subscribe? Then decide on live conversation.
+
+## Classroom mentora amiga: proposal of 6 Nov 2026 (lines await Elena's OK; nothing wired yet)
+Test clip made: new avatar `249a879e-6e98-4474-866a-bffbd69fe6c3` from a Grok classroom still of her face, 11.5 s, 24 s to generate, wallet 377 -> 375.
+Voice under test: `en-US-AvaMultilingualNeural`, one voice for both languages, each clip Spanish then English like Pere and Titi.
+"Program Titi" (`TracePad.tsx`, mode `program`) is the vibe-coding feature the earlier note could not find.
+
+| When | Spanish | English |
+|---|---|---|
+| Very first lesson | ¡Hola! Soy EspaLuz, tu amiga mayor. Pere y Titi te están esperando. | Hi! I'm EspaLuz, your big friend. Pere and Titi are waiting for you. |
+| Later lessons | ¡Qué alegría verte otra vez! Pere y Titi ya están listos. | So good to see you again! Pere and Titi are ready. |
+| Close | Hoy lo hiciste muy bien. Me encantó verte. ¡Hasta pronto! | You did really well today. I loved seeing you. See you soon! |
+| Suggest painting | ¿Quieres pintar algo? Toca Pintar y enséñaselo a Pere y Titi. | Want to paint something? Tap Paint and show Pere and Titi. |
+| Suggest photo | ¿Hay algo bonito cerca de ti? Toca Foto y enséñaselo a Pere y Titi. | Is there something nice near you? Tap Photo and show Pere and Titi. |
+| Suggest tracing (Class only) | ¿Quieres escribir con tu dedo? Toca Trazar. | Want to write with your finger? Tap Trace. |
+| Suggest Program Titi | En Pintar también puedes programar a Titi. ¡Tú le dices qué hacer! | In Paint you can also program Titi. You tell him what to do! |
+| Reconnect 1 | Calma, aquí estoy contigo. Respiramos una vez, despacio. Pere y Titi siguen a tu lado. | It's okay, I'm here with you. One slow breath. Pere and Titi are right beside you. |
+| Reconnect 2 | Está bien sentirse así. Cuando quieras, Pere y Titi te escuchan. | It's okay to feel this way. Whenever you want, Pere and Titi are listening. |
+
+Rules: at most one middle appearance a lesson, never while anyone is speaking or recording, one tap on Habla silences her, no child's name in any clip,
+"talk less" requests never trigger her. Real distress is NOT handled by a clip; parent alert wording is a separate decision.
