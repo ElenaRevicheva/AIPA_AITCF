@@ -207,6 +207,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 6 Nov 16:30 | EspaLuz landing: pale swaying palm fronds at the sky edges, laptop only (local preview first; Elena approves before push) | ascent `src/components/landing/SkyBackground.tsx`, new `PalmFronds.tsx`, `src/index.css` | 9d1d9fc |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
