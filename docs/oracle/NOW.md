@@ -23,6 +23,8 @@ destroying each other's work.
 
 **✅ 6 Nov — Telegram clips = WhatsApp: a linked family paying on one channel reads as paying on all (`family_paying` in `kids-memory` facts_get, ascent `6c7961c`, Familybot `e012faa`, WhatsApp `4c5739f`, deployed). Surprise limit and monthly cap count per channel, not per family.**
 
+**🟡 6 Nov — buttons on Telegram and WhatsApp LIVE on Oracle, clip log + heroes-know-EspaLuz: brain deployed, clip log NEEDS ELENA'S PUBLISH (ascent `3d8f249`, Familybot `ff619f6`, WhatsApp `2249d70`).** Telegram: persistent keyboard, sent once. WhatsApp: Twilio quick-reply, at most once in 6 hours per person (cost/noise). Non-paying tap = pre-made hello. Grep `🔘 buttons shown`, rows `content.event=classroom_clip`. Not proven: a real tap on either bot, Twilio accepting the template outside a test.
+
 **📋 6 Nov — classroom clips leave no log line (they play in the browser); which clip played is inferred from lesson turns in `learning_sessions`, read there, not copied here (a child's words stay out of this repo). Gap: Pere and Titi do not know who EspaLuz is when a child mentions her.**
 
 **✅ 6 Nov ~17:45 UTC — one-tap classroom link LIVE (migration applied, `kids-memory` deployed, Familybot `759c3ff` + WhatsApp `cf1f54e` on Oracle, restarted 17:42:42 UTC, files = git).** Door: no access = refused; linked family = sign-in link with `redirect_to` `/classroom` (link generated, not opened). Words `clase`/`class` send it; offered once when a parent mentions a child or school. Not proven: a new family's first tap, stays signed in on a phone, two phones. **Real result: Alisa saw EspaLuz appear in the web classroom and was delighted, clapped (Elena, 6 Nov).** Bots' kids lessons do NOT yet show mentora clips: web classroom only.
