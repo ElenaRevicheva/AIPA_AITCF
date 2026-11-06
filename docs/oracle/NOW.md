@@ -223,6 +223,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 06 Nov 20:02 | Rename classroom button to Kids Classroom | `espaluz_talking.py` both bots; `espaluz-familybot`, `espaluz-whatsapp` | ff619f6 / 2249d70 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
