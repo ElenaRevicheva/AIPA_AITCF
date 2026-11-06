@@ -9,7 +9,7 @@ Elena: start the promotion, Grok Imagine shots, about 15 seconds, through the In
 ## The film (9:16, Emma voice, Spanish subtitles, no founder, no real child)
 | Time | Picture | Voice (Emma) | Subtitle |
 |---|---|---|---|
-| 0-5 s | New Grok shot: mother cooking, daughter at the kitchen table with a tablet, evening light | Her school is in Spanish. Home runs on work and dinner. | Su escuela es en español. En casa: trabajo y cena. |
+| 0-5 s | New Grok shot: newcomer family from abroad (Elena's correction: a local family does not need this): fair-haired mother cooking, daughter with a tablet, moving boxes, Panama City window | Her school is in Spanish. Home runs on work and dinner. | Su escuela es en español. En casa: trabajo y cena. |
 | 5-11 s | Existing Pere and Titi clips, never posted | Ten minutes a day, Pere and Titi keep her learning, in Spanish and English. | Diez minutos al día, en español e inglés. |
 | 11-15 s | Same kitchen, end card | And you see what she practised. EspaLuz. Free to try. | Y tú ves lo que practicó. Pruébala gratis. espaluz.lat |
 
@@ -27,7 +27,7 @@ Her school is in Spanish. Home life keeps going. Pere and Titi keep her learning
 Pruébala gratis / Free to try: espaluz.lat
 
 ## Cost
-Grok Imagine: one 10-second shot, about $0.63 by the earlier price, generated once. Pere and Titi footage and Emma voice: already paid or free.
+Grok Imagine: two 10-second shots, about $1.26 by the earlier price; first one kept as v1, not for use. Pere and Titi footage and Emma voice: already paid or free.
 
 ## Before a stranger arrives
 - Web sign-up with an outside address: SMTP saved by Elena, one real test still not done.
