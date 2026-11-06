@@ -94,3 +94,22 @@ Voice under test: `en-US-AvaMultilingualNeural`, one voice for both languages, e
 
 Rules: at most one middle appearance a lesson, never while anyone is speaking or recording, one tap on Habla silences her, no child's name in any clip,
 "talk less" requests never trigger her. Real distress is NOT handled by a clip; parent alert wording is a separate decision.
+
+## Classroom mentora amiga: Elena's corrections and second proposal, 6 Nov 2026 (awaiting her choice; nothing wired)
+Elena on the first test: "voice is not friendly"; look okay but must be the whole body in the classroom with Pere and Titi; lines friendlier, more interesting, welcoming, for ages 6-8, not toddlers.
+Measured: Runway Characters always crops to head and shoulders, even from a full-body picture (avatar `5eb7e687-5629-4846-92c5-65ac211c9224`, wallet 375 -> 373), so it cannot show the scene.
+Grok Imagine video from the scene picture keeps all three in frame and moving (768x1168, 6/10/15 s options). A bilingual line filled 10 s with her lips moving (audio pauses at 2.0, 4.5, 7.1 s). "Replace Audio" button exists, not tested. Grok weekly limit is used up, so clips draw on her extra credits.
+Files (git-ignored): ascent `creatives/mentora-20261106` - `espaluz-fullbody.jpg`, `grok-scene-test2.mp4`, `voice-samples/`.
+
+Second set of lines, each to fit 10-15 s:
+| When | Spanish | English |
+|---|---|---|
+| Very first lesson | ¡Hola, qué bueno que llegaste! Soy EspaLuz. Mira, Titi ya se subió a mi mesa, y Pere todavía está decidiendo si saluda. | Hi, I'm so glad you're here! I'm EspaLuz. Look, Titi is already on my desk, and Pere is still deciding whether to wave. |
+| Later lessons | ¡Volviste! Titi preguntó por ti cinco veces. Pere va por la primera. | You're back! Titi asked about you five times. Pere is still on his first. |
+| Close | ¡Qué buena clase! Hoy aprendiste de verdad, y Titi casi se portó bien. Nos vemos pronto. | What a great class! You really learned today, and Titi almost behaved. See you soon. |
+| Suggest painting | Tengo curiosidad: ¿qué pintarías ahora mismo? Toca Pintar y sorprende a Pere y Titi. | I'm curious: what would you paint right now? Tap Paint and surprise Pere and Titi. |
+| Suggest photo | ¿Qué hay cerca de ti que Pere y Titi nunca han visto? Toca Foto y enséñaselo. | What's near you that Pere and Titi have never seen? Tap Photo and show them. |
+| Suggest tracing | ¿Un reto? Toca Trazar y escribe con tu dedo, a ver si Titi puede seguirte. | A challenge? Tap Trace and write with your finger. Let's see if Titi can keep up. |
+| Suggest Program Titi | ¿Sabías que puedes darle órdenes a Titi? Abre Pintar, busca Programa a Titi, y tú mandas. | Did you know you can give Titi orders? Open Paint, find Program Titi, and you're the boss. |
+| Calm 1 | Oye, a veces pasa. Aquí estoy. Respira conmigo una vez, despacio. Pere y Titi te esperan, sin prisa. | Hey, it happens sometimes. I'm here. Take one slow breath with me. Pere and Titi will wait, no rush. |
+| Calm 2 | Lo que sientes importa. Cuando quieras, cuéntaselo a Pere. Es muy bueno escuchando, y nunca tiene prisa. | What you feel matters. Whenever you want, tell Pere. He's very good at listening, and he's never in a hurry. |
