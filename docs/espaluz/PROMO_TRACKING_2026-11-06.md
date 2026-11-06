@@ -1,7 +1,7 @@
 # Promo tracking: view to click to user (6 Nov 2026)
 
 Elena: "not just publish but track who will actually watch this and click the product links, otherwise it will be like with
-AI Growth Operator videos." Status: film 01 published 22:42 UTC. Tracking below is NOT wired yet, except where marked.
+AI Growth Operator videos." Status: film 01 published 22:42 UTC. Wired 22:59:11 UTC for future films; see `COFOUNDERS_WEAPONS_FOR_ESPALUZ_2026-11-06.md`, section 3. Instagram bio still Elena's.
 
 ## What happened last time (read today, counts only)
 | Measure | Number | Source |
