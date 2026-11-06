@@ -225,6 +225,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 06 Nov 20:19 | Bilingual and emoji check on grown-up replies | `main.py`, `espaluz_bridge.py`, `espaluz_enhancements.py`; both bots | b432f86 / dba0013 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
