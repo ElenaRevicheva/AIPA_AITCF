@@ -23,7 +23,7 @@ destroying each other's work.
 
 **✅ 6 Nov — Telegram clips = WhatsApp: a linked family paying on one channel reads as paying on all (`family_paying` in `kids-memory` facts_get, ascent `6c7961c`, Familybot `e012faa`, WhatsApp `4c5739f`, deployed). Surprise limit and monthly cap count per channel, not per family.**
 
-**🟡 6 Nov 19:45 UTC — buttons on Telegram and WhatsApp LIVE on Oracle, not tapped yet. Heroes-know-EspaLuz LIVE: `espaluz-chat` v301 source has the line, BUT it was already in v300: the push of `3d8f249` at 18:15:37 UTC redeployed every function at 18:16:56, so the earlier "NOT DEPLOYED" was wrong (a push to ascent `main` IS a production deploy). No child has tested it yet. Clip log: `classroom_clip` is in the live bundle `index-B9vYNJT_.js`, 0 rows so far, no clip played since (ascent `3d8f249`, Familybot `ff619f6`, WhatsApp `2249d70`).** Telegram: persistent keyboard, sent once. WhatsApp: Twilio quick-reply, at most once in 6 hours per person (cost/noise). Non-paying tap = pre-made hello. Grep `🔘 buttons shown`, rows `content.event=classroom_clip`. Not proven: a real tap on either bot, Twilio accepting the template outside a test.
+**🟡 6 Nov 20:03 UTC — buttons on Telegram and WhatsApp LIVE on Oracle, not tapped yet; classroom button renamed `🏫 Kids Classroom` (Familybot `b432f86`, WhatsApp `dba0013`, restarted 20:03:44 UTC, md5 = git; old label still works; event `buttons_shown_v2`). Heroes-know-EspaLuz LIVE: `espaluz-chat` v301 source has the line, BUT it was already in v300: the push of `3d8f249` at 18:15:37 UTC redeployed every function at 18:16:56, so the earlier "NOT DEPLOYED" was wrong (a push to ascent `main` IS a production deploy). No child has tested it yet. Clip log: `classroom_clip` is in the live bundle `index-B9vYNJT_.js`, 0 rows so far, no clip played since (ascent `3d8f249`, Familybot `ff619f6`, WhatsApp `2249d70`).** Telegram: persistent keyboard, sent once. WhatsApp: Twilio quick-reply, at most once in 6 hours per person (cost/noise). Non-paying tap = pre-made hello. Grep `🔘 buttons shown`, rows `content.event=classroom_clip`. Not proven: a real tap on either bot, Twilio accepting the template outside a test.
 
 **📋 6 Nov — classroom clips leave no log line (they play in the browser); which clip played is inferred from lesson turns in `learning_sessions`, read there, not copied here (a child's words stay out of this repo). Gap: Pere and Titi do not know who EspaLuz is when a child mentions her.**
 
@@ -223,7 +223,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 06 Nov 20:02 | Rename classroom button to Kids Classroom | `espaluz_talking.py` both bots; `espaluz-familybot`, `espaluz-whatsapp` | ff619f6 / 2249d70 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
