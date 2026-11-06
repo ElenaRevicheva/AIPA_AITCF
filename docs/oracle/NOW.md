@@ -207,6 +207,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 6 Nov | EspaLuz roadmap: bilingual teaching, special clips, family list, notebook, classroom | Oracle `espaluz-familybot`, `espaluz-whatsapp`; ascent `supabase/functions/{espaluz-chat,kids-memory,generate-video}` | - |
 | Claude Code | 6 Nov 16:30 | EspaLuz landing: pale swaying palm fronds at the sky edges, laptop only (local preview first; Elena approves before push) | ascent `src/components/landing/SkyBackground.tsx`, new `PalmFronds.tsx`, `src/index.css` | 9d1d9fc |
 
 **Rules**
