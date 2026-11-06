@@ -64,3 +64,22 @@ Five real families, Panama first. It works if at least 3 are still talking after
 
 ## Sources
 [Replika reviews](https://clank.pages.dev/blog/replika-review-2026/), [Replika voice memory](https://www.roborhythms.com/?p=32975), [Tolan, OpenAI](https://openai.com/index/tolan), [Tolan, Fast Company](https://www.fastcompany.com/91283982/tolan-adorable-alien-ai-companion), [Alexa+](https://www.tomsguide.com/ai/alexa-release-date-cost-devices-and-all-the-new-ai-features), [Gemini for Home](https://blog.google/products/google-nest/gemini-for-home/), [LatamGuru](https://appadvice.com/app/latamguru-expat-life/6748356451), [SettleIn](https://apps.apple.com/app/settlein/id6758104988), [Expat.cl](https://www.expat.cl/expat-support-chile), [Tavus pricing](https://www.tavus.io/pricing), [Anam vs Tavus](https://anam.ai/blog/anam-vs-tavus), [Synthesia on Tavus](https://www.synthesia.io/post/tavus-interactive-avatar-alternatives), [Runway Characters](https://runwayml.com/en/product/characters), [Runway API reference](https://skills.sh/runwayml/skills/api-reference), [SB 243 and FTC](https://calawyers.org/privacy-law/regulatory-focus-on-ai-companion-character-chatbots/), [FTC orders](https://www.dlapiper.com/en/insights/publications/2025/09/ftc-ai-chatbots).
+
+## Why people test and leave: one identity, two doors (added 6 Nov)
+Elena's own principle from an earlier product case (details stay private, on the HubSpot deal): one identity shared between the chat and the app, and identity asked at the moment of value.
+
+EspaLuz has the same shape, measured 6 Nov:
+- 34 of 40 people came through WhatsApp. Strangers creating a web account in 14 days: 0. Active links: 3, none a confirmed stranger.
+- The family list, classroom, shared memory and parent report sit behind a web account plus a 6-character code. Web sign-up may also fail for strangers (see the first-users plan).
+- 35 of 38 left the same day; 32 of 40 sent 2 messages or fewer.
+
+So today's family memory reaches almost nobody who is not already linked. This is a hypothesis: stored stranger conversations are too few to prove why they left.
+
+**Proposed next step: the WhatsApp number is the family's identity.**
+1. A stranger's first message quietly starts a family, with no sign-up. Their notes already save on the bot.
+2. At a moment of value, one offer: a tap on a personal link opens the classroom already signed in, with no email or password.
+3. The tap links the number, so memory, family list and parent report work from then on.
+4. She learns the family one light question at a time, in the chat.
+5. Measure: first useful reply, a remembered fact used on a later day, link tapped, a child's first lesson, day-7 return, payment.
+
+This changes sign-in, so Elena decides before anything is built. Success test stays: 5 real families, Panama first; at least 3 talking after 30 days, at least 1 paying.
