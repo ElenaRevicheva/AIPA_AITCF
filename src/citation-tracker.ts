@@ -101,6 +101,8 @@ export const DEFAULT_PROMPTS = [
   // 2 Nov 2026: EspaLuz, asked the way a parent asks. Tracked against aideazz.xyz/espaluz (its shop window).
   'What is a good AI app to help my child learn Spanish and English at home?',
   'AI Spanish tutor for expat families moving to Panama',
+  // 7 Nov 2026 (Elena: expats ask ChatGPT more and more): the question a family asks before the first school day.
+  'We are moving to Panama with kids and their school will be in Spanish. How can I help my child keep up?',
 ];
 
 const FETCH_TIMEOUT_MS = 45_000;
@@ -152,8 +154,9 @@ function promptList(): string[] {
 /** Host match that accepts www and subdomains but not lookalike domains (notaideazz.xyz). */
 function isOurHost(host: string): boolean {
   const h = host.toLowerCase().replace(/^www\./, '');
-  const d = trackedDomain();
-  return h === d || h.endsWith(`.${d}`);
+  // 7 Nov 2026: EspaLuz's own address counts as ours too (CITATION_EXTRA_DOMAINS, comma-separated).
+  const ours = [trackedDomain(), ...(process.env.CITATION_EXTRA_DOMAINS ?? 'espaluz.lat').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean)];
+  return ours.some((d) => h === d || h.endsWith(`.${d}`));
 }
 
 function pathOf(url: string): string | null {
