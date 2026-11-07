@@ -3,8 +3,10 @@
 Every answer comes from what the code does today and matches https://app.espaluz.lat/privacy-policy (rewritten 7 Nov).
 If the product changes, these answers must change with it — a Data safety answer that is false is a policy violation.
 
-Checked in code (ascent-saas-builder, 7 Nov): no third-party analytics SDK (no Google Analytics, Firebase, Sentry,
-Mixpanel); `useAnalytics` writes first-party learning events into our own `learning_sessions`; microphone used for voice
+Checked in code (ascent-saas-builder, 7 Nov; CORRECTED the same evening): **Google Analytics 4 runs on app.espaluz.lat**
+(`src/lib/track.ts`, G-TL5S8V23LT, since 6 Nov): page paths + event names only (app_screen, app_chat_first/return,
+app_door_whatsapp/telegram, signup errors), never message text; not loaded on /classroom; ads signals off; sets the GA
+cookie (client ID). No Firebase/Sentry/Mixpanel. `useAnalytics` also writes first-party learning events into `learning_sessions`; microphone used for voice
 notes (chat + classroom); camera/photo picker for photos in chat and class; no location; no advertising ID; no ads.
 
 ## 1. App content → Privacy policy
@@ -29,6 +31,10 @@ steps: "Sign in → Chat with EspaLuz; Kids classroom opens from the dashboard a
 **Do you provide a way for users to request that their data is deleted?** Yes — https://app.espaluz.lat/privacy-policy
 (section 5: email aipa@aideazz.xyz, subject "Delete my data", deleted within 30 days).
 
+"Shared" = given to a third party for its own use. Google Analytics with ads signals off acts as our analytics
+provider (Google's Data safety guidance treats analytics providers as service providers) → still **Shared: No**; re-check
+the wording in the Console when filling it.
+
 "Shared" = given to a third party for its own use. Our AI, messaging, hosting and payment providers process data
 **on our behalf** (service providers), which Google's form does not count as sharing → **Shared: No** for every type.
 
@@ -41,8 +47,9 @@ steps: "Sign in → Chat with EspaLuz; Kids classroom opens from the dashboard a
 | Audio → Voice or sound recordings | Yes | **Yes** (turned into text; we keep the text, not the audio) | Optional | App functionality |
 | Photos and videos → Photos | Yes | No | Optional | App functionality |
 | Financial info → Purchase history (subscription active / until when) | Yes | No | Required for paid access | App functionality, Account management |
-| App activity → App interactions (lessons, progress) | Yes | No | Required | App functionality, Analytics |
-| Location, Contacts, Calendar, Health, Device IDs, Web history, Files | **No** | | | |
+| App activity → App interactions (lessons, progress; GA page views and button taps) | Yes | No | Required | App functionality, Analytics |
+| Device or other IDs (Google Analytics client ID cookie) | Yes | No | Required | Analytics |
+| Location, Contacts, Calendar, Health, Web history, Files | **No** | | | |
 
 ## 6. App content → Content rating (IARC questionnaire)
 - Category: **Reference, News, or Educational**.
