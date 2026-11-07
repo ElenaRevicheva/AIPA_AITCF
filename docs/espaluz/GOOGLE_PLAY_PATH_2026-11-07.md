@@ -37,4 +37,4 @@ Earliest public listing: ~3 weeks with a personal account (stage D is the clock)
 - 7 Nov: stage A 1 + 3 pushed (ascent `4bc918e`): manifest, 192/512/maskable icons, theme colour; "Reportar / Report" on every chat reply and classroom turn → `feedback` table (insert-only, read policy false). Checked on the built site: manifest + icons 200, report in bundle, 0 console errors. **Live only after Lovable Publish.**
 - Privacy page (`src/pages/PrivacyPolicy.tsx`, dated 15 Jul 2025) needs Elena's review before Play: it says anonymized data "may be used to improve our AI models" (we train nothing), and it does not name the AI providers that process messages (Gemini, Groq, Anthropic, OpenAI), voice notes, WhatsApp/Telegram, or the report button.
 - 7 Nov: privacy page rewritten to the truth (no AI training, no ads/tracking cookies, providers named, children section, deletion by email within 30 days — Elena must honour that promise). Waits on the same Lovable Publish.
-- 7 Nov: Play developer name → "AIdeazz" (app title stays EspaLuz).
+- 7 Nov: Play developer name → "AIdeazz AI Lab" (app title stays EspaLuz).
