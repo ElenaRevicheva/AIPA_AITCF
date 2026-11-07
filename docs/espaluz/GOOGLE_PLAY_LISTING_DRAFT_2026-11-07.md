@@ -1,5 +1,6 @@
 # EspaLuz — Google Play store listing draft (7 Nov 2026)
 
+Positioning (Elena, 7 Nov): expat families and digital nomads in LATAM, for the long road — never generic "Spanish for families".
 Only claims that are true in the product today (see project_espaluz_claims_inventory). No numbers of users, no ratings,
 no "best", no promises of fluency. EspaLuz is named as an AI. Families from abroad, not locals.
 
@@ -7,11 +8,11 @@ no "best", no promises of fluency. EspaLuz is named as an AI. Families from abro
 EspaLuz: Spanish for families
 
 ## Short description (≤80)
-EN: Your family's AI companion for life in Spanish: chat, voice and a kids class.  (79)
-ES: Tu compañera con IA para vivir en español: chat, voz y una clase para peques.  (78)
+EN: Spanish for expat families & digital nomads in LATAM, for the long road.  (72)
+ES: Español para familias expat y nómadas digitales en LATAM, para el largo camino.  (79)
 
 ## Full description — English (en-US)
-Moving to a Spanish-speaking country with your family? EspaLuz helps you live there in Spanish, one real moment at a time.
+Moving to Latin America with your family, or working from there as a digital nomad? EspaLuz is your bilingual companion for the long road: she helps you live there in Spanish, one real moment at a time.
 
 EspaLuz is an AI companion. You write or send a voice note, in English or Spanish, and she answers in both languages,
 with the Spanish phrase you need right now: at school, at the doctor, at the bank, at the market.
@@ -33,7 +34,7 @@ GOOD TO KNOW
 • No ads. We do not sell your data or train AI models on your conversations. Privacy: https://app.espaluz.lat/privacy-policy
 
 ## Descripción completa — Español (es-419)
-¿Te mudas con tu familia a un país de habla hispana? EspaLuz te ayuda a vivir allí en español, un momento real a la vez.
+¿Te mudas a Latinoamérica con tu familia, o trabajas desde allí como nómada digital? EspaLuz es tu compañera bilingüe para el largo camino: te ayuda a vivir allí en español, un momento real a la vez.
 
 EspaLuz es una compañera con inteligencia artificial. Escribes o mandas una nota de voz, en español o en inglés, y ella
 responde en los dos idiomas, con la frase en español que necesitas ahora: en la escuela, en el médico, en el banco, en el mercado.
