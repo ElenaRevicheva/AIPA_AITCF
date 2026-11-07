@@ -25,7 +25,7 @@ destroying each other's work.
 
 **✅ 6 Nov — Telegram clips = WhatsApp: a linked family paying on one channel reads as paying on all (`family_paying` in `kids-memory` facts_get, ascent `6c7961c`, Familybot `e012faa`, WhatsApp `4c5739f`, deployed). Surprise limit and monthly cap count per channel, not per family.**
 
-**🔴 6 Nov — NO NEW EspaLuz FILM until `docs/espaluz/ARSENAL_GATE_2026-11-06.md` is green (Elena). Awaits her go on the agent's items.**
+**🔴 NO NEW EspaLuz FILM until `docs/espaluz/ARSENAL_GATE_2026-11-06.md` is green (Elena). 7 Nov 10:38 UTC: reply fixes live on both bots (md5 = git), class fixes live `espaluz-chat` v302, egress leak already stopped. ChatGPT leg of the citation probe is blind (OpenAI no credits); probe change pushed `e0fb808c`, not deployed because Oracle's `src/citation-tracker.ts` differs from git, reconcile first. Elena: sign-up test, test links, button taps, Instagram bio, OpenAI and Gemini billing.**
 
 **🟡 6 Nov 23:30 UTC — EspaLuz promo: film 01 live, seen on YouTube, Facebook and Instagram. Film tracking LIVE 22:59:11 UTC (Influencer `aa5be94`, Familybot `4bab3fb`, WhatsApp `92b8d55`, md5 = git), no real arrival yet; daily `--films` report 13:40 UTC; YouTube channel link tagged. Elena's move: Instagram bio link on mobile, sign-up test, YouTube warning, Gemini 402. Co-founder map and go-list: `docs/espaluz/COFOUNDERS_WEAPONS_FOR_ESPALUZ_2026-11-06.md`. Nothing from that list started.**
 
@@ -231,7 +231,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 07 Nov 10:36 | EspaLuz arsenal gate: reply and class fixes, family citation probe | `espaluz_enhancements.py`, Familybot `main.py`, `espaluz-chat/index.ts`, `run-citation-probe.sh`; both bots | 4bab3fb / 92b8d55 / 3d8f249 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push

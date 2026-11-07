@@ -13,11 +13,11 @@ Green means proven by a real action in production, never "deployed". Audited 6 N
 | Buttons really deliver | 🟡 | Shown, no tap in logs |
 | One-tap classroom link from a real chat | 🟡 | Link sent, never seen opened |
 | Replies: both languages | 🟡 | One real reply each; not a week of data |
-| Replies: no doubled phrases, no echo | 🔴 | Seen on her screens 6 Nov, not fixed |
+| Replies: no doubled phrases, no echo | 🟡 | Fixed 7 Nov 10:38 UTC (Familybot `876613a`, WhatsApp `9437375`, md5 = git); tested on her two real cases; no new real reply yet |
 | Replies: useful, right product name | 🔴 | "KidsWeb Classroom"; small model while Gemini answers 402 |
-| Class: no needless breathing, no refused mission, less repeated praise | 🔴 | Read 6 Nov, not fixed |
+| Class: no needless breathing, no refused mission, less repeated praise, day question not feelings | 🟡 | Live 7 Nov, `espaluz-chat` v302 (ascent `b949f28`); no lesson since |
 | Heroes know EspaLuz | 🟡 | Live; the only mention was 17:44 UTC, before it went live |
-| App stays up | 🔴 | Supabase cached egress 206% of free; grace ends 4 Dec, then 402s may stop the app (noted 6 Nov; not re-read) |
+| App stays up | 🟡 | Landing videos left Supabase storage 6 Nov (ascent `9d1d9fc`, live): demo requests stopped after 13:00 UTC. Usage already over quota this cycle; Elena to check the usage page before 4 Dec |
 
 ## 2. The storefront: what a curious stranger sees
 | Check | State | Seen |
@@ -31,7 +31,7 @@ Green means proven by a real action in production, never "deployed". Audited 6 N
 ## 3. Being found: ChatGPT, search, communities
 | Check | State | Seen |
 |---|---|---|
-| Family questions measured weekly | 🔴 | Probe supports `--prompt`; Monday run uses default B2B prompts; last 0 of 9 on 4 Nov |
+| Family questions measured weekly | 🔴 | Monday run already has 2 family questions, but only Perplexity and Google measure: OpenAI "no credits" and Gemini 402 since 2 Nov, so **ChatGPT is blind**. Third question and `espaluz.lat` as ours pushed (cto-aipa `e0fb808c`), NOT deployed: Oracle's copy of the tracker differs from git. Manual ChatGPT check 7 Nov: EspaLuz not named; named Studycat, Dinolingo, FabuLingua, Duolingo, Rockalingua, Khan Academy, IXL, Epic, ReadWorks, Preply, Vamos Academy |
 | Pages that answer family questions | 🔴 | Nothing answers "my child starts a Spanish school" |
 | Blog family lane | 🔴 | All buyer questions are B2B; door to the old page |
 | Reddit listener | 🔴 | `community-listen.cjs` exists, no cron found today; topic gate is AI-business |
