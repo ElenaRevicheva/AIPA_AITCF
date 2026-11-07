@@ -31,3 +31,8 @@ Elena: "I still see it like a way moving forward greatly." Decision taken: go. W
   each purchase. 15% to Google. Web, WhatsApp and Telegram keep PayPal / PagueloFacil.
 
 Earliest public listing: ~3 weeks with a personal account (stage D is the clock).
+
+## Progress
+- 7 Nov: Elena chose a **personal** account (persona natural con RUC; no company for D-U-N-S); sign-up started.
+- 7 Nov: stage A 1 + 3 pushed (ascent `4bc918e`): manifest, 192/512/maskable icons, theme colour; "Reportar / Report" on every chat reply and classroom turn → `feedback` table (insert-only, read policy false). Checked on the built site: manifest + icons 200, report in bundle, 0 console errors. **Live only after Lovable Publish.**
+- Privacy page (`src/pages/PrivacyPolicy.tsx`, dated 15 Jul 2025) needs Elena's review before Play: it says anonymized data "may be used to improve our AI models" (we train nothing), and it does not name the AI providers that process messages (Gemini, Groq, Anthropic, OpenAI), voice notes, WhatsApp/Telegram, or the report button.
