@@ -5,7 +5,7 @@ Only claims that are true in the product today (see project_espaluz_claims_inven
 no "best", no promises of fluency. EspaLuz is named as an AI. Families from abroad, not locals.
 
 ## App name (≤30)
-EspaLuz: Spanish for families
+EspaLuz: Spanish for expats   (27; was "Spanish for families" — too generic, Elena 7 Nov)
 
 ## Short description (≤80)
 EN: Spanish for expat families & digital nomads in LATAM, for the long road.  (72)
