@@ -357,6 +357,8 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+### ✅ 7 Nov ~23:00 UTC — Kids class voices: Replicate out of credit + Gemini free TTS 10/day/model spent mid-class → Pere and Titi both spoke as OpenAI nova (12 lines in Alisa's class). generate-voice v292 (ascent `f0f1893`, CLI deploy — push autodeploy did not fire): last fallback keeps characters (Pere onyx 0.85, Titi fable 1.05, EspaLuz nova). Next free layer to consider: Microsoft Edge neural voices (no key) before OpenAI. Also live today: Supabase Site URL → https://app.espaluz.lat, branded bilingual confirm-signup email, /auth/confirm route, privacy page discloses GA4. Stranger web sign-up PROVEN 22:12 UTC.
+
 ### ⏳ 7 Nov ~19:15 UTC — Google Play path GO (personal account, `docs/espaluz/GOOGLE_PLAY_PATH_2026-11-07.md`). Stage A pushed ascent `4bc918e` (installable manifest/icons + Report button) — **WAITS ON LOVABLE PUBLISH**. Privacy page rewrite waits on Elena. Elena is signing up to Play Console.
 
 ### ⏳ 7 Nov 18:24 UTC — Telegram memory was write-only (wrong session key: profile, LangChain, RAG skipped on every grown-up turn); fixed + deployed, Familybot `0db83034`. Voice notes: family names hint + Lisa→Alisa fix on both bots (18:04). Telegram recall PROVEN (Truffle → "Se llama Truffle."). WAITS: same recall test on WhatsApp and signed-in web; then names from gathered facts for unlinked families. See `docs/espaluz/MEMORY_PROOF_2026-11-07.md`.
