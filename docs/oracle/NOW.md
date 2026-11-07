@@ -231,6 +231,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 07 Nov 10:36 | EspaLuz arsenal gate: reply and class fixes, family citation probe | `espaluz_enhancements.py`, Familybot `main.py`, `espaluz-chat/index.ts`, `run-citation-probe.sh`; both bots | 4bab3fb / 92b8d55 / 3d8f249 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
