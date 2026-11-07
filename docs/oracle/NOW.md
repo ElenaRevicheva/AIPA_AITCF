@@ -357,6 +357,8 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+### ✅ 7 Nov 15:33 UTC — EspaLuz WhatsApp reads Meta's business-scoped user ID (Twilio `ExternalUserId`), saves the pair with the phone in table `whatsapp_bsuid`, and maps an ID-only sender back to the same family. WhatsApp `espaluz_bsuid.py` + bridge, Oracle md5 = git (822a973f / be2a5483), restarted 15:33:16, backup `espaluz_bridge.py.bak-20261107-bsuid`. Tested on Oracle with a fake id (saved → known family → unknown = new), test row removed. NOT yet seen: a real `🆔 bsuid saved` line (next WhatsApp message). Bot's own @username = Elena in WhatsApp Manager; see `docs/espaluz/WHATSAPP_BSUID_2026-11-07.md`.
+
 
 **4 Nov — Atuona negative-parallelism cap LIVE on Oracle (`baaac8ae`).** md5 local = git = Oracle for `src/`+`dist/` `atuona-creative-ai`, `negative-parallelism`, test script; `cto-aipa` restarted 20:25:54 UTC, after the file (20:25:44); detector test 7/7 on Oracle. Oracle's `src/atuona-creative-ai.ts` was older than main (no 30 Oct free-tier lines) — replaced, backup `*.bak-negpar-20261104`. OPEN: proof of OUTPUT = first `negpar[proactive]` log line on the next daily send (or Elena taps `/dailyinspire`).
 

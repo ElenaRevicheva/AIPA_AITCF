@@ -32,3 +32,12 @@ Source: Meta, "Business-scoped user IDs" (updated 5 Nov 2026), and Twilio's chan
 4. Log one line per new pair (`🆔 bsuid saved`) with the id masked, so the proof is in the logs.
 5. Handle Meta's `user_changed_number` / `user_changed_user_id` system messages later; rare, and Twilio passes them through.
 Never put a BSUID or phone on a public page.
+
+## Done 7 Nov 15:33 UTC
+Steps 1–4 are live (WhatsApp repo `espaluz_bsuid.py`, table `whatsapp_bsuid`). Step 5 still open.
+
+## The bot's own username (@espaluz)
+Claimed by a person in Meta, not by our code: Meta Business Suite → WhatsApp Manager → Phone numbers → the EspaLuz number →
+Profile → Username. Rules: English letters, digits, `.` and `_` only (no ñ), 3–35 characters. If the same name is used by
+our Facebook Page or Instagram, the number must be linked to that page or account first. A low messaging limit can make the
+number not yet eligible. Changes are limited to 2 per 14 days, so pick once.
