@@ -1,0 +1,18 @@
+# EspaLuz on Google Play - "Finish setting up your app" answers (9 Nov 2026)
+
+App: **EspaLuz: Spanish for expats** · package `lat.espaluz.app` · personal account AIdeazz AI Lab.
+Each answer describes what the code does today, nothing planned. Elena ticks and saves; Claude drafts.
+
+| # | Task | Answer | Status |
+|---|---|---|---|
+| 1 | Privacy policy | `https://app.espaluz.lat/privacy-policy` (live, updated 7 Nov 2026) | ✅ saved 9 Nov |
+| 2 | Sign in details | "All or some functionality is restricted" + one reviewer account (see below) | in progress |
+
+## 2. Sign in details (App access)
+- Choice: **All or some functionality in my app is restricted** (the free demo works without an account; the family map, classroom, memory card and bot linking need one).
+- Reviewer account: a NEW email Elena controls (never linked to her phones - linked phones copy her paid plan and her history), created by Elena on app.espaluz.lat, confirmed, signed in once. A new account with no subscription row is on the 14-day free trial (useSubscription: free_trial, isTrialActive true). Sign-in is email + password only (signInWithPassword; no OAuth, no one-time code). Elena types the email and password into Play Console herself; the password is never written in a repo or chat.
+- Instructions name: `EspaLuz reviewer account`
+- "Any other information required to access your app": **No**.
+- Instructions text (paste):
+
+> Open the app and tap "Get Started" or "Sign In". Sign in with the email and password above (email and password only, no code sent to a phone). After sign-in you land on the family dashboard: "About your new life" questions, the family map, the children's classroom with Pere and Titi, and the chat with EspaLuz. The account is on the free trial, so all features are open. Without signing in, the home page offers a short free chat demo. Linking WhatsApp or Telegram is optional and not needed for review.
