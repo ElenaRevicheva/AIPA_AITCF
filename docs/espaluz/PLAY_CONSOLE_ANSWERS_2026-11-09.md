@@ -6,11 +6,11 @@ Each answer describes what the code does today, nothing planned. Elena ticks and
 | # | Task | Answer | Status |
 |---|---|---|---|
 | 1 | Privacy policy | `https://app.espaluz.lat/privacy-policy` (live, updated 7 Nov 2026) | ✅ saved 9 Nov |
-| 2 | Sign in details | "All or some functionality is restricted" + one reviewer account (see below) | in progress |
+| 2 | Sign in details | "All or some functionality is restricted" + one reviewer account (see below) | account ready 9 Nov 20:10 UTC (confirmed, signed in, 0 bots, free trial); Elena enters it in Play Console |
 
 ## 2. Sign in details (App access)
 - Choice: **All or some functionality in my app is restricted** (the free demo works without an account; the family map, classroom, memory card and bot linking need one).
-- Reviewer account: a NEW email Elena controls (never linked to her phones - linked phones copy her paid plan and her history), created by Elena on app.espaluz.lat, confirmed, signed in once. A new account with no subscription row is on the 14-day free trial (useSubscription: free_trial, isTrialActive true). Sign-in is email + password only (signInWithPassword; no OAuth, no one-time code). Elena types the email and password into Play Console herself; the password is never written in a repo or chat.
+- Reviewer account (created 9 Nov, display name "Reviewer", a + alias of her Gmail - the address and password are not written here): a NEW email Elena controls (never linked to her phones - linked phones copy her paid plan and her history), created by Elena on app.espaluz.lat, confirmed, signed in once. A new account with no subscription row is on the 14-day free trial (useSubscription: free_trial, isTrialActive true). Sign-in is email + password only (signInWithPassword; no OAuth, no one-time code). Elena types the email and password into Play Console herself; the password is never written in a repo or chat.
 - Instructions name: `EspaLuz reviewer account`
 - "Any other information required to access your app": **No**.
 - Instructions text (paste):
