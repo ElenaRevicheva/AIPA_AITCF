@@ -31,8 +31,9 @@ Checked from production (logs, live pages, Supabase usage), not from code alone.
 
 **Seen in the run, open:**
 - **Old phone history bleeds into a new account.** The bots keep their own history per phone/Telegram id, so the test family's notes say "Elena has a cat" and old turns were loaded (`langchain=5 turn(s)`). A stranger with a new phone has none; one person switching accounts does. Test with a phone that never talked to EspaLuz.
-- **Free models are thin under load.** Every web turn: Claude no credit, Grok out of credits, Gemini 503, Groq big model 429 -> answered by Groq small. The paid OpenAI step is last. Ad traffic will hit these limits - decide before paying for ads.
-- Web hospital answer named a specific Bogota hospital "well-rated and affordable" - not from the checked pack; health/places must say "not checked".
+- **Free models: FIXED 9 Nov 15:38 UTC (ascent `871e110`).** Gemini flash answered 0 of 11 web turns in 24 h; Groq free = 8,000 tokens/min per model (~3,000 a turn). Gemini flash-lite (same free key, 0.7 s on a probe) now answers first on the web; the bots already used it. Live: `answered by gemini-lite` x2, ~1.9 s, no failures before it. Still: Claude no credit, Grok out of credits - load-test before big ad spend.
+- **Hospital answer: FIXED on web + both bots** (ascent `871e110`, WA `b50695e`, TG `d2c5a04`, Oracle md5 `fb01982b`, restarted 15:40:15 UTC). Live reply: "I have not checked any", how locals choose, Spanish words to ask.
+- **Questionnaire restarted at question 1 after adding children: FIXED** (ascent `871e110`, waits for Lovable Publish). Answers wait in the browser tab; "Start here" continues at the same question.
 - Web log labels the grown-up as "Clara (child)"; Telegram activity ping fails (`Missing platform_user_id field`, last_activity not updated).
 
 ## Known gaps - acceptable for first free testers, fix soon
