@@ -6,6 +6,8 @@ Each answer describes what the code does today, nothing planned. Elena ticks and
 | # | Task | Answer | Status |
 |---|---|---|---|
 | 1 | Privacy policy | `https://app.espaluz.lat/privacy-policy` (live, updated 7 Nov 2026) | ✅ saved 9 Nov |
+| 3 | Ads | No (code scan: no AdMob/AdSense in web or Android) | answered 9 Nov |
+| 4 | Content rating | email aipa@aideazz.xyz; All Other App Types; downloaded content No; user sharing No; online content Yes (AI-generated); age-restricted No; location sharing No; digital purchases Yes; loot boxes No; cash/crypto/NFT No; browser No; educational Yes -> **All ages everywhere** (ESRB Everyone, PEGI 3, USK 0, IARC 3+, ClassInd L), descriptor only "In-App Purchases" | summary seen 9 Nov |
 | 2 | Sign in details | "All or some functionality is restricted" + one reviewer account (see below) | account ready 9 Nov 20:10 UTC (confirmed, signed in, 0 bots, free trial); Elena enters it in Play Console |
 
 ## 2. Sign in details (App access)
