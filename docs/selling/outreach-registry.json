@@ -4811,5 +4811,261 @@
     ],
     "emailDraft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/eliana-gonzalez-destination-events-atlas-fu.txt"
+  },
+  "luxury-lane-realty-chestertons-global-atlas": {
+    "company": "Luxury Lane Realty - Chestertons Global",
+    "email": "dawn@luxurylanerealty.com",
+    "score": 94,
+    "dealId": "67767577651",
+    "phone": "17024976967",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-lane-realty-chestertons-global-atlas-email.txt",
+    "draft": "docs/selling/drafts/luxury-lane-realty-chestertons-global-atlas.txt"
+  },
+  "luxury-lane-realty-chestertons-global-atlas-fu": {
+    "company": "Luxury Lane Realty - Chestertons Global",
+    "email": "dawn@luxurylanerealty.com",
+    "score": 94,
+    "dealId": "67767577651",
+    "phone": "17024976967",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-lane-realty-chestertons-global-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/luxury-lane-realty-chestertons-global-atlas-fu.txt"
+  },
+  "noali-tamarindo-luxury-property-management-compa-atlas": {
+    "company": "Noali Tamarindo - Luxury Property management company - Costa Rica",
+    "email": "info@noali-tamarindo.com",
+    "score": 88,
+    "dealId": "67768245634",
+    "phone": "50689145304",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/noali-tamarindo-luxury-property-management-compa-atlas-email.txt",
+    "draft": "docs/selling/drafts/noali-tamarindo-luxury-property-management-compa-atlas.txt"
+  },
+  "noali-tamarindo-luxury-property-management-compa-atlas-fu": {
+    "company": "Noali Tamarindo - Luxury Property management company - Costa Rica",
+    "email": "info@noali-tamarindo.com",
+    "score": 88,
+    "dealId": "67768245634",
+    "phone": "50689145304",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/noali-tamarindo-luxury-property-management-compa-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/noali-tamarindo-luxury-property-management-compa-atlas-fu.txt"
+  },
+  "costa-rica-sotheby-s-international-realty-tamari-atlas": {
+    "company": "Costa Rica Sotheby's International Realty | Tamarindo Office",
+    "email": "info@sircostarica.com",
+    "score": 94,
+    "dealId": "67723577859",
+    "phone": "50640015353",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/costa-rica-sotheby-s-international-realty-tamari-atlas-email.txt",
+    "draft": "docs/selling/drafts/costa-rica-sotheby-s-international-realty-tamari-atlas.txt"
+  },
+  "costa-rica-sotheby-s-international-realty-tamari-atlas-fu": {
+    "company": "Costa Rica Sotheby's International Realty | Tamarindo Office",
+    "email": "info@sircostarica.com",
+    "score": 94,
+    "dealId": "67723577859",
+    "phone": "50640015353",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/costa-rica-sotheby-s-international-realty-tamari-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/costa-rica-sotheby-s-international-realty-tamari-atlas-fu.txt"
+  },
+  "esencia-costa-rica-real-estate-property-manageme-atlas": {
+    "company": "Esencia Costa Rica Real Estate & Property Management.",
+    "email": "esenciacr1@gmail.com",
+    "score": 87,
+    "dealId": "67768300843",
+    "phone": "50689121234",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/esencia-costa-rica-real-estate-property-manageme-atlas-email.txt",
+    "draft": "docs/selling/drafts/esencia-costa-rica-real-estate-property-manageme-atlas.txt"
+  },
+  "esencia-costa-rica-real-estate-property-manageme-atlas-fu": {
+    "company": "Esencia Costa Rica Real Estate & Property Management.",
+    "email": "esenciacr1@gmail.com",
+    "score": 87,
+    "dealId": "67768300843",
+    "phone": "50689121234",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/esencia-costa-rica-real-estate-property-manageme-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/esencia-costa-rica-real-estate-property-manageme-atlas-fu.txt"
+  },
+  "yates-cartagena-luxury-yacht-charters-boat-renta-atlas": {
+    "company": "Yates Cartagena | Luxury Yacht Charters & Boat Rentals Cartagena",
+    "email": "reservas@yatescartagena.com",
+    "score": 50,
+    "dealId": "67732592697",
+    "phone": "573234000147",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/yates-cartagena-luxury-yacht-charters-boat-renta-atlas-email.txt",
+    "draft": "docs/selling/drafts/yates-cartagena-luxury-yacht-charters-boat-renta-atlas.txt"
+  },
+  "yates-cartagena-luxury-yacht-charters-boat-renta-atlas-fu": {
+    "company": "Yates Cartagena | Luxury Yacht Charters & Boat Rentals Cartagena",
+    "email": "reservas@yatescartagena.com",
+    "score": 50,
+    "dealId": "67732592697",
+    "phone": "573234000147",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/yates-cartagena-luxury-yacht-charters-boat-renta-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/yates-cartagena-luxury-yacht-charters-boat-renta-atlas-fu.txt"
+  },
+  "baru-yacht-charters-atlas": {
+    "company": "Baru Yacht Charters",
+    "email": "bookings@baruyachtcharters.com",
+    "score": 88,
+    "dealId": "67768297850",
+    "phone": "573113309515",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/baru-yacht-charters-atlas-email.txt",
+    "draft": "docs/selling/drafts/baru-yacht-charters-atlas.txt"
+  },
+  "baru-yacht-charters-atlas-fu": {
+    "company": "Baru Yacht Charters",
+    "email": "bookings@baruyachtcharters.com",
+    "score": 88,
+    "dealId": "67768297850",
+    "phone": "573113309515",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/baru-yacht-charters-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/baru-yacht-charters-atlas-fu.txt"
+  },
+  "luxury-sailing-boats-and-tourism-atlas": {
+    "company": "Luxury Sailing Boats and Tourism",
+    "email": "comercial@luxurysailingcartagena.com",
+    "score": 70,
+    "dealId": "67732616773",
+    "phone": "573156161507",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-sailing-boats-and-tourism-atlas-email.txt",
+    "draft": "docs/selling/drafts/luxury-sailing-boats-and-tourism-atlas.txt"
+  },
+  "luxury-sailing-boats-and-tourism-atlas-fu": {
+    "company": "Luxury Sailing Boats and Tourism",
+    "email": "comercial@luxurysailingcartagena.com",
+    "score": 70,
+    "dealId": "67732616773",
+    "phone": "573156161507",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/luxury-sailing-boats-and-tourism-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/luxury-sailing-boats-and-tourism-atlas-fu.txt"
+  },
+  "colusalife-boat-charters-atlas": {
+    "company": "COLUSAlife Boat Charters",
+    "email": "colusalife@outlook.com",
+    "score": 79,
+    "dealId": "67732797486",
+    "phone": "573224154127",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/colusalife-boat-charters-atlas-email.txt",
+    "draft": "docs/selling/drafts/colusalife-boat-charters-atlas.txt"
+  },
+  "colusalife-boat-charters-atlas-fu": {
+    "company": "COLUSAlife Boat Charters",
+    "email": "colusalife@outlook.com",
+    "score": 79,
+    "dealId": "67732797486",
+    "phone": "573224154127",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "emailDraft": "docs/selling/drafts/colusalife-boat-charters-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/colusalife-boat-charters-atlas-fu.txt"
   }
 }
