@@ -90,3 +90,10 @@ Checked: type check has the same 6 old errors and no new ones; the new regexes t
   syllabic-method order: vowels, m p, s l, t n, d + soft r, c q g + gue gui, f b v + j ge gi, ll ñ ch + y + silent h,
   strong rr + z ce ci, blends (trabadas), reverse syllables (inversas), k w x + güe güi. Same 12 units and themes, so Alisa stays on Unit 5.
   The exact MEDUCA list is still unconfirmed (see KIDS_CLASS_PATH_1ST_GRADE_DRAFT.md); this is the common order, not a cited syllabus.
+
+## Photos, 10 Nov 23:41 UTC (ascent `8ace78a`, live = commit)
+Elena: the free photo reader already exists in the fleet. It does: VibeJobHunter `scripts/judge_feedback_sync.py` `_read_screenshot`
+(free Gemini -> Groq `qwen/qwen3.8-27b` vision -> Grok -> paid), reading her job screenshots since 1 Nov. The classroom now uses the
+same order: **free Gemini (lite, flash) -> Groq qwen vision (free) -> Claude -> Grok.** Paid readers only when both free ones fail.
+*Not yet seen live: no photo since the deploy. Proof = `photo read by gemini` or `photo read by groq` on the next photo.*
+Twin still open: the Telegram and WhatsApp bots' `process_photo` is still OpenAI -> Grok (both paid).
