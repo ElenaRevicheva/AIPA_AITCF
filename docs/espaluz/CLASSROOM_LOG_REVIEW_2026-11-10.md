@@ -51,3 +51,22 @@ and the heroes built on her toys and drawings. This is the companion behaviour t
 
 Google Play note: photos taken in the child's home go to xAI (and Claude when funded). The Data safety form must match what
 actually leaves the device; check it lists photos processed by service providers before the closed test.
+
+## Thinking it through before fixing (with Elena, 10 Nov)
+The question for each finding: is it caused by having no money, or by how the free resources are arranged?
+
+| Finding | Needs money? | Real cause |
+|---|---|---|
+| 1. Voice flips mid-class | Only for the *real* hero voices (Replicate) | Free voices are tried in the wrong order. Gemini gives 30 lines a day in total (10 × 3 models) for **all** families together, so with 12 testers it is a few lines of a morning, then a flip. Azure is the voice Elena chose by ear on 8 Nov. One free voice per hero for the whole class is honest and stable. |
+| 2. Claude first with no credit | No | Order of the chain. Against the free-first rule. Pure delay. |
+| 3. Photos paid via Grok | Grok costs; a free reader exists | No free photo step before the paid one. Also privacy: photos taken inside a child's home. |
+| 4. Energy break takes over | No | Script logic. Worst case: the child speaks up and is not answered. |
+| 5. Unit goal not taught | No | Prompt does not steer back to the unit. This is the product's main promise. |
+| 6. Wrong guesses about photos | No | The photo reader adds details. Her correcting the heroes in Spanish is good learning, so keep the effect deliberately ("Titi gets it wrong, you fix it"), but only if the next reply answers the correction (see 4). |
+
+**Five of six are free.** Lack of money explains one thing: the heroes do not have their *original* voices. It does not explain the rest.
+
+**Honesty for the closed test (12 testers × 14 days):** do not hide that EspaLuz runs on free tiers. Say it once, plainly, in the tester invite
+and Play listing: built by one parent; during testing the heroes use standard voices and replies can take a few seconds; feedback shapes it.
+Do not promise anything the testers will not get (e.g. "the heroes' own voices"). What looks like a scam to a reviewer is a claim the app
+does not keep, not a small budget.
