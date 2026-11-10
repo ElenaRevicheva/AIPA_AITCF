@@ -81,7 +81,7 @@ export function stripStructuralNumericTokens(s: string): string {
 }
 
 /** Pull every numeric token a fact licenses, so the verifier can check the article against it. */
-function numbersIn(s: string): string[] {
+export function numbersIn(s: string): string[] {
   return (stripStructuralNumericTokens(s).match(/\d[\d,.]*/g) || []).map((n) => n.replace(/[.,]$/, ''));
 }
 
@@ -499,7 +499,7 @@ const INVENTION_MAGNETS = [
  * Numbers a piece of prose may use without a source: small counts used
  * rhetorically, ordinals, years, and clock-like fragments.
  */
-function isFreeNumber(n: string): boolean {
+export function isFreeNumber(n: string): boolean {
   const clean = n.replace(/,/g, '');
   const v = Number(clean);
   if (!Number.isFinite(v)) return true;

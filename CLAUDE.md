@@ -300,6 +300,15 @@ preference. Never let a model re-tell an incident.
   🛡️ technical defense + the posting-shaped CV, ✅ cover letter, 📋 Comet prompt — and `node scripts/hs-audit-apply-kit.cjs`
   on Oracle shows the deal ✓ in every column. Read the notes back from HubSpot before saying it is done.
 - **Never call Claude directly — go through the cost-aware waterfall** (Elena, 30 Oct 2026). Order: free first (Gemini → Groq → Grok → OpenAI), Claude LAST while `MODEL_TIER=free`, Claude first when there is credit; `scripts/model-tier.cjs` sets the tier from her Anthropic billing mail. Use `completeWithProfile` / `claudeWithGroqFallback` (cto-aipa) or `llm_chain` / `claude_helper` (Python bots). A direct `messages.create` must sit behind `if (freeTier())` and carry a `tier-gated` comment — `scripts/pii-guard.cjs` blocks any added line that does not. Model ids come from `.env` (`CLAUDE_SONNET_MODEL`, EspaLuz `CLAUDE_MODEL_NAME`), never a literal.
+- **Several models at once? Use the FAN-OUT, never a new script** (Elena, 10 Nov 2026). The waterfall (`llm-resilience.ts`) is
+  failover: one answer wins. When a job needs *several independent answers to compare* (research, fact cross-checks, "how do
+  AI engines answer X"), use `src/llm-fanout.ts` → `fanOut(prompt, {engines, models})`: Perplexity / OpenAI / Gemini / Grok /
+  Claude in parallel, each with its retrieved sources, usage, `grounded` flag, NO-CREDIT fail-fast and 429 retry; Claude only
+  when not on the free tier or `allowPaidClaude`. `bundleForCrossCheck()` hands the answers to a verifier. To check that a
+  claim's number is really written in its source, use `src/source-check.ts` → `checkClaim()` (built on the blog grounding
+  gate `blog-evidence.ts`, plus RU/EU number formats). Tests: `node scripts/test-source-check.cjs`. First user: a private client
+  research engagement (details only in private memory, never in this public repo). Before ANY new script or install, grep the fleet for
+  that capability first and say what is reused vs new.
 - **Never `git add -A`** here — stage named files only.
 - Build locally, `scp` to Oracle, then **always `pm2 restart cto-aipa
   --update-env`**. Node caches modules; a copied file with no restart means the
