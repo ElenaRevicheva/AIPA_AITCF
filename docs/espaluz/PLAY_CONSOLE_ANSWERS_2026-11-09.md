@@ -62,3 +62,10 @@ Families policy check against the code:
   captcha). About page proof: anyone on the web can see + join; only owners/managers view members, conversations, post.
   Linked to Closed testing - Alpha as its tester group, saved. Invite texts: `docs/espaluz/PLAY_TESTER_INVITE_2026-11-10.md`.
   The Play opt-in link appears only after the release is reviewed. Next: release Next -> Preview -> send for review.
+- **10 Nov ~22:55 UTC - SENT FOR REVIEW** (Elena: "send for review for me"), after her Lovable Publish.
+  Before sending: assetlinks.json live with BOTH keys (fresh fetch; one cached copy still showed only the upload key);
+  countries = all 178 for the closed test (the only release error); quick check "Incomplete advertising ID declaration"
+  answered **No** - the bundle's manifest has no AD_ID permission (only billing, internet, network state,
+  notifications). Publishing overview: 16 changes -> "Changes in review". Google: usually within 7 days.
+  Managed publishing is OFF, so the closed test goes live as soon as it is approved.
+  Next: when approved, copy the tester opt-in link (Testers tab), Elena sends the invite.

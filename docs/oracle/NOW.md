@@ -1,6 +1,6 @@
 # NOW — the shared session between Cursor and Claude Code
 
-**📱 10 Nov — EspaLuz Google Play:** store listing (v3 texts, icon, feature graphic, 4 phone shots, AI labels) saved; closed-test release 1 (1.0.0) uploaded as DRAFT, not sent for review; tester Google Group "EspaLuz testers" linked. ⚠️ ascent `9ceb99a` adds the Play signing key to assetlinks.json — needs Elena's Lovable Publish, then curl to verify both keys. Details: `docs/espaluz/PLAY_CONSOLE_ANSWERS_2026-11-09.md` §7.
+**📱 10 Nov — EspaLuz Google Play:** store listing (v3 texts, icon, feature graphic, 4 phone shots, AI labels) saved; closed-test release 1 (1.0.0) SENT FOR REVIEW 10 Nov ~22:55 UTC (all countries, ad-ID = No); tester Google Group "EspaLuz testers" linked; assetlinks.json live with both keys (ascent `9ceb99a`). When approved: tester opt-in link -> Elena's invite. Details: `docs/espaluz/PLAY_CONSOLE_ANSWERS_2026-11-09.md` §7.
 
 **Cursor Cloud, Cursor Desktop and Claude Code all work this repo and none of them can
 see each other's chats.** No shared conversation, no Claude MCP in Cursor, no way to send
