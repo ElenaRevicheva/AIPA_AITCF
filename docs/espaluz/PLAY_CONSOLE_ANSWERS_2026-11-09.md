@@ -29,3 +29,21 @@ Families policy check against the code:
 - Children's data: classroom opens only after a grown-up signs in; a child never creates an account; privacy policy section 4 "Children" (no ads, no ad ID, parent can see/delete); no GPS anywhere.
 - Analytics: GA4 was already off on /classroom; **now never loaded inside the Play app at all** (ascent commit "track: never load Google Analytics inside the Play app", reuses playBilling.insidePlayApp). Needs Lovable Publish.
 - Open, legal not technical: a child's words and voice in the classroom are processed by AI providers (listed in the privacy policy). COPPA/GDPR-K ask for verifiable parental consent; today the consent is "a grown-up signs in and opens the classroom". Elena may want a one-line parent consent checkbox before the first classroom lesson - her decision, ideally with legal advice.
+
+## 6. Data safety (10 Nov)
+- Collects data: Yes. Encrypted in transit: Yes. Account creation: Username and password only. Delete account URL and delete data URL: `https://app.espaluz.lat/privacy-policy#delete` (section lists what is deleted, what stays with PayPal/Google Play, partial deletion by email; "forget" only stops use). Families commitment badge: Yes. No extra badges.
+- Data types ticked (10): Name, Email, User IDs, Other info (questionnaire) | Purchase history | Other in-app messages | Photos | Voice or sound recordings | App interactions, Other user-generated content. Nothing for location, contacts, files, calendar, web browsing, crash/diagnostics, device IDs.
+- Per type: collected YES, shared NO (AI providers are service providers acting for us = not "sharing" under Google's definition), ephemeral NO (stored).
+
+| Type | Required/optional | Purposes |
+|---|---|---|
+| Name | Required (sign-up asks it) | App functionality, Personalization, Account management |
+| Email address | Required | App functionality, Account management, Developer communications |
+| User IDs | Required | App functionality, Account management |
+| Other info (questionnaire) | Optional (every question has Skip) | App functionality, Personalization |
+| Purchase history | Optional (only if they subscribe) | App functionality, Account management |
+| Other in-app messages | Required (chatting is the app) | App functionality, Personalization |
+| Photos | Optional | App functionality, Personalization |
+| Voice or sound recordings | Optional (they can type) | App functionality |
+| App interactions | Required | App functionality, Personalization, Analytics |
+| Other user-generated content | Optional | App functionality, Personalization |
