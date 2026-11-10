@@ -82,3 +82,11 @@ Everything below uses pieces that already existed; nothing new to pay for.
 - **Corrections:** agree, say the right version in both languages, no game.
 Checked: type check has the same 6 old errors and no new ones; the new regexes tested on today's real turns (3 corrections caught, 5 ordinary turns not).
 **Still needs money (honest note for testers): the heroes' original Replicate voices.** Claude dry costs one fast refusal per turn (left as Elena's 31 Oct "paid first" design).
+
+## Syllables, 10 Nov 22:50 UTC (ascent `09ad3b0` + `9783424`, live = commit)
+- Elena caught a teaching error: "ra, ro, ru" from *arrodón* is the **strong rr** (a-rro-dón); Unit 5 is the soft r (pe-ro, ca-ra).
+  The sounds bridge now says so and takes the d syllable (dón) from such words instead.
+- Elena: every syllable, as bilingual schools teach from kinder. The 12 units now cover every Spanish syllable family in the usual
+  syllabic-method order: vowels, m p, s l, t n, d + soft r, c q g + gue gui, f b v + j ge gi, ll ñ ch + y + silent h,
+  strong rr + z ce ci, blends (trabadas), reverse syllables (inversas), k w x + güe güi. Same 12 units and themes, so Alisa stays on Unit 5.
+  The exact MEDUCA list is still unconfirmed (see KIDS_CLASS_PATH_1ST_GRADE_DRAFT.md); this is the common order, not a cited syllabus.
