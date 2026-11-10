@@ -73,3 +73,17 @@ AN IMPORTANT NOTE
 EspaLuz is an AI-powered companion for language learning, cultural discovery and everyday communication. She does not provide professional, medical, legal or official government advice.
 
 A new country takes time to become home. EspaLuz walks the long road with your family.
+
+## Graphics - uploaded by Claude in Elena's Chrome, saved as draft 10 Nov ~21:15 UTC
+- Icon `D:/aideazz/espaluz-android/store/app-icon-512.png` (512x512), feature graphic `feature-graphic-1024x500.png`.
+- Phone screenshots `phone-1..4.png`, 1080x1920 (9:16, 4 = promotion minimum), in order: home hero / a real demo chat
+  (question about a daughter's first school day in Panama, live reply in Spanish + English) / Pere & Titi card / the
+  family map. Captured from the live site by headless Chrome at 360x720 @3x, framed with one caption each.
+  Presentation only: the cookie banner was declined, the "Edit with Lovable" badge hidden, and the chat box stretched
+  so the whole real reply shows. No text was changed. Script: session scratchpad `cdp.mjs` + `frame.py` (not kept).
+- Console check after save: name 27, short 80, full 3,694 chars; tamarin / video replies / ask us to delete /
+  built never / 14-day free trial / "Spanish, English or Russian" present; "Monkey", "video chat", "if subscribed",
+  "your language" absent.
+- Live bundle check 10 Nov after Elena's Lovable Publish: parent consent screen present, "Maria" quote gone.
+- Seen, not fixed: an anonymous visitor's dashboard greets "Hello, !" (empty name); the live site shows the
+  "Edit with Lovable" badge to every visitor.
