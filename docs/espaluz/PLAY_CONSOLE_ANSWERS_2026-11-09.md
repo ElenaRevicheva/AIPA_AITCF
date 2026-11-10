@@ -58,3 +58,7 @@ Families policy check against the code:
   `curl https://app.espaluz.lat/.well-known/assetlinks.json` shows both.
 - Testers tab: feedback address aipa@aideazz.xyz saved. No tester list yet (email list or Google Group = Elena's choice).
 - Still before review: tester list, then Next -> Preview and confirm -> send for review in Publishing overview.
+- 10 Nov (Elena: "Yes, create it"): Google Group **EspaLuz testers** created in Elena's account (she ticked the
+  captcha). About page proof: anyone on the web can see + join; only owners/managers view members, conversations, post.
+  Linked to Closed testing - Alpha as its tester group, saved. Invite texts: `docs/espaluz/PLAY_TESTER_INVITE_2026-11-10.md`.
+  The Play opt-in link appears only after the release is reviewed. Next: release Next -> Preview -> send for review.
