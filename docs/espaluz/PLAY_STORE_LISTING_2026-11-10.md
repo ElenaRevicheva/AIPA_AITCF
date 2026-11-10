@@ -74,6 +74,10 @@ EspaLuz is an AI-powered companion for language learning, cultural discovery and
 
 A new country takes time to become home. EspaLuz walks the long road with your family.
 
+**Proposed addition, NOT in Play yet (10 Nov 21:40 UTC, Claude; proven live by Elena's tap, log `🃏 card sent`):** under
+ONE COMPANION, after the shared-memory line:
+`- On Telegram, live cards right in the chat: your family's road, life in your country, and local words to practise.`
+
 ## Graphics - uploaded by Claude in Elena's Chrome, saved as draft 10 Nov ~21:15 UTC
 - Icon `D:/aideazz/espaluz-android/store/app-icon-512.png` (512x512), feature graphic `feature-graphic-1024x500.png`.
 - Phone screenshots `phone-1..4.png`, 1080x1920 (9:16, 4 = promotion minimum), in order: home hero / a real demo chat
