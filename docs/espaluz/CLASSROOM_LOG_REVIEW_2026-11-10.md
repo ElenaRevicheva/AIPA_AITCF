@@ -70,3 +70,15 @@ The question for each finding: is it caused by having no money, or by how the fr
 and Play listing: built by one parent; during testing the heroes use standard voices and replies can take a few seconds; feedback shapes it.
 Do not promise anything the testers will not get (e.g. "the heroes' own voices"). What looks like a scam to a reviewer is a claim the app
 does not keep, not a small budget.
+
+## Fixed 10 Nov 22:34 UTC (ascent `8f413fa`, live = commit, downloaded and diffed)
+Everything below uses pieces that already existed; nothing new to pay for.
+- **One voice per hero all day:** heroes speak Azure F0 first, Gemini behind it. Live call 22:38 UTC: `voice spoken by azure-pere`,
+  `azure-titi`, no Gemini refusals first, 2.0 s and 2.5 s (today's average was 5.8 s). Revert without code: secret `FREE_HERO_VOICE_ORDER=gemini,azure`.
+- **Photos:** Claude -> free Gemini (the no-billing key text already uses) -> Grok. Prompt says only what is clearly visible. *Not yet seen live: proof = `photo read by gemini` on her next photo.*
+- **Energy break:** the same line every time was a bug (the base prompt named "cross-crawl", so every break matched it); now the planned break rotates.
+  The answer to her always stays, the turn ends with a question, and no break on a correction or photo turn.
+- **Unit goal:** SOUNDS BRIDGE every 4th turn (offset from the break) until the unit's syllables were shown, built from her own topic; enforced in code if the free model skips it.
+- **Corrections:** agree, say the right version in both languages, no game.
+Checked: type check has the same 6 old errors and no new ones; the new regexes tested on today's real turns (3 corrections caught, 5 ordinary turns not).
+**Still needs money (honest note for testers): the heroes' original Replicate voices.** Claude dry costs one fast refusal per turn (left as Elena's 31 Oct "paid first" design).
