@@ -1,0 +1,53 @@
+# Kids classroom: production log review, 10 Nov 2026
+
+Source: Supabase project logs (`function_edge_logs`, `function_logs`) and `learning_sessions` rows, read 17:56 UTC.
+Window: 17:20–17:56 UTC. One sitting of about 30 minutes: **31 lesson turns, 17:23:52–17:53:35 UTC, one web account.**
+This repo is public, so the child's words are not quoted here. No code or settings were changed by this review.
+Why it matters now: the Google Play closed test (12 testers × 14 days) starts from this classroom, and a reviewer sees what she saw.
+
+## Reliability: clean
+| Function | Calls | HTTP | avg / max time |
+|---|---|---|---|
+| `generate-voice` | 107 | all 200 | 5.8 s / **29.0 s** |
+| `espaluz-chat` | 70 | all 200 | 2.1 s / 14.5 s |
+| `voice-to-text` | 40 | all 200 | 0.7 s / 3.5 s |
+| `kids-memory` | 12 | all 200 | 0.4 s |
+| `payment-mirror` | 12 | all 200 | 0.6 s |
+
+Zero 4xx/5xx. Groq Whisper transcribed every clip. Unit stayed at **Unit 5** all session; the 5 Nov "every press advances the
+unit" bug did not reappear. The "Entiendo que…" tic from 5 Nov is gone (0 of 31). One turn was correctly flagged as the parent speaking.
+
+## What went wrong (from the logs)
+1. **Pere and Titi changed voice in the middle of the class.** Replicate (their real voices) still `402 Insufficient credit`.
+   Free Gemini voices are capped at **10 requests per day per model**; 30 lines failed `429` on all three Gemini models and fell to Azure.
+   Result: Pere spoke 20 lines in Gemini's voice and 17 in Azure's; Titi 13 and 13. A child hears two different Peres in one class.
+   Each of those 30 lines also first waited for three failing Gemini calls before Azure answered (part of the 29 s worst case).
+2. **Claude is still first in the chain and fails every turn:** 19 text turns + 9 photo turns `credit balance is too low`.
+   Text then fell to Gemini-lite (25) or Groq (6); 7 Gemini timeouts added waiting.
+3. **All 9 photos were read by Grok (paid xAI credit),** because Claude is dry and there is no free vision step before Grok.
+4. **The energy break took over the lesson.** The same fixed line ("Pausa de energía, 20 segundos…") appeared in **6 of 31 turns**
+   (17:28, 17:36, 17:40, 17:44, 17:46, 17:51). Three times it replaced the closing question, and at 17:46 it was the **only** reply:
+   she had just corrected the heroes about a photo and got no answer to it.
+5. **The unit goal was barely taught.** Unit 5 target: syllables with d and soft r, sounds h/b/f/l, counting by 2s.
+   Counting by 2 appeared twice (apples, legs). Syllables: 0 of 31 turns. Repeat-after-me: once. The heroes followed her topics
+   (photos, toys, family) well, but never steered back to the syllable work.
+6. **Photo replies guess and get corrected.** Twice the heroes stated something false about a photo (a drink, a toy that flies) and she corrected them.
+   The vision reply invents details beyond the caption.
+7. **6 of 31 turns end with no question**, so the child does not know it is her turn.
+
+## What went right
+She stayed 30 minutes, spoke full Spanish sentences unprompted, sent 9 photos of her own things, corrected the heroes in Spanish,
+and the heroes built on her toys and drawings. This is the companion behaviour the niche promises.
+
+## Suggested order (nothing done; each is Elena's go)
+1. **One voice per hero for the whole day.** When Gemini returns the daily `429`, skip Gemini for the rest of the day (circuit breaker)
+   so every line comes from Azure; or put Azure before Gemini for heroes. Free, removes the voice flip and most of the 29 s wait.
+2. **Skip Claude while it reports no credit** (same circuit breaker, re-check hourly). Free-first rule; also cuts latency.
+3. **Energy break: at most once per class, never as the only line, never replacing the question.** Code-side, in the classroom script.
+4. **Steer back to the unit every ~4 turns** (one syllable or sound mini-game tied to her topic: "arrodón" → ra-ro-ru).
+5. **Photo replies: describe only what the caption says,** ask instead of guess.
+6. Free vision before Grok (Gemini vision) so photos stop spending xAI credit.
+7. Replicate top-up brings the real hero voices back (money, Elena's call).
+
+Google Play note: photos taken in the child's home go to xAI (and Claude when funded). The Data safety form must match what
+actually leaves the device; check it lists photos processed by service providers before the closed test.
