@@ -25,6 +25,10 @@ ok('no false hit inside a longer number (24 vs 245)', () => assert(!inSrc('24', 
 ok('no false hit inside a decimal (5 vs 1.5)', () => assert(!inSrc('5', 'рост на 1.5 процента')));
 ok('years and small counts need no source (blog-evidence isFreeNumber)', () =>
   assert.deepStrictEqual(claimNumbers('In 2025 three offices, 7 teams'), []));
+ok('small decimals ARE claims (4.5 M is a fact, unlike "three reasons")', () =>
+  assert.deepStrictEqual(claimNumbers('Volume was 4.5 M, up from 1.4 M'), ['4.5', '1.4']));
+ok('a separated thousand is not a year (2,100 vessels)', () => assert.deepStrictEqual(claimNumbers('more than 2,100 vessels in 2024'), ['2,100']));
+ok('decimal comma small number is a claim too', () => assert.deepStrictEqual(claimNumbers('рост составил 8,7 млн'), ['8,7']));
 ok('footnote markers are not claims', () => assert.deepStrictEqual(claimNumbers('Revenue was 54.27 M [11][12]'), ['54.27']));
 ok('ISO dates and URLs are not claims (blog-evidence strip)', () =>
   assert.deepStrictEqual(claimNumbers('see https://example.org/a/9143 on 2026-03-01: 613 orders'), ['613']));

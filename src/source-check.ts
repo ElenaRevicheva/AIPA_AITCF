@@ -54,7 +54,10 @@ export function claimNumbers(claim: string): string[] {
     const n = m[1] ?? '';
     if (!n) continue;
     const plain = n.replace(new RegExp(`[${GROUP_SPACE}]`, 'g'), '').replace(/,(?=\d{3}\b)/g, '');
-    if (isFreeNumber(plain)) continue;
+    // Blog prose may use small counts freely ("three reasons"); a research claim may not use
+    // small DECIMALS freely: "4.5 Mt" is a fact. So only whole numbers <= 10 and years are free here.
+    // ...and a number written WITH a separator ("2,100 vessels") is never a year.
+    if (isFreeNumber(plain) && !/[.,]\d/.test(plain) && n === plain) continue;
     if (!out.includes(n)) out.push(n);
   }
   return out;
