@@ -26,7 +26,8 @@ web - plus a kids classroom.
 EspaLuz is not a course and not a tutor. She is a companion for the long road of a new life in a Spanish-speaking
 country: from the first months of adapting to the day it starts to feel like home.
 
-She talks with you in Spanish and in your language at the same time, on the go, in the chats you already use.
+She answers in Spanish and English side by side, on the go, in the chats you already use. You can write or speak
+to her in Spanish, English or Russian.
 The conversation is about your real life, and the Spanish comes with it.
 
 A COMPANION THAT BELONGS TO YOUR FAMILY
