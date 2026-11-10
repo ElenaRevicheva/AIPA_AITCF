@@ -91,3 +91,9 @@ ONE COMPANION, after the shared-memory line:
 - Live bundle check 10 Nov after Elena's Lovable Publish: parent consent screen present, "Maria" quote gone.
 - Seen, not fixed: an anonymous visitor's dashboard greets "Hello, !" (empty name); the live site shows the
   "Edit with Lovable" badge to every visitor.
+- Tablet / desktop / XR screenshots: optional - the Review step showed no error without them; left empty on purpose
+  (phone shots stretched into tablet slots would mislead).
+- AI asset declaration (Elena 10 Nov: "Yes, label them"): "Label assets as created or edited using AI". Labeled: app
+  icon (origin not recorded, labeled to be safe), feature graphic, phone-1 (AI portrait), phone-2 (AI-written reply),
+  phone-3 (AI Pere & Titi art). NOT labeled: phone-4 (plain app interface, no AI image). Listing saved; nothing sent
+  for review.
