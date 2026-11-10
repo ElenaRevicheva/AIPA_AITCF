@@ -11,9 +11,15 @@ second; no "best/#1", no prices, no invented numbers or testimonials; the paid p
 EspaLuz: Spanish for expats
 
 ## Short description (max 80)
-Spanish for your family's new life in Latin America, with a caring AI companion
+Expat families & nomads in LATAM: bilingual companion on WhatsApp, Telegram, web
+
+(Elena's line from the live site hero, en.json eyebrow, cut to 80. Earlier draft: "Spanish for your family's new life in Latin
+America, with a caring AI companion".)
 
 ## Full description (max 4000)
+Expat families & digital nomads in LATAM: a bilingual long-road companion in all your chats - WhatsApp, Telegram,
+web - plus a kids classroom inspired by international school programs.
+
 Moving to a Spanish-speaking country with your family? EspaLuz helps you live there in Spanish: at school, at the
 doctor, at the bank, with the neighbours.
 
@@ -24,7 +30,8 @@ FOR FAMILIES SETTLING IN
 - Tell EspaLuz about your move once: your country, your children, what worries you. It remembers your family and
   answers for your situation, not a textbook one.
 - A step-by-step map of the first months in a new country.
-- A classroom for children with two friendly teachers, Pere and Titi, opened by a parent.
+- A classroom for children with two friendly teachers, Pere and Titi, opened by a parent. Its games follow
+  Cambridge Primary goals (maths, music, computing, first words).
 - Take a photo of a letter, a form or a sign and ask what it means and how to answer.
 - Local guidance for 21 Spanish-speaking countries in Latin America.
 
