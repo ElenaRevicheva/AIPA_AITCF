@@ -47,3 +47,14 @@ Families policy check against the code:
 | Voice or sound recordings | Optional (they can type) - **ephemeral YES**: voice-to-text sends the audio to speech recognition and keeps only the text (no storage upload in the code, checked 10 Nov) | App functionality |
 | App interactions | Required | App functionality, Personalization, Analytics |
 | Other user-generated content | Optional | App functionality, Personalization |
+
+## 7. Closed testing release (10 Nov, Claude in Elena's Chrome, "Yes, do it")
+- Track "Closed testing - Alpha": release **1 (1.0.0)** from `D:/aideazz/espaluz-android/espaluz-1.0.0.aab` (package
+  lat.espaluz.app, signed by the upload key SHA-256 D4:B6:...:6D:C0 - checked from the bundle's own certificate).
+  Release name "1.0.0 first closed test", en-US notes. **Saved as draft - NOT sent for review.**
+- Play App Signing on: Google signs installs with its own key, SHA-256 2D:AA:...:9C:50 (App integrity page). The site
+  trusted only the upload key, so Play installs would open with a browser bar. Added Google's key next to the upload key
+  in `public/.well-known/assetlinks.json` (ascent `9ceb99a`, additive). **Live only after Lovable Publish** - check
+  `curl https://app.espaluz.lat/.well-known/assetlinks.json` shows both.
+- Testers tab: feedback address aipa@aideazz.xyz saved. No tester list yet (email list or Google Group = Elena's choice).
+- Still before review: tester list, then Next -> Preview and confirm -> send for review in Publishing overview.
