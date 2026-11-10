@@ -6,22 +6,24 @@ only), then Elena's own circle. Ads ("Android? Help us test") only after that.
 
 Group: **EspaLuz testers** - anyone can join; only Elena sees members and posts.
 Join link: https://groups.google.com/g/espaluz-testers
-Test opt-in link: appears in Play Console -> Closed testing - Alpha -> Testers once the release is approved.
+Test opt-in link (live 10 Nov, track Active): https://play.google.com/apps/testing/lat.espaluz.app
 
 ## The message (Elena sends it personally - WhatsApp or email; fill [name])
 
 **English**
 > Hi [name], it's Elena from EspaLuz. EspaLuz is becoming an Android app, and before it opens to everyone Google
 > asks for a small group of real families to try it for two weeks. Would you be one of them?
-> It takes two taps: join our tester group here https://groups.google.com/g/espaluz-testers and then I'll send you the
-> link to install it from Google Play. Your plan and family memory stay the same. Tell me anything that feels confusing
+> Three taps on your Android phone: 1) join our tester group https://groups.google.com/g/espaluz-testers
+> 2) open https://play.google.com/apps/testing/lat.espaluz.app and tap "Become a tester" 3) install EspaLuz from Google Play.
+> Please keep it for two weeks. Your plan and family memory stay the same. Tell me anything that feels confusing
 > or broken - that is exactly what I need. Thank you!
 
 **Español**
 > Hola [name], soy Elena de EspaLuz. EspaLuz va a ser una app de Android, y antes de abrirla a todos Google pide que un
 > grupo pequeño de familias reales la pruebe durante dos semanas. ¿Te gustaría ser una de ellas?
-> Son dos pasos: únete a nuestro grupo de prueba aquí https://groups.google.com/g/espaluz-testers y luego te mando el
-> enlace para instalarla desde Google Play. Tu plan y la memoria de tu familia siguen igual. Cuéntame todo lo que te
+> Son tres pasos en tu teléfono Android: 1) únete a nuestro grupo https://groups.google.com/g/espaluz-testers
+> 2) abre https://play.google.com/apps/testing/lat.espaluz.app y toca "Convertirse en tester" 3) instala EspaLuz desde Google Play.
+> Por favor, mantenla dos semanas. Tu plan y la memoria de tu familia siguen igual. Cuéntame todo lo que te
 > parezca confuso o roto: eso es justo lo que necesito. ¡Gracias!
 
 ## Rules
