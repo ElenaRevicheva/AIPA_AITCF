@@ -44,6 +44,6 @@ Families policy check against the code:
 | Purchase history | Optional (only if they subscribe) | App functionality, Account management |
 | Other in-app messages | Required (chatting is the app) | App functionality, Personalization |
 | Photos | Optional | App functionality, Personalization |
-| Voice or sound recordings | Optional (they can type) | App functionality |
+| Voice or sound recordings | Optional (they can type) - **ephemeral YES**: voice-to-text sends the audio to speech recognition and keeps only the text (no storage upload in the code, checked 10 Nov) | App functionality |
 | App interactions | Required | App functionality, Personalization, Analytics |
 | Other user-generated content | Optional | App functionality, Personalization |
