@@ -30,11 +30,11 @@ the heroes' voices (checked 10 Nov), so nothing there must change for voices.
 Welcome post for the "EspaLuz testers" group / second message after someone joins:
 
 > **What to expect during the test.** Pere and Titi speak with standard synthetic voices, and an answer can take a few seconds.
-> Your family's feedback goes straight to the person who builds EspaLuz and is fixed in days, not months: tell us anything that
+> Your family's feedback is read by the person who builds EspaLuz: tell us anything that
 > feels slow, unclear or wrong, and what your child enjoyed.
 
 > **Qué esperar durante la prueba.** Pere y Titi hablan con voces sintéticas estándar, y una respuesta puede tardar unos segundos.
-> Lo que nos cuente tu familia llega directo a quien construye EspaLuz y se corrige en días, no en meses: cuéntanos lo que se sienta
+> Lo que nos cuente tu familia lo lee la persona que construye EspaLuz: cuéntanos lo que se sienta
 > lento, poco claro o incorrecto, y lo que más disfrutó tu peque.
 
 Never say: "the heroes' own voices", "instant replies", "we are a small team with no budget".

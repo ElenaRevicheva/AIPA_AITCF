@@ -56,7 +56,7 @@ For digital nomads, relocating families and travelers:
 - Ask what everyday life is like in different Spanish-speaking countries before deciding where to settle.
 - Practise real-life conversations before you need them.
 - Discover local lifestyle and cultural differences.
-- Type or speak naturally. EspaLuz answers in text and voice, and subscribers can receive short video replies from her avatar.
+- Type or speak naturally. EspaLuz answers in text and voice, and subscribers can receive a few short video replies from her avatar each month.
 
 DESIGNED WITH FAMILIES IN MIND
 - No advertising.
@@ -77,6 +77,8 @@ A new country takes time to become home. EspaLuz walks the long road with your f
 **Proposed addition, NOT in Play yet (10 Nov 21:40 UTC, Claude; proven live by Elena's tap, log `🃏 card sent`):** under
 ONE COMPANION, after the shared-memory line:
 `- On Telegram, live cards right in the chat: your family's road, life in your country, and local words to practise.`
+
+**10 Nov late (Elena OK): video line now says "a few ... each month" (generate-video caps at 30/month); same change on the site (ascent a012672). Saved in Play by Claude (reload shows the new line, old one gone); Publishing overview lists nothing pending - the listing goes public with the production release.**
 
 ## Graphics - uploaded by Claude in Elena's Chrome, saved as draft 10 Nov ~21:15 UTC
 - Icon `D:/aideazz/espaluz-android/store/app-icon-512.png` (512x512), feature graphic `feature-graphic-1024x500.png`.
