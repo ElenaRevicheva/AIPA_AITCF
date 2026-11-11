@@ -88,6 +88,17 @@ Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
   app's 14 days. During a PayPal trial, `paid_until` = PayPal's first billing date (from the API), so the extra week is
   honoured exactly and ends exactly.
 
+## One terms table (11 Nov 2026, Elena: "the same for everybody and everywhere")
+| Channel | Free time before any payment | Then |
+|---|---|---|
+| Every account (web, WhatsApp, Telegram, Android app) | 14 days, no card | choose a way to pay |
+| PayPal `P-6GR9…` (web, WA, TG) | **+2 more weeks** (PayPal's own trial) | $11.00/month |
+| PágueloFácil (WA `pagar`, TG `/pagar`) | none extra | $11 / 30 days, prepaid |
+| Google Play `espaluz_monthly` / base plan `monthly` (Android app) | none extra (no offer yet) | $11.00/month; USD 11.00 in Panama, US, Ecuador, El Salvador; Google's local price elsewhere (e.g. EUR 11.99, MXN 239) |
+
+Created + activated by Claude in Elena's Play Console 11 Nov (her "Yes, create"). Payments profile = Panama 5630-…; payout bank not added yet (hers).
+**Mismatch left:** only PayPal gives 2 extra weeks. Elena decides: drop them (new PayPal plan with no trial, swap the id in web + both bots, existing subscribers keep theirs) or give them everywhere (Play 14-day free-trial offer + PágueloFácil first payment covers 44 days).
+
 ## Open for Elena
 - One PayPal plan for new subscribers on every channel ($11 Monthly with 2 free weeks, or $7.77 Standard with 1)?
   Existing subscribers keep the plan they are on.
