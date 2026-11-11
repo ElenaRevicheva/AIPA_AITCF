@@ -28,3 +28,16 @@ Nothing is fake: every answer reaches all 3 channels. But 6 of 8 answers are sof
 Do NOT redesign the questionnaire before launch. Cheapest proof first: one live test (same question, check the reply
 reflects home country + level + focus). Only if replies ignore them: add explicit rules for #4 (stage), #7 (level) and
 #8 (focus -> pack sections) in the 3 twins (web function + 2 bots).
+
+## 11 Nov update - Elena chose to wire 2, 3, 7, 8 now
+Web chat (ascent `1c44fac`, `profileRules()` in espaluz-chat): HEART LANGUAGE gloss (non-English/Spanish only),
+BRIDGES (compare one custom; ask when unsure about the home country), SPANISH LEVEL (pitch inside the Spanish+English
+pairs - bilingual form unchanged), START FROM WHAT MATTERS NOW (focus -> topics + matching country facts first).
+Local test: sample Russian / "I get by" / school+home profile prints all 4 rules; English-only profile prints none.
+**Bots (WhatsApp + Telegram) twins NOT yet updated** - `profile_line()` in both `espaluz_enhancements.py`; Oracle deploy
+after Elena sees the web reply change.
+
+## Parked post-launch: heritage language (Elena, 11 Nov)
+Children raised in a Spanish-speaking country who understand the parents' language but do not speak it (receptive
+bilingualism / heritage-language loss). Real pain, new product line (curriculum, voices, classroom content in that
+language). Not before Play production access.
