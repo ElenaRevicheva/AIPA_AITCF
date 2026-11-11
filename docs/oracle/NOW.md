@@ -262,6 +262,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-11-11 21:20 | /classroom-ru page (Bear & Fox) | ascent: NEW src/pages/ClassroomRu.tsx, NEW public/classroom-ru + public/heroes-ru, ONE route line in src/App.tsx. Not Classroom.tsx, not playBilling.ts (someone's uncommitted edit there) | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
