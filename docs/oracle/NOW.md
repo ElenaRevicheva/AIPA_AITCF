@@ -1,6 +1,7 @@
 # NOW — the shared session between Cursor and Claude Code
 
 **📱 10 Nov — EspaLuz Google Play:** store listing (v3 texts, icon, feature graphic, 4 phone shots, AI labels) saved; closed-test release 1 (1.0.0) SENT FOR REVIEW 10 Nov ~22:55 UTC (all countries, ad-ID = No); tester Google Group "EspaLuz testers" linked; assetlinks.json live with both keys (ascent `9ceb99a`). When approved: tester opt-in link -> Elena's invite. Details: `docs/espaluz/PLAY_CONSOLE_ANSWERS_2026-11-09.md` §7.
+**💳 11 Nov 01:51 UTC — EspaLuz payments = PayPal + PagueloFacil + Google Play ONLY.** Gumroad (account closed), PayPangea, Stripe removed from code: WhatsApp `c13ec18`, Familybot `d6b4660`, privacy page ascent `a19b0d9` (needs Lovable Publish). Deployed by copy, both bots restarted 01:51 UTC, live files = git (CR-stripped md5), `/gumroad/webhook` → 404, `/` → 200. Rollback: tag `backup/before-gumroad-removal-20261110` + Oracle `~/_backup/gumroad-20261110/`. Do not re-add any other payment provider.
 
 **Cursor Cloud, Cursor Desktop and Claude Code all work this repo and none of them can
 see each other's chats.** No shared conversation, no Claude MCP in Cursor, no way to send
