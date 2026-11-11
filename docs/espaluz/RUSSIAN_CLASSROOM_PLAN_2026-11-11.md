@@ -12,7 +12,7 @@ Approved by Elena 11 Nov. Built during the 14-day closed-test wait. Not in the P
 
 ## Who
 - **Bear** - calm, slow, warm; Pere's role (the patient one). **Fox** - quick, playful, curious; Titi's role.
-- **Names (Elena, 11 Nov): bear = Миша Медок, fox = Лиса Алиса.** The fox shares the name of Elena's daughter on purpose.
+- **Names (Elena, 11 Nov): bear = Мишка Медок, fox = Лиса Алиса.** The fox shares the name of Elena's daughter on purpose.
   Rule for the lesson prompt: the fox ALWAYS calls herself by the full "Лиса Алиса"; the child is called only by her own
   name (from the family list), never "Алиса" alone in the fox's lines - so a child named Alisa always knows who is meant.
 - Shown only to families whose heart language (questionnaire #3) is Russian, plus Elena.
@@ -25,7 +25,7 @@ Child understands Russian, does not speak it (receptive bilingualism). Goal = SP
 4. Topics from her real life: family list names, school, Panama around her - plus Russian folk tales
    (Колобок, Теремок, Репка) and seasons of Russian nature.
 5. Parent report after each lesson, same idea as Pere & Titi: what she said in Russian, new words.
-- Age: built for 6-8 (Alisa's age to confirm).
+- Age: 6-8 (confirmed by Elena 11 Nov).
 
 ## Look - Grok Imagine (Elena's X Premium; image first, then "Make video")
 Style must match Pere & Titi's classroom (`public/classroom/classroom-c.jpg`): warm 3D animated storybook, soft golden
