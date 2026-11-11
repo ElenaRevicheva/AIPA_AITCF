@@ -12,8 +12,9 @@ Approved by Elena 11 Nov. Built during the 14-day closed-test wait. Not in the P
 
 ## Who
 - **Bear** - calm, slow, warm; Pere's role (the patient one). **Fox** - quick, playful, curious; Titi's role.
-- Names: Elena to choose. Folk options: bear **Михаил Потапыч / Потапыч / Миша**; fox **Лиса Патрикеевна / Лисичка /
-  Рыжик**. (Avoid "Лиса Алиса" - the child's own name.)
+- **Names (Elena, 11 Nov): bear = Миша Медок, fox = Лиса Алиса.** The fox shares the name of Elena's daughter on purpose.
+  Rule for the lesson prompt: the fox ALWAYS calls herself by the full "Лиса Алиса"; the child is called only by her own
+  name (from the family list), never "Алиса" alone in the fox's lines - so a child named Alisa always knows who is meant.
 - Shown only to families whose heart language (questionnaire #3) is Russian, plus Elena.
 
 ## How it teaches (heritage speaker, not a beginner)
