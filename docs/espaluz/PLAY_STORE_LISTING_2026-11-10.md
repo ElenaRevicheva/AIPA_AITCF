@@ -67,7 +67,9 @@ DESIGNED WITH FAMILIES IN MIND
 PRICING
 Downloading EspaLuz is free. You can try a short conversation without creating an account.
 
-Full access requires a subscription. New subscribers start with a 14-day free trial and are charged only when it ends, unless they cancel before. The price is shown before you subscribe. You can manage or cancel your subscription in Google Play.
+Every new family gets 14 days of full access free, with no card needed. After that, full access requires a monthly subscription, paid from the day you subscribe. The price is the same on every channel and is shown before you subscribe. You can manage or cancel your subscription in Google Play at any time.
+
+(11 Nov: replaced the 'charged only when the trial ends' sentence - the 14 days are the app's own, Google adds no trial. Saved in Play, reload verified.)
 
 AN IMPORTANT NOTE
 EspaLuz is an AI-powered companion for language learning, cultural discovery and everyday communication. She does not provide professional, medical, legal or official government advice.

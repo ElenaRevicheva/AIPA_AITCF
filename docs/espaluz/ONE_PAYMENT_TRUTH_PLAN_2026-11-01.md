@@ -92,12 +92,13 @@ Sandbox first (PayPal sandbox, `PAGUELOFACIL_SANDBOX`) for every money path.
 | Channel | Free time before any payment | Then |
 |---|---|---|
 | Every account (web, WhatsApp, Telegram, Android app) | 14 days, no card | choose a way to pay |
-| PayPal `P-6GR9…` (web, WA, TG) | **+2 more weeks** (PayPal's own trial) | $11.00/month |
+| PayPal **`P-94X4…` "EspaLuz Family Monthly"** (new subscribers, web + WA + TG, created 11 Nov via API) | none extra | $11.00/month |
+| PayPal `P-6GR9…` / `P-38A7…` (families already subscribed) | kept as they are | $11 / $7.77 |
 | PágueloFácil (WA `pagar`, TG `/pagar`) | none extra | $11 / 30 days, prepaid |
-| Google Play `espaluz_monthly` / base plan `monthly` (Android app) | none extra (no offer yet) | $11.00/month; USD 11.00 in Panama, US, Ecuador, El Salvador; Google's local price elsewhere (e.g. EUR 11.99, MXN 239) |
+| Google Play `espaluz_monthly` / base plan `monthly` (Android app) | none extra | $11.00/month; USD 11.00 in Panama, US, Ecuador, El Salvador; Google's local price elsewhere (e.g. EUR 11.99, MXN 239) |
 
 Created + activated by Claude in Elena's Play Console 11 Nov (her "Yes, create"). Payments profile = Panama 5630-…; payout bank not added yet (hers).
-**Mismatch left:** only PayPal gives 2 extra weeks. Elena decides: drop them (new PayPal plan with no trial, swap the id in web + both bots, existing subscribers keep theirs) or give them everywhere (Play 14-day free-trial offer + PágueloFácil first payment covers 44 days).
+**Resolved 11 Nov (Elena: option 2):** 14 days free everywhere, then $11/month from the day you subscribe. Old plans still accepted by the WA webhook + linking. Before: Elena decides: drop them (new PayPal plan with no trial, swap the id in web + both bots, existing subscribers keep theirs) or give them everywhere (Play 14-day free-trial offer + PágueloFácil first payment covers 44 days).
 
 ## Open for Elena
 - One PayPal plan for new subscribers on every channel ($11 Monthly with 2 free weeks, or $7.77 Standard with 1)?
