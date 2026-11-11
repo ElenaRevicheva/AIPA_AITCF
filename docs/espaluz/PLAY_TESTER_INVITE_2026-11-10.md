@@ -4,10 +4,11 @@ Google needs 12 testers opted in for 14 days in a row before the app can go publ
 So the first 12 are real families, invited personally: first the people already using EspaLuz on the web (Android
 only), then Elena's own circle. Ads ("Android? Help us test") only after that.
 
-Group: **EspaLuz testers** - MUST be: who can search = anyone on the web, who can join = anyone can join, who can view
-members = managers only. 11 Nov: a second account (not the owner) got "You don't have permission to access this content",
-so the earlier note "anyone can join" was never true. Proof it works = a non-owner account sees a Join button.
-Join link: https://groups.google.com/g/espaluz-testers
+Group: **EspaLuz testers** - verified 11 Nov from the About page: anyone on the web can see and join; only owners and
+managers can view members, view conversations and post. Because conversations are managers-only, the bare group link
+(/g/espaluz-testers) opens the Conversations view and a non-member gets "You don't have permission to access this
+content" - with no Join button. Always send the **/about** link: it shows the description and the Join button.
+Join link: https://groups.google.com/g/espaluz-testers/about
 Test opt-in link (live 10 Nov, track Active): https://play.google.com/apps/testing/lat.espaluz.app
 
 ## The message (Elena sends it personally - WhatsApp or email; fill [name])
@@ -15,7 +16,7 @@ Test opt-in link (live 10 Nov, track Active): https://play.google.com/apps/testi
 **English**
 > Hi [name], it's Elena from EspaLuz. EspaLuz is becoming an Android app, and before it opens to everyone Google
 > asks for a small group of real families to try it for two weeks. Would you be one of them?
-> Three taps on your Android phone: 1) join our tester group https://groups.google.com/g/espaluz-testers
+> Three taps on your Android phone: 1) join our tester group https://groups.google.com/g/espaluz-testers/about
 > 2) open https://play.google.com/apps/testing/lat.espaluz.app and tap "Become a tester" 3) install EspaLuz from Google Play: https://play.google.com/store/apps/details?id=lat.espaluz.app
 > (if a white empty window opens, close it and open that link again, choosing "Google Play" to open it).
 > Any Google account works. Just use the same one for all three steps.
@@ -27,7 +28,7 @@ Test opt-in link (live 10 Nov, track Active): https://play.google.com/apps/testi
 **Español**
 > Hola [name], soy Elena de EspaLuz. EspaLuz va a ser una app de Android, y antes de abrirla a todos Google pide que un
 > grupo pequeño de familias reales la pruebe durante dos semanas. ¿Te gustaría ser una de ellas?
-> Son tres pasos en tu teléfono Android: 1) únete a nuestro grupo https://groups.google.com/g/espaluz-testers
+> Son tres pasos en tu teléfono Android: 1) únete a nuestro grupo https://groups.google.com/g/espaluz-testers/about
 > 2) abre https://play.google.com/apps/testing/lat.espaluz.app y toca "Convertirse en tester" 3) instala EspaLuz desde Google Play: https://play.google.com/store/apps/details?id=lat.espaluz.app
 > (si se abre una ventana blanca vacía, ciérrala y abre ese enlace otra vez, eligiendo "Google Play").
 > Sirve cualquier cuenta de Google. Solo usa la misma en los tres pasos.
