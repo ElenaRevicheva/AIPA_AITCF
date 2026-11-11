@@ -4,7 +4,9 @@ Google needs 12 testers opted in for 14 days in a row before the app can go publ
 So the first 12 are real families, invited personally: first the people already using EspaLuz on the web (Android
 only), then Elena's own circle. Ads ("Android? Help us test") only after that.
 
-Group: **EspaLuz testers** - anyone can join; only Elena sees members and posts.
+Group: **EspaLuz testers** - MUST be: who can search = anyone on the web, who can join = anyone can join, who can view
+members = managers only. 11 Nov: a second account (not the owner) got "You don't have permission to access this content",
+so the earlier note "anyone can join" was never true. Proof it works = a non-owner account sees a Join button.
 Join link: https://groups.google.com/g/espaluz-testers
 Test opt-in link (live 10 Nov, track Active): https://play.google.com/apps/testing/lat.espaluz.app
 
