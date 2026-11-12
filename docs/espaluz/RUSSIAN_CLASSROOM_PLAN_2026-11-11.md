@@ -17,6 +17,15 @@ Approved by Elena 11 Nov. Built during the 14-day closed-test wait. Not in the P
   name (from the family list), never "Алиса" alone in the fox's lines - so a child named Alisa always knows who is meant.
 - Shown only to families whose heart language (questionnaire #3) is Russian, plus Elena.
 
+## 12 Nov 2026 - CHANGED: bilingual Russian + English, adapted from Pere & Titi (Elena)
+Elena: "all the features of the Russian classroom should be adapted from Pere and Titi - bilingual exactly like them"; pair = **Russian + English** (her choice over Russian + Spanish).
+- Every line: Russian first, then the same idea in English - shown under it and voiced (voice-ru: Russian Azure voice, then an English one: Mishka en-US-GuyNeural, Lisa en-US-AnaNeural; secrets AZURE_*_EN_VOICE).
+- Two ways in: **Поговорим / Let's talk** (Pere & Titi's lesson rhythm: hello+memory, wake-up game, 2 sentences, game, weekly forest story, calm, goodbye+mission) and **Урок / Class** (12 units, same themes/English/numbers as Pere & Titi's first grade, Russian letters in the bukvar order; two classes per unit).
+- Brain break every 4th turn (Лиса), calm the turn after (Мишка); missions at the goodbye; memory of her own words + last mission from earlier lessons; parent report card on the page (unit, words she said in Russian, new words, mission).
+- Turns saved as `learning_sessions.session_type = 'classroom_ru'` (Pere & Titi's rows never read). Dashboard: map step 3 button, website only.
+- Code: ascent `2dbad9a` (kids-ru, voice-ru, ClassroomRu.tsx). Pere & Titi files: 0 lines changed.
+- The section below is the ORIGINAL 11 Nov design (Russian only) - superseded where it conflicts.
+
 ## How it teaches (heritage speaker, not a beginner)
 Child understands Russian, does not speak it (receptive bilingualism). Goal = SPEAKING, 5-10 min a day.
 1. The heroes speak only Russian, short and slow; no Spanish/English translation unless the child is stuck.
