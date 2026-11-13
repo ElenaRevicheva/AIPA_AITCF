@@ -40,14 +40,20 @@ Every piece reuses something already live. New code = one service worker + one s
 4. **"Hear yourself" without AI.** Offline there is no pronunciation grading, so the tablet records the child's
    repetition on the device and plays it back next to the hero's line (MediaRecorder works offline; recordings never
    leave the tablet). Honest and fun.
-5. **Today's errand pack for the parent (the unique part).** Before leaving home the parent taps the errand
-   (school, doctor, bank, migración, market). EspaLuz saves that topic's CHECKED lines from the family's belonging pack
-   (`belonging/<country>.json`, already used by both bots) plus key phrases, with voice, bilingual. Works in a queue
-   with no signal. Built from existing packs; no new facts.
+5. **~~Today's errand pack~~ - REJECTED by Elena (13 Nov):** school / bank / doctor / migración come and go; phrases
+   about them get glued to every lesson and every conversation and turn into noise. EspaLuz is a companion for wherever
+   life happens, not a topic list. Replaced by:
+   **The road pack follows YOUR life, and nothing sticks.** Before the car leaves Wi-Fi, the tablet saves:
+   - what EspaLuz actually taught this family in the last days (phrases from their own conversations and lessons, on
+     any topic their life brought up - including their own work since the 13 Nov profession question),
+   - each with its voice, Spanish -> English, with the pronunciation hint,
+   - plus 2-3 lines of THIS country's everyday life from the checked belonging pack, rotating, never the same line twice in a row.
+   **Spaced, then retired:** a phrase comes back a few times on later days, then leaves the pack for good. Nothing is
+   repeated just because it once mattered. The pack is different every drive because life is different every day.
 6. **Progress waits, then syncs.** Offline activity is queued on the device and sent through the existing
    `submit-progress` / `learning_sessions` path when Wi-Fi returns.
 
-**Honest promise for the listing:** "Your last lessons and today's errand phrases travel with you - no Wi-Fi needed."
+**Honest promise for the listing:** "What EspaLuz taught your family this week travels with you - no Wi-Fi needed."
 Not promised: live AI conversation or pronunciation checking offline.
 
 **Order:** 1 → 2 → 3 (one update during the 14-day closed test, a real "we listened and improved" answer for Google's
