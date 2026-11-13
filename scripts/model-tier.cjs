@@ -80,6 +80,30 @@ function billingDecision(days = Number(arg('days')) || 45) {
   return ev[0] || null;
 }
 
+/**
+ * 13 Nov 2026 (Elena: "if Anthropic changes the wording, nobody will know and my bots will not use Claude even if I
+ * purchased credits"). A SECOND signal beside the billing emails, not instead of them: ask Claude for one token with the
+ * fleet's own key. 200 = credit is there; Anthropic's "credit balance is too low" = it is not; anything else (network,
+ * 429, 5xx) = 'unknown' and the email decision stands exactly as before. Costs a fraction of a cent per hour with credit,
+ * nothing without it. Key and model id come from cto-aipa's .env (all fleet keys draw on the same Anthropic balance).
+ */
+async function probeClaude() {
+  try {
+    const env = fs.readFileSync(ENV, 'utf8');
+    const val = (k) => ((env.match(new RegExp(`^${k}=(.*)$`, 'm')) || [])[1] || '').trim().replace(/^["']|["']$/g, '');
+    const key = val('ANTHROPIC_API_KEY'), model = val('CLAUDE_SONNET_MODEL');
+    if (!key || !model) return { state: 'unknown', note: 'no key or CLAUDE_SONNET_MODEL in .env' };
+    const r = await fetch('https://api.anthropic.com/v1/messages', { // tier-gated: this call IS the tier check (1 token)
+      method: 'POST', signal: AbortSignal.timeout(20000),
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model, max_tokens: 1, messages: [{ role: 'user', content: 'ok' }] }) });
+    if (r.ok) return { state: 'live', note: 'HTTP 200' };
+    const msg = String(((await r.json().catch(() => ({}))).error || {}).message || '');
+    if (/credit balance|billing|purchase credits|access.*turned off/i.test(msg)) return { state: 'no-credit', note: `HTTP ${r.status}` };
+    return { state: 'unknown', note: `HTTP ${r.status}` };
+  } catch (e) { return { state: 'unknown', note: String(e.message).slice(0, 60) }; }
+}
+
 function apply(tier) {
   const t = TIERS[tier];
   if (!t) throw new Error(`unknown tier ${tier}`);
@@ -123,8 +147,17 @@ function current() {
 (async () => {
   let tier = arg('tier'), why = 'set by hand';
   if (process.argv.includes('--auto')) {
-    const d = billingDecision();
+    let d = billingDecision();
     const now = current();
+    // 13 Nov 2026: the live check has the last word only when it is SURE; 'unknown' leaves everything as before.
+    // An email OLDER than a live-check decision is old news: it must not undo that decision on a network hiccup.
+    let st = {}; try { st = JSON.parse(fs.readFileSync(STATE, 'utf8')); } catch { /* first run */ }
+    if (d && d.at && /live 1-token check/.test(st.why || '') && d.at < Date.parse(st.at || 0)) d = null;
+    const want = d ? d.tier : now;
+    const p = arg('probe') ? { state: arg('probe'), note: 'forced for a test' } : await probeClaude();
+    if (p.state === 'live' && want === 'free') d = { tier: 'claude', why: `Claude answered a live 1-token check (${p.note}) - credit is there even though no billing email said so` };
+    if (p.state === 'no-credit' && want !== 'free') d = { tier: 'free', why: `Claude refused a live 1-token check (${p.note}): credit balance too low` };
+    console.log(`${new Date().toISOString()} live Claude check: ${p.state} (${p.note})`);
     // 25 Oct (Elena: "no daily garbage about my credits"): daily check, but it acts and messages ONLY on a change.
     if (!d || d.tier === now) return console.log(`${new Date().toISOString()} tier stays ${now}${d ? ` (${d.why})` : ' (no billing email in 45 days)'}`);
     tier = d.tier; why = d.why;
