@@ -1,7 +1,7 @@
 # app.espaluz.lat — "Moments EspaLuz helps with": calmer titles and lines (DRAFT, 13 Nov 2026)
 
 Elena: "draft calmer titles and lines". Rules: no toy words (magic, adventure, comes alive), no "survival", no invented
-people, no claim the product does not make today. Awaiting her approval; nothing changed on the site yet.
+people, no claim the product does not make today. APPROVED 13 Nov with one change: topic 9 removed too (generic, any search answers it). Built in ascent `0c72a13`, 9 topics.
 
 **Heading:** EspaLuz: your family's Spanish-English companion on WhatsApp, Telegram and the web
 
