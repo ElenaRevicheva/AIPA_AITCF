@@ -1,4 +1,8 @@
-# EspaLuz "Video moments" - plan (Elena approved the concept 14 Nov 2026; build AFTER Play launch)
+# EspaLuz "Video moments" - plan (Elena approved the concept 14 Nov 2026)
+
+**BUILT 14 Nov (ascent e652a3f): Celebrations.** Elena moved it before launch. The clip is NOT uploaded (3 still
+pictures leave the device, 512 px JPEG); allowance 1/month (`CELEBRATION_MONTHLY_CAP`); kept clip in `avatars/<user>/`
+(public URL, unguessable task id). Practice stays after launch.
 
 Dashboard section is live as "Video moments with EspaLuz" (ascent 73881d3): photoreal hello + 2 "Coming soon" cards.
 
