@@ -2,7 +2,10 @@
 
 **BUILT 14 Nov (ascent e652a3f): Celebrations.** Elena moved it before launch. The clip is NOT uploaded (3 still
 pictures leave the device, 512 px JPEG); allowance 1/month (`CELEBRATION_MONTHLY_CAP`); kept clip in `avatars/<user>/`
-(public URL, unguessable task id). Practice stays after launch.
+(public URL, unguessable task id).
+
+**BUILT 15 Nov (ascent c0fcf16): Face-to-face practice** (Elena: "do that now"). Runway clip only for the final tips
+(one clip, not two: the opening would make the family wait 1-2 min before the first question); 2 tips videos/month.
 
 Dashboard section is live as "Video moments with EspaLuz" (ascent 73881d3): photoreal hello + 2 "Coming soon" cards.
 
