@@ -52,7 +52,7 @@ Sources: Supabase `learning_sessions` rows + function logs (edge + console), 19:
   - Titi's "you love sharks that cook" is his on-purpose silly mistake for the child to correct (she said on 3 Nov she
     does not like sharks).
 
-## DONE 14 Nov ~21:45 UTC (Elena: "yes, do that") - ascent `6a988c6`, voice-to-text + kids-ru deployed, page waits on Publish
+## DONE 14 Nov ~21:45 UTC (Elena: "yes, do that") - ascent `6a988c6`, voice-to-text + kids-ru deployed, page PUBLISHED (live bundle sends context:"classroom_ru", verified); real-class proof still open
 
 ## Plan as approved
 1. ascent `ClassroomRu.tsx`: send `language: 'ru'` + `context: 'classroom_ru'` to voice-to-text.
