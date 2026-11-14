@@ -1,4 +1,4 @@
-# Draft: "For your child, ten minutes a day" card text (14 Nov 2026) - WAITING FOR ELENA
+# "For your child, ten minutes a day" card text (14 Nov 2026) - APPROVED by Elena, applied en/es/ru
 
 Why: Elena: the middle card "looks empty" next to the other two cards. Enrich it with real facts, no repeats.
 
