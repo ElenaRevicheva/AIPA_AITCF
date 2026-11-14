@@ -27,3 +27,13 @@ Proposal: 1 = YOU (mother at laptop photo), 2 = CHILD (Pere & Titi photo), 3 = W
 The old card 2 ("one-minute report") is folded into the child card, so nothing true is lost.
 
 After approval: same texts in Russian and Spanish (en/ru/es locale files), then device check 360/412/768/1280/1600.
+
+## APPLIED 14 Nov (ascent 0d960e6): Elena approved all, kept her own sub-line ("homework" -> "housework"). en/ru/es. Device check 360-1600 ok.
+
+## Proposal 2 - "Ways to start" block, remove duplicated text (NOT applied, waiting for Elena)
+WhatsApp item - BEFORE: "EspaLuz WhatsApp is Now LIVE!" / "Start your Spanish learning journey instantly!" / QR / "Scan to chat instantly!" / photo / "Scan the QR code or click the button to start chatting with EspaLuz on WhatsApp!" / [Start WhatsApp Chat]
+WhatsApp item - AFTER: QR / "Scan with your phone camera or tap the button - say ¡Hola! and she answers in Spanish and English." / photo / [Start WhatsApp Chat] / "+507 6662 3757"
+Telegram item - BEFORE: "Invite your family!" / QR / "Scan to learn on the go!" / [Join Telegram Family]
+Telegram item - AFTER: QR / "Scan or tap - the whole family can join the same EspaLuz." / [Join Telegram Family]
+"Say ¡Hola! on WhatsApp or Telegram" item - BEFORE: slogan + "Ready to start your learning journey on the go?" + "Just text: WhatsApp +507... or click the link to Telegram https://t.me/..." + "Say ¡Hola!..." + the same 2 buttons again.
+"Say ¡Hola!" item - AFTER: removed (everything it says now lives once in the WhatsApp and Telegram items).
