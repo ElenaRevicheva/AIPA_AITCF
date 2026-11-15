@@ -1,6 +1,6 @@
 # NOW — the shared session between Cursor and Claude Code
 
-**🔎 15 Nov 15:20 UTC prod review** (`docs/espaluz/CLASSROOMS_LOG_REVIEW_2026-11-15.md`): site PUBLISHED with today's features; WA+TG turns reach the brain; Russian class hears Russian (fix works) but template praise "целое предложение" x5 + name mix-up -> **classroom-ru owner**; Alisa used free talk, not class (levels untested); phrase bracket bug fixed `f9d78b0` (needs Publish).
+**🔎 15 Nov 15:20 UTC prod review** (`docs/espaluz/CLASSROOMS_LOG_REVIEW_2026-11-15.md`): site PUBLISHED with today's features; WA+TG turns reach the brain; Russian class hears Russian (fix works); template praise "целое предложение" x5 + name mix-up FIXED (prompt + code guard, logs `[kids-ru] cut a template`); Alisa used free talk, not class (levels untested); phrase bracket bug fixed `f9d78b0` (needs Publish).
 
 **🌎 15 Nov ~12:30 UTC: EspaLuz plan APPROVED by Elena and built (surgical, additive).** ascent: `d8a2abc` questionnaire (5 new questions EspaLuz acts on, typed answer on every question, en/ru/es; web rules) · `ff0fde6` journey block + lessons back with REAL data (all channels, measured; country-guide lessons first, Start fixed) · `10873ee` memory callback (one shared rule `_shared/memory_callback.ts`, web + kids-memory `with_callback`) · `0727ff7` classroom KINDER / 1st / 2nd grade (same 12 themes, level by age, parent chooser in the banner; site says ages 5-8, false '3-5/8-10' line fixed) · `6703e3d` "Your first year in <country>" path + first 30 days (guide's belonging_moments, ids matched in bot turns by submit-progress). Bots DEPLOYED 11:51 + 11:54 UTC (profile rules; callback; live md5 = git: enhancements 0fa0b38f, WA memory e9518fbf, FB memory 4b26efe9; backups `~/_session-backups/{profile,callback}-20261115/`). **Waits on Lovable Publish.** Not yet proven by a real family turn: `[brain] ... turn saved`, `[callback] how_did_it_go`, `[classroom] level kinder`. Docs: `docs/espaluz/{BELONGING_DASHBOARD_PLAN,QUESTIONNAIRE_GAPS,CLASSROOM_AGES_5_8_PLAN,CLASSROOM_LEVELS_CONTENT,COMPETITORS}_2026-11-15.md`.
 
@@ -308,7 +308,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (EspaLuz session) | 2026-11-15 15:40 | Russian class: template praise 'целое предложение' + name mix-up (Elena's go) | ascent supabase/functions/kids-ru/index.ts | f9d78b0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
