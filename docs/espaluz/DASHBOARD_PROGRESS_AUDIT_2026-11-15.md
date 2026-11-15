@@ -53,3 +53,15 @@ turns like Telegram does, but only if a real use appears.
 
 Effort: one web component + reading existing rows (no new tables, no new server function, no bot deploy). ~half a day.
 Risk: low; old components stay in the repo, only removed from the dashboard (easy rollback).
+
+## What to borrow from her own CRM (aideazz.xyz/ops) - read 15 Nov, proposal, NOT applied
+Read: `aideazz/public/ops/index.html`, `src/record-timeline.ts`, `scripts/agents-team-snapshot.cjs`, `scripts/espaluz-truth-sync.py`.
+1. **History first, one timeline per record** (record-timeline.ts: 3 sources merged newest-first, each tagged pipeline/email/queue)
+   -> one family timeline: WhatsApp / Telegram / app / classroom / practice / notebook, newest first, each tagged by channel.
+   All rows are already in `learning_sessions` (after the bots' brain sync deploys).
+2. **Freshness on screen** ("EspaLuz checked 12 min ago", "⚠ sync late" over 120 min; truth_runs append-only)
+   -> "Last heard: WhatsApp today 09:12 · Telegram 2 days ago"; the family sees the brain is live.
+3. **Fail-closed, never mock rows** ("numbers are not available right now") - already the rule in FamilyNextSteps.
+4. **Did it / Skip with write-back** (CRM job lane) -> next step cards get "Done" / "Not now", saved as an event, so a
+   skipped suggestion is not repeated tomorrow and done ones count.
+Not borrowed: the JSON snapshot cron (Supabase is queried directly), HubSpot mirroring.
