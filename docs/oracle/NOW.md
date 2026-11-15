@@ -308,6 +308,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (EspaLuz session) | 2026-11-15 15:40 | Russian class: template praise 'целое предложение' + name mix-up (Elena's go) | ascent supabase/functions/kids-ru/index.ts | f9d78b0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
