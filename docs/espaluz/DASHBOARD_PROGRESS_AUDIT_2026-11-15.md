@@ -29,7 +29,13 @@ Also on the dashboard: a red "ENHANCED Debug Info" panel in the same component (
 - **Celebrations** (`celebration_video`) and talking clips.
 - **Real activity per channel** from row dates (WhatsApp facts, Telegram turns, web chat, classroom).
 
-## Proposal (NOT applied - waiting for Elena)
+## APPLIED 15 Nov (ascent 2cbf725), Elena: "keep only valuable stuff"
+LearningAnalytics already shows the week (days, child units) and the family map card 7 the notebook, so only the
+missing part was built: "Phrases to keep, and your next step" (FamilyNextSteps.tsx). TelegramProgress and
+LearningModules are off the dashboard (files kept). Lesson Start buttons pointed to /learning-module/ (route is /learning/).
+Data quality seen: notebook notes "Elena lives in Palouse" (voice mishearing of Panama?) - correctable in card 7.
+
+## Original proposal
 
 Replace the three blocks with ONE block, **"Your family's week with EspaLuz"**, built only from the real rows above:
 
