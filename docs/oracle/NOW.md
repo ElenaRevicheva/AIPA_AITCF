@@ -312,6 +312,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (side session) | 16 Nov 16:00 | on-demand "move paid cards" Trello rollover command | src/trello-rollover.ts (new), src/iendi-cita.ts (exports), src/telegram-bot.ts; pm2 cto-aipa restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
