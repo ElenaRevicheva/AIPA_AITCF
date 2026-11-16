@@ -29,7 +29,7 @@ const MONTHS: Record<string, number> = {
   julio: 7, agosto: 8, septiembre: 9, setiembre: 9, octubre: 10,
   noviembre: 11, diciembre: 12,
 };
-const MONTH_NAME = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+export const MONTH_NAME = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 export interface Appointment {
@@ -60,7 +60,7 @@ function creds(): { key: string; token: string } {
   return { key, token };
 }
 
-async function tGet<T>(path: string, params: Record<string, string> = {}): Promise<T> {
+export async function tGet<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const { key, token } = creds();
   const u = new URL(TRELLO_BASE + path);
   Object.entries({ ...params, key, token }).forEach(([k, v]) => u.searchParams.set(k, v));
@@ -69,7 +69,7 @@ async function tGet<T>(path: string, params: Record<string, string> = {}): Promi
   return (await r.json()) as T;
 }
 
-async function tSend<T>(method: 'POST' | 'PUT', path: string, body: Record<string, string>): Promise<T> {
+export async function tSend<T>(method: 'POST' | 'PUT', path: string, body: Record<string, string>): Promise<T> {
   const { key, token } = creds();
   const u = new URL(TRELLO_BASE + path);
   u.searchParams.set('key', key);
@@ -132,19 +132,19 @@ export function parseIendiText(raw: string): { appts: Appointment[]; problems: s
   return { appts, problems };
 }
 
-interface Board { id: string; name: string }
+export interface Board { id: string; name: string }
 interface List { id: string; name: string }
 interface Label { id: string; color: string }
 
 /** Resolve `Kira <Mes> <Año>` from the appointment's own month — never a hardcoded list. */
-async function boardForMonth(month: number, year: number, boards: Board[]): Promise<Board | null> {
+export async function boardForMonth(month: number, year: number, boards: Board[]): Promise<Board | null> {
   const want = `${MONTH_NAME[month]} ${year}`.toLowerCase();
   return boards.find(b => b.name.toLowerCase().includes(want.toLowerCase())
     && /kira/i.test(b.name)) || null;
 }
 
 /** The dated column. Matched fuzzily — October's is "Датировано." with a stray period. */
-async function citaList(boardId: string): Promise<List | null> {
+export async function citaList(boardId: string): Promise<List | null> {
   const lists = await tGet<List[]>(`/boards/${boardId}/lists`, { fields: 'name' });
   return lists.find(l => /cita|датиров/i.test(l.name)) || null;
 }

@@ -106,6 +106,7 @@ import {
   sameRequest,
 } from './trello-voice';
 import { synthesizeBriefingMp3 } from './sprint-briefing/tts-openai';
+import { isRolloverRequest, parseUpToDay, planRollover, formatPlan, savePending, takePending, executeRollover, formatResult } from './trello-rollover';
 import {
   loadRadarLedger,
   radarKeyboard,
@@ -409,6 +410,29 @@ async function answerFromMail(ctx: Context, request: string): Promise<boolean> {
     + `\n===== ${tag} END =====`, 900, 'telegram/mail');
   await ctx.reply(r.text);
   return true;
+}
+
+/**
+ * "Move paid cards" (16 Nov 2026) — ON DEMAND ONLY: she says it, the bot lists, she taps ✅, then it moves.
+ * Nothing here runs on a timer. See src/trello-rollover.ts.
+ */
+async function startRollover(ctx: Context, text: string, source: 'voice' | 'text' | 'command'): Promise<void> {
+  const uid = ctx.from?.id || 0;
+  console.log(`[trello-rollover] asked by ${source}: "${text.slice(0, 80)}"`);
+  try {
+    const plan = await planRollover(parseUpToDay(text));
+    const movable = plan.items.filter(i => !i.cancelled).length;
+    console.log(`[trello-rollover] plan ${plan.fromBoard || '?'} → ${plan.toBoard || '?'} up to day ${plan.upTo.d}: ${plan.items.length} card(s), ${movable} movable${plan.problem ? `, problem: ${plan.problem}` : ''}`);
+    if (plan.problem || !movable) { await ctx.reply(formatPlan(plan)); return; }
+    const token = savePending(plan, uid);
+    await ctx.reply(formatPlan(plan), { reply_markup: { inline_keyboard: [[
+      { text: `✅ Move ${movable}`, callback_data: `tvroll:ok:${token}` },
+      { text: '❌ Leave them', callback_data: `tvroll:no:${token}` },
+    ]] } });
+  } catch (e) {
+    console.error('[trello-rollover] plan failed:', (e as Error).message.slice(0, 160));
+    await ctx.reply('❌ I could not read the Cita column: ' + (e as Error).message.slice(0, 160) + '. Nothing moved.');
+  }
 }
 
 async function routeToTrello(ctx: Context, text: string, source: 'voice' | 'text',
@@ -1001,6 +1025,7 @@ Type /menu for all commands! 🚀
         { cmd: '/cita', desc: 'Clinic appointments to Trello cards: right Kira month board, Cita column, red (family), Panama times, column re-sorted. Sending the same block twice changes nothing.', usage: 'Reply to the clinic message (or a voice note) with /cita — or paste it: /cita <block>' },
         { cmd: '/dated', desc: 'YOUR OWN dated item as an ORANGE (business) card, same dated column. Understands "next Tuesday 3pm". It states the date back to you and refuses rather than guessing.', usage: '/dated 20 October — send the Fermatix invoice' },
         { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
+        { cmd: '/rollpaid', desc: 'Move PAID cards to next month. Lists this month’s Cita cards due up to the day you name (today if none), flags cancelled subscriptions, and moves only after you tap ✅ — same day next month, same time. Never runs on its own. Or just say "move paid cards" / "перенеси оплаченные" / "pasa las pagadas".', usage: '/rollpaid 15  (or say: move paid cards up to the 15th)' },
         { cmd: '/deepseekkey', desc: 'Wire DeepSeek V4.1 Flash for Atuona. Message is deleted; key is probed before write.', usage: '/deepseekkey sk-…' },
         { cmd: '/blueskykey', desc: 'Let the daily blog post to Bluesky. Message is deleted; the app password is tested before write.', usage: '/blueskykey yourname.bsky.social xxxx-xxxx-xxxx-xxxx' },
       ],
@@ -1245,6 +1270,10 @@ Or just ask me anything - I understand natural language!`;
   /dated next Tuesday 3pm call with Igor
   Understands relative dates. Tells you the date it read — check it.
 /citasort - Re-sort every Kira Cita column by date now
+/rollpaid - Move PAID Cita cards to next month's board (asks ✅ first)
+  /rollpaid 15 — or say "move paid cards up to the 15th" /
+  "перенеси оплаченные до 15" / "pasa las pagadas hasta el 15"
+  Same day next month, same time. Cancelled subscriptions stay. Never automatic.
 
 🎤 Voice → Trello — just speak naturally, no trigger phrase needed:
   "By the 20th, call the car inspection and find the counteragent address"
@@ -1309,6 +1338,24 @@ Or just ask me anything - I understand natural language!`;
     saveRadarProposal(resolved.proposal);
     return resolved.proposal;
   };
+
+  // "Move paid cards" confirm (16 Nov 2026). Only this tap moves anything.
+  bot.callbackQuery(/^tvroll:(ok|no):/, async (ctx) => {
+    const [, verdict, token] = (ctx.callbackQuery?.data || '').split(':');
+    const plan = takePending(token || '', ctx.from?.id || 0);
+    await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    if (!plan) { await ctx.answerCallbackQuery({ text: 'That list is older than 30 minutes — say "move paid cards" again.' }); return; }
+    if (verdict !== 'ok') {
+      console.log('[trello-rollover] declined by Elena — nothing moved');
+      await ctx.answerCallbackQuery({ text: 'Left as they are' });
+      await ctx.reply('👍 Nothing moved.');
+      return;
+    }
+    await ctx.answerCallbackQuery({ text: 'Moving…' });
+    console.log(`[trello-rollover] confirmed by Elena: ${plan.items.filter(i => !i.cancelled).length} card(s)`);
+    const r = await executeRollover(plan);
+    await ctx.reply(formatResult(plan, r));
+  });
 
   // Voice → Trello learning (28 Oct 2026): her answer to a proposed rule. Only an approved rule reaches the classifier.
   bot.callbackQuery(/^tvrule:(ok|no):/, async (ctx) => {
@@ -2178,6 +2225,12 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
     } catch (e) {
       await ctx.reply('❌ ' + (e as Error).message.slice(0, 180) + '\n\nNothing written.');
     }
+  });
+
+  /** /rollpaid [day] — same as saying "move paid cards (up to the 15th)". Lists first; only ✅ moves. */
+  bot.command('rollpaid', async (ctx) => {
+    const arg = (ctx.match || '').toString().trim();
+    await startRollover(ctx, /^\d{1,2}$/.test(arg) ? `up to ${arg}` : arg, 'command');
   });
 
   /** /citasort — put every Kira month board's Cita column back in date order, now. */
@@ -7899,6 +7952,9 @@ Ready to commit? Use:
       // Register for alerts when user chats
       if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
 
+      // "Move paid cards" (16 Nov 2026): lists, then waits for her ✅. Before every other Trello path, so it never becomes a card.
+      if (isRolloverRequest(message || '')) { await startRollover(ctx, message || '', 'text'); return; }
+
       // Task → document (18 Oct 2026): "hazme una cotización en PDF para …" becomes the file — before Trello files it as a
       // task. Anything else returns false here and goes on exactly as before.
       if (await documentFromTask(ctx, message || '')) return;
@@ -8020,6 +8076,9 @@ Ready to commit? Use:
       // Task → document by voice (18 Oct 2026): the same recogniser as typed text; its summary line is spoken back.
       // After the VibeJob Hunter case, which keeps its voice commands even when one mentions "cover letter in PDF".
       if (await documentFromTask(ctx, transcription)) return;
+
+      // "Move paid cards" by voice (16 Nov 2026): same list + ✅ step as typed text.
+      if (isRolloverRequest(transcription)) { await startRollover(ctx, transcription, 'voice'); return; }
 
       // ── Trello (12 Oct 2026: shared with typed text — routeToTrello / tryAttachLink) ──────────
       if (asksMailLookup(transcription) && await answerFromMail(ctx, transcription)) return;
