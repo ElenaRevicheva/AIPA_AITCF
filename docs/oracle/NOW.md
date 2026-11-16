@@ -312,7 +312,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (side session) | 16 Nov 16:00 | on-demand "move paid cards" Trello rollover command | src/trello-rollover.ts (new), src/iendi-cita.ts (exports), src/telegram-bot.ts; pm2 cto-aipa restart | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -435,6 +434,11 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+### ✅ 16 Nov ~15:50 UTC — Trello "move paid cards" (CTO AIPA, on demand only)
+DONE: 8 paid Cita cards (10–15 Nov) moved Kira Noviembre → **Kira Diciembre 2026** Cita on Elena's OK, read back: Make 11 Dec (bills the 11th per SUBSCRIPTIONS.md), HubSpot 16 Dec (bills the 16th), Panapass 10 Dec, Tigo/BCC/Ensa-IDAAN/Sr Carlos/mas Movil 15 Dec; column sorted. Bot: say/type "move paid cards" / "перенеси оплаченные" / "pasa las pagadas" [+ "up to 15" / "до 15" / "hasta el 15"] [+ "except 2, 5" / "кроме" / "menos"] or `/rollpaid 15` → numbered list, cancelled subscriptions flagged and left, ✅/❌ buttons, only ✅ moves (same day next month, same Panama time, read back). Never on a timer. `src/trello-rollover.ts` (new) reuses `iendi-cita.ts` helpers. Commits `3948cf51`, `0ba743ce`.
+VERIFIED BY: Oracle md5 = build (trello-rollover.js `2aca2d20`, telegram-bot.js `e559fabf`), pm2 start 15:47:00 > file 15:46:52, tests 31/31 on Oracle, live read-only plan for "перенеси оплаченные до 30 кроме 1, 3, 5, 7" listed 7 cards, 4 kept. Backups `~/_session-backups/*20261116-rollover`.
+NEXT / RISK: not yet seen a REAL Telegram run — first one prints `[trello-rollover] asked by text|voice`. Trap: `. ./.env` in an Oracle shell gives Trello "invalid token"; grep/cut the TRELLO_ lines.
+
 ### ✅ 7 Nov ~23:00 UTC — Kids class voices: Replicate out of credit + Gemini free TTS 10/day/model spent mid-class → Pere and Titi both spoke as OpenAI nova (12 lines in Alisa's class). generate-voice v292 (ascent `f0f1893`, CLI deploy — push autodeploy did not fire): last fallback keeps characters (Pere onyx 0.85, Titi fable 1.05, EspaLuz nova). Next free layer to consider: Microsoft Edge neural voices (no key) before OpenAI. Also live today: Supabase Site URL → https://app.espaluz.lat, branded bilingual confirm-signup email, /auth/confirm route, privacy page discloses GA4. Stranger web sign-up PROVEN 22:12 UTC.
 
 ### ⏳ 7 Nov ~19:15 UTC — Google Play path GO (personal account, `docs/espaluz/GOOGLE_PLAY_PATH_2026-11-07.md`). Stage A pushed ascent `4bc918e` (installable manifest/icons + Report button) — **WAITS ON LOVABLE PUBLISH**. Privacy page rewrite waits on Elena. Elena is signing up to Play Console.
