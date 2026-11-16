@@ -55,6 +55,21 @@ rule: families first, nomads second, never dropped), Premium "Coming soon" ×3, 
 inline checkout form (after sign-up), the long culture sentence, the founder/"How EspaLuz is built" block (to /about or a
 collapsed footer section).
 
+## Andy's advice — the only rules we follow (each has a pass test)
+
+1. **Clear in the first minute: who it is for + what it does.** Pass: the first phone screen alone answers both.
+2. **Less text; every word carries weight** ("our teachers don't read"). Pass: whole page ≤ ~300 words per language;
+   no sentence that repeats another; no slogan without a fact.
+3. **The agent test before every publish:** reader-agents playing real parents read it cold. Pass: each says in one
+   sentence who it is for and what it does, confidence ≥ 4 of 5, in EN, ES and RU. Today: 3 of 5 (fail).
+4. **One page in the guide's order:** navbar with one button → hero (outcome + one button) → short demo → what you get →
+   3 steps → one price → real testimonials only → one closing button → footer. Pass: one button repeated, never a
+   second choice competing.
+5. **Measure, do not guess (PostHog):** time on page, scroll depth, landing → Start → sign-up. Pass: a "before" number
+   exists before the new page goes live, and an "after" number one week later.
+
+Not his advice, ours (kept): real claims only; families first, nomads second; translation of everything.
+
 ## Measuring it (PostHog, as suggested)
 
 GA4 is already on the site (loads after cookie consent; event `app_screen`). It does not show HOW people read.
