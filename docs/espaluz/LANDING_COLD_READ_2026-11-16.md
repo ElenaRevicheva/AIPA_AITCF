@@ -70,6 +70,16 @@ collapsed footer section).
 
 Not his advice, ours (kept): real claims only; families first, nomads second; translation of everything.
 
+## Live evidence (16 Nov ~17:00 UTC, Android Pixel 7 screen, Chromium, production)
+
+- First screen a stranger sees: logo, "Get Started", the face, "Hear EspaLuz say hello", the audience line - then the
+  cookie banner covers the bottom 29% of the screen, ON TOP of the headline. What EspaLuz is and what it costs are not
+  on the first screen (price and "20 messages without an account" start at screen 1.2; the one-minute report at 2.4).
+- 9.4 phone screens long; 18 things to tap, 15 of them different; "WhatsApp" written 9 times; 9 videos on one page.
+- Accounts in production: 13 in total since July 2025. Web sign-ups in the last 30 days: 5 - four are Elena's own or
+  testers, one is a stranger who never confirmed the email. Paying strangers: 0.
+- PostHog is live: nothing before "Accept"; after it the recorder loads (posthog-recorder.js).
+
 ## Measuring it (PostHog, as suggested)
 
 GA4 is already on the site (loads after cookie consent; event `app_screen`). It does not show HOW people read.
