@@ -43,5 +43,15 @@ eq('Make kept', r.cancelledMatch('Pay make.com'), null);
 eq('HubSpot kept', r.cancelledMatch('Hubspot'), null);
 eq('Microsoft kept', r.cancelledMatch('Оплата Микрософт'), null);
 
+// "except" numbers
+eq('except 1, 3', r.parseExcept('move paid cards up to 30 except 1, 3'), [1, 3]);
+eq('кроме 1 и 3', r.parseExcept('перенеси оплаченные до 30 кроме 1 и 3'), [1, 3]);
+eq('menos 2 y 5', r.parseExcept('pasa las pagadas menos 2 y 5'), [2, 5]);
+eq('but not #4', r.parseExcept('move paid cards but not #4'), [4]);
+eq('no except', r.parseExcept('move paid cards up to the 15th'), []);
+eq('applyExcept numbers skip cancelled', r.applyExcept({ items: [
+  { id: 'a', cancelled: null }, { id: 'b', cancelled: 'Spotify' }, { id: 'c', cancelled: null }, { id: 'd', cancelled: null }] }, [2])
+  .items.map(i => !!i.kept), [false, false, true, false]);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

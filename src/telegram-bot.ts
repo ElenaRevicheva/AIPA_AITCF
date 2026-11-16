@@ -106,7 +106,7 @@ import {
   sameRequest,
 } from './trello-voice';
 import { synthesizeBriefingMp3 } from './sprint-briefing/tts-openai';
-import { isRolloverRequest, parseUpToDay, planRollover, formatPlan, savePending, takePending, executeRollover, formatResult } from './trello-rollover';
+import { isRolloverRequest, parseUpToDay, parseExcept, applyExcept, planRollover, formatPlan, savePending, takePending, executeRollover, formatResult } from './trello-rollover';
 import {
   loadRadarLedger,
   radarKeyboard,
@@ -420,8 +420,8 @@ async function startRollover(ctx: Context, text: string, source: 'voice' | 'text
   const uid = ctx.from?.id || 0;
   console.log(`[trello-rollover] asked by ${source}: "${text.slice(0, 80)}"`);
   try {
-    const plan = await planRollover(parseUpToDay(text));
-    const movable = plan.items.filter(i => !i.cancelled).length;
+    const plan = applyExcept(await planRollover(parseUpToDay(text)), parseExcept(text));
+    const movable = plan.items.filter(i => !i.cancelled && !i.kept).length;
     console.log(`[trello-rollover] plan ${plan.fromBoard || '?'} → ${plan.toBoard || '?'} up to day ${plan.upTo.d}: ${plan.items.length} card(s), ${movable} movable${plan.problem ? `, problem: ${plan.problem}` : ''}`);
     if (plan.problem || !movable) { await ctx.reply(formatPlan(plan)); return; }
     const token = savePending(plan, uid);
@@ -1352,7 +1352,7 @@ Or just ask me anything - I understand natural language!`;
       return;
     }
     await ctx.answerCallbackQuery({ text: 'Moving…' });
-    console.log(`[trello-rollover] confirmed by Elena: ${plan.items.filter(i => !i.cancelled).length} card(s)`);
+    console.log(`[trello-rollover] confirmed by Elena: ${plan.items.filter(i => !i.cancelled && !i.kept).length} card(s)`);
     const r = await executeRollover(plan);
     await ctx.reply(formatResult(plan, r));
   });

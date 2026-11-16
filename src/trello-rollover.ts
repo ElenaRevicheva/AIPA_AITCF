@@ -70,6 +70,23 @@ export function parseUpToDay(text: string): number | null {
   return d >= 1 && d <= 31 ? d : null;
 }
 
+/**
+ * "except 1, 3" / "кроме 1 и 3" / "menos 1, 3" / "but not 2" — numbers from the list she was shown (the list is
+ * ordered by due date, so the same request numbers the cards the same way). Those cards stay where they are.
+ */
+export function parseExcept(text: string): number[] {
+  const m = (text || '').match(/(?:except|but\s+not|without|skip|кроме|без|menos|excepto|salvo|sin)\s+((?:(?:№|#)?\s*\d{1,2}\s*(?:,|and|и|y|&|\s)\s*)*(?:№|#)?\s*\d{1,2})/i);
+  if (!m || !m[1]) return [];
+  return [...new Set((m[1].match(/\d{1,2}/g) || []).map(Number))].filter(n => n >= 1).sort((a, b) => a - b);
+}
+
+/** Mark the numbered (non-cancelled) items she excluded as kept. Numbering = order shown in formatPlan. */
+export function applyExcept(p: RolloverPlan, except: number[]): RolloverPlan {
+  if (!except.length) return p;
+  let n = 0;
+  return { ...p, items: p.items.map(i => { if (i.cancelled) return i; n++; return except.includes(n) ? { ...i, kept: true } : i; }) };
+}
+
 // ── Dates (Panama wall clock) ──────────────────────────────────────────────────
 
 interface Ymd { y: number; m: number; d: number }
@@ -97,7 +114,7 @@ export function fmtPanama(iso: string): string {
 
 // ── Plan ───────────────────────────────────────────────────────────────────────
 
-export interface RolloverItem { id: string; name: string; due: string; newDue: string; cancelled: string | null }
+export interface RolloverItem { id: string; name: string; due: string; newDue: string; cancelled: string | null; kept?: boolean }
 export interface RolloverPlan {
   fromBoard: string; fromListId: string;
   toBoard: string; toBoardId: string; toListId: string;
@@ -138,12 +155,15 @@ export function formatPlan(p: RolloverPlan): string {
   if (p.problem) return `⚠️ Move paid cards: ${p.problem}. Nothing moved.`;
   const head = `📦 ${p.fromBoard} → ${p.toBoard}, Cita cards due 1–${p.upTo.d} ${MONTH_NAME[p.upTo.m]}:`;
   if (!p.items.length) return `${head}\nNone. Nothing to move.`;
-  const roll = p.items.filter(i => !i.cancelled);
+  const numbered = p.items.filter(i => !i.cancelled);
   const flagged = p.items.filter(i => i.cancelled);
-  const lines = roll.map((i, n) => `${n + 1}. ${i.name.slice(0, 60)} — ${fmtPanama(i.due)} → ${fmtPanama(i.newDue)}`);
+  const moving = numbered.filter(i => !i.kept).length;
+  const lines = numbered.map((i, n) => i.kept
+    ? `${n + 1}. ↷ ${i.name.slice(0, 60)} — ${fmtPanama(i.due)}, stays (you said except)`
+    : `${n + 1}. ${i.name.slice(0, 60)} — ${fmtPanama(i.due)} → ${fmtPanama(i.newDue)}`);
   const flags = flagged.map(i => `⛔ ${i.name.slice(0, 60)} (${fmtPanama(i.due)}) — ${i.cancelled} is CANCELLED, staying put`);
-  return [head, ...lines, ...(flags.length ? ['', ...flags] : []),
-    '', roll.length ? `Tap ✅ to move these ${roll.length}, or ❌ to leave everything as it is.` : 'Nothing to move.'].join('\n');
+  return [head, ...lines, ...(flags.length ? ['', ...flags] : []), '',
+    moving ? `Tap ✅ to move these ${moving}, or ❌ to leave everything as it is.\nNot all of them? Say it again with "except 2, 5" (кроме / menos).` : 'Nothing to move.'].join('\n');
 }
 
 // ── Pending confirmations (in memory, 30 min) ─────────────────────────────────
@@ -173,6 +193,7 @@ export async function executeRollover(p: RolloverPlan): Promise<RolloverResult> 
   const r: RolloverResult = { moved: [], skipped: [], failed: [] };
   for (const i of p.items) {
     if (i.cancelled) { r.skipped.push(`${i.name} (cancelled: ${i.cancelled})`); continue; }
+    if (i.kept) { r.skipped.push(`${i.name} (you said except)`); continue; }
     try {
       const now = await tGet<CardRow>(`/cards/${i.id}`, { fields: 'name,due,idList,closed' });
       if (now.closed || now.idList !== p.fromListId) { r.skipped.push(`${i.name} (no longer in ${p.fromBoard} Cita)`); continue; }
