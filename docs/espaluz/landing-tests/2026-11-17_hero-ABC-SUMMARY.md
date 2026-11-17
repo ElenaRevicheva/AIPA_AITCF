@@ -49,3 +49,9 @@ The Spanish-speaking reader's question ("is this for me?") appears in every vers
 | G | 76 (EN) | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 |
 The Spanish reader's question changed from "is this for me?" (12 of 12 earlier runs) to "show concrete examples of how it
 helps a native Spanish speaker adapt to Panamá" - he now reads it as for him. Next: the demo block.
+
+## Demo "See a real lesson" added under the Start button (approved by Elena) — hero B + ES line + demo
+| B+ES+demo | 5/4/5 · 5/4/4 | 4.50 | 0 of 6 — EN and ES readers tap "See a real lesson" FIRST in both runs |
+Screens: real live app, temporary test family "Ana" + "Sofi" (6), Panamá, created and deleted 17 Nov (0 rows left, checked).
+Readers read text only (not the images); they slowed on the honesty note "(a test family, no real child)".
+Next asks: a short VIDEO of a lesson (EN), local Spanish of Argentina (RU), concrete help for Spanish speakers (ES).
