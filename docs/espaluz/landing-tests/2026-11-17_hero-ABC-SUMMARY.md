@@ -16,3 +16,15 @@ Differences between versions are inside the run-to-run noise. What repeats in EV
 - the Spanish-speaking (Venezuelan) reader, 6 of 6: "why Spanish help if I already speak Spanish?" -> a positioning line for
   Spanish-speaking families (their value = English + the new country's customs), not a wording tweak;
 - the Russian reader in Argentina: "local Spanish (Rioplatense) or generic?" (the 21 country guides do teach local expressions).
+
+## D — Elena's own text, grammar polished (added the same day)
+"For families who have moved to Latin America — and for digital nomads and travelers still finding their place. / Spanish
+and English for your child. A companion for your whole family. / Ages 5–8 … Real learning instead of cartoons. For you,
+wherever you are: Spanish to understand the people, the culture and the unwritten rules of everyday life, and to feel at
+home here — plus English that grows with your family." 84 words (EN).
+
+| D | 84 | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 — EN tapped the main button once |
+
+Readers slowed on: "English that grows with your family" (EN, RU both runs), the nomads line (all three), the long ES
+"para entender a la gente, la cultura y las reglas no escritas…" line. Still asked: a view of the lesson; the Spanish
+speaker's "why Spanish help for me?".
