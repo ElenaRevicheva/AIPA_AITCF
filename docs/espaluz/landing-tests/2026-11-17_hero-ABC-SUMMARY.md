@@ -28,3 +28,13 @@ home here — plus English that grows with your family." 84 words (EN).
 Readers slowed on: "English that grows with your family" (EN, RU both runs), the nomads line (all three), the long ES
 "para entender a la gente, la cultura y las reglas no escritas…" line. Still asked: a view of the lesson; the Spanish
 speaker's "why Spanish help for me?".
+
+## E — Elena's second text, grammar polished
+"For families who have moved to Latin America, and for digital nomads and travelers still searching for their place. /
+Spanish and English for your child, and a companion for you / … For you: help on WhatsApp with the practical side of
+everyday life, right where it happens — Spanish to feel at home here, and English that grows with your family." 80 words (EN).
+
+| E | 80 | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 — EN tapped the main button once |
+
+Readers slowed on "a companion for you" ("y una compañera para ti", "и спутница для вас" — RU both runs), plus the
+same recurring items (nomads line, "feel at home", demo missing, Spanish speaker's question).

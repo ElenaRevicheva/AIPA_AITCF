@@ -66,5 +66,22 @@
       "headline": "Испанский и английский для ребёнка. Помощница для всей семьи.",
       "sub": "5–8 лет: десять минут в день с Пере и Тити, по примеру международных двуязычных школ. Настоящая учёба вместо мультиков. Для вас — где бы вы ни были: испанский, чтобы понимать людей, культуру и неписаные правила повседневной жизни и чувствовать себя здесь как дома, и английский, который растёт вместе с вашей семьёй."
     }
+  },
+  "E": {
+    "en": {
+      "eyebrow": "For families who have moved to Latin America, and for digital nomads and travelers still searching for their place.",
+      "headline": "Spanish and English for your child, and a companion for you",
+      "sub": "Ages 5–8: ten minutes a day with Pere & Titi, inspired by international bilingual schools. Real learning instead of cartoons. For you: help on WhatsApp with the practical side of everyday life, right where it happens — Spanish to feel at home here, and English that grows with your family."
+    },
+    "es": {
+      "eyebrow": "Para familias que se mudaron a Latinoamérica, y para nómadas digitales y viajeros que todavía buscan su lugar.",
+      "headline": "Español e inglés para tu hijo, y una compañera para ti",
+      "sub": "De 5 a 8 años: diez minutos al día con Pere y Titi, inspirados en las escuelas bilingües internacionales. Aprendizaje real en lugar de dibujos animados. Para ti: ayuda en WhatsApp con lo práctico del día a día, justo donde sucede: español para sentirte en casa aquí, e inglés que crece con tu familia."
+    },
+    "ru": {
+      "eyebrow": "Для семей, переехавших в Латинскую Америку, и для цифровых кочевников и путешественников, которые ещё ищут своё место.",
+      "headline": "Испанский и английский для ребёнка — и спутница для вас",
+      "sub": "5–8 лет: десять минут в день с Пере и Тити, по примеру международных двуязычных школ. Настоящая учёба вместо мультиков. Для вас — помощь в WhatsApp с практическими делами повседневной жизни, прямо там, где они происходят: испанский — чтобы чувствовать себя здесь как дома, английский — чтобы расти всей семьёй."
+    }
   }
 }
