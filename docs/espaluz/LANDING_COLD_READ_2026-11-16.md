@@ -86,3 +86,15 @@ GA4 is already on the site (loads after cookie consent; event `app_screen`). It 
 PostHog free tier adds session recordings + scroll depth + funnel (landing → Start → sign-up). Needs Elena to create the
 account (her email); then a 10-line snippet behind the same cookie consent. Baseline first, then the new page — so the
 change is measured, not guessed.
+
+## PAUSED 17 Nov 2026 — Elena: "we should take it into action, but stop for now"
+Live now: cookie strip, hero edit 1 ("Spanish and English for your child, and a helper for you"), English coach switch.
+Waiting for Elena's three approvals (nothing applied, local copies restored):
+1. **Hero B** (tested best: 0 of 6 readers leave, Spanish reader taps the main button) — texts in
+   `landing-tests/2026-11-17_hero-ABC-variants.json` key "B"; results `landing-tests/2026-11-17_hero-ABC-SUMMARY.md`.
+2. **Spanish page only:** add "¿Ya hablas español? EspaLuz te acompaña con el inglés y con las costumbres de tu nuevo país."
+   (the Spanish reader asked "why Spanish help for me?" in all 8 runs).
+3. **Short demo block "See a real lesson"** under the Start button: 3 real phone screenshots (classroom, grown-up chat with
+   an English correction, one-minute parent report). Source: (a) one temporary test family, deleted after — needs her yes;
+   or (b) her own screenshots with names hidden.
+Then: apply in EN/ES/RU → `node scripts/landing-agent-test.cjs --url=http://localhost:4173/ --label=<name>` twice → Publish.
