@@ -59,3 +59,9 @@ Next asks: a short VIDEO of a lesson (EN), local Spanish of Argentina (RU), conc
 ## Demo folded on + (Elena), before "Ways to start"
 | folded | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 — nobody taps the demo row first; 5 of 6 ask again "what does the child's screen look like?" |
 Open demo (above): EN+ES tapped it first in both runs. Folded: the readers stop seeing it. Real visitors' taps: PostHog.
+
+## Roadmap "How EspaLuz works" (open, 3 steps) after the three cards — Elena's placement
+| roadmap | 4/4/4 · 5/4/4 | 4.17 | 0 of 6 — readers still ask "what does the child's screen look like?" |
+Why: the readers read the first screen + first 300 words; the roadmap sits after the three cards, beyond word ~300, so
+they never reach it. A skimming visitor may not either. Moving it right under the Start button (Andy's guide) puts it
+inside the first 300 words - Elena's decision.
