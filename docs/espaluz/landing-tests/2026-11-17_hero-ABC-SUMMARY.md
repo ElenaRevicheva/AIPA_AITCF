@@ -55,3 +55,7 @@ helps a native Spanish speaker adapt to Panamá" - he now reads it as for him. N
 Screens: real live app, temporary test family "Ana" + "Sofi" (6), Panamá, created and deleted 17 Nov (0 rows left, checked).
 Readers read text only (not the images); they slowed on the honesty note "(a test family, no real child)".
 Next asks: a short VIDEO of a lesson (EN), local Spanish of Argentina (RU), concrete help for Spanish speakers (ES).
+
+## Demo folded on + (Elena), before "Ways to start"
+| folded | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 — nobody taps the demo row first; 5 of 6 ask again "what does the child's screen look like?" |
+Open demo (above): EN+ES tapped it first in both runs. Folded: the readers stop seeing it. Real visitors' taps: PostHog.
