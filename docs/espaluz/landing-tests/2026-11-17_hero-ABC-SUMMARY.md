@@ -44,3 +44,8 @@ same recurring items (nomads line, "feel at home", demo missing, Spanish speaker
 
 Score table so far (two runs each): A 4.67 (1 leave) · B 4.33 (0) · C 4.50 (0) · D 4.00 (0) · E 4.00 (0) · F 4.17 (1).
 The Spanish-speaking reader's question ("is this for me?") appears in every version; it is the open positioning gap.
+
+## G = B + the Spanish-speaker line (ES page) — APPROVED by Elena and applied (ascent, 17 Nov)
+| G | 76 (EN) | 4/4/4 · 4/4/4 | 4.00 | 0 of 6 |
+The Spanish reader's question changed from "is this for me?" (12 of 12 earlier runs) to "show concrete examples of how it
+helps a native Spanish speaker adapt to Panamá" - he now reads it as for him. Next: the demo block.
