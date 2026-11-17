@@ -38,3 +38,9 @@ everyday life, right where it happens — Spanish to feel at home here, and Engl
 
 Readers slowed on "a companion for you" ("y una compañera para ti", "и спутница для вас" — RU both runs), plus the
 same recurring items (nomads line, "feel at home", demo missing, Spanish speaker's question).
+
+## F — B with Elena's "Latin America" small line
+| F | ~80 | 4/4/5 · 4/4/4 | 4.17 | 1 of 6 (ES, run 2: "leave" - "seems aimed at non-Spanish speakers") |
+
+Score table so far (two runs each): A 4.67 (1 leave) · B 4.33 (0) · C 4.50 (0) · D 4.00 (0) · E 4.00 (0) · F 4.17 (1).
+The Spanish-speaking reader's question ("is this for me?") appears in every version; it is the open positioning gap.
