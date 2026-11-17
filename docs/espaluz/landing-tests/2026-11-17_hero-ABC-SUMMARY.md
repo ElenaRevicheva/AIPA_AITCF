@@ -65,3 +65,11 @@ Open demo (above): EN+ES tapped it first in both runs. Folded: the readers stop 
 Why: the readers read the first screen + first 300 words; the roadmap sits after the three cards, beyond word ~300, so
 they never reach it. A skimming visitor may not either. Moving it right under the Start button (Andy's guide) puts it
 inside the first 300 words - Elena's decision.
+
+## Roadmap step 1 = real WhatsApp (17 Nov) — PASS (EN 4, ES 5, RU 4; 0 leave)
+Elena's WhatsApp + Telegram test answers showed 3 real bot flaws (NOT used on the page):
+1. WhatsApp answered "Aquí en Cuba" + names "Beilys y Christian" to "Our PANAMANIAN neighbours…": that number is linked to
+   a test account whose profile says Cuba with those test family members - no leak between families, but the country and
+   family the person names in the message should beat the saved profile.
+2. Telegram answered "Tu hija Alisa" to "my SON has a fever": the bot's own long memory overrode the message.
+3. Telegram's "English:" translation line repeated the Spanish.
