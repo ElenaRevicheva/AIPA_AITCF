@@ -9,6 +9,18 @@ non-English nomads: in parallel, Russian as support).
 Checked in code: ascent dashboard components, espaluz-chat (profileRules: SHORT STAY / STAYING FOR GOOD / HEART LANGUAGE /
 settles), FamilyProfileDialog (stay_plan, learn incl. settling), ClassroomRu.tsx (Мишка & Лиса), both bots' menus.
 
+## SOURCE OF TRUTH - Table 1 (Elena, 18 Nov)
+**TABLE 1 - how each category learns (Elena's rule: every family practises ENGLISH in parallel)** - EXACT, as approved 18 Nov
+| Category | Spanish | English in parallel |
+|---|---|---|
+| 1. English-speaking expats | learn Spanish (the main track) | their native language. Spanish is explained through English, which keeps replies bilingual |
+| 2. Nomads, travellers, still searching | Spanish for each country they pass through | **practise English** in parallel, if English isn't their first language |
+| 3. Native Spanish speakers across Latin America | their own language; they learn the country's local words and ways | **practise English: the main track** (the 4-week English path) |
+| 4. Russian-speaking families | learn Spanish for life here | **practise English in parallel**, with Russian as support (glosses, and Мишка & Лиса for the children) |
+So in the weekly plan, every family whose first language isn't English gets an English step every week: Russian families,
+native Spanish speakers and non-English-speaking nomads. (Today that exists only in Settling-in mode and when "English" or
+"Both" is picked in the questionnaire; for Russian families it becomes the default.)
+
 ## What every family has now
 Dashboard: welcome (settling variant) · map (8 steps) · web chat · child's class card · first year in <country> (21 checked
 guides) · family's week · plan/trial · journey (phrases + tip + listen, conversations) · lessons (10 country + 5 basic

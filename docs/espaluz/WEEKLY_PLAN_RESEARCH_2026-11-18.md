@@ -9,6 +9,16 @@ Medellín -> Mexico/Costa Rica?) · Carlos (Venezuelan engineer, native Spanish,
 single mom, still searching: Uruguay -> Costa Rica, wants her 7-year-old bilingual in English) · Marina (Russian IT PM,
 Panamá, 7-year-old should keep Russian + learn Spanish and English).
 
+## SOURCE OF TRUTH - Table 2 (Elena, 18 Nov)
+**TABLE 2 - what each category needs (five real families, readers 18 Nov)** - EXACT, as approved 18 Nov
+| | They'd pay if… | Must not happen |
+|---|---|---|
+| **Jennifer** (expat, learning Spanish) | it solves real school and neighbour moments in 5-minute steps | evening pings, streak guilt, long drills |
+| **Lukas & Bia** (nomads) | they get **"Where next?"** (compare countries) + **"first 2 weeks in a new city"** | a fixed "first year in one country" for a 90-day stay |
+| **Carlos** (native, work English) | a **structured 4-week work-English course** with voice drills and blunt corrections | beginner Spanish, fluffy motivation |
+| **Valentina** (native, still searching) | her daughter stays engaged in English **and** her own English grows | being treated as a Spanish learner; a one-country track |
+| **Marina** (Russian) | one app covers her daughter's Russian, Panamá Spanish and her work English | explanations only in English, without Russian |
+
 ## What they all agree on
 - TIME: 45-75 min a WEEK. Weekday steps 5-10 min; one longer slot at the weekend; at least one day off.
 - CHANNEL: WhatsApp/Telegram first, voice notes welcome; the web for the kids' class and a rehearsal.
