@@ -1,4 +1,4 @@
-# Settling-in mode for Spanish speakers - diagnosis + plan (18 Nov 2026, waits on Elena's "go")
+# Settling-in mode for Spanish speakers - diagnosis + plan (18 Nov 2026) - BUILT same day
 
 Elena: "the Spanish speaker wants Spanish meaning and adaptation, not English meanings - our crucial defect?" Yes, for
 that audience. Evidence: live readers 18 Nov (ES persona, Venezuelan father in Panamá): web chat 2/5, modules 2/5, would
@@ -24,3 +24,18 @@ WhatsApp, Telegram. The FRAME is the problem - EspaLuz assumes every family is l
 5. Kids' class unchanged (bilingual ES+EN fits a Spanish-speaking child).
 6. Meanings in the family's own language for everyone (fixes the RU reader).
 7. Readers again; bar = the Venezuelan father would pay.
+
+## BUILT 18 Nov (Elena: "everything, but replies stay half Spanish half English - English is a must")
+Reuses the existing engine, nothing rebuilt: the English coach (englishOnly) + the country packs + the BRIDGES rule, plus one
+detector (settles / _settles, twin) and one SETTLING IN rule (twin, word for word in espaluz-chat and both bots).
+- questionnaire 4th answer; also on for native language Spanish. Replies stay bilingual (Elena).
+- brain: ascent `cc847de` (espaluz-chat v388); bots WA `26cb15e`, TG `b855739`, live md5 `c2959781`, restarted 14:38 UTC,
+  backup `~/_session-backups/settling-in-20261118/`.
+- dashboard (waits on Publish): `cc847de` + `2c89508` - welcome to your life in <country>, country lessons only,
+  'Tu camino aquí', 'Español: nativo'. Every change = `settling ? new : old`, so other families see no change.
+Additive check: every removed line was replaced by a version keeping the old one as the default (git diff -U0).
+Proof (Venezuelan test family, deleted): web reply bilingual, school year March vs Venezuela's September, xopá, chuleta, real
+English practice; both bots' prompts carry SETTLING IN, learning direction = english.
+Reader (Venezuelan father, dashboard es): top half WOULD PAY (was no); class card 5, lessons 4-5. Still no on the bottom
+half: 'Tu camino aquí' counts "Spanish words", the seeded test phrases were beginner ones; Russian class button/placeholder
+shown to him (Elena placed it for everyone, 12 Nov). Raw: landing-tests/2026-11-18_settling-in-reader.json
