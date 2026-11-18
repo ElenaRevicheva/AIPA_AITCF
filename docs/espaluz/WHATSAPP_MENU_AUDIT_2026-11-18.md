@@ -1,7 +1,16 @@
 # EspaLuz WhatsApp menu audit - 18 Nov 2026
 
 Elena: "dig into each comment with production logs and testing - does it truly work and serve the user? No stale, useless
-comments that make noise." **Nothing in the menu has been changed yet** - this file is the evidence; the wording is her call.
+comments that make noise."
+
+## ✅ FIXED 18 Nov 23:03 UTC (WA `4f3a0e8`, live md5 `699779eb`, backup `~/_session-backups/wa-menu-fixes-20261118/`)
+Elena: "so are you moving on?" -> the fixes that remove broken promises, additive, no working entry removed:
+- `trial` -> real status ("13 free days left (until 2 Dec)", or "access active" for payers, or the payment options); read-only, the one-time reminders still arrive on their day.
+- `go slower` / `more audio` / correction style -> the tutor now READS the saved choice (one line in the reply instructions, only for what the person changed). Proven: the rule reaches `system_prompt` (main model + backup).
+- **A stranger's real question during the setup is answered** (was taken as their NAME - "¡Perfecto, How!" - or as their family, and never answered). Both spots: the reply generator's first-message check and the name/family steps. Names and family lists still go to the setup (14/14 samples sorted right).
+- 5 false menu lines corrected word for word: "(Coming soon)" removed, the help words that really work (`help banking` ...), `clase` = link to the web class, `adult` = while in kids mode, welcome "Unlimited" -> "up to 30 messages a day while you try it".
+- **Correction to this audit:** "setup swallows `connect CODE`" was my test's fault - `ZZ9ZZ9` is not a valid code (6 characters 0-9/A-F); real codes are caught before the setup. The real swallow was QUESTIONS, fixed above.
+- STILL Elena's call: the short one-message menu below (rewrites the whole text).
 
 ## How it was checked
 1. **Production history (Twilio, every WhatsApp message 14 Oct - 18 Nov):** 404 messages, 77 incoming, from **4 people**
