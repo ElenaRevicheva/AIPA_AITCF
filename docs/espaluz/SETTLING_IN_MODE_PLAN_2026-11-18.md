@@ -48,3 +48,12 @@ shown to him (Elena placed it for everyone, 12 Nov). Raw: landing-tests/2026-11-
 - Live md5: enhancements `0d6bd63d` (both), WA bridge `15826d7e`, TG main `a5db7173`; restarted 14:49 UTC; backup
   `~/_session-backups/settle-menu-20261118/`. Proof: test family, learn_set from the Telegram bot -> profile learn = settle.
 Additive check: every replaced line is a list that gained one item (git diff -U0).
+
+## Last fixes + final read (18 Nov, Elena: "fix both; move Мишка & Лиса somewhere reasonable, never wipe it")
+- 'Tu camino aquí' for a settling family: no "Spanish words" tile; phrases tile "Frases que EspaLuz te enseñó" (`92fe836`).
+- Мишка & Лиса: map card 3 only for a Russian-speaking family (page in Russian or Russian native language); everyone else:
+  a quiet link at the foot of /classroom ("Также: Мишка & Лиса · Russian class · beta"). Website only, never the header,
+  never inside the Play app (12 Nov rules kept). Checked on real pages (es settling / en / ru + classroom foot).
+- Lessons subtitle without "lo básico del español"; chat box "en español o en inglés" for settling families (`b64f0e4`).
+- FINAL READ (Venezuelan father): BOTH halves WOULD PAY (morning: no). Chat 4 (was 2), Panama lessons 5, face-to-face 5,
+  class card 5, Tu camino aquí 4. Left: test-family persona mismatch only. Raw: landing-tests/2026-11-18_settling-in-reader-final.json
