@@ -39,3 +39,12 @@ English practice; both bots' prompts carry SETTLING IN, learning direction = eng
 Reader (Venezuelan father, dashboard es): top half WOULD PAY (was no); class card 5, lessons 4-5. Still no on the bottom
 half: 'Tu camino aquí' counts "Spanish words", the seeded test phrases were beginner ones; Russian class button/placeholder
 shown to him (Elena placed it for everyone, 12 Nov). Raw: landing-tests/2026-11-18_settling-in-reader.json
+
+## Menus (Elena: "add it to the WhatsApp and Telegram menus, additively - every line stays visible")
+- Telegram: /settle added at the END (23 commands, all 22 old ones kept - getMyCommands checked); menu text + one line
+  under /english · /spanish · /both; the typed words settle / instalarme / обжиться work too (TG `b474708`).
+- WhatsApp: one menu line under "English, Spanish or both": "Already speak Spanish? type settle (or instalarme)" (WA `2cf46cb`).
+- One switch (learn_switch, twin): bot record = english, shared profile = the 4th answer; kids-memory learn_set accepts it.
+- Live md5: enhancements `0d6bd63d` (both), WA bridge `15826d7e`, TG main `a5db7173`; restarted 14:49 UTC; backup
+  `~/_session-backups/settle-menu-20261118/`. Proof: test family, learn_set from the Telegram bot -> profile learn = settle.
+Additive check: every replaced line is a list that gained one item (git diff -U0).
