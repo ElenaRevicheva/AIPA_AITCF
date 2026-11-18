@@ -26,3 +26,16 @@ Landing: PASS (EN 4, ES 4, RU 4); all would tap "Try 20 messages without an acco
 5. "Video moments" card: celebrations + practice + family world + privacy text crowded; privacy text reads as confusing.
 6. "Your first year": Carnival / summer show "When it comes" - could show the usual month (never a moving date as fact).
 Best-rated: Sofi's class card, phrases collected, Panama first-year path, CSS-visit guidance, the school-note handling.
+
+## Follow-up the same evening (Elena: "fix the settling points")
+FIXED (ascent `1cfdcd4`, `22ce7e9`; brain deployed; web WAITS ON PUBLISH):
+- settling families rehearse IN ENGLISH (EspaLuz plays the interviewer in English, Spanish below, corrects their English;
+  voice listens in English). Proven: 'ingeneering'/'responsable' corrected; ordinary families still rehearse in Spanish.
+- settling families: Panama lessons in one list, no level tabs/badges, local expressions first, greetings lesson hidden.
+- settling families: chat welcome = "life here + practise your English".
+Carlos re-read: top half went to WOULD PAY / trust 4 once, then trust 3 on the next run (the reader varies run to run).
+Left - PRODUCT DECISIONS, not bugs:
+- collected Panama words show an ENGLISH meaning (bilingual rule; Carlos would like the nuance in Spanish too)
+- for a native speaker "slang + calendar alone" is not $11 - the English track must feel structured (a weekly English plan?)
+- the chat's voice-language box shows "Español" (it is the voice-recognition language, read as "Spanish tutor")
+- practice scene input placeholder is cut off on a phone
