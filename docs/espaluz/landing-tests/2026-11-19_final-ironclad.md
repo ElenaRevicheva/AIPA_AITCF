@@ -41,13 +41,13 @@ no card, pagar & /pagar, channels, voice/photo/RU. Soft only: "a few videos each
 | Not clear in the first minute - too much text | PARTLY. Phone first screen = 32 words; in Andy's own test (first screen + first 300 words) Jennifer, nomads, Marina got who/what right, clarity 4/5. Carlos + Valentina (native speakers) 3/5 "not for me - close the tab": their door ("Find your family's path") is below the first 300 words. Whole page: ~1,050 visible words (2,200 with folds open). |
 | Test with agents as humans: can they get it in 200-300 words? | DONE today, exactly this test. |
 | Every word must carry weight | NOT YET. Readers named the dead weight: "still searching for their place", "English that grows with your family", "Hear EspaLuz say hello", "Real learning instead of cartoons". |
-| PostHog (time on page, behaviour, conversion) | NOT DONE. The site has GA4 only. |
+| PostHog (time on page, behaviour, conversion) | DONE since 16 Nov (`ascent src/lib/posthogReplay.ts`, project 740401): front page + sign-in only, only after "Accept", never in the Play app, typing masked. CORRECTION: this report first said "not done" - the test browser declines cookies, so PostHog rightly stayed off. Privacy page now names it (19 Nov, `c498fdc`). |
 
 ## For Elena (not changed - her call)
 1. Lift "Find your family's path" into the first screen (native speakers close the tab before reaching it).
 2. Cut the dead-weight phrases above (Andy).
 3. First screen: a real picture of the kids' class instead of the AI portrait (3 readers asked "what does it look like?").
-4. PostHog (free tier) - needs the privacy page + consent updated.
+4. PostHog - already running (16 Nov); privacy page updated 19 Nov. Next: read its recordings of the front page.
 5. Payment card: "Merchant ID ..." + "Step 1/2 PayPal onboarding" text (3 readers: technical, suspicious); PayPal-only.
 6. Russian under rehearsal questions (Marina).
 
@@ -57,3 +57,6 @@ loading), "no answer to the photo" (above the cut). **Real, all 6 readers: the w
 press - FIXED**: badge "Part of EspaLuz Family" upfront, the refusal links to the prices, "clip or photo" (EN/ES/RU).
 Known, Elena's call: Russian families get English, not Russian, under answers and rehearsal lines; one rehearsal carried
 on after correcting Carlos (model behaviour). Best-rated piece across families: the face-to-face rehearsal.
+
+## 8. Lift of "Find your family's path" (Elena, 19 Nov)
+Moved unchanged to right after the three video cards (`c3002e4`); full inventory before/after identical (308 texts, 35 links, 15 buttons, 32 media, EN/ES/RU). Dedicated A/B readers: all 5 prefer it, clarity Jennifer 3->5, nomads 3->5, Carlos 2->4, Valentina 3->5, Marina 3->5; all found their own row; no crucial problem.
