@@ -50,3 +50,10 @@ no card, pagar & /pagar, channels, voice/photo/RU. Soft only: "a few videos each
 4. PostHog (free tier) - needs the privacy page + consent updated.
 5. Payment card: "Merchant ID ..." + "Step 1/2 PayPal onboarding" text (3 readers: technical, suspicious); PayPal-only.
 6. Russian under rehearsal questions (Marina).
+
+## 7. Readers on the RESULTS of the features used by hand (20 passes: chat answer, rehearsal, wish, photo answer)
+Not real: "cut off at top/bottom" (12x - the chat panel scrolls; the test photographed the panel), "voice stuck" (still
+loading), "no answer to the photo" (above the cut). **Real, all 6 readers: the wish locked only AFTER photo + occasion +
+press - FIXED**: badge "Part of EspaLuz Family" upfront, the refusal links to the prices, "clip or photo" (EN/ES/RU).
+Known, Elena's call: Russian families get English, not Russian, under answers and rehearsal lines; one rehearsal carried
+on after correcting Carlos (model behaviour). Best-rated piece across families: the face-to-face rehearsal.
