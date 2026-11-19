@@ -346,6 +346,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-19 ~15:30 | EspaLuz landing: "Find your family's path" fold (Tables 1+2) + Telegram ?start=settle | ascent src/pages/Index.tsx, components/landing, locales; EspaLuzFamilybot main.py; service espaluz-familybot | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
