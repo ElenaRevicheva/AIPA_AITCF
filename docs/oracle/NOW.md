@@ -343,6 +343,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-19 ~11:00 | EspaLuz: every command first explains itself + its exit (menu gaps) | EspaLuzWhatsApp espaluz_bridge.py, kids_lessons.py; EspaLuzFamilybot main.py; services espaluz-whatsapp, espaluz-familybot | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
