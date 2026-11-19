@@ -31,7 +31,7 @@ Deployed 19 Nov 00:07 UTC: Familybot `dcec652`, live md5 `cc09c418`, backup
 changed in place (the menu cleaner, the card command list x2, the setup check); everything else is added; no command,
 no menu line removed.
 
-## Found, NOT fixed (Elena's call)
+## Found, NOT fixed (Elena's call) - items 1 and 2 FIXED 19 Nov, see `REVIEW_MEANINGS_2026-11-19.md`
 1. **The tutor saves words WITHOUT meanings:** `main.py` `memory.add_vocab(word, word, "word")` - 140 of 141 saved words
    have the word as its own "translation" (only "hola - hello" is real). `/review` now shows only words with a real
    meaning, so for most families it says "no words yet" until this is fixed. The meanings exist in the replies
