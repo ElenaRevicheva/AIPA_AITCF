@@ -43,3 +43,17 @@ features as the $11 plan.
 ## What the readers valued (unprompted)
 WhatsApp help with school messages (Jennifer, nomads, Marina), the 10-minute kids' class (all), the weekly plan, one memory
 across channels. Would pay: Jennifer yes, nomads yes, Marina yes (landing) / no (dashboard, Russian), Carlos no, Valentina no.
+
+## Round 2 (19 Nov, after "Find your family's path") - each family with ITS row opened + dashboards
+Verified by hand: **"all phone pictures are blank" (5 readers) = my capture** (the sideways rows load only when scrolled
+sideways) - a visitor-style check loaded 16/16 pictures on the new build AND live, EN + ES. Also capture/test artifacts:
+the sky above the menu (sticky header flattened), "Parent Parent", "1 person", country lessons missing, Telegram
+"connected but not heard yet", © 2026.
+**Fixed:** settling family's lesson card no longer titled "Spanish modules" (Carlos, Valentina - crucial); the Russian
+path row now names Pere & Titi (Spanish + English) next to Мишка & Лиса (Marina).
+**Elena's call:** "Living Proof of Concept" badge on the landing reads as "unfinished prototype" (Jennifer, nomads);
+the $11 card's PayPal form does not say whether the 14 free days come first (nomads, Carlos); "Merchant ID ..." line on
+the price card looks technical (Jennifer); PayPal-only on the web (Marina); rehearsal shows English, not Russian (Marina).
+**Scores (trust 1-5 / would pay), landing · dashboard:** Jennifer 2-3 (blank-phones artifact) · 3, yes/no; nomads 2
+(artifact) · 3-4, yes/no; Carlos 2-3 no · 3-4, no/YES (first "yes" from Carlos); Valentina 2-4, no/YES · 3, no;
+Marina 2-4, no/yes · 2-4, yes/no. New: Carlos and Valentina both named the "Ya hablamos español" path the best thing.
