@@ -342,6 +342,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-19 ~13:00 | EspaLuz: word meanings for /review, neutral default persona, opt-in morning plan reminders | EspaLuzFamilybot main.py + espaluz_enhancements.py (twin) + espaluz_memory.py; EspaLuzWhatsApp espaluz_bridge.py + twin; ascent kids-memory; services espaluz-familybot, espaluz-whatsapp | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
