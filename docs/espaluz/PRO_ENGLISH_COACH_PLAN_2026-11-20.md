@@ -51,3 +51,19 @@ Live real-time voice calls (Loora's phone-call feel) — new infrastructure, not
 - **Not built:** a LIVE talking face that lip-syncs every reply in real time (a video call). That is new infrastructure and credits
   per minute - not additive. A middle step is possible later: the rehearsal's final tips are already a real lip-synced clip.
 - **Spanish button on Q3:** pushed ascent `8047e99` 20 Nov; live only after Lovable Publish.
+
+## ✅ ELENA'S DECISION 20 Nov (supersedes "Step 1" above): a SEPARATE layer, nothing existing edited
+- **Who:** NATIVE Spanish speakers (Panamá, Costa Rica, any LATAM) learning PROFESSIONAL English to earn: serving English-speaking
+  clients, remote jobs, business travel. NOT the existing "I already speak Spanish" path (that one can be a non-native) — it stays
+  exactly as it is, and so do bilingual replies, families, classroom, every current mode.
+- **No avatar.** Loora-style = listen, correct, answer in English, by text and voice. The Runway clips stay a family feature.
+- **Own door:** its own entry (own tracked WhatsApp/Telegram start code + own Spanish page "Inglés profesional"), its own profile
+  flag (`track: pro_english`) that no existing question can set.
+- **One turn:** user speaks (voice note / mic) or types, in English or Spanish -> existing transcription -> NEW coach prompt:
+  (1) "Better: ..." their sentence fixed, (2) the coach answers and keeps the conversation going in English, (3) one short Spanish
+  line only when they are stuck -> English voice reply (existing en-US voice).
+- **Scenarios for money:** client call, quoting a price, customer service, remote-job interview, small talk with expats/investors,
+  business trip (airport, hotel, meeting), professional email. Short level check first; weekly progress.
+- **Code shape:** all new files (coach prompt, scenarios, level check). The ONLY touch to existing code is one routing line at
+  each entry point: `if track == pro_english -> new coach; else -> unchanged`. WhatsApp first (where Panamanians are), then web, TG.
+- **Effort:** ~2 days for WhatsApp + web with production proof; pronunciation score (Azure) later, optional.
