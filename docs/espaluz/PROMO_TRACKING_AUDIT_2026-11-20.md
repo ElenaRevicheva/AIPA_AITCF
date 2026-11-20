@@ -55,3 +55,20 @@ Rule: **no paid boost before every door is proven by one real tap.**
 ## 4. What it costs
 Steps 1, 3, 5, 6: small additions in the two bots (no removals), same deploy routine. Step 2: one small web change + Publish.
 Step 4: Elena pastes links into bio / channel / pinned comment (or Claude does it in her Chrome with her OK).
+
+## 5. Are we ready to promote? (live checks, 20 Nov ~17:00 UTC)
+| Area | State | Proof |
+|---|---|---|
+| Web sign-up reaches strangers | 🟢 | 5 real email sign-ups since 7 Nov (Outlook, Gmail, Yahoo) confirmed in 2-8 min - the 6 Nov SMTP blocker is gone |
+| Shared brain (web + bots) | 🟢 | 802 of 803 function calls OK in the last 24 h (1 error) |
+| Telegram bot | 🟢 | active, 0 errors in 48 h; menus audited and fixed 19 Nov |
+| WhatsApp bot | 🟢 | active; the 89 "errors" in 48 h are internet scanners hitting the server, not failed replies; menus fixed 18-19 Nov |
+| Landing + dashboard | 🟢 | strict readers 20 Nov: families 4/5 would pay, /pro-english 4/5 with 0 defects |
+| Catching who clicks | 🔴 | 0 film arrivals ever; web sign-ups forget their film; "Comment Android" is uncatchable on YouTube (sections 2-3) |
+| A stranger stays past message 2 | 🟡 | 6 Nov baseline: 35 of 38 left the same day; many fixes since, no fresh stranger data |
+| Pro English from a real phone | 🟡 | live and tested by Claude, not yet by Elena |
+| Brand pages a visitor lands on | 🟡 | last seen 6 Nov: FB Page cover = old bot screenshot with a Gumroad link (Gumroad is gone), IG = personal career profile, YouTube channel mixes other films + a guidelines warning. Not rechecked today |
+| App stays up under traffic | 🟡 | Supabase free quota over (Cached Egress), grace ends 4 Dec; Elena to read the usage page |
+
+**Verdict:** the product is working, not noise - ready for a SMALL, ORGANIC, TRACKED start (Facebook groups + our own posts +
+recruiting the 12 Play testers). NOT ready for a paid boost: the catch is not built and the brand pages were stale.
