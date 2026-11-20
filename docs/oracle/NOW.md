@@ -353,6 +353,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-20 ~16:00 | EspaLuz Pro English layer (new files, 1 routing line) | EspaLuzWhatsApp: NEW pro_english*.py + espaluz_bridge.py routing; Oracle espaluz WhatsApp pm2 | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
