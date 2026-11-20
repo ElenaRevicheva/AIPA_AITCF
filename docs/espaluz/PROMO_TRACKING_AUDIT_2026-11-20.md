@@ -72,3 +72,31 @@ Step 4: Elena pastes links into bio / channel / pinned comment (or Claude does i
 
 **Verdict:** the product is working, not noise - ready for a SMALL, ORGANIC, TRACKED start (Facebook groups + our own posts +
 recruiting the 12 Play testers). NOT ready for a paid boost: the catch is not built and the brand pages were stale.
+
+## 6. BUILT and proven live, 20 Nov ~22:00 UTC
+| Step | What now happens | Proof |
+|---|---|---|
+| Arrival -> HubSpot | anyone arriving by a coded WhatsApp/Telegram link becomes a `[ESPALUZ] WA/TG <id> — trial` deal; description says film + platform/group + first message; the existing action note (open chat, follow-up draft, checklist) comes with it | live test deal: "arrived from film f20261120a0e2 on Facebook group 1" (archived after) |
+| Facebook-group codes | `-g1`, `-g2`, … accepted by both bots and the web | pattern test + the live HubSpot test above |
+| ANDROID door | a message starting with ANDROID gets the 3 tester steps; the Gmail they send joins `play_testers` free to 31 Dec, tagged with the film | live run on Oracle: row `bot telegram f20261120a0e2-g1`, access_until 2026-12-31 (deleted after) |
+| Post footer | "Write ANDROID to EspaLuz on WhatsApp +507 6662 3757" (IG/YT); a tappable `ANDROID (<film>-fb)` link on Facebook - no more "comment Android" | Influencer rendered texts checked; live md5 64dda4a7 = commit, restarted 21:55:18 |
+| Web first touch | the first campaign tag is kept 90 days and saved on the account at sign-up (`auth.users.raw_user_meta_data.first_touch`) | real sign-up through the built site: first_touch = f20261120a0e2 / facebook / g2 (test account deleted); live bundle index-C6vIKD8j.js |
+
+Deploys: bots WA + Telegram (espaluz_catch.py twin; WA 867bde3, FB 83fc70c; restart 21:51:27 > files; backups
+`~/_session-backups/catch-20261120/`), Influencer (backup same folder), ascent aad0130 + 060452c (kids-memory) + 4d81903 (web, published).
+
+**Still NOT proven:** one real tap from Elena's phone per door (WhatsApp, Telegram, web, ANDROID). That is the go/no-go.
+**Not built:** a Telegram ping per arrival (HubSpot deal is the record now); per-person lines in the 13:40 film report.
+
+## 7. Facebook groups: one code per group (fill the table as you post)
+Film code example: ES film 02 = `f20261120a0e2`. Group N -> tag `gN`.
+- WhatsApp: `https://wa.me/50766623757?text=%C2%A1Hola%20EspaLuz%21%20%28f20261120a0e2-gN%29`
+- Android: `https://wa.me/50766623757?text=ANDROID%20%28f20261120a0e2-gN%29`
+- Telegram: `https://t.me/EspaLuzFamily_bot?start=f20261120a0e2-gN`
+- Web: `https://app.espaluz.lat/?utm_source=facebook&utm_medium=group&utm_campaign=f20261120a0e2&utm_content=gN`
+
+| Tag | Group | Date posted |
+|---|---|---|
+| g1 | | |
+| g2 | | |
+| g3 | | |
