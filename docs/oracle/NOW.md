@@ -2,6 +2,8 @@
 
 **🔎 15 Nov 15:20 UTC prod review** (`docs/espaluz/CLASSROOMS_LOG_REVIEW_2026-11-15.md`): site PUBLISHED with today's features; WA+TG turns reach the brain; Russian class hears Russian (fix works); template praise "целое предложение" x5 + name mix-up FIXED (prompt + code guard, logs `[kids-ru] cut a template`); Alisa used free talk, not class (levels untested); phrase bracket bug fixed `f9d78b0` (needs Publish).
 
+**⏸ HANDOFF 20 Nov ~16:10 UTC (Elena left for the car).** DONE: Pro English any-topic coach live (`86c83d3`, tested); page premium-by-request line pushed (`ec39f1c`). NEXT: Lovable Publish for `ec39f1c` (page only); Elena's real phone test ('pro english' on WA + one voice note). VERIFIED BY: live brain run 20 Nov, all repos 0/0. RISK: none open; premium price undecided (by request only).
+
 **🎨 20 Nov 16:00 UTC PUBLISHED + verified live: Pro English ENGLISH-FIRST (~90% English, Spanish only when stuck; Michael/Loora-style) in the brain (ascent `b4763db`, tested live); landing cards say which layer is which ('You already speak Spanish and are moving within Latin America' = bilingual everyday companion; Pro English = English-only work coach); Russian row LAST (beta); promise line violet-only + gold 'Luz' (`6863909`). OPEN: paid add-on for a full avatar session needs Elena's price.**
 
 **🧭 20 Nov: PUBLISHED (Lovable, ~15:45 UTC, verified live): landing 'Find your path' + 5th path card Pro English + inclusive wording EN/ES/RU; /pro-english live; Spanish button on heart-language Q3 live.**

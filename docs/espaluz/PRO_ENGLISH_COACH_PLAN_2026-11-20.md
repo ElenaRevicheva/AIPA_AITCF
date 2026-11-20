@@ -77,3 +77,8 @@ Live real-time voice calls (Loora's phone-call feel) — new infrastructure, not
 - Web `/pro-english` (`696df27`): Spanish door when signed out; coach + mic (WAV for Azure) + "see it said" clip when signed in. Needs Lovable Publish.
 - Clips: `generate-video` mode `pro_english`, PRO_ENGLISH_MONTHLY_CAP=2 for paid families. Buying MORE clips / a 1-hour avatar session = NOT built (needs a price + payment flow, Elena's call).
 - NEXT: Elena's real phone test (WA "pro english", one voice note); clip button on the bots; Spanish promo + Michael as referrer.
+
+## 20 Nov late: conversation partner + premium by request
+- Coach = conversation partner, not a script (ascent `86c83d3`, tested live): any topic or question, EN or ES, text or voice; scenes are suggestions; always answered in English (film tip in ES question -> English answer; make vs do; "propina" mid-scene then back to scene).
+- Premium full live lip-synced session: NO price yet (Elena). Page shows "by request - Write to us" -> aipa@aideazz.xyz (`ec39f1c`, needs Lovable Publish).
+  Market check 20 Nov: Praktika/Loora include animated tutors in ~$10-15/mo plans, no separate live-video tier found; live avatar cost to us ~$0.35/min (Tavus, third-party figure) to ~$3/min (HeyGen per-second rate) -> a 1-hour session costs us ~$21-180. Unverified vendor blogs except HeyGen docs.
