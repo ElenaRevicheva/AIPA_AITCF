@@ -2,7 +2,7 @@
 
 **🔎 15 Nov 15:20 UTC prod review** (`docs/espaluz/CLASSROOMS_LOG_REVIEW_2026-11-15.md`): site PUBLISHED with today's features; WA+TG turns reach the brain; Russian class hears Russian (fix works); template praise "целое предложение" x5 + name mix-up FIXED (prompt + code guard, logs `[kids-ru] cut a template`); Alisa used free talk, not class (levels untested); phrase bracket bug fixed `f9d78b0` (needs Publish).
 
-**🗣️ 20 Nov: Pro English = SEPARATE LAYER for native Spanish speakers (Elena's decision) - PLAN ONLY, waiting her go.** `docs/espaluz/PRO_ENGLISH_COACH_PLAN_2026-11-20.md` (last section): own door + flag `track: pro_english`, new files only, one routing line per entry point, no avatar, voice+text, WhatsApp first, ~2 days. NEVER edit existing modes or bilingual replies. Spanish button on heart-language Q3 pushed ascent `8047e99` - needs Lovable Publish. Film captions v2 on hold.
+**🇺🇸 20 Nov: EspaLuz PRO ENGLISH LIVE on WhatsApp + Telegram + brain; web page pushed, WAITS ON LOVABLE PUBLISH.** Separate layer for NATIVE Spanish speakers (prof. English to earn). Brain `ascent _shared/pro_english.ts` via espaluz-chat `proEnglish` (one brain/memory, linked turns = event `pro_english_turn`); doors: WA/TG words 'pro english'/'inglés profesional' or code `(proen-..)`/`?start=proen-..`, web `/pro-english`. Level check -> 7 money scenes -> Better/why/English reply + en voice; Azure pronunciation (AZURE_SPEECH_KEY, F0 ends ~7 Dec = her call) proven 97/100 synthetic; Runway clip `generate-video mode pro_english` 2/month paid (web only so far). Clients: WA `pro_english_wa.py` (md5 1d58..., restart 15:18:09), TG `pro_english_tg.py` (restart 15:20:03), backups `*.bak-20261120-proenglish`. NOT yet: a real phone test by Elena, bots' clip button, Spanish landing promo. Existing modes/bilingual untouched. Plan `docs/espaluz/PRO_ENGLISH_COACH_PLAN_2026-11-20.md`. Spanish button Q3 ascent `8047e99` also waits on Publish. Film captions v2 on hold.
 
 **🎬 20 Nov: FILM 02 CAPTIONS v2 - ELENA'S PICK.** She: video fine, words ugly, rewrite the text. 3 styles (A Reels boxes rec. / B editorial / C sticker) rendered on real frames + new EN/ES/RU wording -> `docs/espaluz/FILM02_CAPTIONS_V2_2026-11-20.md`, sheet sent to her. Footage/links/end card unchanged. NEXT after pick: restyle cut.py, re-cut 3 films. Test tap of f20261119eeee-fb still not confirmed. Static SEO shell on app.espaluz.lat verified live 20 Nov (2,013 chars in #root; a8d184f only branded it).
 
@@ -353,7 +353,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-11-20 ~16:00 | EspaLuz Pro English layer (new files, 1 routing line) | EspaLuzWhatsApp: NEW pro_english*.py + espaluz_bridge.py routing; Oracle espaluz WhatsApp pm2 | - |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push

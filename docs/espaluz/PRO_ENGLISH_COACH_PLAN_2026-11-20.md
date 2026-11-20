@@ -67,3 +67,13 @@ Live real-time voice calls (Loora's phone-call feel) — new infrastructure, not
 - **Code shape:** all new files (coach prompt, scenarios, level check). The ONLY touch to existing code is one routing line at
   each entry point: `if track == pro_english -> new coach; else -> unchanged`. WhatsApp first (where Panamanians are), then web, TG.
 - **Effort:** ~2 days for WhatsApp + web with production proof; pronunciation score (Azure) later, optional.
+
+## ✅ BUILT 20 Nov (Elena approved: separate layer + Azure + Runway clips as paid extra)
+- Brain: ascent `supabase/functions/_shared/pro_english.ts` (`a978374`, `bd0b8d8`), doorway in espaluz-chat (import + bot auth + branch).
+  Live proof: guest run on the deployed brain - level check -> A2, scene 2 adapted to a tour agency, "80 dollars for person" ->
+  "Better: $80 per person. It includes lunch and snorkeling." + Spanish reason; Azure 97/100 on a synthetic en-US note.
+  Family chat smoke test after deploy: unchanged bilingual answer.
+- WhatsApp `EspaLuzWhatsApp/pro_english_wa.py` + 13 routing lines in espaluz_bridge.py; Telegram `EspaLuzFamilybot/pro_english_tg.py` + 22 lines in main.py. Both live on Oracle.
+- Web `/pro-english` (`696df27`): Spanish door when signed out; coach + mic (WAV for Azure) + "see it said" clip when signed in. Needs Lovable Publish.
+- Clips: `generate-video` mode `pro_english`, PRO_ENGLISH_MONTHLY_CAP=2 for paid families. Buying MORE clips / a 1-hour avatar session = NOT built (needs a price + payment flow, Elena's call).
+- NEXT: Elena's real phone test (WA "pro english", one voice note); clip button on the bots; Spanish promo + Michael as referrer.
