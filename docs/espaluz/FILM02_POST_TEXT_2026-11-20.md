@@ -10,20 +10,20 @@ The **first line of your caption becomes the YouTube title** (up to 88 character
 
 **EN film** (`espaluz-film02-en-v2.mp4`)
 ```
-New country, new language, new everything. EspaLuz helps your family feel at home 🌎
-School notes, the doctor, the paperwork, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
+Moved to Latin America with your family? EspaLuz helps you feel at home 🌎
+New country, new language, new everything. School notes, the doctor, the paperwork, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
 ```
 
 **ES film** (`espaluz-film02-es-v2.mp4`)
 ```
-Nuevo país, nuevo idioma, todo nuevo. EspaLuz ayuda a tu familia a sentirse en casa 🌎
-Notas del colegio, el médico, los trámites, qué significa de verdad "ahorita": pregúntale a EspaLuz por WhatsApp, Telegram o la web. Responde en español e inglés y recuerda a tu familia. Tu peque tiene 10 minutos al día con Pere y Titi (de 5 a 8 años).
+¿Te mudaste a Latinoamérica con tu familia? EspaLuz te ayuda a sentirte en casa 🌎
+Nuevo país, nuevo idioma, todo nuevo. Notas del colegio, el médico, los trámites, qué significa de verdad "ahorita": pregúntale a EspaLuz por WhatsApp, Telegram o la web. Responde en español e inglés y recuerda a tu familia. Tu peque tiene 10 minutos al día con Pere y Titi (de 5 a 8 años).
 ```
 
 **RU film** (`espaluz-film02-ru-v2.mp4`)
 ```
-Новая страна, новый язык, всё новое. EspaLuz поможет вашей семье почувствовать себя дома 🌎
-Записки из школы, врач, документы, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
+Переехали в Латинскую Америку с семьёй? EspaLuz поможет почувствовать себя дома 🌎
+Новая страна, новый язык, всё новое. Записки из школы, врач, документы, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
 ```
 
 ## 2. The ending the bot adds by itself (NEW: the Google Play beta line)
@@ -37,11 +37,13 @@ Then, on every platform:
 ```
 App · WhatsApp · Telegram — 14 days free · 14 días gratis
 
-🤖 New: the EspaLuz Android app is in beta on Google Play. Free beta testers welcome! Comment "Android" and help us shape it.
-🤖 Nuevo: la app de EspaLuz para Android está en beta en Google Play. ¡Buscamos testers, gratis! Comenta "Android" y ayúdanos a mejorarla.
+📱 On Android? Get the EspaLuz app before everyone else, and your whole family uses it FREE until 31 December (normally $11/month). We're in beta on Google Play and looking for 12 families. Comment "Android" and we'll send you the invite.
+📱 ¿Tienes Android? Ten la app de EspaLuz antes que nadie, y toda tu familia la usa GRATIS hasta el 31 de diciembre (normalmente $11 al mes). Estamos en beta en Google Play y buscamos 12 familias. Comenta "Android" y te mandamos la invitación.
 
 People in this video are AI-generated.
 ```
+
+**Why people will join (Elena, 20 Nov: "nobody tests for nothing"):** the line leads with what THEY get: the app first, and the whole family free until 31 Dec instead of 14 days (the `play_testers` mechanism, already live for 5 testers). "12 families" is the real Google requirement and makes it feel exclusive.
 
 **Why "comment Android":** comments work on all three platforms, and links don't work on two of them. Each person who comments
 sends you their Gmail. You add it in Play Console → Testing → Closed testing → Testers, and in the `play_testers` table so they get free access.
@@ -50,15 +52,15 @@ Every claim is true today: closed testing track `lat.espaluz.app`, and testers h
 
 ## 3. Full example: what the Instagram Reel will show (EN)
 ```
-New country, new language, new everything. EspaLuz helps your family feel at home 🌎
-School notes, the doctor, the paperwork, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
+Moved to Latin America with your family? EspaLuz helps you feel at home 🌎
+New country, new language, new everything. School notes, the doctor, the paperwork, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
 
-🌎 EspaLuz — live your new country in Spanish
+🌎 EspaLuz — your new life in Latin America, in Spanish · tu nueva vida en Latinoamérica
 🔗 Link in bio, or type espaluz.lat · Enlace en el perfil, o escribe espaluz.lat
 App · WhatsApp · Telegram — 14 days free · 14 días gratis
 
-🤖 New: the EspaLuz Android app is in beta on Google Play. Free beta testers welcome! Comment "Android" and help us shape it.
-🤖 Nuevo: la app de EspaLuz para Android está en beta en Google Play. ¡Buscamos testers, gratis! Comenta "Android" y ayúdanos a mejorarla.
+📱 On Android? Get the EspaLuz app before everyone else, and your whole family uses it FREE until 31 December (normally $11/month). We're in beta on Google Play and looking for 12 families. Comment "Android" and we'll send you the invite.
+📱 ¿Tienes Android? Ten la app de EspaLuz antes que nadie, y toda tu familia la usa GRATIS hasta el 31 de diciembre (normalmente $11 al mes). Estamos en beta en Google Play y buscamos 12 familias. Comenta "Android" y te mandamos la invitación.
 
 People in this video are AI-generated.
 ```
