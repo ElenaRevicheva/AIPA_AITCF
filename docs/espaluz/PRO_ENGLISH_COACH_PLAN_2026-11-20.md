@@ -37,3 +37,17 @@ Live real-time voice calls (Loora's phone-call feel) — new infrastructure, not
 - Contradicts the 6 Nov rule "grown-up replies stay bilingual" — this mode is opt-in only, families untouched. Elena decides.
 - Positioning: EspaLuz's niche is families in a new country; Pro English is a second door, not a replacement.
 - Proof before claims: no public copy about "pronunciation scoring" until step 2 is live and verified.
+
+## Avatar: Loora vs EspaLuz (checked 20 Nov)
+- **Loora** (support page loora.com/support/features/avatar-feature): a small video window "during Classic and Read and Talk
+  lessons"; role-play lessons have NO avatar ("chat only"); can be hidden. The page does NOT say whether the lips follow the speech,
+  nor the vendor, nor if it is paid-only. Unverified either way.
+- **EspaLuz already has the real thing, as clips:** "See EspaLuz" in the web chat = Runway, one photo + our own voice -> photoreal
+  lip-synced clip (`generate-video`, avatar id in env). Paid subscription only, 30 clips/month, wallet floor guard. By design
+  (6 Nov) the clip says a short true note, never repeats the reply. Also: practice tips as a clip (2/month), celebrations (1/month).
+  First real clip 6 Nov, log `[talking] clip started ... used=1/30`.
+- **What is a loop:** during the face-to-face rehearsal and in the classroom, her clip loops with the sound off while her voice
+  plays - no live lip-sync engine, and the code says so.
+- **Not built:** a LIVE talking face that lip-syncs every reply in real time (a video call). That is new infrastructure and credits
+  per minute - not additive. A middle step is possible later: the rehearsal's final tips are already a real lip-synced clip.
+- **Spanish button on Q3:** pushed ascent `8047e99` 20 Nov; live only after Lovable Publish.
