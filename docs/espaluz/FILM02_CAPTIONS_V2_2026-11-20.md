@@ -1,4 +1,4 @@
-# EspaLuz film 02 — captions v2 (20 Nov 2026) — DONE: style A, re-cut 20 Nov (`cut_v2.py` -> `out/*-v2.mp4`)
+# EspaLuz film 02 — captions v2 (20 Nov 2026) — DONE: style A; v3 (20 Nov 16:00 UTC) opens on Latin America (`cut_v2.py` -> `out/*-v3.mp4`, `MANIFEST-v3.md5`)
 
 Elena, 20 Nov: "the video is fine; the words look ugly; work on the text itself." Footage, timing, links and end card stay.
 Build script: ascent `creatives/espaluz-demo-20261117/film02/cut.py` (laptop, git-ignored). Style preview: `style_preview.py` → `tmp/style-sheet.jpg`.
@@ -15,7 +15,7 @@ Any of them can also pop in word by word (kinetic captions) instead of fading in
 ## New wording (*key word* = highlighted)
 | # | EN | ES | RU |
 |---|----|----|----|
-| 1 | New *country.* | Nuevo *país.* | Новая *страна.* |
+| 1 | New country. / *Latin America.* (v3) | Nuevo país. / *Latinoamérica.* | Новая страна. / *Латинская Америка.* |
 | 2 | New language. / New *everything.* | Nuevo idioma. / *Todo* nuevo. | Новый язык. / *Всё* новое. |
 | 3 | School notes. Doctors. / *Paperwork.* — sub: Just ask on WhatsApp | Notas del colegio. Médicos. / *Trámites.* — sub: Pregúntale por WhatsApp | Записки из школы. Врачи. / *Документы.* — sub: Просто спросите в WhatsApp |
 | 4 | The little things / *nobody* explains | Las cositas que / *nadie* te explica | Мелочи, которые / *никто* не объяснит |
