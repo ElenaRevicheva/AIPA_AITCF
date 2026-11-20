@@ -1,4 +1,4 @@
-# EspaLuz film 02 — captions v2 (20 Nov 2026) — WAITING ON ELENA'S PICK
+# EspaLuz film 02 — captions v2 (20 Nov 2026) — DONE: style A, re-cut 20 Nov (`cut_v2.py` -> `out/*-v2.mp4`)
 
 Elena, 20 Nov: "the video is fine; the words look ugly; work on the text itself." Footage, timing, links and end card stay.
 Build script: ascent `creatives/espaluz-demo-20261117/film02/cut.py` (laptop, git-ignored). Style preview: `style_preview.py` → `tmp/style-sheet.jpg`.
