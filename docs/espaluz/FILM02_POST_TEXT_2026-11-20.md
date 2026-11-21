@@ -7,7 +7,7 @@ The text under each video = **your caption** + **a fixed ending the bot adds** (
 The **first line of your caption becomes the YouTube title** (up to 88 characters + "#Shorts").
 
 ## 1. What you paste as the caption (one per film)
-_21 Nov: documents first + one adaptation word (EN culture / ES costumbres / RU обычаи), same as the film v16._
+_21 Nov: documents first + one adaptation word (EN culture / ES costumbres / RU повседневная жизнь - «обычаи» sounded old-fashioned), same as the films EN/ES v16, RU v17._
 
 **EN film** (`espaluz-film02-en-v16.mp4`)
 ```
@@ -21,10 +21,10 @@ New country, new language, new everything. Paperwork, schools, doctors, the loca
 Nuevo país, nuevo idioma, todo nuevo. Trámites, colegios, médicos, las costumbres de aquí, qué significa de verdad "ahorita": pregúntale a EspaLuz por WhatsApp, Telegram o la web. Responde en español e inglés y recuerda a tu familia. Tu peque tiene 10 minutos al día con Pere y Titi (de 5 a 8 años).
 ```
 
-**RU film** (`espaluz-film02-ru-v16.mp4`)
+**RU film** (`espaluz-film02-ru-v17.mp4`)
 ```
 Переехали в Латинскую Америку с семьёй? EspaLuz поможет почувствовать себя дома 🌎
-Новая страна, новый язык, всё новое. Документы, школы, врачи, местные обычаи, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
+Новая страна, новый язык, всё новое. Документы, школы, врачи, повседневная жизнь, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
 ```
 
 ## 2. The ending the bot adds by itself (NEW: the Google Play beta line)
