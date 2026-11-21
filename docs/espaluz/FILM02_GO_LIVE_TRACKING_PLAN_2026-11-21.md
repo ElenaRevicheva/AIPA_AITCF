@@ -15,7 +15,7 @@ Builds on (does NOT rebuild): `PROMO_TRACKING_AUDIT_2026-11-20.md` (catch built 
 ## The gaps (why views could again turn into nothing)
 | # | Gap | Effect |
 |---|---|---|
-| G1 | The film's END CARD shows plain doors (app.espaluz.lat, @espaluz, @EspaLuzFamily_bot) | a viewer who TYPES what they saw arrives untagged - the most common path for video |
+| G1 | The film's END CARD shows plain doors (app.espaluz.lat, @espaluz · +507 6662 3757 since v14, @EspaLuzFamily_bot); video pixels are never tappable on any platform | a viewer who TYPES what they saw arrives untagged - the most common path for video |
 | G2 | Instagram captions and YouTube Shorts descriptions are not tappable | coded links there are dead unless in the IG bio / YT channel links / pinned YT comment |
 | G3 | No real tap has ever been proven per door | we do not KNOW the chain works end to end from a phone |
 | G4 | Arrivals are counts in a daily report; no per-person alert | Elena cannot act within WhatsApp's 24 h window |
