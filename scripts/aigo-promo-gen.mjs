@@ -17,7 +17,8 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 const run = promisify(execFile);
 
-const BASE = '/home/ubuntu/aigo-promo';
+// AIGO_BASE (21 Nov 2026): reuse this tool for another film's folder (EspaLuz film 02 music) - its own plan + ledger.
+const BASE = process.env.AIGO_BASE || '/home/ubuntu/aigo-promo';
 const PLAN = JSON.parse(fs.readFileSync(path.join(BASE, 'plan.json'), 'utf8'));
 const LEDGER = path.join(BASE, 'ledger.jsonl');
 const UPLOADS = path.join(BASE, 'uploads.json');
