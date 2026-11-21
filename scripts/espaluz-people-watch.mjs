@@ -12,6 +12,8 @@
  *                - web sign-ups that came from a film (auth user_metadata.first_touch) become HubSpot deals
  *                  ([ESPALUZ] WEB <email> — trial) through the existing /api/crm-event door. No message to Elena.
  *   --digest     - ONE daily summary: who arrived from which film, what the system already did, what needs her.
+ *                  With --stdout it is printed instead of sent: espaluz-funnel-weekly.mjs --films (13:40 UTC) appends it,
+ *                  so Elena gets ONE daily EspaLuz message (inventory: docs/espaluz/ESPALUZ_LEAD_INSTRUMENTS_INVENTORY_2026-11-21.md).
  *
  * Run on Oracle:  cd ~/cto-aipa && node scripts/espaluz-people-watch.mjs [--digest] [--dry]
  * State: ~/cto-aipa/.espaluz-people-watch.json (cursors). Reads the bots' shared Postgres through the Familybot venv.
@@ -27,6 +29,7 @@ const FAMILYBOT = path.join(HOME, 'EspaLuzFamilybot');
 const STATE = path.join(ROOT, '.espaluz-people-watch.json');
 const DIGEST = process.argv.includes('--digest');
 const DRY = process.argv.includes('--dry');
+const STDOUT = process.argv.includes('--stdout');
 
 function readEnv(file) {
   try {
@@ -157,6 +160,7 @@ async function digest(state) {
     ? `📣 EspaLuz people, last 24 h: ${lines.length}\n${lines.join('\n')}\n\nThe bots greeted everyone and nudge the quiet ones once. ` +
       `Anyone who needed a person was sent to you separately. Nothing else needs you today.`
     : '📣 EspaLuz people, last 24 h: no new film arrivals. Nothing needs you.';
+  if (STDOUT) { console.log(text); return true; }   // 21 Nov 2026: printed into the 13:40 film report (one message)
   return telegram(text);
 }
 

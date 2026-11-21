@@ -138,8 +138,18 @@ async function sendTelegram(text) {
   console.log(r.ok ? 'sent to Telegram' : `Telegram send failed: ${(await r.text()).slice(0, 200)}`);
 }
 
+/** The people part (who arrived from a film, what the bots already did) from espaluz-people-watch.mjs --digest --stdout. */
+function peopleDigest() {
+  try {
+    return execFileSync('node', ['scripts/espaluz-people-watch.mjs', '--digest', '--stdout'], { encoding: 'utf8', timeout: 60_000 }).trim();
+  } catch (e) {
+    return `People: unreadable (${String(e.message).slice(0, 80)})`;
+  }
+}
+
 async function main() {
-  if (FILMS_ONLY) return sendTelegram(await filmScoreboard());
+  // 21 Nov 2026 (Elena: one message, not three): the people summary rides in the same daily film report.
+  if (FILMS_ONLY) return sendTelegram(`${await filmScoreboard()}\n\n${peopleDigest()}`);
   const visits = await ga4({
     dimensions: [{ name: 'sessionSource' }],
     metrics: [{ name: 'screenPageViews' }],
