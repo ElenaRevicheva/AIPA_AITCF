@@ -2791,7 +2791,7 @@ async function startCTOAIPA() {
           (typeof body.userId === 'string' && body.userId) ||
           (typeof name === 'string' && name.replace(/^TG user\s+/i, '')) ||
           'unknown';
-        const channel: 'telegram' | 'whatsapp' = source.includes('whatsapp') ? 'whatsapp' : 'telegram';
+        const channel: 'telegram' | 'whatsapp' | 'web' = source.includes('whatsapp') ? 'whatsapp' : source.includes('web') ? 'web' : 'telegram';
         const espaluz = await pushEspaLuzDealToHubSpot({
           channel,
           userId: String(userId),

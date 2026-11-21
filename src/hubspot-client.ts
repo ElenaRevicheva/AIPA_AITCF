@@ -1436,7 +1436,7 @@ export async function pushEspaLuzContentActivityToHubSpot(input: {
 
 /** EspaLuz TG/WA users — product trials, not CTO client prospects. Bypass client gate. */
 export async function pushEspaLuzDealToHubSpot(input: {
-  channel: 'telegram' | 'whatsapp';
+  channel: 'telegram' | 'whatsapp' | 'web';
   userId: string;
   context?: string;
   atlasConceptId?: string;
@@ -1447,7 +1447,8 @@ export async function pushEspaLuzDealToHubSpot(input: {
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping EspaLuz CRM push');
     return null;
   }
-  const ch = input.channel === 'whatsapp' ? 'WA' : 'TG';
+  // 21 Nov 2026: web sign-ups from a film become deals too ([ESPALUZ] WEB <email> — trial), via espaluz-people-watch.mjs.
+  const ch = input.channel === 'whatsapp' ? 'WA' : input.channel === 'web' ? 'WEB' : 'TG';
   const dealName = `[ESPALUZ] ${ch} ${input.userId} — trial`;
   try {
     const existing = await findDealByName(dealName);
