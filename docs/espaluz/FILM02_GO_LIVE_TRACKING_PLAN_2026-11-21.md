@@ -53,3 +53,17 @@ Builds on (does NOT rebuild): `PROMO_TRACKING_AUDIT_2026-11-20.md` (catch built 
 ## Size
 Steps 1b, 2, 3: small additions in the bots / functions (no removals), the usual deploy + proof. Step 1a: one web route + one
 end-card re-render (no credits). Steps 4-5: Chrome work with Elena's OK. Nothing paid.
+
+## Profile links (G2) - checked live 21 Nov, proposals WAIT for Elena's OK per change
+Code for profile links (not a film): `f20261121b10b` ("b10b" = bio) - matches the bots' FILM_RE, so arrivals become
+`promo_arrival` + HubSpot deal like any film. `-ig` = Instagram bio, `-yt` = YouTube channel.
+- **WhatsApp @espaluz = the bot: VERIFIED** (Elena's phone: username search -> "EspaLuz AI Family Tutor", +507 6662-3757).
+  Note: the WA Business description still says "expats and digital nomads ... Learn Spanish" (old order; families first now).
+- **YouTube @AIdeazz** channel links: 1) EspaLuz `app.espaluz.lat/?utm_source=youtube&utm_medium=channel_link` (tagged, shown under
+  the channel name) 2) AI Ops Runbook. MISSING: WhatsApp + Telegram. Proposal: add
+  `https://wa.me/50766623757?text=Hola%20EspaLuz%21%20%28f20261121b10b-yt%29` and `https://t.me/EspaLuzFamily_bot?start=f20261121b10b-yt`.
+- **Instagram @elena_revicheva** (personal/career account, 5 of 5 bio links used): 1) WhatsApp `wa.me/50766623757` UNTAGGED
+  (arrivals from IG are invisible) 2) app `?utm_source=instagram&utm_medium=bio` (tagged) 3) sop-ai-ops 4) Atlas 5) /api audit.
+  Proposal: link 1 URL -> `https://wa.me/50766623757?text=Hola%20EspaLuz%21%20%28f20261121b10b-ig%29` (same title). No room for
+  Telegram unless one AIdeazz link goes. Bio TEXT stays (career profile - job search uses it).
+Checked: both proposed links open the right bot (og:title), and the code matches FILM_RE.
