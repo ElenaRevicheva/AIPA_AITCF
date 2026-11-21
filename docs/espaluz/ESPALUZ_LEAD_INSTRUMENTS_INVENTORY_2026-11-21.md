@@ -36,3 +36,11 @@ Checked live today (Oracle crontab, Make blueprints, HubSpot, code). Builds on `
 4. Blog buyer-question mode: one family lane with the door to app.espaluz.lat.
 5. Influencer daily-promo deals: stop writing one HubSpot deal per post (they bury real families in the stream).
 Each needs Elena's go (they touch her public channels or the B2B blog).
+
+## 4. In plain words for Elena (21 Nov): what runs by itself, what reaches her
+Her role: read ONE daily report, approve or refuse proposals. Everything else is automatic.
+- **Promotion (automatic):** Influencer bot posts a forwarded film to FB Page + YouTube Short + IG Reel with tagged links; daily 23:00 Telegram channel promo; CMO daily LinkedIn/IG post (EspaLuz part outdated - needs her go); YouTube channel + IG bio links tagged.
+- **Tracking (automatic):** film code in every link -> bot arrival -> HubSpot deal (film, platform, first message); GA4 film visits + PostHog; web sign-ups keep the film -> HubSpot WEB deal; truth layer hourly (every real person, trial/paid); 13:40 UTC report (films + people).
+- **Outreach (automatic):** bots answer 24/7 in the person's language with family memory; one nudge to a quiet arrival (18-23 h); trial-end reminders, life-event follow-ups, weekly recap, morning line; Android tester enrollment self-serve.
+- **Reaches Elena:** the 13:40 UTC report, and instantly ONLY a person who needs a human (price / premium / a real person / a complaint).
+- **Still manual today:** forwarding each film to the Influencer bot (can become a scheduled queue); her personal reply to "needs human" people.
