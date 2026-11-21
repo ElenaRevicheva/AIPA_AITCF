@@ -67,3 +67,16 @@ Code for profile links (not a film): `f20261121b10b` ("b10b" = bio) - matches th
   Proposal: link 1 URL -> `https://wa.me/50766623757?text=Hola%20EspaLuz%21%20%28f20261121b10b-ig%29` (same title). No room for
   Telegram unless one AIdeazz link goes. Bio TEXT stays (career profile - job search uses it).
 Checked: both proposed links open the right bot (og:title), and the code matches FILM_RE.
+
+## Last automated EspaLuz posts (checked live 21 Nov in Elena's Chrome)
+Automated = Influencer bot -> Make 6869112 -> Facebook Page + YouTube Short + Instagram Reel. FB groups / Reddit stay manual.
+- **6 Nov film "Su escuela es en español"** (newest): YouTube Short `L-MYvQZYyG0` = 1 view; Instagram Reel (6 Nov) = 0 comments.
+  Text under both: "Tap the channel name above / Link in bio, or type espaluz.lat" - **zero URLs**.
+- **2 Nov film "Your new country, in Spanish"**: YouTube Short `RPGI_lhfqFU` = 1,233 views; description PRINTED the URLs
+  (old lovable.app web link, plain wa.me, plain t.me - untagged).
+- Facebook Page: not readable (Chrome is not signed in to Facebook; Claude does not sign in). The bot's code adds 4 tappable
+  tagged links there (web utm, WhatsApp with film code, Telegram start code, ANDROID wa.me link).
+**Finding:** on 2 Nov we removed the URLs from YouTube because they are not tappable in the phone Shorts player. But YouTube
+links in a description ARE clickable on a computer and TV (the watch page). So the 6 Nov post lost every tappable link for
+desktop viewers. Proposal: YouTube description = the same tagged links as Facebook (film code + `-yt`) PLUS the
+"on a phone, tap the channel name" hint. Instagram: captions never link -> the bio links carry it (tag the WhatsApp link).
