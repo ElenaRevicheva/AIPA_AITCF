@@ -1459,6 +1459,12 @@ export async function pushEspaLuzDealToHubSpot(input: {
     if (existing?.id) {
       console.log(`[HubSpot] EspaLuz deal exists (${existing.id}): ${dealName}`);
       if (contactId) await associateDealContact(existing.id, contactId);
+      // 21 Nov 2026 (Elena's go/no-go taps): a person who ALREADY has a deal and comes back through a film link left no
+      // trace - the "arrived from film" context only reached NEW deals. Now the existing deal gets one note per arrival.
+      if (input.context && /arrived from film/i.test(input.context)) {
+        await addNoteToDeal(existing.id, `<strong>🎯 Came back from a film</strong><br>${escHs(input.context.slice(0, 600))}`);
+        console.log(`[HubSpot] EspaLuz film return noted on deal ${existing.id}`);
+      }
       const dup = { contactId, dealId: existing.id };
       const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
       attachHubSpotToAtlasLoop('espaluz', dup, input.crmMeta ?? {
