@@ -71,7 +71,7 @@ async function telegram(text) {
   return r.ok;
 }
 
-const where = (tag) => ({ fb: 'Facebook', ig: 'Instagram', yt: 'YouTube' }[tag] || (/^g\d+$/.test(tag) ? `Facebook group ${tag.slice(1)}` : tag || '?'));
+const where = (tag) => ({ fb: 'Facebook', ig: 'Instagram', yt: 'YouTube', li: 'LinkedIn' }[tag] || (/^g\d+$/.test(tag) ? `Facebook group ${tag.slice(1)}` : tag || '?'));
 const filmOf = (reason) => { const m = /^(f\d{8}[0-9a-f]{4})-(\w+)$/.exec(reason || ''); return m ? { film: m[1], tag: m[2] } : null; };
 const door = (platform, who) => platform === 'whatsapp' ? `https://wa.me/${String(who).replace(/\D/g, '')}` : `Telegram id ${who} (reply through the bot)`;
 
