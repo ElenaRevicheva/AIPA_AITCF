@@ -7,24 +7,27 @@ The text under each video = **your caption** + **a fixed ending the bot adds** (
 The **first line of your caption becomes the YouTube title** (up to 88 characters + "#Shorts").
 
 ## 1. What you paste as the caption (one per film)
-_21 Nov: documents first + one adaptation word (EN culture / ES costumbres / RU повседневная жизнь - «обычаи» sounded old-fashioned), same as the films EN/ES v16, RU v17._
+_21 Nov (v18): the slogan line "Paperwork gets solved once. Adaptation is what lasts." (Elena) under the headline; the film shows "...Doctors. *Adaptation.*" and SAYS the slogan. Before: documents first + one adaptation word (EN culture / ES costumbres / RU повседневная жизнь - «обычаи» sounded old-fashioned), same as the films EN/ES v16, RU v17._
 
-**EN film** (`espaluz-film02-en-v16.mp4`)
+**EN film** (`espaluz-film02-en-v18.mp4`)
 ```
 Moved to Latin America with your family? EspaLuz helps you feel at home 🌎
-New country, new language, new everything. Paperwork, schools, doctors, the local culture, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
+Paperwork gets solved once. Adaptation is what lasts.
+New country, new language, new everything. Schools, doctors, everyday life, what "ahorita" really means: just ask EspaLuz on WhatsApp, Telegram or the web. It answers in Spanish and English and remembers your family. Your child gets 10 minutes a day with Pere & Titi (ages 5-8).
 ```
 
-**ES film** (`espaluz-film02-es-v16.mp4`)
+**ES film** (`espaluz-film02-es-v18.mp4`)
 ```
 ¿Te mudaste a Latinoamérica con tu familia? EspaLuz te ayuda a sentirte en casa 🌎
-Nuevo país, nuevo idioma, todo nuevo. Trámites, colegios, médicos, las costumbres de aquí, qué significa de verdad "ahorita": pregúntale a EspaLuz por WhatsApp, Telegram o la web. Responde en español e inglés y recuerda a tu familia. Tu peque tiene 10 minutos al día con Pere y Titi (de 5 a 8 años).
+Los trámites pasan. La adaptación queda.
+Nuevo país, nuevo idioma, todo nuevo. Colegios, médicos, la vida diaria, qué significa de verdad "ahorita": pregúntale a EspaLuz por WhatsApp, Telegram o la web. Responde en español e inglés y recuerda a tu familia. Tu peque tiene 10 minutos al día con Pere y Titi (de 5 a 8 años).
 ```
 
-**RU film** (`espaluz-film02-ru-v17.mp4`)
+**RU film** (`espaluz-film02-ru-v18.mp4`)
 ```
 Переехали в Латинскую Америку с семьёй? EspaLuz поможет почувствовать себя дома 🌎
-Новая страна, новый язык, всё новое. Документы, школы, врачи, повседневная жизнь, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
+Документы оформляют один раз. Адаптация — это надолго.
+Новая страна, новый язык, всё новое. Школы, врачи, повседневная жизнь, что на самом деле значит «ahorita»: просто спросите EspaLuz в WhatsApp, Telegram или на сайте. Она отвечает по-испански и по-английски и помнит вашу семью. Ребёнку — 10 минут в день с Пере и Тити (5-8 лет).
 ```
 
 ## 2. The ending the bot adds by itself (NEW: the Google Play beta line)
