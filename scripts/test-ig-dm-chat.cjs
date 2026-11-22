@@ -34,6 +34,7 @@ const now = new Date('2026-11-22T21:00:00Z');
   ok(r4.startsWith('[ig-chat] ice ESPALUZ_FREE') && sent.at(-1).text.includes('14'), 'ice breaker answers from the fixed text, no model');
   ok(m.ICE_BREAKERS.length <= 4 && m.ICE_BREAKERS.every((b) => b.question.length <= 80), 'ice breakers within Meta limits (≤4, ≤80 chars)');
 
+  ok((await m.handleMessaging({ sender: { id: 'D' }, postback: { payload: 'MANYCHAT_xyz' } }, send, { ownId: 'ME', llm, now })) === "skip: another app's button", "ManyChat's button tap is not answered twice");
   process.env.IG_CHAT_MAX_PER_DAY = '2';
   await m.handleMessaging({ sender: { id: 'C' }, message: { text: 'a' } }, send, { ownId: 'ME', llm, now });
   await m.handleMessaging({ sender: { id: 'C' }, message: { text: 'b' } }, send, { ownId: 'ME', llm, now });

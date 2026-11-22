@@ -101,6 +101,8 @@ export async function handleMessaging(ev: any, send: Sender, opts: { ownId?: str
   const payload = String(ev?.postback?.payload || ev?.message?.quick_reply?.payload || '');
   const text = String(ev?.message?.text || '').trim();
   if (!payload && !text) return 'skip: no text (sticker/media)';
+  // A tap on ANOTHER app's button (ManyChat's "Muéstrame" on the two ManyChat Reels) reaches us too: not ours, stay out.
+  if (payload && !ICE_BREAKERS.some((b) => b.payload === payload)) return 'skip: another app\'s button';
 
   const s = load();
   const code = chatCode(s, opts.now);
