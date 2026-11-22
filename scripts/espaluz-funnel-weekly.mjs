@@ -110,7 +110,10 @@ async function filmScoreboard() {
   });
   // Normalise: an old caption put a newline inside the link ("video\n"), some rows carry a leading space; unfilled
   // templates ({source}, {film}, PLACEHOLDER) and the eeee test code are our own tests, never a person.
-  const clean = (s) => String(s || '').replace(/\\n|\s+/g, '').replace(/^\((not set|referral|organic)\)$/, '');
+  const clean = (s) => {
+    const t = String(s || '').replace(/\\n/g, '').trim();
+    return /^\((not set|referral|organic|direct)\)$/.test(t) ? '' : t.replace(/\s+/g, '');
+  };
   const isTest = (campaign, source) => /[{}]|PLACEHOLDER/i.test(campaign + source) || /eeee/.test(campaign);
   const tagged = (campaign, source) => /^f\d{8}/.test(campaign) || /^(espaluz-lat|video|youtube|instagram|facebook)$/.test(source);
   const rows = new Map();
