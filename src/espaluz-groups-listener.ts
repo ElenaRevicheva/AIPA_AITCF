@@ -41,7 +41,7 @@ export const GROUP_QUERIES: GroupQuery[] = [
 const FAMILY = /\b(kid|kids|child|children|son|daughter|famil\w*|school|colegio|escuela|niñ\w+|hij\w+|дет\w*|ребен\w*|ребён\w*|сын\w*|доч\w*|школ\w*|семь\w*)\b/i;
 const LANGUAGE_OR_MOVE = /\b(spanish|español|espanol|english|inglés|ingles|испанск\w*|английск\w*|move|moving|moved|relocat\w*|expat\w*|mudanza|mudarnos|nos mudamos|переезд\w*|переех\w*|adapt\w*|settl\w*)\b/i;
 /** Sales posts, services, rentals, jobs - never a family asking for help. */
-const NOISE = /(for sale|se vende|vendo|alquil|for rent|rent\b|servicio de|transporte|acarreo|mudanzas? (económica|baratas)|hiring|vacante|empleo|job offer|tutor available|clases? de español (desde|a solo)|promo|descuento|discount|whatsapp \+?\d)/i;
+const NOISE = /(for sale|se vende|vendo|alquil|for rent|rent\b|servicio de|transporte|acarreo|mudanzas? (económica|baratas)|hiring|vacante|empleo|job offer|tutor available|clases? de español (desde|a solo)|promo|descuento|discount|whatsapp \+?\d|teacher (for|available)|private pod|we are hiring|buscamos (profesor|maestr)|te encanta trabajar|inscripciones|matr[ií]cula abierta|enroll now)/i;
 
 export function groupTag(groupId: string): string {
   let h = 0;
