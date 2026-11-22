@@ -14,7 +14,7 @@
 import oracledb from 'oracledb';
 import { getPoolConnection } from './database';
 
-export type SourceId = 'reddit' | 'indiehackers' | 'hackernews';
+export type SourceId = 'reddit' | 'indiehackers' | 'hackernews' | 'fbgroups'; // fbgroups = EspaLuz lane (espaluz-groups-listener.ts)
 export type OpportunityStatus = 'queued' | 'posted' | 'skipped';
 
 export interface Opportunity {

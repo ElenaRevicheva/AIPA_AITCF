@@ -3230,6 +3230,23 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       console.log(`💬 Community listener cron: "${communityCronExpr}" (${triageTz}) — drafts only, never posts`);
     }
 
+    // EspaLuz Facebook-group lane (22 Nov 2026, Elena): ONE reply to paste per weekday, never a flood. Finds public
+    // family posts via Google (Groups API is gone), drafts, delivers through the same community card + buttons.
+    if (process.env.ESPALUZ_GROUPS_ENABLED === 'true') {
+      const groupsCronExpr = process.env.ESPALUZ_GROUPS_CRON || '5 10 * * 1-5';
+      cron.schedule(
+        groupsCronExpr,
+        () => {
+          import('./espaluz-groups-listener')
+            .then(m => m.runEspaluzGroupsCycle())
+            .then(r => console.log(`[espaluz-groups] ${r.candidates} candidates · ${r.declined} declined · ${r.delivered} delivered`))
+            .catch(e => console.error('[espaluz-groups] cron error:', e));
+        },
+        { timezone: triageTz },
+      );
+      console.log(`👨‍👩‍👧 EspaLuz groups listener cron: "${groupsCronExpr}" (${triageTz}) — one paste a weekday, never posts`);
+    }
+
     const sprintCronExpr = process.env.SPRINT_BRIEFING_CRON?.trim();
     if (sprintCronExpr && process.env.SPRINT_BRIEFING_SECRET?.trim()) {
       cron.schedule(

@@ -423,7 +423,8 @@ async function searchIndieHackers(spec: QuerySpec): Promise<RawThread[]> {
     }));
 }
 
-const SOURCES: Record<SourceId, (spec: QuerySpec) => Promise<RawThread[]>> = {
+// fbgroups runs on its own weekday cron (espaluz-groups-listener.ts), never in this hourly/weekly AIdeazz scan.
+const SOURCES: Partial<Record<SourceId, (spec: QuerySpec) => Promise<RawThread[]>>> = {
   reddit: searchReddit,
   hackernews: searchHackerNews,
   indiehackers: searchIndieHackers,
