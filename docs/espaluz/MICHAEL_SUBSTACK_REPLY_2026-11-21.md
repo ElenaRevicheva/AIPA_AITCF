@@ -74,3 +74,11 @@ Hi Michael! 😊 Yes, I subscribed - congrats on starting, I really value your w
 Honestly, I'm not a Substack expert: my AI agents publish my content for me on other channels. But there is one thing from my own field - how ChatGPT and Perplexity decide which coaches to recommend - that could really help your Substack. Let's talk about it once you've had a moment to try Pro English 🙂
 
 And if you know 1-2 people with Android who'd like to test EspaLuz free until 31 December, they just write ANDROID to @espaluz on WhatsApp 🙏
+
+## v5 - FINAL (Elena: he proposed meeting Monday; no pressure about trying Pro English; tester line stays, friendly)
+
+Hi Michael! 😊 Yes, I subscribed - congrats on starting, I really value your work.
+
+Honestly, I'm not a Substack expert: my AI agents publish my content for me on other channels. But there is one thing from my own field - how ChatGPT and Perplexity decide which coaches to recommend - that could really help your Substack. Let's talk about it at our meeting on Monday 🙂
+
+And BTW, if you know some people with Android who'd like to test EspaLuz free until 31 December, they just write ANDROID to @espaluz on WhatsApp 🙏
