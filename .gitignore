@@ -94,3 +94,5 @@ docs/strategy/*
 # Auto-built per-deal CVs (hs-fill-apply-kit on Oracle); rebuilt from the job JSON on demand
 docs/applications/cv-by-job/auto/
 data/lead-machine-query-yield.json
+.ig-token.json
+.ig-comment-dm.json

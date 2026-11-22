@@ -1,0 +1,146 @@
+/**
+ * ig-comment-dm.ts — our own "comment HOLA -> instant DM" for Instagram (22 Nov 2026).
+ *
+ * Elena: "start building our own ManyChat". ManyChat Free works on ONE specific Reel per automation and caps at 25
+ * people a month. This does the same on EVERY Reel, no cap, through Meta's official Instagram API (Instagram Login):
+ *   comment containing HOLA / OLA on any of her posts
+ *     -> public reply under the comment (Graph: POST /{comment-id}/replies)
+ *     -> ONE private reply DM with the tracked WhatsApp / app / Telegram links (Graph: POST /{ig-user-id}/messages,
+ *        recipient.comment_id; Meta allows one private reply per comment, within 7 days)
+ * Each Reel gets its own film-style code f<date><4 hex>-ig (bots' FILM_RE), so an arrival lands in HubSpot and the
+ * 13:40 report like every film.
+ *
+ * Route: https://webhook.aideazz.xyz/cto/ig/webhook  (nginx /cto/ -> this process, port 3000)
+ * Env: IG_DM_ENABLED=true, IG_APP_SECRET, IG_VERIFY_TOKEN, IG_USER_ID, IG_ACCESS_TOKEN (long-lived; a refreshed one in
+ *      .ig-token.json wins), IG_GRAPH_VERSION (default v23.0).
+ * Off by default. While ManyChat still runs on a Reel, list it in IG_DM_SKIP_MEDIA so a person never gets two DMs.
+ */
+
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import type { Express, Request, Response } from 'express';
+
+const ROOT = process.cwd();
+const STATE_FILE = path.join(ROOT, '.ig-comment-dm.json');
+const TOKEN_FILE = path.join(ROOT, '.ig-token.json');
+const GRAPH = () => `https://graph.instagram.com/${process.env.IG_GRAPH_VERSION?.trim() || 'v23.0'}`;
+const WA = '50766623757';
+
+/** HOLA / OLA / ¡Hola! as a word, any case. "holaaa" and "Hola!!" count; "Holanda" does not. */
+export const KEYWORD = /(^|[^\p{L}])¡?h?ola+(?![\p{L}])/iu;
+
+interface State { done: string[]; media: Record<string, string> }
+
+function loadState(): State {
+  try { return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); } catch { return { done: [], media: {} }; }
+}
+function saveState(s: State): void {
+  s.done = s.done.slice(-5000);
+  fs.writeFileSync(STATE_FILE, JSON.stringify(s, null, 1));
+}
+
+function accessToken(): string {
+  try {
+    const t = JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'));
+    if (t?.access_token) return String(t.access_token);
+  } catch { /* fall back to env */ }
+  return process.env.IG_ACCESS_TOKEN?.trim() || '';
+}
+
+/** One stable code per Reel: f<YYYYMMDD of first HOLA><4 hex of the media id>. Stored so it never changes. */
+export function codeForMedia(state: State, mediaId: string, now = new Date()): string {
+  if (!state.media[mediaId]) {
+    const day = now.toISOString().slice(0, 10).replace(/-/g, '');
+    state.media[mediaId] = `f${day}${crypto.createHash('md5').update(mediaId).digest('hex').slice(0, 4)}`;
+  }
+  return state.media[mediaId]!;
+}
+
+export function dmText(code: string): string {
+  const hello = encodeURIComponent(`Hola EspaLuz 👋 (ref ${code}-ig)`);
+  return [
+    '¡Hola! 👋 Soy EspaLuz, la compañera de tu familia para la nueva vida en español.',
+    "I'm EspaLuz, your family's companion for a new life in Spanish. 14 días gratis · 14 days free.",
+    '',
+    `💬 WhatsApp: https://wa.me/${WA}?text=${hello}`,
+    `📱 App: https://app.espaluz.lat/?utm_source=instagram&utm_medium=dm&utm_campaign=${code}`,
+    `✈️ Telegram: https://t.me/EspaLuzFamily_bot?start=${code}_ig`,
+  ].join('\n');
+}
+
+const PUBLIC_REPLIES = [
+  '¡Hola! 💌 Te mandé un mensaje · Sent you a DM',
+  '¡Hola! 👋 Revisa tus mensajes · Check your DMs',
+  '¡Hola! 🌎 Mira tus mensajes · Look in your DMs',
+];
+
+export function validSignature(rawBody: Buffer | undefined, header: string | undefined, secret: string): boolean {
+  if (!rawBody || !header || !secret) return false;
+  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const a = Buffer.from(expected);
+  const b = Buffer.from(String(header));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+async function graphPost(p: string, body: unknown): Promise<{ ok: boolean; status: number; text: string }> {
+  const res = await fetch(`${GRAPH()}${p}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken()}` },
+    body: JSON.stringify(body),
+  });
+  return { ok: res.ok, status: res.status, text: (await res.text()).slice(0, 300) };
+}
+
+/** Handles one comments-change value. Exported for tests (no network when dryRun). */
+export async function handleComment(value: any, opts: { dryRun?: boolean } = {}): Promise<string> {
+  const commentId = String(value?.id || '');
+  const text = String(value?.text || '');
+  const fromId = String(value?.from?.id || '');
+  const mediaId = String(value?.media?.id || '');
+  if (!commentId || !mediaId) return 'skip: no ids';
+  if (fromId && fromId === process.env.IG_USER_ID?.trim()) return 'skip: own comment';
+  if (value?.parent_id) return 'skip: reply in a thread';
+  if (!KEYWORD.test(text)) return 'skip: no keyword';
+  const skip = (process.env.IG_DM_SKIP_MEDIA || '').split(',').map((s) => s.trim()).filter(Boolean);
+  if (skip.includes(mediaId)) return 'skip: media still on ManyChat';
+
+  const state = loadState();
+  if (state.done.includes(commentId)) return 'skip: already answered';
+  const code = codeForMedia(state, mediaId);
+  if (opts.dryRun) return `would answer ${commentId} with ${code}`;
+
+  const dm = await graphPost(`/${process.env.IG_USER_ID}/messages`, { recipient: { comment_id: commentId }, message: { text: dmText(code) } });
+  const pub = await graphPost(`/${commentId}/replies`, { message: PUBLIC_REPLIES[state.done.length % PUBLIC_REPLIES.length] });
+  // Record even a failed DM: Meta allows ONE private reply per comment, so a retry loop could only spam errors.
+  state.done.push(commentId);
+  saveState(state);
+  const line = `[ig-dm] HOLA on media ${mediaId} (${code}) -> DM ${dm.status}${dm.ok ? '' : ' ' + dm.text} · public ${pub.status}`;
+  console.log(line);
+  return line;
+}
+
+export function registerInstagramCommentDm(app: Express): void {
+  // Meta's subscription check: echo hub.challenge when the verify token matches.
+  app.get('/ig/webhook', (req: Request, res: Response) => {
+    const ok = req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.IG_VERIFY_TOKEN?.trim();
+    if (ok) res.status(200).send(String(req.query['hub.challenge'] ?? ''));
+    else res.sendStatus(403);
+  });
+
+  app.post('/ig/webhook', (req: Request, res: Response) => {
+    if (!validSignature((req as any).rawBody, req.get('x-hub-signature-256') || undefined, process.env.IG_APP_SECRET?.trim() || '')) {
+      res.sendStatus(401);
+      return;
+    }
+    res.sendStatus(200); // Meta wants a fast 200; the work happens after.
+    if (process.env.IG_DM_ENABLED !== 'true') return;
+    for (const entry of req.body?.entry ?? []) {
+      for (const change of entry?.changes ?? []) {
+        if (change?.field !== 'comments') continue;
+        handleComment(change.value).catch((e) => console.error('[ig-dm] failed:', e?.message ?? e));
+      }
+    }
+  });
+  console.log(`📸 Instagram comment-to-DM webhook: /ig/webhook (${process.env.IG_DM_ENABLED === 'true' ? 'ON' : 'off'})`);
+}

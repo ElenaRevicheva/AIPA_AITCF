@@ -63,6 +63,7 @@ import { visibilityRouter } from './visibility-api';
 import { newsletterRouter } from './newsletter-api';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
+import { registerInstagramCommentDm } from './ig-comment-dm';
 
 dotenv.config({ override: true });
 
@@ -823,6 +824,9 @@ async function startCTOAIPA() {
   const app = express();
   app.set('trust proxy', 1); // behind nginx (webhook.aideazz.xyz → /cto/)
   app.use(express.json({ verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; } }));
+
+  // EspaLuz Instagram comment HOLA -> DM (22 Nov 2026). Public at /cto/ig/webhook; off unless IG_DM_ENABLED=true.
+  registerInstagramCommentDm(app);
 
   // AIdeazz Lab Visibility API (AEO/GEO/Tech-SEO audit) — public at /cto/v1/visibility
   app.use(visibilityRouter());
