@@ -36,6 +36,10 @@ export const GROUP_QUERIES: GroupQuery[] = [
   { q: 'переезд в Панаму с детьми школа', weight: 8 },
   { q: 'русские в Мексике дети испанский', weight: 7 },
   { q: 'familia extranjera Panamá niños inglés', weight: 6 },
+  { q: 'relocating with daughter school Spanish expat', weight: 8 },
+  { q: 'schools for expat families Costa Rica', weight: 8 },
+  { q: 'moving to Spain with kids learn Spanish school', weight: 7 },
+  { q: 'expat family Ecuador kids school', weight: 7 },
 ];
 
 const FAMILY = /\b(kid|kids|child|children|son|daughter|famil\w*|school|colegio|escuela|niñ\w+|hij\w+|дет\w*|ребен\w*|ребён\w*|сын\w*|доч\w*|школ\w*|семь\w*)\b/i;
@@ -77,11 +81,16 @@ export function isFamilyQuestion(title: string, body: string): boolean {
 export async function findGroupPosts(seen: Set<string>): Promise<ScoredThread[]> {
   const best = new Map<string, ScoredThread>();
   for (const spec of GROUP_QUERIES) {
+    // Past week first, then past month: Google returns only ~2 real group posts per query (22 Nov probe), and a
+    // three-week-old family question is still worth a helpful answer. Redirect links (google.com/goto) are blogs - dropped.
     let results: Awaited<ReturnType<typeof bdSerpSearch>> = [];
-    try {
-      results = await bdSerpSearch(spec.q, { site: 'site:facebook.com/groups', tbs: 'qdr:w', num: 10, retries: 1 });
-    } catch (e: any) {
-      console.warn('[espaluz-groups] search failed:', spec.q, e?.message ?? e);
+    for (const tbs of ['qdr:w', 'qdr:m']) {
+      try {
+        results = results.concat(await bdSerpSearch(spec.q, { site: 'site:facebook.com/groups', tbs, num: 10, retries: 1 }));
+      } catch (e: any) {
+        console.warn('[espaluz-groups] search failed:', spec.q, tbs, e?.message ?? e);
+      }
+      await new Promise((res) => setTimeout(res, 1600));
     }
     for (const r of results) {
       const ids = parseGroupUrl(r.link);
