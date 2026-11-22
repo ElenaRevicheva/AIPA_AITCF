@@ -36,7 +36,13 @@ const WA = '50766623757';
 /** HOLA / OLA / ¡Hola! as a word, any case. "holaaa" and "Hola!!" count; "Holanda" does not. */
 export const KEYWORD = /(^|[^\p{L}])¡?h?ola+(?![\p{L}])/iu;
 
-interface State { done: string[]; media: Record<string, string> }
+/**
+ * A post only gets the bot if its caption INVITES the comment ("Comenta HOLA" / "Comment HOLA"). The same Instagram
+ * account carries AIdeazz posts that open with "¡Hola, explorer!" - a HOLA there must never get an EspaLuz DM.
+ */
+export const CTA = new RegExp(process.env.IG_DM_CAPTION_RE?.trim() || '(coment[ae]|comment)\\s*["“«]?\\s*hola', 'i');
+
+interface State { done: string[]; media: Record<string, string>; invites?: Record<string, boolean> }
 
 function loadState(): State {
   try { return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); } catch { return { done: [], media: {} }; }
@@ -105,8 +111,18 @@ async function graphPost(p: string, body: unknown): Promise<{ ok: boolean; statu
   return { ok: res.ok, status: res.status, text: (await res.text()).slice(0, 300) };
 }
 
-/** Handles one comments-change value. Exported for tests (no network when dryRun). */
-export async function handleComment(value: any, opts: { dryRun?: boolean } = {}): Promise<string> {
+async function captionInvites(state: State, mediaId: string, caption?: string): Promise<boolean> {
+  state.invites ??= {};
+  if (caption !== undefined) return (state.invites[mediaId] = CTA.test(caption));
+  if (mediaId in state.invites) return state.invites[mediaId]!;
+  const res = await fetch(`${GRAPH()}/${mediaId}?fields=caption`, { headers: { Authorization: `Bearer ${accessToken()}` } });
+  if (!res.ok) return false; // unknown post -> stay silent (fail closed), and ask again next time
+  const body: any = await res.json();
+  return (state.invites[mediaId] = CTA.test(String(body?.caption || '')));
+}
+
+/** Handles one comments-change value. Exported for tests (no network when dryRun; pass opts.caption). */
+export async function handleComment(value: any, opts: { dryRun?: boolean; caption?: string } = {}): Promise<string> {
   const commentId = String(value?.id || '');
   const text = String(value?.text || '');
   const fromId = String(value?.from?.id || '');
@@ -115,11 +131,15 @@ export async function handleComment(value: any, opts: { dryRun?: boolean } = {})
   if (fromId && fromId === process.env.IG_USER_ID?.trim()) return 'skip: own comment';
   if (value?.parent_id) return 'skip: reply in a thread';
   if (!KEYWORD.test(text)) return 'skip: no keyword';
-  const skip = (process.env.IG_DM_SKIP_MEDIA || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (skip.includes(mediaId)) return 'skip: media still on ManyChat';
+  const list = (v?: string) => (v || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const tester = list(process.env.IG_DM_TEST_USERNAMES).includes(String(value?.from?.username || '').toLowerCase());
+  if (!tester && list(process.env.IG_DM_SKIP_MEDIA).includes(mediaId)) return 'skip: media still on ManyChat';
 
   const state = loadState();
   if (state.done.includes(commentId)) return 'skip: already answered';
+  if (!opts.dryRun || opts.caption !== undefined) {
+    if (!(await captionInvites(state, mediaId, opts.caption))) { saveState(state); return 'skip: post does not invite HOLA'; }
+  }
   const code = codeForMedia(state, mediaId);
   if (opts.dryRun) return `would answer ${commentId} with ${code}`;
 

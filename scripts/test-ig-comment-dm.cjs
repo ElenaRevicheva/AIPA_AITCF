@@ -31,6 +31,17 @@ process.env.IG_USER_ID = '42';
   ok((await m.handleComment({ id: 'c4', text: 'hola', from: { id: '7' }, media: { id: 'm' } }, { dryRun: true })) === 'skip: media still on ManyChat', 'ManyChat Reel skipped');
   process.env.IG_DM_SKIP_MEDIA = '';
   ok(String(await m.handleComment({ id: 'c5', text: 'Hola!', from: { id: '7' }, media: { id: 'm2' } }, { dryRun: true })).startsWith('would answer c5'), 'stranger HOLA answered');
+  // Caption gate (22 Nov): the same account posts AIdeazz content that opens with "¡Hola, explorer!".
+  ok(m.CTA.test('💬 Comenta HOLA y te mando el enlace'), 'CTA: Spanish invite');
+  ok(m.CTA.test('Comment "HOLA" and EspaLuz sends you the link'), 'CTA: English invite');
+  ok(!m.CTA.test('¡Hola, Founders & technical leaders explorer! Your breakthrough awaits'), 'CTA: AIdeazz greeting is not an invite');
+  ok((await m.handleComment({ id: 'c6', text: 'hola', from: { id: '7' }, media: { id: 'm3' } },
+    { dryRun: true, caption: '¡Hola, explorer! Indexing. Crawlability.' })) === 'skip: post does not invite HOLA', 'HOLA on AIdeazz post ignored');
+  ok(String(await m.handleComment({ id: 'c7', text: 'HOLA', from: { id: '7' }, media: { id: 'm4' } },
+    { dryRun: true, caption: '💬 Comenta HOLA y te mando el enlace' })).startsWith('would answer c7'), 'HOLA on inviting post answered');
+  process.env.IG_DM_TEST_USERNAMES = 'kiravelerevich';
+  ok(String(await m.handleComment({ id: 'c8', text: 'hola', from: { id: '9', username: 'KiraVelerevich' }, media: { id: 'm' } },
+    { dryRun: true, caption: 'Comenta HOLA' })).startsWith('would answer c8'), 'test account may use a ManyChat Reel');
   console.log(fail ? `${fail} FAILED` : 'all passed');
   process.exit(fail ? 1 : 0);
 })();
