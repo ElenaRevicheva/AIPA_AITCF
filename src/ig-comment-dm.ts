@@ -22,6 +22,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import type { Express, Request, Response } from 'express';
+import { handleMessaging } from './ig-dm-chat';
 
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, '.ig-comment-dm.json');
@@ -173,7 +174,18 @@ export function registerInstagramCommentDm(app: Express): void {
         if (change?.field !== 'comments') continue;
         handleComment(change.value).catch((e) => console.error('[ig-dm] failed:', e?.message ?? e));
       }
+      // Direct messages + ice-breaker taps (22 Nov 2026): EspaLuz answers in Instagram (src/ig-dm-chat.ts).
+      if (process.env.IG_CHAT_ENABLED === 'true') {
+        for (const ev of entry?.messaging ?? []) {
+          handleMessaging(ev, (to, text) =>
+            graphPost(`/${messagesSender()}/messages`, { recipient: { id: to }, message: { text } }),
+          ).catch((e) => console.error('[ig-chat] failed:', e?.message ?? e));
+        }
+      }
     }
   });
-  console.log(`📸 Instagram comment-to-DM webhook: /ig/webhook (${process.env.IG_DM_ENABLED === 'true' ? 'ON' : 'off'})`);
+  console.log(
+    `📸 Instagram comment-to-DM webhook: /ig/webhook (${process.env.IG_DM_ENABLED === 'true' ? 'ON' : 'off'})` +
+      ` · DM chat ${process.env.IG_CHAT_ENABLED === 'true' ? 'ON' : 'off'}`,
+  );
 }
