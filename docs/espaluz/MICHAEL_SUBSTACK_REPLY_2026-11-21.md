@@ -47,3 +47,21 @@ But there is one angle from my own field I can genuinely share: AI search. More 
 • "Michael McRae, business English coach in Panama" is stated plainly in your About page and in each post.
 
 When you have 3-4 posts up, send me the link: I'll run my AI-visibility audit on your Substack and check whether ChatGPT and Perplexity mention you - my thanks for helping me test Pro English 🙏
+
+## v3 (Elena: zero work for her - no coding, no her time; self-serve tools only; fair exchange: he tests Pro English
+## and brings 1-2 Android testers, Google Play still needs testers)
+Checked 21 Nov: the live free audit (aideazz.xyz/api, public demo key) on a real Substack post = 85/100 (A), 34 checks ->
+Substack does the technical AI-readiness itself; what decides citations is his wording. He runs it himself. Android
+testers enroll themselves (write ANDROID to @espaluz on WhatsApp -> 3 steps -> free to 31 Dec).
+
+Hi Michael! 😊 Yes, I subscribed - I really value your work.
+
+Honestly, I don't post on Substack myself: my AI agents publish my content automatically on other channels, so you'll master the platform faster than me.
+
+One angle from my own field that may help: AI search. More people now ask ChatGPT or Perplexity "who can help me with business English in Panama?" instead of Googling. I tested a Substack page with my free AI-visibility audit: Substack already scores 85/100 on the technical side - so whether AI engines cite YOU depends only on your words:
+• titles = the exact questions your clients would ask,
+• keep your key posts free (paywalled posts can't be cited),
+• "Michael McRae, business English coach in Panama" written plainly on your About page and in each post.
+You can check any page yourself, free: aideazz.xyz/api
+
+And a small favour in return 🙏 I still need a few Android testers for the EspaLuz app on Google Play. If 1-2 people you know have Android, they just write ANDROID to @espaluz on WhatsApp - EspaLuz sends them the 3 steps, and their family uses it free until 31 December. And of course, your honest feedback on Pro English is gold for me.
