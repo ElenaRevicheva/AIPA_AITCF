@@ -51,6 +51,11 @@ const {
   aigoVideoLinesFor,
 } = require('../docs/selling/aigo-kit.cjs');
 const { extractSiteEmails, isTemplateAddress, isNotABuyerInbox } = require('./lib/site-contacts.cjs');
+// EspaLuz mode (Elena, 22 Nov 2026: "refocus Atlas on EspaLuz ... the gun must be loaded 100%"). Same machine — supply,
+// contact finding, CRM dedup, deal + task + one-click note, follow-up, publish, Telegram — different buyer and letter:
+// businesses that meet relocating families get a free welcome link for their clients. No audit (it measures a website
+// for an AI-visibility pitch, which EspaLuz is not). AIGO mode is untouched; it is frozen at tag atlas-aigo-final-2026-11-22.
+const ESPALUZ_KIT = require('../docs/selling/espaluz-kit.cjs');
 const videoLines = (lead) => aigoVideoLinesFor(`${lead.query || ''} ${lead.company || ''}`);
 // Elena's switch (13 Oct 2026: "I prefer to switch it on when I say so"). OFF by default, so
 // syncing this file changes nothing: letters, registry rows and notes stay byte-identical to the
@@ -69,6 +74,10 @@ const AIGO_KIT_ON = process.env.ATLAS_AIGO_KIT === '1' || g('ATLAS_AIGO_KIT') ==
 // (lib/site-contacts.cjs — Cloudflare-hidden emails, placeholder / pattern / complaints-desk
 // filter) and stop quoting a score measured on a 403 block page. OFF = byte-identical to before.
 const TRUE_CONTACTS_ON = process.env.ATLAS_TRUE_CONTACTS === '1' || g('ATLAS_TRUE_CONTACTS') === '1';
+// What Atlas sells this Monday: 'aigo' (AI Growth Operator, the default and the frozen behaviour) or 'espaluz'.
+const OFFER = String(process.env.ATLAS_OFFER || g('ATLAS_OFFER') || 'aigo').trim().toLowerCase();
+const ESPALUZ = OFFER === 'espaluz';
+const ESPALUZ_LANE = 'espaluz_family_partners';
 // Google Places = the maps data this machine was built on (name, own website, phone, rating), through
 // Elena's own key (Elena, 13 Oct 2026: "fix that, but only within the free monthly allowance").
 // Text Search with phone/website is Google's "Text Search Enterprise" SKU: 1,000 free requests a month
@@ -319,6 +328,30 @@ const ICP_BY_LANE = {
    * never worked. Same buying pattern as the other lanes, in the 4 AIGO strong-fit industries, chosen for
    * businesses that sell an experience or a visible result. No local tail: it is a high-ticket offer only.
    */
+  /**
+   * EspaLuz family partners (22 Nov 2026, ATLAS_OFFER=espaluz only). Businesses that meet relocating FAMILIES every
+   * week, in the places families actually move to. `seg` picks the letter's one-sentence reason (espaluz-kit.cjs).
+   * Never Spanish schools or tutors: they sell what EspaLuz is. English queries, like the AIGO high-ticket set, because a
+   * business serving newcomers writes in English. Tier 'fresh' = the people closest to the family's first weeks.
+   */
+  espaluz_family_partners: [
+    { q: 'relocation services for families', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', seg: 'relocation', tier: 'fresh' },
+    { q: 'international school', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', seg: 'school', tier: 'fresh' },
+    { q: 'relocation services', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en', seg: 'relocation', tier: 'fresh' },
+    { q: 'bilingual international school', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en', seg: 'school', tier: 'fresh' },
+    { q: 'relocation services', ll: '@19.4326,-99.1332,12z', city: 'Mexico City', gl: 'mx', hl: 'en', seg: 'relocation', tier: 'fresh' },
+    { q: 'relocation services expats', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en', seg: 'relocation', tier: 'fresh' },
+    { q: 'immigration lawyer residency', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', seg: 'immigration' },
+    { q: 'real estate agency for expats', ll: '@8.7800,-82.4410,12z', city: 'Boquete Panama', gl: 'pa', hl: 'en', seg: 'realestate' },
+    { q: 'real estate agency for expats', ll: '@8.5300,-79.9000,12z', city: 'Coronado Panama', gl: 'pa', hl: 'en', seg: 'realestate' },
+    { q: 'international school', ll: TAM, city: 'Guanacaste Costa Rica', gl: 'cr', hl: 'en', seg: 'school' },
+    { q: 'residency and immigration services', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en', seg: 'immigration' },
+    { q: 'international moving company', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', seg: 'movers' },
+    { q: 'relocation services', ll: '@20.9144,-100.7452,12z', city: 'San Miguel de Allende Mexico', gl: 'mx', hl: 'en', seg: 'relocation' },
+    { q: 'international school', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en', seg: 'school' },
+    { q: 'relocation services', ll: '@-2.9001,-79.0059,12z', city: 'Cuenca Ecuador', gl: 'ec', hl: 'en', seg: 'relocation' },
+    { q: 'immigration lawyer residency', ll: '@19.4326,-99.1332,12z', city: 'Mexico City', gl: 'mx', hl: 'en', seg: 'immigration' },
+  ],
   ai_video_generation: [
     { q: 'luxury yacht charter', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
     { q: 'boutique hotel', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
@@ -369,6 +402,10 @@ const LANE_OFFER = {
     label: 'visibilidad en IA',
     pitch: () =>
       `Son 3 arreglos concretos y de implementación rápida para que su negocio aparezca como respuesta citable cuando alguien le pregunta a ChatGPT o Perplexity por opciones en su sector.`,
+  },
+  [ESPALUZ_LANE]: {
+    label: 'EspaLuz · enlace de bienvenida para familias',
+    pitch: () => '',
   },
   ai_video_generation: {
     label: 'video promocional con IA',
@@ -1430,6 +1467,101 @@ async function stageLead(lead, audit, angle) {
 }
 
 /**
+ * EspaLuz partner (22 Nov 2026): same CRM shape as stageLead — contact + deal at 🔥 I Act TODAY + HIGH task + note
+ * with the one-click EMAIL / WHATSAPP buttons for both touches + registry rows go-wa.ts sends from (Elena in Cc).
+ * No audit, no PDF: the kit is the partner's own welcome link + the films. Deal prefix [ESPALUZ-ATLAS] keeps these
+ * out of hs-outcomes-to-atlas (an AIGO lane report) and makes them one HubSpot search away.
+ */
+async function stageEspaluzLead(lead, code) {
+  const slug = `${slugify(lead.company).slice(0, 44)}-espaluz`;
+  const L = { ...lead, slug };
+  const segLabel = ESPALUZ_KIT.SEGMENT_LABEL[lead.seg] || 'family partner';
+  const dealName = `[ESPALUZ-ATLAS] ${lead.company} — family welcome link · ${segLabel}`;
+  const { subject, body } = ESPALUZ_KIT.buildEspaluzDraft(L, code);
+  if (DRY) return { slug, dealName, dealId: null, subject, body };
+
+  const draftRel = `docs/selling/drafts/${slug}-email.txt`;
+  fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, draftRel), `SUBJECT: ${subject}\n\nTO: ${lead.email}\n\n${body}\n`, 'utf8');
+
+  const contact = await hs('POST', '/crm/v3/objects/contacts', {
+    properties: { email: lead.email, company: lead.company, website: lead.website, ...(lead.phone ? { phone: lead.phone } : {}), hs_lead_status: 'NEW' },
+  });
+  const deal = await hs('POST', '/crm/v3/objects/deals', {
+    properties: { dealname: dealName, dealstage: STAGE_ACT_TODAY, pipeline: 'default', hubspot_owner_id: OWNER },
+  });
+  if (contact?.id && deal?.id) {
+    await hs('PUT', `/crm/v4/objects/deals/${deal.id}/associations/default/contacts/${contact.id}`, undefined).catch(() => {});
+  }
+  if (deal?.id) {
+    try {
+      const task = await hs('POST', '/crm/v3/objects/tasks', {
+        properties: {
+          hs_task_subject: `Enviar 1er contacto EspaLuz — ${lead.company} (${segLabel})`,
+          hs_task_body: `Socio EspaLuz de Atlas listo para enviar.\n\nSitio: ${lead.website}\nEmail: ${lead.email}\nCiudad: ${lead.city}\n\nLos botones de envío están en la nota del deal.`,
+          hs_task_status: 'NOT_STARTED',
+          hs_task_priority: 'HIGH',
+          hs_timestamp: Date.now(),
+          hubspot_owner_id: OWNER,
+        },
+      });
+      if (task?.id) {
+        await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${deal.id}`, [
+          { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 },
+        ]).catch(() => {});
+      }
+    } catch (e) {
+      console.warn(`      ⚠️ task not created for ${lead.company}: ${String(e.message).slice(0, 80)}`);
+    }
+  }
+
+  const waRel = `docs/selling/drafts/${slug}.txt`;
+  const waText = ESPALUZ_KIT.buildEspaluzWaDraft(L, code);
+  if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
+  const fuSlug = `${slug}-fu`;
+  const fuRel = `docs/selling/drafts/${fuSlug}-email.txt`;
+  const fu = ESPALUZ_KIT.buildEspaluzFuDraft(L, code);
+  fs.writeFileSync(path.join(ROOT, fuRel), `SUBJECT: ${fu.subject}\n\nTO: ${lead.email}\n\n${fu.body}\n`, 'utf8');
+
+  const reg = loadRegistry();
+  const common = {
+    company: lead.company,
+    email: lead.email,
+    offer: 'espaluz',
+    code,
+    ...(deal?.id ? { dealId: String(deal.id) } : {}),
+    ...(lead.phone ? { phone: digitsOnly(lead.phone) } : {}),
+    cc: ESPALUZ_KIT.ESPALUZ_CC,
+  };
+  reg[slug] = { ...common, emailDraft: draftRel, ...(lead.phone ? { draft: waRel } : {}) };
+  reg[fuSlug] = { ...common, emailDraft: fuRel };
+  saveRegistry(reg);
+
+  const link = buildHubSpotEmailAnchor(slug, lead.email, `✉️ EMAIL 1er CONTACTO EspaLuz — aipa@aideazz.xyz (${lead.email})`);
+  const waLink = lead.phone ? buildHubSpotWaAnchor(lead.phone, waText, `➡️ WHATSAPP 1er CONTACTO (laptop) — EspaLuz (${formatPhone507(lead.phone)})`) : null;
+  const fuLink = buildHubSpotEmailAnchor(fuSlug, lead.email, `✉️ EMAIL FU EspaLuz — aipa@aideazz.xyz (${lead.email})`);
+  const noteBody = [
+    `<b>FOLLOW-UP — click y enviar (texto listo, sin editar)</b><br>`,
+    `${link}<br>`,
+    waLink ? `${waLink}<br>` : '',
+    `${fuLink}<br><br>`,
+    `<b>🌎 NUEVO SOCIO ESPALUZ — Atlas (familias que llegan)</b><br>`,
+    `<b>Tipo:</b> ${segLabel} · <b>Ciudad:</b> ${lead.city}<br>`,
+    `<b>Sitio:</b> ${lead.website}<br><b>Email:</b> ${lead.email}<br>`,
+    lead.phone ? `<b>Tel:</b> ${lead.phone}<br>` : '',
+    lead.rating ? `<b>Google:</b> ${lead.rating}★ (${lead.reviews || 0} reseñas)<br>` : '',
+    `<b>Código de la semana:</b> ${code} · <b>enlace del socio:</b> utm_content=${slug}<br>`,
+    `<hr><b>Asunto:</b> ${subject}<br><br>`,
+    `<pre style="white-space:pre-wrap;font-family:inherit">${body.replace(/</g, '&lt;')}</pre>`,
+  ].join('');
+  const note = await hs('POST', '/crm/v3/objects/notes', { properties: { hs_note_body: noteBody, hs_timestamp: Date.now() } });
+  if (note?.id && deal?.id) {
+    await hs('PUT', `/crm/v4/objects/notes/${note.id}/associations/default/deals/${deal.id}`, undefined).catch(() => {});
+  }
+  return { slug, dealName, dealId: deal?.id || null, subject, body };
+}
+
+/**
  * A no-website business (13 Oct 2026): Company + Deal + HIGH task + one note with the
  * permission-first WhatsApp button. No email, no audit, no registry row — there is no
  * site to audit and no email to send; WhatsApp from the laptop is the only channel.
@@ -1516,7 +1648,9 @@ if (require.main === module) (async () => {
   }
   // The week's legs, worked in order (19 Oct 2026). No primary lane (or a forced one): one leg, as before.
   const legs = [];
-  if (primary) {
+  if (ESPALUZ) {
+    legs.push({ lane: ESPALUZ_LANE, score: null, role: 'EspaLuz (ATLAS_OFFER=espaluz)', quota: Infinity });
+  } else if (primary) {
     const other = pickLane(primary);
     if (other.lane && other.lane !== primary) {
       legs.push({ lane: primary, score: laneScore(primary), role: 'primary', quota: Math.min(PRIMARY_MIN, MAX_NEW) });
@@ -1541,6 +1675,8 @@ if (require.main === module) (async () => {
   console.log(
     `[lead-machine] WEEK: ${legs.map((l) => `${l.lane} (${l.role}${Number.isFinite(l.quota) ? ` ≤${l.quota}` : ''})`).join(' → ')}`,
   );
+  const espaluzCode = ESPALUZ ? ESPALUZ_KIT.weekCode() : null;
+  if (ESPALUZ) console.log(`[lead-machine] OFFER: EspaLuz family partners · week code ${espaluzCode} · no audit, no PDF`);
   const known = await loadKnown();
   console.log(`[lead-machine] dedup set: ${known.names.size} companies, ${known.domains.size} domains already worked`);
   const staged = [];
@@ -1653,6 +1789,14 @@ if (require.main === module) (async () => {
         // both get staged.
         if (fp) known.names.add(fp);
         if (domain) known.domains.add(domain);
+        if (ESPALUZ) {
+          const r = await stageEspaluzLead({ ...b, email, lane: leg.lane, query: target.q, seg: target.seg, city: target.city }, espaluzCode);
+          staged.push({ ...b, email, lane: leg.lane, seg: target.seg, city: target.city, ...r });
+          console.log(`   ✅ ${b.company.slice(0, 32)} · EspaLuz ${target.seg} · ${email}`);
+          if (DRY && staged.length === 1) console.log(`\n----- first letter (dry run) -----\nSUBJECT: ${r.subject}\n\n${r.body}\n----------------------------------\n`);
+          await sleep(400);
+          continue;
+        }
         const audit = await auditSite(b.website);
         if (!audit) {
           skip.noAudit++;
@@ -1731,7 +1875,7 @@ if (require.main === module) (async () => {
   if (!DRY) saveYield(yieldLedger);
 
   // ── No-website top-up (19 Oct 2026): dental, only when the lane's queries left the slots short ──
-  if (NOWEB_MAX > 0 && NOWEB_QUERIES.length && placesReady()) {
+  if (!ESPALUZ && NOWEB_MAX > 0 && NOWEB_QUERIES.length && placesReady()) {
     for (const q of NOWEB_QUERIES) {
       if (pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX).length >= NOWEB_MAX) break;
       try {
@@ -1746,7 +1890,7 @@ if (require.main === module) (async () => {
 
   // ── No-website businesses: the best NOWEB_MAX, on top of the regular MAX_NEW ──
   // A wider pool, so a candidate already in HubSpot by phone is replaced by the next best one.
-  const nowebPicked = pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX * 3);
+  const nowebPicked = ESPALUZ ? [] : pickNoWebsite(noWebsiteSeen, known.names, fingerprint, NOWEB_MAX * 3);
   const nowebStaged = [];
   let nowebKnownByPhone = 0;
   for (const c of nowebPicked) {
@@ -1788,9 +1932,15 @@ if (require.main === module) (async () => {
   if ((staged.length || nowebStaged.length) && !DRY) {
     const nowebLine = noWebsiteTelegramLine(nowebStaged);
     const lines = [
-      `🔥 ${staged.length + nowebStaged.length} nuevos leads listos — 🔥 I Act TODAY`,
+      ESPALUZ
+        ? `🌎 ${staged.length} socios EspaLuz listos (familias que llegan) — 🔥 I Act TODAY`
+        : `🔥 ${staged.length + nowebStaged.length} nuevos leads listos — 🔥 I Act TODAY`,
       ``,
-      ...staged.map((s) => `· ${s.company} — ${s.score}/${s.grade} · ${s.city} · ${LANE_OFFER[s.lane]?.label || s.lane}`),
+      ...staged.map((s) =>
+        ESPALUZ
+          ? `· ${s.company} — ${ESPALUZ_KIT.SEGMENT_LABEL[s.seg] || s.seg} · ${s.city}`
+          : `· ${s.company} — ${s.score}/${s.grade} · ${s.city} · ${LANE_OFFER[s.lane]?.label || s.lane}`,
+      ),
       ...(nowebLine ? [``, nowebLine] : []),
       ``,
       `Cada uno ya tiene contacto, deal, tarea y el botón ENVIAR en la nota de HubSpot.`,
