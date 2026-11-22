@@ -65,3 +65,12 @@ One angle from my own field that may help: AI search. More people now ask ChatGP
 You can check any page yourself, free: aideazz.xyz/api
 
 And a small favour in return 🙏 I still need a few Android testers for the EspaLuz app on Google Play. If 1-2 people you know have Android, they just write ANDROID to @espaluz on WhatsApp - EspaLuz sends them the 3 steps, and their family uses it free until 31 December. And of course, your honest feedback on Pro English is gold for me.
+
+## v4 - SENT VERSION CANDIDATE (Elena: short, friendly teaser; keep the real guidance for later, after he tests Pro English
+## and brings 1-2 Android testers - handing over every key now ends the conversation)
+
+Hi Michael! 😊 Yes, I subscribed - congrats on starting, I really value your work.
+
+Honestly, I'm not a Substack expert: my AI agents publish my content for me on other channels. But there is one thing from my own field - how ChatGPT and Perplexity decide which coaches to recommend - that could really help your Substack. Let's talk about it once you've had a moment to try Pro English 🙂
+
+And if you know 1-2 people with Android who'd like to test EspaLuz free until 31 December, they just write ANDROID to @espaluz on WhatsApp 🙏
