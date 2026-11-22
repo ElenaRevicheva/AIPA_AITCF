@@ -27,3 +27,13 @@ Buttons:
 ## Limits (free layer)
 25 contacts/month is a hard ceiling. Elena's rule: no upgrade. If the counter nears 25, the 13:40 report says so and
 she decides.
+
+## LIVE 22 Nov ~14:15 UTC (Claude via Elena's Chrome, her go "do the rest for me")
+- ManyChat account `fb6008426` ("Elena Revicheva", FREE, 0/25 contacts), Instagram @elena_revicheva connected by Elena.
+- Automation "Auto-send links from comments" = **LIVE**, bound to the EN v18 Reel `DgBN7VvjgFD` ONLY.
+  **Free plan limit:** "any post" and "next post" are paid - each Reel needs its own automation (free also caps how many
+  automations run). Keywords: HOLA, Hola, hola, OLA, Ola, ola, ¡Hola!. Public reply under the comment: 3 bilingual variants.
+  Opening DM (bilingual) + button "Show me · Muéstrame" -> link DM with the 3 tracked buttons above.
+- Reel caption edited (line 2): "💬 Comment HOLA and EspaLuz sends you the link · Comenta HOLA y te mando el enlace".
+- NOT yet proven: a real HOLA comment from another account (her own comments do not trigger ManyChat).
+- ES / RU v18 Reels: when posted, add one automation per Reel + the same caption line (Claude, in Chrome).
