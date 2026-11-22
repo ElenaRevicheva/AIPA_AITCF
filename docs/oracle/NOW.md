@@ -434,6 +434,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-11-22 16:10 | EspaLuz kids CLASS mode: deeper units per age, lead-don't-push, goal checklist, unit-aware trace/games, goal report; fix who-is-who + STT near-sound | ascent `supabase/functions/espaluz-chat/index.ts`, `src/components/kids/{TracePad,GamesPad}.tsx`, kids report; Supabase function deploy | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
