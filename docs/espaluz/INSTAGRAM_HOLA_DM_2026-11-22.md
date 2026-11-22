@@ -25,8 +25,8 @@ Buttons:
 | ✈️ Telegram | `https://t.me/EspaLuzFamily_bot?start=f20261122c0de_ig` |
 
 ## Limits (free layer)
-25 contacts/month is a hard ceiling. Elena's rule: no upgrade. If the counter nears 25, the 13:40 report says so and
-she decides.
+25 contacts/month is a hard ceiling. Elena's rule: no upgrade. The counter shows in the ManyChat sidebar ("Free contacts
+limit x/25"); the 13:40 report does not read it yet. Arrivals themselves DO show in the report (code f20261122c0de-ig).
 
 ## LIVE 22 Nov ~14:15 UTC (Claude via Elena's Chrome, her go "do the rest for me")
 - ManyChat account `fb6008426` ("Elena Revicheva", FREE, 0/25 contacts), Instagram @elena_revicheva connected by Elena.
