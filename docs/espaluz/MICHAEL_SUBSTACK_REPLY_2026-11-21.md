@@ -31,3 +31,19 @@ Honestly, I'm not a Substack specialist: I don't post there myself, my time goes
 5️⃣ End every post with one clear door to your 1:1 coaching. Substack is your shop window; your coaching is the business.
 
 An hour a week, scheduled ahead, is enough to start. Good luck - I'll be reading! 🌟
+
+## v2 (Elena: v1 was generic - he is a strong coach and knows the basics; give something genuine)
+Genuine = Elena's own specialty, AI visibility (GEO/AEO). Checked 21 Nov: substack.com robots.txt blocks only BLEXBot
+(an SEO crawler) - GPTBot, PerplexityBot, ClaudeBot are not blocked, so FREE posts can be read and cited by AI engines;
+paywalled posts cannot. Her free audit (aideazz.xyz/api) is live (200). The offer uses tools she already runs.
+
+Hi Michael! 😊 Yes, I subscribed - I really value your work.
+
+Honestly, I don't post on Substack myself: my AI agents publish my content automatically on other channels, so I'm not the right person for platform tips - you'll master it faster than me.
+
+But there is one angle from my own field I can genuinely share: AI search. More and more people now ask ChatGPT or Perplexity "who can help me with business English in Panama?" instead of Googling. I checked - Substack lets those AI engines read public posts. So your free posts can become the answer they give, if:
+• the title is the exact question your clients would type,
+• your key posts stay free (paywalled posts can't be cited),
+• "Michael McRae, business English coach in Panama" is stated plainly in your About page and in each post.
+
+When you have 3-4 posts up, send me the link: I'll run my AI-visibility audit on your Substack and check whether ChatGPT and Perplexity mention you - my thanks for helping me test Pro English 🙏
