@@ -11,8 +11,10 @@
  * 13:40 report like every film.
  *
  * Route: https://webhook.aideazz.xyz/cto/ig/webhook  (nginx /cto/ -> this process, port 3000)
- * Env: IG_DM_ENABLED=true, IG_APP_SECRET, IG_VERIFY_TOKEN, IG_USER_ID, IG_ACCESS_TOKEN (long-lived; a refreshed one in
- *      .ig-token.json wins), IG_GRAPH_VERSION (default v23.0).
+ * Env: IG_DM_ENABLED=true, IG_APP_SECRET, IG_VERIFY_TOKEN, IG_USER_ID, IG_PAGE_ID, IG_GRAPH_VERSION (default v23.0).
+ * Tokens live in .ig-token.json (mode 600, gitignored): access_token = system user "EspaLuz HOLA bot" (never expires),
+ * page_access_token + page_id = the EspaLuz Facebook Page that owns @elena_revicheva. IG_ACCESS_TOKEN is the fallback.
+ * Meta app: "EspaLuz Comment Replies" under the verified EspaLuz AI Family Tutor portfolio (created 22 Nov 2026).
  * Off by default. While ManyChat still runs on a Reel, list it in IG_DM_SKIP_MEDIA so a person never gets two DMs.
  */
 
@@ -24,7 +26,11 @@ import type { Express, Request, Response } from 'express';
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, '.ig-comment-dm.json');
 const TOKEN_FILE = path.join(ROOT, '.ig-token.json');
-const GRAPH = () => `https://graph.instagram.com/${process.env.IG_GRAPH_VERSION?.trim() || 'v23.0'}`;
+// New Meta apps (Nov 2026) only get "Unified login": a never-expiring system-user token from the business portfolio,
+// spoken to on graph.facebook.com. The private reply goes out AS THE FACEBOOK PAGE that owns the Instagram account
+// (POST /{page-id}/messages with the Page token). IG_GRAPH_HOST=graph.instagram.com keeps the old Instagram-login path.
+const GRAPH = () =>
+  `https://${process.env.IG_GRAPH_HOST?.trim() || 'graph.facebook.com'}/${process.env.IG_GRAPH_VERSION?.trim() || 'v23.0'}`;
 const WA = '50766623757';
 
 /** HOLA / OLA / ¡Hola! as a word, any case. "holaaa" and "Hola!!" count; "Holanda" does not. */
@@ -40,12 +46,19 @@ function saveState(s: State): void {
   fs.writeFileSync(STATE_FILE, JSON.stringify(s, null, 1));
 }
 
+function tokenFile(): Record<string, string> {
+  try { return JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8')) || {}; } catch { return {}; }
+}
+
+/** The Page token speaks for the Page (needed for messages); the system-user token is the fallback. */
 function accessToken(): string {
-  try {
-    const t = JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'));
-    if (t?.access_token) return String(t.access_token);
-  } catch { /* fall back to env */ }
-  return process.env.IG_ACCESS_TOKEN?.trim() || '';
+  const t = tokenFile();
+  return String(t.page_access_token || t.access_token || process.env.IG_ACCESS_TOKEN?.trim() || '');
+}
+
+/** Who sends the DM: the Facebook Page linked to the Instagram account; old Instagram-login apps used the IG user. */
+export function messagesSender(): string {
+  return String(tokenFile().page_id || process.env.IG_PAGE_ID?.trim() || process.env.IG_USER_ID?.trim() || '');
 }
 
 /** One stable code per Reel: f<YYYYMMDD of first HOLA><4 hex of the media id>. Stored so it never changes. */
@@ -110,7 +123,7 @@ export async function handleComment(value: any, opts: { dryRun?: boolean } = {})
   const code = codeForMedia(state, mediaId);
   if (opts.dryRun) return `would answer ${commentId} with ${code}`;
 
-  const dm = await graphPost(`/${process.env.IG_USER_ID}/messages`, { recipient: { comment_id: commentId }, message: { text: dmText(code) } });
+  const dm = await graphPost(`/${messagesSender()}/messages`, { recipient: { comment_id: commentId }, message: { text: dmText(code) } });
   const pub = await graphPost(`/${commentId}/replies`, { message: PUBLIC_REPLIES[state.done.length % PUBLIC_REPLIES.length] });
   // Record even a failed DM: Meta allows ONE private reply per comment, so a retry loop could only spam errors.
   state.done.push(commentId);
