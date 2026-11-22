@@ -170,13 +170,17 @@ export function registerInstagramCommentDm(app: Express): void {
     res.sendStatus(200); // Meta wants a fast 200; the work happens after.
     if (process.env.IG_DM_ENABLED !== 'true') return;
     for (const entry of req.body?.entry ?? []) {
+      // Meta delivers DMs in two shapes: entry.messaging[] (Messenger style) or entry.changes[] with field
+      // "messages" / "messaging_postbacks" and the event in value (the shape its own Test button sends, 22 Nov).
+      const msgEvents: any[] = [...(entry?.messaging ?? [])];
       for (const change of entry?.changes ?? []) {
+        if (change?.field === 'messages' || change?.field === 'messaging_postbacks') { msgEvents.push(change.value); continue; }
         if (change?.field !== 'comments') continue;
         handleComment(change.value).catch((e) => console.error('[ig-dm] failed:', e?.message ?? e));
       }
       // Direct messages + ice-breaker taps (22 Nov 2026): EspaLuz answers in Instagram (src/ig-dm-chat.ts).
       if (process.env.IG_CHAT_ENABLED === 'true') {
-        for (const ev of entry?.messaging ?? []) {
+        for (const ev of msgEvents) {
           handleMessaging(ev, (to, text) =>
             graphPost(`/${messagesSender()}/messages`, { recipient: { id: to }, message: { text } }),
           ).catch((e) => console.error('[ig-chat] failed:', e?.message ?? e));
