@@ -79,7 +79,7 @@ function botArrivals() {
   const py = [
     'import espaluz_talking as t',
     'c=t._db(); cur=c.cursor()',
-    "cur.execute(\"SELECT event_data->>'reason', platform, COUNT(DISTINCT event_data->>'who') FROM event_log WHERE event_type='promo_arrival' GROUP BY 1,2 ORDER BY 1,2\")",
+    "cur.execute(\"SELECT event_data->>'reason', platform, COUNT(DISTINCT event_data->>'who') FROM event_log WHERE event_type='promo_arrival' AND event_data->>'reason' NOT LIKE '%eeee%' GROUP BY 1,2 ORDER BY 1,2\")",
     "print('; '.join(f'{f} {p} {n}' for f, p, n in cur.fetchall()) or 'none yet')",
   ].join('\n');
   try {
@@ -95,9 +95,12 @@ function botArrivals() {
 /** One block per film: views, then who came, then what they did. GA4 keeps utm_campaign on the session. */
 async function filmScoreboard() {
   const appHost = { filter: { fieldName: 'hostName', stringFilter: { matchType: 'EXACT', value: 'app.espaluz.lat' } } };
+  // 22 Nov 2026: a raw GA4 "session" is not a person. When a post goes live, Facebook / Instagram / YouTube fetch every
+  // link for the preview card - US desktop, 0 s engaged, 100% bounce. They made ~45 "film visits" look like interest.
+  // So the report leads with ENGAGED sessions (GA4: >10 s, or 2+ pages, or a conversion) and names the rest as robots.
   const sessions = await ga4({
     dimensions: [{ name: 'sessionCampaignName' }, { name: 'sessionSource' }],
-    metrics: [{ name: 'sessions' }],
+    metrics: [{ name: 'sessions' }, { name: 'engagedSessions' }],
     dimensionFilter: appHost,
   });
   const steps = await ga4({
@@ -105,22 +108,41 @@ async function filmScoreboard() {
     metrics: [{ name: 'eventCount' }],
     dimensionFilter: { andGroup: { expressions: [appHost, { filter: { fieldName: 'eventName', stringFilter: { matchType: 'BEGINS_WITH', value: 'app_' } } }] } },
   });
-  const tagged = (campaign, source) => /^f\d{8}/.test(campaign) || /^(espaluz-lat|video|youtube|instagram)$/.test(source);
+  // Normalise: an old caption put a newline inside the link ("video\n"), some rows carry a leading space; unfilled
+  // templates ({source}, {film}, PLACEHOLDER) and the eeee test code are our own tests, never a person.
+  const clean = (s) => String(s || '').replace(/\\n|\s+/g, '').replace(/^\((not set|referral|organic)\)$/, '');
+  const isTest = (campaign, source) => /[{}]|PLACEHOLDER/i.test(campaign + source) || /eeee/.test(campaign);
+  const tagged = (campaign, source) => /^f\d{8}/.test(campaign) || /^(espaluz-lat|video|youtube|instagram|facebook)$/.test(source);
   const rows = new Map();
+  let robots = 0;
+  let tests = 0;
   for (const r of sessions) {
-    const [campaign, source] = r.dimensionValues.map((d) => d.value);
-    if (tagged(campaign, source)) rows.set(`${campaign} ${source}`, { visits: Number(r.metricValues[0].value) || 0, events: {} });
+    const [campaign, source] = r.dimensionValues.map((d) => clean(d.value));
+    const all = Number(r.metricValues[0].value) || 0;
+    const engaged = Number(r.metricValues[1].value) || 0;
+    if (isTest(campaign, source)) { tests += all; continue; }
+    if (!tagged(campaign, source)) continue;
+    robots += all - engaged;
+    const key = `${campaign} ${source}`.trim();
+    const row = rows.get(key) || { people: 0, opens: 0, events: {} };
+    row.people += engaged;
+    row.opens += all;
+    rows.set(key, row);
   }
   for (const r of steps) {
-    const [campaign, source, name] = r.dimensionValues.map((d) => d.value);
-    const row = rows.get(`${campaign} ${source}`);
-    if (row) row.events[name] = Number(r.metricValues[0].value) || 0;
+    const [campaign, source, name] = r.dimensionValues.map((d) => clean(d.value));
+    const row = rows.get(`${campaign} ${source}`.trim());
+    if (row) row.events[name] = (row.events[name] || 0) + (Number(r.metricValues[0].value) || 0);
   }
-  const lines = [...rows.entries()].map(([key, v]) => {
+  const lines = [...rows.entries()].filter(([, v]) => v.people || Object.keys(v.events).length).map(([key, v]) => {
     const n = (name) => v.events[name] || 0;
-    return `${key.replace('(not set) ', '').replace('(referral) ', '')}: ${v.visits} visits -> chat ${n('app_chat_first')} -> limit ${n('app_free_wall')} -> sign-up ${n('app_signup_sent')} -> class ${n('app_classroom_open')} -> doors ${n('app_door_whatsapp') + n('app_door_telegram')}`;
+    return `${key}: ${v.people} real visitors -> chat ${n('app_chat_first')} -> limit ${n('app_free_wall')} -> sign-up ${n('app_signup_sent')} -> class ${n('app_classroom_open')} -> doors ${n('app_door_whatsapp') + n('app_door_telegram')}`;
   });
-  return `🎬 Films, last 7 days\nYouTube views:\n${await youtubeViews()}\n\nApp arrivals from films:\n${lines.join('\n') || 'none yet'}\n\nBot arrivals from films, all time: ${botArrivals()}\nFacebook and Instagram views: not read, see the platforms.\nPaid: see the payments line on Mondays.`;
+  const people = [...rows.values()].reduce((s, v) => s + v.people, 0);
+  return `🎬 Films, last 7 days\nYouTube views:\n${await youtubeViews()}\n\n` +
+    `App arrivals from films: ${people} real visitors (stayed and looked).\n${lines.join('\n') || 'none yet'}\n` +
+    `Not counted: ${robots} link-preview robots (0 s, left at once)${tests ? `, ${tests} our own test opens` : ''}.\n\n` +
+    `Bot arrivals from films, all time: ${botArrivals()}\nFacebook and Instagram views: not read, see the platforms.\nPaid: see the payments line on Mondays.`;
 }
 
 async function sendTelegram(text) {
