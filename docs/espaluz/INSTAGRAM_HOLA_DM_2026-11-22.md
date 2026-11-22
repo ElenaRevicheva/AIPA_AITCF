@@ -37,3 +37,13 @@ limit x/25"); the 13:40 report does not read it yet. Arrivals themselves DO show
 - Reel caption edited (line 2): "💬 Comment HOLA and EspaLuz sends you the link · Comenta HOLA y te mando el enlace".
 - NOT yet proven: a real HOLA comment from another account (her own comments do not trigger ManyChat).
 - ES / RU v18 Reels: when posted, add one automation per Reel + the same caption line (Claude, in Chrome).
+
+## OUR OWN webhook LIVE 22 Nov 20:34 UTC (replaces ManyChat once App Review passes)
+- Code `src/ig-comment-dm.ts`, route `https://webhook.aideazz.xyz/cto/ig/webhook`, 30 tests `node scripts/test-ig-comment-dm.cjs`.
+- Meta app "EspaLuz Comment Replies" (Development mode) in the verified EspaLuz AI Family Tutor portfolio; webhook
+  field `comments` subscribed + account subscription ON. Token: system user "EspaLuz HOLA bot", never expires.
+- Proof: `[ig-dm] HOLA on media 18643872349054710 (f2026112251b9) -> DM 200 · public 200` (2nd-profile test on the ES Reel).
+- Rules: one DM + one public reply per comment; only posts whose caption invites HOLA; the two ManyChat Reels skipped
+  (except the test account); each Reel gets its own code f<date><hex>-ig.
+- To use on a new Reel: write "💬 Comenta HOLA · Comment HOLA" in the caption. Nothing else.
+- Before strangers: Meta App Review for advanced access (instagram_manage_comments, instagram_manage_messages).
