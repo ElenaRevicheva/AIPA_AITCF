@@ -124,6 +124,9 @@ export function parseRequestUtms(req: Request): {
 
 /** Same site + same visitor within this window pings Telegram once. */
 const REPEAT_MUTE_DAYS = 30;
+// 23 Nov 2026: permanent mute for known test traffic (see the alert code below).
+const MUTED_AUDIT_URL = /(^|\/\/|\.)mohave\.edu(\/|$)/i;
+const MUTED_AUDIT_IPS = new Set(['38.70.237.10']);
 const SEEN_PATH = path.join(__dirname, '..', 'data', 'visibility-lead-seen.json');
 
 /** True when this site was already audited from this IP inside the window; otherwise records it. */
@@ -201,6 +204,13 @@ function logAuditLead(params: {
   // Elena, 13 Oct 2026: the same OUTSIDE visitor re-auditing the same site is noise that
   // buries a real prospect's first audit (a bot from one IP ran mohave.edu through the demo
   // every ~2 days). Her own key's pings — Atlas, the stagers — stay exactly as they were.
+  // Elena, 23 Nov 2026: "mohave.edu is not a real person and not a real company - a test from when my API was being built,
+  // still floating". The repeat-mute above lives in memory, so every cto-aipa restart forgot it and the old test came back.
+  // Known test sites and the bot's IP are muted for good: still logged here, never sent to her Telegram.
+  if (MUTED_AUDIT_URL.test(url) || (ip && MUTED_AUDIT_IPS.has(ip))) {
+    console.log(`[visibility-lead] known test (url/ip on the permanent mute list) — logged, not sent to Telegram`);
+    return;
+  }
   if (!key.startsWith('aidz_owner_') && seenRecently(url, ip)) {
     console.log(`[visibility-lead] repeat within ${REPEAT_MUTE_DAYS}d from the same visitor — logged, not sent to Telegram`);
     return;
