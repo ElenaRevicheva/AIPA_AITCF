@@ -40,6 +40,11 @@ const now = new Date('2026-11-22T21:00:00Z');
   await m.handleMessaging({ sender: { id: 'C' }, message: { text: 'b' } }, send, { ownId: 'ME', llm, now });
   ok((await m.handleMessaging({ sender: { id: 'C' }, message: { text: 'c' } }, send, { ownId: 'ME', llm, now })) === 'skip: daily cap', 'daily cap per person');
   ok(sent.every((s) => s.text.length <= 990), 'every reply fits an Instagram message');
+  // 23 Nov 2026: a long bilingual answer is trimmed - the doors (WhatsApp, App, Telegram) are never the part that gets cut.
+  const longLlm = async () => ('Hola, EspaLuz ayuda a tu familia en la vida diaria. '.repeat(14) + '\n\n' + 'Hi, EspaLuz helps your family in daily life. '.repeat(14));
+  await m.handleMessaging({ sender: { id: 'LONG' }, message: { text: 'hola' } }, send, { ownId: 'ME', llm: longLlm, now });
+  const lt = sent.at(-1).text;
+  ok(lt.length <= 990 && /wa\.me/.test(lt) && /app\.espaluz\.lat/.test(lt) && /t\.me\/EspaLuzFamily_bot/.test(lt), 'long answer: all three doors survive the 990-character limit');
 
   // ── Inbox poll (22 Nov 2026) ──
   process.env.IG_CHAT_MAX_PER_DAY = '12';

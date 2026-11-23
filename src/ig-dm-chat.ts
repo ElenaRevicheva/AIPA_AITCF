@@ -79,7 +79,8 @@ export const ICE_BREAKERS: { question: string; payload: string; answer: string }
 const SYSTEM = `You are EspaLuz answering a stranger's Instagram direct message for the EspaLuz Instagram account.
 ALWAYS BILINGUAL (23 Nov 2026, Elena: "a potential user may have zero Spanish"): first the answer in the language the person
 wrote in, then a blank line, then the SAME answer in the other language - Spanish -> English, English -> Spanish; if they wrote
-Russian: Russian first, then English. Each half warm and short: 2-3 sentences, no lists, no hashtags.
+Russian: Russian first, then English. Each half warm and SHORT: at most 2 sentences and under 260 characters - no lists,
+no hashtags, no separator lines.
 
 TRUE FACTS — use only these, never add numbers, prices, user counts, guarantees or features not listed:
 - EspaLuz is an AI companion for families building a new life in Spanish in Latin America (21 countries): real moments
@@ -191,7 +192,15 @@ export async function handleMessaging(ev: any, send: Sender, opts: { ownId?: str
     if (!reply) return 'skip: model returned nothing';
   }
   const wantsDoors = firstToday || /\b(start|empezar|empiezo|link|enlace|whatsapp|app|telegram|probar|try|начать|ссылк)/i.test(text);
-  const out = `${reply}${wantsDoors ? `\n\n${doors(code)}` : ''}`.slice(0, 990);
+  // 23 Nov 2026: the doors are never the part that gets cut - the bilingual answer is trimmed (at a sentence end) to leave room.
+  const tail = wantsDoors ? `\n\n${doors(code)}` : '';
+  let body = reply;
+  if (body.length + tail.length > 990) {
+    body = body.slice(0, Math.max(0, 985 - tail.length));
+    const cut = Math.max(body.lastIndexOf('\n'), body.lastIndexOf('. ') + 1, body.lastIndexOf('! ') + 1);
+    body = (cut > 0 ? body.slice(0, cut) : body).trim();
+  }
+  const out = `${body}${tail}`.slice(0, 990);
 
   const r = await send(from, out);
   if (!r.ok) { // a refused send is not an answer: do not count it or remember it as said (pollOnce retries later)
