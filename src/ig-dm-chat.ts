@@ -107,14 +107,16 @@ export async function pollOnce(
 ): Promise<string[]> {
   const now = opts.now || new Date();
   const newDays = opts.newDays ?? Number(process.env.IG_CHAT_NEW_DAYS || 14);
-  const s = load();
-  const seen = new Set<string>((s as any).seenMids || []);
   const out: string[] = [];
   for (const c of convs) {
+    const s = load(); // fresh each time: handleMessaging saves the same file, a stale copy would overwrite it
+    const seen = new Set<string>((s as any).seenMids || []);
     const msgs = [...(c.messages?.data || [])].sort((a, b) => b.created_time.localeCompare(a.created_time)); // newest first
     const newest = msgs[0];
     if (!newest || newest.from?.id === opts.ownId) continue; // last word is ours (bot, ManyChat or Elena)
     const person = newest.from?.id || '';
+    const retryAt: Record<string, string> = ((s as any).retryAt ??= {});
+    if (retryAt[person] && new Date(retryAt[person]) > now) continue; // Meta refused last time; wait before asking again
     const engaged = (s.people[person]?.turns?.length || 0) > 0;
     const oldest = msgs[msgs.length - 1] ?? newest;
     const ageDays = (now.getTime() - new Date(oldest.created_time).getTime()) / 86400000;
@@ -133,7 +135,20 @@ export async function pollOnce(
     save(s);
     if (!text) continue;
     const lastMid = fresh[fresh.length - 1]?.id || '';
-    out.push(await handleMessaging({ sender: { id: person }, message: { text, mid: lastMid } }, send, { ownId: opts.ownId, now, ...(opts.llm ? { llm: opts.llm } : {}) }));
+    const line = await handleMessaging({ sender: { id: person }, message: { text, mid: lastMid } }, send, { ownId: opts.ownId, now, ...(opts.llm ? { llm: opts.llm } : {}) });
+    out.push(line);
+    // Refused by Meta (e.g. "not the thread owner" while another app or the inbox still holds the chat): the person is
+    // still waiting, so forget these messages as "seen" and try again in IG_CHAT_RETRY_MIN (15) minutes. The 24 h filter
+    // above stops the retries once Meta's reply window closes.
+    const s2 = load();
+    const seen2 = new Set<string>((s2 as any).seenMids || []);
+    const retry2: Record<string, string> = ((s2 as any).retryAt ??= {});
+    if (/-> reply [45]\d\d/.test(line)) {
+      fresh.forEach((m) => seen2.delete(m.id));
+      retry2[person] = new Date(now.getTime() + Number(process.env.IG_CHAT_RETRY_MIN || 15) * 60000).toISOString();
+    } else delete retry2[person];
+    (s2 as any).seenMids = [...seen2];
+    save(s2);
   }
   return out;
 }
@@ -177,6 +192,11 @@ export async function handleMessaging(ev: any, send: Sender, opts: { ownId?: str
   const out = `${reply}${wantsDoors ? `\n\n${doors(code)}` : ''}`.slice(0, 990);
 
   const r = await send(from, out);
+  if (!r.ok) { // a refused send is not an answer: do not count it or remember it as said (pollOnce retries later)
+    const line = `[ig-chat] ${ice ? `ice ${ice.payload}` : 'message'} -> reply ${r.status} ${r.text}`;
+    console.log(line);
+    return line;
+  }
   p.count++;
   p.turns.push({ role: 'them', text: (text || payload).slice(0, 300) }, { role: 'espaluz', text: reply.slice(0, 300) });
   p.turns = p.turns.slice(-12);

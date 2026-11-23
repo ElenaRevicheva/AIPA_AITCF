@@ -63,6 +63,20 @@ const now = new Date('2026-11-22T21:00:00Z');
   const again = await m.pollOnce(convs, send, { ownId: 'ME', since, now: pnow, llm });
   ok(sent.length - before === 1 && !again.some((l) => l.startsWith('[ig-chat]')), 'the same message is never answered twice');
 
+  // ── Meta refuses ("not the thread owner") -> not marked done, retried after the wait (23 Nov 2026) ──
+  const refuse = async () => ({ ok: false, status: 400, text: '{"error":{"error_subcode":2534037}}' });
+  const lconv = [{ id: 'c_lock', updated_time: '', messages: { data: [msg('L1', '2026-11-22T20:50:00Z', 'LOCK', '¿Hay algo para mis hijos?')] } }];
+  const r1L = await m.pollOnce(lconv, refuse, { ownId: 'ME', since, now: pnow, llm });
+  ok(r1L.some((l) => l.includes('reply 400')), 'refused send is reported');
+  const n0 = sent.length;
+  await m.pollOnce(lconv, send, { ownId: 'ME', since, now: new Date(pnow.getTime() + 5 * 60000), llm });
+  ok(sent.length === n0, 'no retry before the wait is over');
+  const r3L = await m.pollOnce(lconv, send, { ownId: 'ME', since, now: new Date(pnow.getTime() + 16 * 60000), llm });
+  ok(sent.length === n0 + 1 && sent.at(-1).to === 'LOCK' && r3L.some((l) => l.includes('reply 200')), 'retried and answered once the chat is free');
+  ok(sent.at(-1).text.includes('wa.me'), 'a refused first try does not use up the doors');
+  await m.pollOnce(lconv, send, { ownId: 'ME', since, now: new Date(pnow.getTime() + 40 * 60000), llm });
+  ok(sent.length === n0 + 1, 'answered message is not answered again');
+
   process.chdir(os.tmpdir());
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* a temp dir left behind is harmless */ }
   console.log(fail ? `${fail} FAILED` : 'all passed');
