@@ -75,7 +75,7 @@ const SEGMENT_LABEL = {
 // visual than the portfolio page), THEN why EspaLuz exists. Spanish letter -> the Spanish deck.
 const OUTLOOK_ES = 'https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026_ES.pdf';
 const INTRO_ES = [
-  `¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de sistemas de IA radicada en Panamá y fundadora de AIdeazz AI Lab, donde creamos EspaLuz, una tutora de IA para familias. Quién soy y cómo trabajo, en pocas páginas: ${OUTLOOK_ES}`,
+  `¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de sistemas de IA radicada en Panamá y fundadora de AIdeazz AI Lab, donde creamos EspaLuz, una tutora de IA para familias. Quién soy y cómo trabajo, en pocas páginas (también va adjunto en PDF): ${OUTLOOK_ES}`,
   ``,
   `EspaLuz nació de mi propia mudanza: llegué a Panamá con mi hija pequeña — somos una familia bilingüe ruso-inglés — y empezamos el español desde cero.`,
 ];
