@@ -77,9 +77,11 @@ persona's languages present, no flooding) AND the persona itself as a sceptical 
 |---|---|---|---|
 | 1 (13:30) | 1/10 | 4/10 | first-reply fixes round 1 (Spain keyword, help words, country form, welcome, TG map, Russian row, web sign-up) |
 | 2 (13:48) | 3/10 | 9/10 | no echo of their text, translation as a lesson, mood label hidden, Russian kept for bot-only families, "both" not a Spanish speaker, Pro English hears each answer |
-| 3 (14:07) | **4/10** | **10/10** | lesson only under short messages, class link on app.espaluz.lat; harness waits for real answers |
+| 3 (14:07) | 4/10 | 10/10 | lesson only under short messages, class link on app.espaluz.lat; harness waits for real answers |
+| 4 (15:13) | 6/10 | 10/10 (would stay 10/10) | no class offer during health talk; button line says "if you have children"; no guessed child gender; Russian first; Pro English fair level + interview scene first |
+| 5 (15:38) | **7/10** | **10/10** (would stay 10/10) | Telegram: Russian rule restated as the final instruction; Pro English tone without cheering |
 
-Still flagged by the critics after run 3 (not fixed today): the kids-class offer arriving in the middle of an adult's question;
+Still failing after run 5 (scores 6-7, all "would stay"): **nomads on WhatsApp** want "Where next?" and "first 2 weeks in a new city" - not built (Table 2); **Pro English on Telegram** wants a structured 4-week course - not built; **Russian on Telegram**: the FIRST answer (asked while the setup step waits) still comes without Russian, later answers have it - open bug. Earlier, after run 3, the critics flagged: the kids-class offer arriving in the middle of an adult's question;
 voice notes and buttons with no words saying what they are; Pro English has no visible 4-week programme and its level check
 (3 questions, may be answered in Spanish) gives a CEFR guess a strict user does not trust; on Telegram the Russian path's first
 answer can still come without Russian; answers are long for a phone.
