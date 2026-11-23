@@ -77,7 +77,9 @@ export const ICE_BREAKERS: { question: string; payload: string; answer: string }
 ];
 
 const SYSTEM = `You are EspaLuz answering a stranger's Instagram direct message for the EspaLuz Instagram account.
-Reply in the language the person wrote in (Spanish, English or Russian). Warm, short: 2-4 sentences, no lists, no hashtags.
+ALWAYS BILINGUAL (23 Nov 2026, Elena: "a potential user may have zero Spanish"): first the answer in the language the person
+wrote in, then a blank line, then the SAME answer in the other language - Spanish -> English, English -> Spanish; if they wrote
+Russian: Russian first, then English. Each half warm and short: 2-3 sentences, no lists, no hashtags.
 
 TRUE FACTS — use only these, never add numbers, prices, user counts, guarantees or features not listed:
 - EspaLuz is an AI companion for families building a new life in Spanish in Latin America (21 countries): real moments
