@@ -22,7 +22,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import type { Express, Request, Response } from 'express';
-import { handleMessaging } from './ig-dm-chat';
+import { handleMessaging, pollOnce } from './ig-dm-chat';
 
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, '.ig-comment-dm.json');
@@ -195,8 +195,38 @@ export function registerInstagramCommentDm(app: Express): void {
       }
     }
   });
+  // Inbox poll (22 Nov 2026): Meta reads fine but does not push DMs to this app, so we read once a minute.
+  if (process.env.IG_CHAT_POLL === 'true') {
+    const since = new Date(process.env.IG_CHAT_POLL_SINCE?.trim() || Date.now());
+    let busy = false;
+    const tick = async () => {
+      if (busy) return;
+      busy = true;
+      try {
+        const pageId = messagesSender();
+        const fields = 'updated_time,messages.limit(25){id,created_time,from,message}';
+        const res = await fetch(`${GRAPH()}/${pageId}/conversations?platform=instagram&limit=10&fields=${encodeURIComponent(fields)}`, {
+          headers: { Authorization: `Bearer ${accessToken()}` },
+        });
+        if (!res.ok) { console.warn(`[ig-poll] read ${res.status} ${(await res.text()).slice(0, 160)}`); return; }
+        const body: any = await res.json();
+        const lines = await pollOnce(body?.data || [], (to, text) => graphPost(`/${pageId}/messages`, { recipient: { id: to }, message: { text } }), {
+          ownId: process.env.IG_USER_ID?.trim() || '',
+          since,
+        });
+        for (const l of lines) if (!l.startsWith('skip')) console.log(`[ig-poll] ${l}`);
+      } catch (e: any) {
+        console.warn(`[ig-poll] failed: ${String(e?.message ?? e).slice(0, 160)}`);
+      } finally {
+        busy = false;
+      }
+    };
+    setInterval(tick, Number(process.env.IG_CHAT_POLL_MS || 60000));
+    setTimeout(tick, 5000);
+  }
   console.log(
     `📸 Instagram comment-to-DM webhook: /ig/webhook (${process.env.IG_DM_ENABLED === 'true' ? 'ON' : 'off'})` +
+      ` · inbox poll ${process.env.IG_CHAT_POLL === 'true' ? 'ON' : 'off'}` +
       ` · DM chat ${process.env.IG_CHAT_ENABLED === 'true' ? 'ON' : 'off'}`,
   );
 }

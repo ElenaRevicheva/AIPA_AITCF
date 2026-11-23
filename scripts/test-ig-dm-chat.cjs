@@ -41,6 +41,28 @@ const now = new Date('2026-11-22T21:00:00Z');
   ok((await m.handleMessaging({ sender: { id: 'C' }, message: { text: 'c' } }, send, { ownId: 'ME', llm, now })) === 'skip: daily cap', 'daily cap per person');
   ok(sent.every((s) => s.text.length <= 990), 'every reply fits an Instagram message');
 
+  // ── Inbox poll (22 Nov 2026) ──
+  process.env.IG_CHAT_MAX_PER_DAY = '12';
+  const since = new Date('2026-11-22T20:00:00Z');
+  const pnow = new Date('2026-11-22T21:00:00Z');
+  const msg = (id, iso, from, message) => ({ id, created_time: iso, from: { id: from }, message });
+  const before = sent.length;
+  const convs = [
+    // new contact: first message 1 h ago -> answered
+    { id: 'c_new', updated_time: '', messages: { data: [msg('m1', '2026-11-22T20:30:00Z', 'NEW1', 'hola, ¿cómo funciona?')] } },
+    // old friend: history reaches back 2 months -> never answered
+    { id: 'c_old', updated_time: '', messages: { data: [msg('o2', '2026-11-22T20:40:00Z', 'FRIEND', 'how are you?'), msg('o1', '2026-09-20T10:00:00Z', 'FRIEND', 'hi')] } },
+    // Elena already answered last -> nothing to do
+    { id: 'c_done', updated_time: '', messages: { data: [msg('d2', '2026-11-22T20:45:00Z', 'ME', 'todo bien'), msg('d1', '2026-11-22T20:44:00Z', 'NEW2', 'hola')] } },
+    // message from before the poll started -> backlog, not answered
+    { id: 'c_back', updated_time: '', messages: { data: [msg('b1', '2026-11-22T19:00:00Z', 'NEW3', 'hola')] } },
+  ];
+  const r = await m.pollOnce(convs, send, { ownId: 'ME', since, now: pnow, llm });
+  ok(sent.length - before === 1 && sent.at(-1).to === 'NEW1', 'poll answers only the new contact');
+  ok(r.some((l) => l.includes('older chat')), "poll never answers an old friend's chat");
+  const again = await m.pollOnce(convs, send, { ownId: 'ME', since, now: pnow, llm });
+  ok(sent.length - before === 1 && !again.some((l) => l.startsWith('[ig-chat]')), 'the same message is never answered twice');
+
   process.chdir(os.tmpdir());
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* a temp dir left behind is harmless */ }
   console.log(fail ? `${fail} FAILED` : 'all passed');

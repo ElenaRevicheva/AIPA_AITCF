@@ -90,6 +90,54 @@ NEVER give legal, immigration, medical or financial advice; for those say a loca
 EspaLuz for the Spanish around it. Never claim to be human. If the person wants to start or asks how, say the links
 are below. Do not write any links yourself.`;
 
+/**
+ * INBOX POLL (22 Nov 2026). Meta did not deliver DM webhooks to this app (2 test DMs, zero POSTs, although the account
+ * lists the app as subscribed to `messages`), while the same token READS the inbox fine. So once a minute we read the
+ * newest conversations and answer what is new. Safety for a personal profile: never an old friend's chat — a thread
+ * whose fetched history reaches back more than IG_CHAT_NEW_DAYS (14) is skipped unless EspaLuz already answers there.
+ * Only messages newer than the process start (or IG_CHAT_POLL_SINCE) and younger than 24 h (Meta's reply window).
+ */
+export interface PollMsg { id: string; created_time: string; from?: { id: string }; message?: string }
+export interface PollConv { id: string; updated_time: string; messages?: { data: PollMsg[] } }
+
+export async function pollOnce(
+  convs: PollConv[],
+  send: Sender,
+  opts: { ownId: string; since: Date; now?: Date; llm?: typeof completeWithProfile; newDays?: number },
+): Promise<string[]> {
+  const now = opts.now || new Date();
+  const newDays = opts.newDays ?? Number(process.env.IG_CHAT_NEW_DAYS || 14);
+  const s = load();
+  const seen = new Set<string>((s as any).seenMids || []);
+  const out: string[] = [];
+  for (const c of convs) {
+    const msgs = [...(c.messages?.data || [])].sort((a, b) => b.created_time.localeCompare(a.created_time)); // newest first
+    const newest = msgs[0];
+    if (!newest || newest.from?.id === opts.ownId) continue; // last word is ours (bot, ManyChat or Elena)
+    const person = newest.from?.id || '';
+    const engaged = (s.people[person]?.turns?.length || 0) > 0;
+    const oldest = msgs[msgs.length - 1] ?? newest;
+    const ageDays = (now.getTime() - new Date(oldest.created_time).getTime()) / 86400000;
+    if (!engaged && ageDays > newDays) { out.push(`skip ${c.id.slice(-6)}: an older chat (not a new contact)`); continue; }
+    const fresh: PollMsg[] = [];
+    for (const m of msgs) {
+      if (m.from?.id === opts.ownId) break; // only what came after our last word
+      const t = new Date(m.created_time);
+      if (seen.has(m.id) || t < opts.since || now.getTime() - t.getTime() > 24 * 3600000) continue;
+      fresh.push(m);
+    }
+    if (!fresh.length) continue;
+    const text = fresh.reverse().map((m) => m.message || '').filter(Boolean).join('\n');
+    fresh.forEach((m) => seen.add(m.id));
+    (s as any).seenMids = [...seen].slice(-3000);
+    save(s);
+    if (!text) continue;
+    const lastMid = fresh[fresh.length - 1]?.id || '';
+    out.push(await handleMessaging({ sender: { id: person }, message: { text, mid: lastMid } }, send, { ownId: opts.ownId, now, ...(opts.llm ? { llm: opts.llm } : {}) }));
+  }
+  return out;
+}
+
 /** Sends one Instagram DM through the Page (Unified login). `send` is injected so tests never touch the network. */
 export type Sender = (recipientId: string, text: string) => Promise<{ ok: boolean; status: number; text: string }>;
 
