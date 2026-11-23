@@ -2713,7 +2713,8 @@ async function startCTOAIPA() {
       }
       // 23 Nov 2026: EspaLuz synthetic test families (+9990000NNNN WhatsApp / 99990000NNNNNNN Telegram, ids no real
       // person can have - espaluz_synthetic.py) walk the real bots; they must never become a HubSpot deal.
-      if (/\+?9990000\d{4}\b|\b99990000\d{7}\b/.test(JSON.stringify(req.body ?? {}))) {
+      // 23 Nov 2026: + 7-digit WhatsApp tails (the runner now numbers every run, so a test family is never reused).
+      if (/\+?9990000(\d{7}|\d{4})\b|\b99990000\d{7}\b/.test(JSON.stringify(req.body ?? {}))) {
         console.log(`[crm-event] 🧪 synthetic test user - not pushed (source=${source})`);
         res.json({ ok: true, synthetic: true });
         return;
