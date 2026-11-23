@@ -168,6 +168,13 @@ export function registerInstagramCommentDm(app: Express): void {
       return;
     }
     res.sendStatus(200); // Meta wants a fast 200; the work happens after.
+    // Shape only, never content (22 Nov 2026: DMs were not arriving; this says what Meta DOES send).
+    try {
+      const shape = (req.body?.entry ?? []).map((e: any) =>
+        Object.keys(e || {}).filter((k) => !['id', 'time'].includes(k)).map((k) => (k === 'changes' ? `changes:${(e.changes || []).map((c: any) => c?.field).join('+')}` : k)).join(','),
+      );
+      console.log(`[ig-webhook] object=${req.body?.object} entry=[${shape.join(' | ')}]`);
+    } catch { /* logging must never break the webhook */ }
     if (process.env.IG_DM_ENABLED !== 'true') return;
     for (const entry of req.body?.entry ?? []) {
       // Meta delivers DMs in two shapes: entry.messaging[] (Messenger style) or entry.changes[] with field
