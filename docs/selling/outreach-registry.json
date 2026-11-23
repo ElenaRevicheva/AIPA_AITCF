@@ -5323,5 +5323,173 @@
     ],
     "emailDraft": "docs/selling/drafts/the-break-collective-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/the-break-collective-atlas-fu.txt"
+  },
+  "agence-panama-facile-relocation-espaluz": {
+    "company": "Agence Panama Facile Relocation",
+    "email": "panama.facile@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68558453275",
+    "phone": "50765837631",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/agence-panama-facile-relocation-espaluz-email.txt",
+    "draft": "docs/selling/drafts/agence-panama-facile-relocation-espaluz.txt"
+  },
+  "agence-panama-facile-relocation-espaluz-fu": {
+    "company": "Agence Panama Facile Relocation",
+    "email": "panama.facile@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68558453275",
+    "phone": "50765837631",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/agence-panama-facile-relocation-espaluz-fu-email.txt"
+  },
+  "your-panama-relocation-experience-espaluz": {
+    "company": "Your Panama Relocation Experience",
+    "email": "info@yourpanamarelocationexperience.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68561540668",
+    "phone": "50768936589",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/your-panama-relocation-experience-espaluz-email.txt",
+    "draft": "docs/selling/drafts/your-panama-relocation-experience-espaluz.txt"
+  },
+  "your-panama-relocation-experience-espaluz-fu": {
+    "company": "Your Panama Relocation Experience",
+    "email": "info@yourpanamarelocationexperience.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68561540668",
+    "phone": "50768936589",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/your-panama-relocation-experience-espaluz-fu-email.txt"
+  },
+  "panama-moving-solutions-s-a-espaluz": {
+    "company": "PANAMA MOVING SOLUTIONS, S.A",
+    "email": "info@pmovings.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68555999512",
+    "phone": "5073973543",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/panama-moving-solutions-s-a-espaluz-email.txt",
+    "draft": "docs/selling/drafts/panama-moving-solutions-s-a-espaluz.txt"
+  },
+  "panama-moving-solutions-s-a-espaluz-fu": {
+    "company": "PANAMA MOVING SOLUTIONS, S.A",
+    "email": "info@pmovings.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68555999512",
+    "phone": "5073973543",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/panama-moving-solutions-s-a-espaluz-fu-email.txt"
+  },
+  "motivated-movers-espaluz": {
+    "company": "Motivated Movers",
+    "email": "hello@getmotivatedmovers.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68567371552",
+    "phone": "18503596997",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/motivated-movers-espaluz-email.txt",
+    "draft": "docs/selling/drafts/motivated-movers-espaluz.txt"
+  },
+  "motivated-movers-espaluz-fu": {
+    "company": "Motivated Movers",
+    "email": "hello@getmotivatedmovers.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68567371552",
+    "phone": "18503596997",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/motivated-movers-espaluz-fu-email.txt"
+  },
+  "canal-movers-logistic-corp-espaluz": {
+    "company": "Canal Movers & Logistic Corp",
+    "email": "rates@canalmovers.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68584688019",
+    "phone": "50760457346",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/canal-movers-logistic-corp-espaluz-email.txt",
+    "draft": "docs/selling/drafts/canal-movers-logistic-corp-espaluz.txt"
+  },
+  "canal-movers-logistic-corp-espaluz-fu": {
+    "company": "Canal Movers & Logistic Corp",
+    "email": "rates@canalmovers.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68584688019",
+    "phone": "50760457346",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/canal-movers-logistic-corp-espaluz-fu-email.txt"
+  },
+  "panama-intermoving-relocation-inc-espaluz": {
+    "company": "Panama Intermoving & Relocation Inc.",
+    "email": "ventas@panamapir.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68579428743",
+    "phone": "5073220745",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/panama-intermoving-relocation-inc-espaluz-email.txt",
+    "draft": "docs/selling/drafts/panama-intermoving-relocation-inc-espaluz.txt"
+  },
+  "panama-intermoving-relocation-inc-espaluz-fu": {
+    "company": "Panama Intermoving & Relocation Inc.",
+    "email": "ventas@panamapir.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68579428743",
+    "phone": "5073220745",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/panama-intermoving-relocation-inc-espaluz-fu-email.txt"
+  },
+  "a-very-good-moving-company-espaluz": {
+    "company": "A Very Good Moving Company",
+    "email": "verygoodmovingco@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68573262437",
+    "phone": "18507336592",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/a-very-good-moving-company-espaluz-email.txt",
+    "draft": "docs/selling/drafts/a-very-good-moving-company-espaluz.txt"
+  },
+  "a-very-good-moving-company-espaluz-fu": {
+    "company": "A Very Good Moving Company",
+    "email": "verygoodmovingco@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68573262437",
+    "phone": "18507336592",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/a-very-good-moving-company-espaluz-fu-email.txt"
+  },
+  "la-conciergerie-panam-espaluz": {
+    "company": "La Conciergerie Panamá",
+    "email": "panama.premium.conciergerie@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68589001584",
+    "phone": "15732268415",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/la-conciergerie-panam-espaluz-email.txt",
+    "draft": "docs/selling/drafts/la-conciergerie-panam-espaluz.txt"
+  },
+  "la-conciergerie-panam-espaluz-fu": {
+    "company": "La Conciergerie Panamá",
+    "email": "panama.premium.conciergerie@gmail.com",
+    "offer": "espaluz",
+    "code": "f202611235e1d",
+    "dealId": "68589001584",
+    "phone": "15732268415",
+    "cc": "elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/la-conciergerie-panam-espaluz-fu-email.txt"
   }
 }
