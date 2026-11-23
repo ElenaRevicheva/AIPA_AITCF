@@ -41,7 +41,11 @@ const ENV = { ...readEnv(path.join(ROOT, '.env')), ...process.env };
 const TG = ENV.TELEGRAM_BOT_TOKEN;
 const CHAT = (ENV.CONCIERGE_TG_CHAT || ENV.TELEGRAM_AUTHORIZED_USERS || '').split(',')[0].trim();
 const OWNER = new Set((ENV.ESPALUZ_OWNER_IDS || '').split(',').map((s) => s.replace(/\D/g, '')).filter(Boolean));
-const isOwner = (who) => OWNER.has(String(who).replace(/\D/g, ''));
+// 23 Nov 2026 (Elena: "flooded by these robotic messages"): the synthetic test families (EspaLuzWhatsApp/espaluz_synthetic.py,
+// ids +9990000NNNN[NNN] / 99990000NNNNNNN that no real person can have) are never a person who needs her. They count as
+// owners here, so every section below (needs a human, web sign-ups, the daily digest) skips them.
+const isSynthetic = (who) => /^(9990000(\d{4}|\d{7})|99990000\d{7})$/.test(String(who).replace(/\D/g, ''));
+const isOwner = (who) => isSynthetic(who) || OWNER.has(String(who).replace(/\D/g, ''));
 const isTest = (film) => /eeee/.test(film || '');   // go/no-go test code, never a real person
 
 const loadState = () => { try { return JSON.parse(fs.readFileSync(STATE, 'utf8')); } catch { return {}; } };
