@@ -70,7 +70,16 @@ const SEGMENT_LABEL = {
   movers: 'international movers',
 };
 
-const CLOSING = ['Saludos,', 'Elena Revicheva', 'Fundadora de EspaLuz · AIdeazz AI Lab ✨', 'https://app.espaluz.lat'];
+// 23 Nov 2026 (Elena: "they should understand that I'm a professional, not just a mother who relocated"): who she is
+// first - AI systems engineer in Panama, founder of AIdeazz AI Lab - with the Professional Outlook deck (clearer and more
+// visual than the portfolio page), THEN why EspaLuz exists. Spanish letter -> the Spanish deck.
+const OUTLOOK_ES = 'https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026_ES.pdf';
+const INTRO_ES = [
+  `¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de sistemas de IA radicada en Panamá y fundadora de AIdeazz AI Lab, donde creamos EspaLuz, una tutora de IA para familias. Quién soy y cómo trabajo, en pocas páginas: ${OUTLOOK_ES}`,
+  ``,
+  `EspaLuz nació de mi propia mudanza: llegué a Panamá con mi hija pequeña — somos una familia bilingüe ruso-inglés — y empezamos el español desde cero.`,
+];
+const CLOSING = ['Saludos,', 'Elena Revicheva', 'Ingeniera de sistemas de IA · Fundadora de AIdeazz AI Lab ✨', 'EspaLuz, tutora de IA para familias: https://app.espaluz.lat'];
 
 function buildEspaluzDraft(lead, code) {
   const seg = SEGMENT_LINE[lead.seg] || SEGMENT_LINE.relocation;
@@ -79,7 +88,7 @@ function buildEspaluzDraft(lead, code) {
   const body = [
     `Estimado equipo de ${lead.company}:`,
     ``,
-    `¡Un gusto saludarles! 👋 Soy Elena Revicheva. Me mudé a Panamá con mi hija, y de esa experiencia nació EspaLuz.`,
+    ...INTRO_ES,
     ``,
     `${seg(city)} Lo más difícil de las primeras semanas casi nunca es el papeleo: es la nota de la escuela, el pediatra, el vecino, el supermercado — todo en español.`,
     ``,
@@ -122,7 +131,7 @@ function buildEspaluzFuDraft(lead, code) {
 
 function buildEspaluzWaDraft(lead, code) {
   return [
-    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva. Me mudé a Panamá con mi hija y creé EspaLuz, la compañera de la familia para la nueva vida en español (WhatsApp, Telegram o app, con clases para niños; 14 días gratis).`,
+    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de sistemas de IA en Panamá y fundadora de AIdeazz AI Lab. Llegué a Panamá con mi hija pequeña (familia bilingüe ruso-inglés, español desde cero) y creé EspaLuz, tutora de IA para familias (WhatsApp, Telegram o app, con clases para niños; 14 días gratis). Quién soy: ${OUTLOOK_ES}`,
     ``,
     `${(SEGMENT_LINE[lead.seg] || SEGMENT_LINE.relocation)(esCity(lead.city))} ¿Les sirve un enlace de bienvenida propio de ${lead.company} para sus clientes? Sin costo para ustedes:`,
     partnerLink(lead.slug, code),
