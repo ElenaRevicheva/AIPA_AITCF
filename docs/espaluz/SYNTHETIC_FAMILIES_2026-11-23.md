@@ -64,3 +64,22 @@ Score: **routing 15/15 correct** (every button switched on its own path). **Firs
 WhatsApp `+99900003003/3201/3302/3504/3605`, Telegram `999900000003003/3201/3302/3504/3605` (trial rows, bot memory,
 onboarding files), web/class accounts for Telegram ids `9999000000009011..9015` and the class links sent to settle/expat,
 4 `learning_sessions` family_profile rows (12:41–12:43). Not deleted yet — waits on Elena's go.
+
+## Strict human-like families (same day, 13:30–14:35 UTC)
+
+Elena: "make those test families truly human-like and truly very critical, very strict." Each persona (Jennifer US mom, Lukas
+German nomad, Valentina Venezuelan, Carlos Colombian dev, Marina from Moscow) taps the button, asks a real question the way that
+person types, then reacts to what EspaLuz actually said with a follow-up written in character. Judged twice: hard rules in code
+(path confirmed, no payment block before the answer, no menu/form instead of an answer, right country and no wrong one, the
+persona's languages present, no flooding) AND the persona itself as a sceptical critic (score ≥ 8, "landed right", "would stay").
+
+| run | passed (strict) | "I landed in the right place" | what was fixed before it |
+|---|---|---|---|
+| 1 (13:30) | 1/10 | 4/10 | first-reply fixes round 1 (Spain keyword, help words, country form, welcome, TG map, Russian row, web sign-up) |
+| 2 (13:48) | 3/10 | 9/10 | no echo of their text, translation as a lesson, mood label hidden, Russian kept for bot-only families, "both" not a Spanish speaker, Pro English hears each answer |
+| 3 (14:07) | **4/10** | **10/10** | lesson only under short messages, class link on app.espaluz.lat; harness waits for real answers |
+
+Still flagged by the critics after run 3 (not fixed today): the kids-class offer arriving in the middle of an adult's question;
+voice notes and buttons with no words saying what they are; Pro English has no visible 4-week programme and its level check
+(3 questions, may be answered in Spanish) gives a CEFR guess a strict user does not trust; on Telegram the Russian path's first
+answer can still come without Russian; answers are long for a phone.
