@@ -464,6 +464,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 24 Nov ~20:10 | atuona.xyz fixes (Elena): ClaimPoem contract-address error, #054 claim button apostrophe, Mint copy 45->99, header overflow 769-1180px, remove UI emojis. Backup + tag `pre-fixes-2026-11-24` | atuona: `index.html` (hand-written parts), `src/main.js`, `src/ClaimPoem.jsx` | atuona `5f584579` |
 | Claude Code (side session) | 23 Nov ~17:00 | WhatsApp → HubSpot activity: PLAN only, waiting on Elena's OK (`docs/crm/WHATSAPP_TO_HUBSPOT_PLAN_2026-11-23.md`) | will touch: `src/hubspot-client.ts` (new helper), `src/telegram-bot.ts` (`/wa`), new `scripts/hs-log-wa.cjs`, new EspaLuzWhatsApp cron script. Nothing yet. | — |
 
 **Rules**
