@@ -462,6 +462,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 24 Nov ~18:00 | atuona.xyz design layer (Elena: grain + typed layer, drop motion, RU/EN collision, Film Studio cinema + fragment<->film links). Backup + tag `pre-design-2026-11-24` done | atuona repo: `scripts/build-vault.mjs`, new `scripts/build-craft.mjs`, `scripts/build-film-sheets.mjs`, `package.json` (vault:build), `index.html` (generated), `public/aifilmstudio/index.html`. Mint path NOT touched | atuona `9f730be5` |
 | Claude Code (side session) | 23 Nov ~17:00 | WhatsApp → HubSpot activity: PLAN only, waiting on Elena's OK (`docs/crm/WHATSAPP_TO_HUBSPOT_PLAN_2026-11-23.md`) | will touch: `src/hubspot-client.ts` (new helper), `src/telegram-bot.ts` (`/wa`), new `scripts/hs-log-wa.cjs`, new EspaLuzWhatsApp cron script. Nothing yet. | — |
 
 **Rules**
