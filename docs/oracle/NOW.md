@@ -1,5 +1,7 @@
 # NOW — the shared session between Cursor and Claude Code
 
+**⚡ 24 Nov ~23:00 UTC Claude Code: atuona DNA numbers (99/46/53/2) now glitch (atuona `f08f6ffd`, live, curl-verified).** Generated in `scripts/build-dna.mjs` (data-text + ::before/::after sliced copies, bursts every 2.6s, off for reduced motion). Elena: 'glitchy, NOT running like a marketing promotion' - never add a count-up/rolling-number effect.
+
 **🎬 24 Nov ~22:20 UTC Claude Code: atuona Film Studio RESTORED to its original look (atuona `f57310e9`, live).** Elena: the cinema restyle 'looks ugly now, bring it back exactly'. Removed full-bleed frames, poster stills, hover loop. ONLY 'Fragments in this film #092 #071 ...' links stay (Arearea 19 / Crimson Escape 5 / CNGC 8). Proof: outside the 33-line block `public/aifilmstudio/index.html` is byte-identical to tag `pre-design-2026-11-24`. DO NOT re-add the cinema styling.
 
 **🩸 24 Nov ~22:00 UTC Claude Code: atuona ink stain STAYS + typed line uncovered (atuona `e81f5bdd`, live, 99/99/99, mint bundle unchanged).** Elena: 'I do not see any ink spot' - v1 ink faded to 0 after landing (invisible on a still page); now lands and stays at .55 behind each LIVE badge. Typed line was half-covered by the card's hover lift (~20px); room now 2rem. HONEST STATE for the next agent: tonight's layer is detail inside the Vault + the Film Studio page; the first screen (hero, Manifest, Mint grey boxes) is unchanged by design. Elena feels the site did not visibly change - a first-screen redesign is the open question, HER call, not started.
