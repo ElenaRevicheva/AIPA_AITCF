@@ -1,6 +1,6 @@
 # NOW — the shared session between Cursor and Claude Code
 
-**🎨 24 Nov ~23:40 UTC Claude Code: atuona oxblood/graphite palette is a PREVIEW on branch `palette-oxblood` (`cf103c65`), NOT on main, NOT live - Elena's call.** One removable layer `scripts/build-palette.mjs` (re-points :root colour vars + quiets 4 glows; readable brick for red text). Guards pass. Restore point for the current look: tag `pre-palette-2026-11-24` + `D:ideazz\_backupstuona-pre-palette-20261124\`. On her yes: merge branch to main (no conflicts expected unless index.html moved), rebuild, verify live.
+**🎨 24 Nov ~23:40 UTC Claude Code: atuona oxblood/graphite palette is a PREVIEW on branch `palette-oxblood` (`cf103c65`), NOT on main, NOT live - Elena's call.** One removable layer `scripts/build-palette.mjs` (re-points :root colour vars + quiets 4 glows; readable brick for red text). Guards pass. Restore point for the current look: tag `pre-palette-2026-11-24` + `D:\aideazz\_backups\atuona-pre-palette-20261124\`. On her yes: merge branch to main (no conflicts expected unless index.html moved), rebuild, verify live.
 
 **⚡ 24 Nov ~23:00 UTC Claude Code: atuona DNA numbers (99/46/53/2) now glitch (atuona `f08f6ffd`, live, curl-verified).** Generated in `scripts/build-dna.mjs` (data-text + ::before/::after sliced copies, bursts every 2.6s, off for reduced motion). Elena: 'glitchy, NOT running like a marketing promotion' - never add a count-up/rolling-number effect.
 
