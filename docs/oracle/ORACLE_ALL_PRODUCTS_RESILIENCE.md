@@ -1,8 +1,36 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 22–25 Nov 2026 — EspaLuz proven by synthetic families, Instagram on our own app, atuona rebuilt as one design layer, NFTs repaired on-chain
+
+**Read this section first.** It gives the state on **25 Nov 2026**, taken from verified NOW.md entries (each one names its proof). The 16–19 Oct fleet table below is older; for what is in flight and whose move it is, read `docs/oracle/NOW.md`.
+
+### What shipped, and how each change was proven
+
+| Date | Product | What changed | Proof |
+|---|---|---|---|
+| 22 Nov | CTO AIPA (PM2 `cto-aipa`) | **Our own Instagram HOLA comment-to-DM webhook** (`src/ig-comment-dm.ts`, `/cto/ig/webhook`). Meta app *EspaLuz Comment Replies*. On 23 Nov ManyChat was disconnected, so Instagram DMs run on our app only. Inbox poll every minute, because Meta does not push DM webhooks. EspaLuz answers DMs through the waterfall, bilingual, 12/day cap (`IG_CHAT_ENABLED` gate) | log `[ig-dm] HOLA on media … -> DM 200 · public 200`; unsigned POST 401 / GET 403; 24 + 17 tests |
+| 22 Nov | CTO AIPA | **EspaLuz Facebook-group listener**: one paste per weekday; Elena posts by hand (`src/espaluz-groups-listener.ts`) | dist md5 = git |
+| 22 Nov | Atlas (PM2 `whitespace`) | **Refocused on EspaLuz family partners** (`ATLAS_OFFER=espaluz`). The AIGO machine is frozen at tag `atlas-aigo-final-2026-11-22`; its PAUSED cron lines are deliberate | tag in both repos + restore guide |
+| 23 Nov | EspaLuz WhatsApp + Telegram (systemd) | **Synthetic test families**: strict personas walk 5 landing paths × WhatsApp + Telegram through the real bots. Synthetic ids (`+9990000…`) are logged, never sent, never pushed to HubSpot, never alert Elena. About 30 fixes followed: no echo, a setup form never swallows a real message, Russian kept, no kids-class offer during health talk, country flag in replies, nomad tools *where next* / *first 2 weeks* | 18-door strict round: chat **12/12**, web 5/6, 36/36 doors landed right (`docs/espaluz/STRICT_RUN_18_DOORS_2026-11-23.md`) |
+| 23 Nov | EspaLuz | **Pro Spanish** door on WhatsApp + Telegram: the same engine as Pro English, on an `es` track | live replies in the strict round |
+| 23 Nov | EspaLuz → HubSpot | **Every new WhatsApp contact** gets a quiet `[ESPALUZ] WA <id> — trial` deal on its first message | 23 live deals |
+| 23 Nov | Sync | Oracle = git for 32/32 bot files and 16/16 cto-aipa files. Bot repos are now private; Oracle still reads them | `git ls-remote` OK; service start times newer than files |
+| 24 Nov | atuona.xyz (4everland, no Oracle) | **Design layer, additive only**: hero *Drops of Fragments*, film grain, typed line, RU/EN title stamps, ink stain behind LIVE, glitching DNA numbers, oxblood/graphite palette, *Underground Aesthetic* as an ink stamp, phone fix for part headers. Film Studio restored to its original look on Elena's call | every ship: `verify` NOTHING LOST, `vault:test` 10/10, live 99 poems / 156 `claimPoem` / mint bundle unchanged; layout measured at 375 / 768 / 1440 |
+| 25 Nov | atuona NFT (Polygon DropERC721 `0x9cD9…e4D8`) | **45 tokens repaired.** Images had pointed at a dead Fleek host (522, never archived), and ipfs.io / dweb.link answer 429. New card images + metadata now live at `atuona.xyz/nft/` (original JSON with **only** `image` changed). Elena signed `updateBatchBaseURI(0, "https://atuona.xyz/nft/meta/")` from the owner wallet, which is her thirdweb **social-login** wallet (not lost) | tokenURI(n) = `https://atuona.xyz/nft/meta/n` for **45/45** via polygon-bor-rpc.publicnode.com; meta + image 200 |
+| 25 Nov | atuona vault | English stamps now say which film gave the title (*from the film "…"*), ≥1000px; phones keep the "appears in" line | measured 1024 / 1280 / 1440, no collision; live 7/7 `data-film` |
+
+### Traps learned in these days
+
+- **NFT metadata is off-chain.** The chain holds only a pointer. A dead image host shows as an "empty NFT" even though nothing on-chain broke. Never delete `atuona/public/nft/`: all 45 tokens read from it. Rollback = the same call with `ipfs://QmXheK9JHF52aNtFEUL2twzrTsSLSBmpNfVYGEpgpvZsgq/`.
+- **"Lost" admin keys:** read the contract's roles before declaring a key lost. aideazz.eth (`0x116b…7dA5`) also holds DEFAULT_ADMIN + METADATA on the NFT contract.
+- **Simulate before signing**, either with thirdweb Explorer's *Simulate* or an `eth_call`. A repeated *Execute* sent ~5 identical transactions (harmless only because the call is idempotent, ~0.12 POL).
+- **"Could not generate content."** is a real film title (poem #099), not an error string. Do not "fix" it.
+- **Synthetic families must never look real**: guarded ids, no sends, no HubSpot, no alerts. Keep their data until production testing ends.
+- **Scheduled one-off on Oracle** (`~/nexus-gap/`, fires 27 Nov 02:00 UTC): do not kill it.
+
 ## 🟢 16–19 Oct 2026 — what changed, how it was proven, and the traps
 
-**Read this section first.** It gives the state on **19 Oct 2026 (~13:40–13:55 UTC)**, checked read-only against Oracle (process start times, md5s, git HEADs, crontab, logs), the laptop repos and GitHub, not against config. The 12–15 Oct section below still holds wherever this one is silent; everything after it is history. On 19 Oct about 190 stale, contradictory or public-unsafe passages further down were corrected in place and marked **(updated 19 Oct 2026)**, *corrected* or *superseded*. Whose move each item is: `docs/oracle/NOW.md` (PART 2). House rule (NOW.md §6b): **no rebuilding** — only surgical, additive fixes inside existing code that move Elena toward a paying client or a hiring manager. Employers are named here by count or stage only (NOW.md, 17 Oct).
+It gave the state on **19 Oct 2026 (~13:40–13:55 UTC)**, checked read-only against Oracle (process start times, md5s, git HEADs, crontab, logs), the laptop repos and GitHub, not against config. The 12–15 Oct section below still holds wherever this one is silent; everything after it is history. On 19 Oct about 190 stale, contradictory or public-unsafe passages further down were corrected in place and marked **(updated 19 Oct 2026)**, *corrected* or *superseded*. Whose move each item is: `docs/oracle/NOW.md` (PART 2). House rule (NOW.md §6b): **no rebuilding** — only surgical, additive fixes inside existing code that move Elena toward a paying client or a hiring manager. Employers are named here by count or stage only (NOW.md, 17 Oct).
 
 ### 🔄 Fleet state — every running process vs the code it loads (re-checked 19 Oct ~13:40–13:55 UTC)
 
