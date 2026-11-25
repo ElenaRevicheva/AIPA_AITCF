@@ -1,5 +1,6 @@
 # NOW — the shared session between Cursor and Claude Code
 
+**⏰ 25 Nov ~11:00 UTC Claude Code: a one-off scheduled job is WAITING on Oracle — DO NOT KILL.** A plain `bash -c sleep … ; node news_sweep_20261126.cjs` in `~/nexus-gap/` (not PM2, no cron) fires once on 27 Nov 02:00 UTC, runs one Grok news search and Telegrams Elena via the existing bot token, then exits. Touches no service, cron or repo. Private client job; details in the private project. Remove this line after 27 Nov 02:00 UTC.
 
 **🔖 24 Nov Claude Code: atuona header tagline 'Underground Aesthetic' = centred brick INK STAMP + blinking cursor (Elena's pick 'A with D'; atuona `e8f7d677`, live, curl-verified 99 poems / 156 claimPoem / bundle main-D9ycBBj3.js / showManifesto onclick kept).** Styling only, in the CRAFT block of `scripts/build-craft.mjs` (words + element untouched). Measured centred under ATUONA, one line, no sideways scroll at 375/768/1440, 0 console errors. Restore: tag `pre-tagline-2026-11-24` + D:/aideazz/_backups/atuona-pre-tagline-20261124/.
 
