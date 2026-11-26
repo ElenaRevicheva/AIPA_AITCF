@@ -93,7 +93,15 @@ export function channelKeeper() {
 }
 
 // ── 2 + 3. DRAFT → PUBLISH on the CTO AIPA bot ────────────────────────────────────────────────
-const drafts = new Map<string, { text: string; userId: number; at: number }>();
+// Pending drafts live on disk too (26 Nov 2026): a restart must not turn ✅ into "expired".
+type Draft = { text: string; userId: number; at: number };
+const PENDING = path.join(DIR, 'pending.json');
+const drafts = new Map<string, Draft>(((): [string, Draft][] => {
+  try { return Object.entries(JSON.parse(fs.readFileSync(PENDING, 'utf8'))) as [string, Draft][]; } catch { return []; }
+})());
+function savePending(): void {
+  try { ensureDir(); fs.writeFileSync(PENDING, JSON.stringify(Object.fromEntries(drafts), null, 2)); } catch (e: any) { console.error(`[atuona-channel] pending.json write failed: ${e?.message}`); }
+}
 const armed = new Map<number, number>(); // userId → armed-until
 
 const VOICE_LEAD = /^\s*(?:в\s+канал|в\s+атуону|канал|атуона\s+канал|to\s+(?:the\s+)?channel|post\s+to\s+(?:the\s+)?channel|channel)\s*[:,.\-—–!]*\s*/i;
@@ -125,13 +133,19 @@ export async function offerDraft(ctx: Context, text: string, source: 'voice' | '
   for (const [k, d] of drafts) if (Date.now() - d.at > DRAFT_TTL_MS) drafts.delete(k);
   const token = randomBytes(5).toString('hex');
   drafts.set(token, { text: clean, userId, at: Date.now() });
-  const where = channelId() ? '' : '\n\n⚠️ The channel is not known yet — post or edit anything in it once, then press ✅.';
-  await ctx.reply(`📥 Draft saved. This goes to the Atuona channel exactly as written:\n\n${clean}${where}`, {
-    reply_markup: { inline_keyboard: [[
-      { text: '✅ Publish', callback_data: `achan:ok:${token}` },
-      { text: '❌ Cancel', callback_data: `achan:no:${token}` },
-    ]] },
-  });
+  savePending();
+  await showDraft(ctx, token, clean);
+}
+
+const TEACH = '⚠️ I do not know the channel yet. One tap fixes it for good: in the channel, long-press any post → Forward → Atuona_AIPA. I will remember the channel and show this draft again.';
+const buttons = (token: string) => ({ inline_keyboard: [[
+  { text: '✅ Publish', callback_data: `achan:ok:${token}` },
+  { text: '❌ Cancel', callback_data: `achan:no:${token}` },
+]] });
+
+async function showDraft(ctx: Context, token: string, text: string): Promise<void> {
+  const where = channelId() ? '' : `\n\n${TEACH}`;
+  await ctx.reply(`📥 Draft saved. This goes to the Atuona channel exactly as written:\n\n${text}${where}`, { reply_markup: buttons(token) });
 }
 
 /** Shown when /channel is tapped — the whole instruction, short (Elena, 26 Nov 2026). */
@@ -147,6 +161,24 @@ export const CHANNEL_HOWTO = [
 ].join('\n');
 
 export function registerAtuonaChannel(bot: Bot): void {
+  // Teach the channel by forwarding one of its posts — ONLY while the channel is unknown, so once it
+  // is learned a forwarded post passes straight on to the bot's other handlers, as before.
+  bot.on('message', async (ctx, next) => {
+    const origin = (ctx.message as any)?.forward_origin;
+    if (channelId() || origin?.type !== 'channel' || !origin.chat?.id) return next();
+    const chat = origin.chat as { id: number; title?: string };
+    const me = await ctx.api.getChatMember(chat.id, ctx.me.id).catch(() => null);
+    if (!me || (me.status !== 'administrator' && me.status !== 'creator')) {
+      await ctx.reply(`⚠️ I am not an admin of "${chat.title || chat.id}", so I cannot post there. Make Atuona_AIPA an admin of that channel, then forward a post again.`);
+      return;
+    }
+    writeState({ channelId: chat.id, title: chat.title });
+    console.log(`[atuona-channel] learned channel ${chat.id} "${chat.title}" from a forwarded post`);
+    await ctx.reply(`✅ Got it — I will post to "${chat.title}".`);
+    const mine = [...drafts.entries()].filter(([, d]) => d.userId === (ctx.from?.id || 0)).sort((a, b) => b[1].at - a[1].at);
+    if (mine[0]) await showDraft(ctx, mine[0][0], mine[0][1].text);
+  });
+
   bot.command('channel', async (ctx) => {
     const text = (ctx.match as string | undefined)?.trim();
     if (text) { await offerDraft(ctx, text, 'text'); return; }
@@ -171,8 +203,9 @@ export function registerAtuonaChannel(bot: Bot): void {
       return;
     }
     drafts.delete(token);
+    savePending();
     if (verdict !== 'ok') {
-      archive({ kind: 'cancelled', source: 'cto-aipa', text: d.text });
+      archive({ kind: 'cancelled', source: 'atuona-bot', text: d.text });
       await ctx.answerCallbackQuery({ text: 'Not published' });
       await ctx.reply('👍 Not published. The draft stays in the archive.');
       return;
@@ -180,16 +213,15 @@ export function registerAtuonaChannel(bot: Bot): void {
     const id = channelId();
     if (!atuonaApi || !id) {
       drafts.set(token, d);
+      savePending();
       await ctx.answerCallbackQuery({ text: 'Channel not ready' });
-      await ctx.reply(!atuonaApi ? '⚠️ The Atuona bot is not running, so nothing was published. The draft is saved.' : '⚠️ I do not know the channel yet: post or edit anything in it once, then press ✅ again.', {
-        reply_markup: { inline_keyboard: [[{ text: '✅ Publish', callback_data: `achan:ok:${token}` }, { text: '❌ Cancel', callback_data: `achan:no:${token}` }]] },
-      });
+      await ctx.reply(!atuonaApi ? '⚠️ The Atuona bot is not running, so nothing was published. The draft is saved.' : TEACH, { reply_markup: buttons(token) });
       return;
     }
     await ctx.answerCallbackQuery({ text: 'Publishing…' });
     try {
       const m = await atuonaApi.sendMessage(id, d.text);
-      archive({ kind: 'published', chat_id: id, message_id: m.message_id, source: 'cto-aipa', text: d.text });
+      archive({ kind: 'published', chat_id: id, message_id: m.message_id, source: 'atuona-bot', text: d.text });
       console.log(`[atuona-channel] published #${m.message_id} to ${id} (${d.text.length} chars)`);
       await ctx.reply(`✅ Published in the Atuona channel (post #${m.message_id}) and archived.`);
     } catch (err: any) {

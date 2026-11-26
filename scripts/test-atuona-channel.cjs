@@ -49,7 +49,8 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   const { Bot } = require('grammy');
   const bot = new Bot('0:x', { botInfo: { id: 1, is_bot: true, first_name: 'A', username: 'a_bot', can_join_groups: false, can_read_all_group_messages: false, supports_inline_queries: false } });
   const calls = [];
-  bot.api.config.use(async (prev, method, payload) => { calls.push({ method, payload }); return { ok: true, result: { message_id: 99, date: 0, chat: { id: 1, type: 'private' } } }; });
+  fs.rmSync(path.join(dir, 'state.json'), { force: true }); // wiring starts with the channel unknown
+  bot.api.config.use(async (prev, method, payload) => { calls.push({ method, payload }); return { ok: true, result: method === 'getChatMember' ? { status: 'administrator', user: { id: 1 } } : { message_id: 99, date: 0, chat: { id: 1, type: 'private' } } }; });
   m.registerAtuonaChannel(bot);
   const reachedOld = [];
   bot.on('message:text', (ctx) => { reachedOld.push(ctx.message.text); });
@@ -68,5 +69,16 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   t2('armed text becomes a draft, not chat', reachedOld.length === before && calls.some((c) => (c.payload.text || '').includes('В Панаме') && c.payload.reply_markup));
   await bot.handleUpdate(upd('А теперь просто поговорим'));
   t2('after the draft, text goes back to the old handler', reachedOld.at(-1) === 'А теперь просто поговорим');
+  // forward a channel post while the channel is unknown -> learned, latest draft offered again
+  t2('pending draft written to disk', JSON.stringify(JSON.parse(fs.readFileSync(path.join(dir, 'pending.json'), 'utf8'))).includes('В Панаме'));
+  t2('unknown channel: preview teaches the forward', calls.some((c) => /long-press any post → Forward/.test(c.payload.text || '')));
+  const n0 = calls.length, r0 = reachedOld.length;
+  await bot.handleUpdate({ update_id: uid++, message: { message_id: uid, date: 0, chat: { id: 5, type: 'private' }, from: { id: 5, is_bot: false, first_name: 'E' }, text: 'old post', forward_origin: { type: 'channel', chat: { id: -100777, title: 'Atuona: NFT Gallery of Moments', type: 'channel' }, message_id: 3, date: 0 } } });
+  t2('forward teaches the channel', m.channelId() === -100777);
+  t2('learning checked admin rights', calls.slice(n0).some((c) => c.method === 'getChatMember'));
+  t2('draft offered again after learning', calls.slice(n0).some((c) => (c.payload.text || '').includes('В Панаме') && c.payload.reply_markup));
+  t2('learning forward not passed to old handler', reachedOld.length === r0);
+  await bot.handleUpdate({ update_id: uid++, message: { message_id: uid, date: 0, chat: { id: 5, type: 'private' }, from: { id: 5, is_bot: false, first_name: 'E' }, text: 'another forward', forward_origin: { type: 'channel', chat: { id: -100777, title: 'X', type: 'channel' }, message_id: 4, date: 0 } } });
+  t2('once learned, forwards go to old handlers as before', reachedOld.at(-1) === 'another forward');
   console.log(`${ok2}/${ok2 + bad2} grammY wiring checks`); if (bad2) process.exit(1);
 })();
