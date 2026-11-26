@@ -63,7 +63,7 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   t2('other commands still work', reachedOld.includes('/menu'));
   const before = reachedOld.length;
   await bot.handleUpdate(upd('/channel'));
-  t2('/channel arms, old handler not called', reachedOld.length === before && calls.some((c) => /Send the post now/.test(c.payload.text || '')));
+  t2('/channel arms, old handler not called', reachedOld.length === before && calls.some((c) => /Channel mode is ON/.test(c.payload.text || '')));
   await bot.handleUpdate(upd('Ливни, ливни... В Панаме - плыть.'));
   t2('armed text becomes a draft, not chat', reachedOld.length === before && calls.some((c) => (c.payload.text || '').includes('В Панаме') && c.payload.reply_markup));
   await bot.handleUpdate(upd('А теперь просто поговорим'));

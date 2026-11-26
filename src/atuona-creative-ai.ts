@@ -6460,7 +6460,7 @@ _Just click any command to see what it does!_
 ❓ *HELP* (start here!)
 ━━━━━━━━━━━━━━━━━━━━
 /help - 📖 Vibe coder guide
-/channel - 📢 Poem to the Atuona channel (voice or text, saved first)
+/channel - 📢 Tap, then send ONE voice or text → it goes to the Atuona channel (saved first, you tap ✅)
 
 ━━━━━━━━━━━━━━━━━━━━
 🌅 *DAILY RITUAL*
@@ -12132,7 +12132,7 @@ ${elenaLang === 'english'
       try {
         await atuonaBot!.api.setMyCommands([
           { command: 'menu', description: '📋 Full command menu' },
-          { command: 'channel', description: '📢 Post to the Atuona channel (saved first)' },
+          { command: 'channel', description: '📢 Tap, then ONE voice/text → Atuona channel (✅ to post)' },
           { command: 'help', description: '📖 Vibe coder guide' },
           { command: 'ritual', description: '🔄 Begin daily writing flow' },
           { command: 'create', description: '🎨 Next page — Claude Opus 5' },

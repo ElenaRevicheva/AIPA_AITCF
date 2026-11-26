@@ -134,12 +134,24 @@ export async function offerDraft(ctx: Context, text: string, source: 'voice' | '
   });
 }
 
+/** Shown when /channel is tapped — the whole instruction, short (Elena, 26 Nov 2026). */
+export const CHANNEL_HOWTO = [
+  '📢 Channel mode is ON for your NEXT message (15 min).',
+  '',
+  '1. Send ONE voice note or ONE text — the poem.',
+  '2. I save it at once and show you the text.',
+  '3. Tap ✅ Publish → it appears in the Atuona channel. ❌ Cancel → nothing is posted (the copy stays saved).',
+  '',
+  'Without /channel, a voice note goes to our usual creative chat — unless it starts with the words «в канал».',
+  'Shortcut: /channel your text — all in one message.',
+].join('\n');
+
 export function registerAtuonaChannel(bot: Bot): void {
   bot.command('channel', async (ctx) => {
     const text = (ctx.match as string | undefined)?.trim();
     if (text) { await offerDraft(ctx, text, 'text'); return; }
     armed.set(ctx.from?.id || 0, Date.now() + ARM_TTL_MS);
-    await ctx.reply('🎙️ Send the post now — a voice note or text. I save it as a draft first, then show it to you before anything is published.');
+    await ctx.reply(CHANNEL_HOWTO);
   });
 
   // Armed by /channel: the next plain text is the post. Registered before the general text handler.
