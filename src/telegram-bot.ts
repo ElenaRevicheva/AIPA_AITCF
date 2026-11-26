@@ -5,6 +5,7 @@ import { Bot, Context, InputFile } from 'grammy';
 import { registerConciergeCallbacks } from './concierge';
 import { registerCommunityCallbacks } from './community-notify';
 import { registerPhotosToPdf } from './photos-to-pdf';
+import { registerAtuonaChannel, channelLead, isArmed as channelArmed, offerDraft as offerChannelDraft } from './atuona-channel';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
@@ -874,6 +875,8 @@ export function initTelegramBot(): Bot | null {
   // Photos to PDF (3 Nov 2026): while she is sending photos for one PDF they are pages, not questions, so this sits
   // before the photo, document and chat handlers. Outside a collection it only answers "pdf" / "/pdf" said alone.
   registerPhotosToPdf(bot);
+  // Atuona channel (26 Nov 2026): /channel or a voice note "в канал …" → saved draft → ✅ → posted by the Atuona bot.
+  registerAtuonaChannel(bot);
 
   // ==========================================================================
   // COMMANDS
@@ -8051,6 +8054,13 @@ Ready to commit? Use:
       // Recorded only once Telegram took it: replyMarkdownSafe's plain-text retry was otherwise spoken twice.
       ctx.reply = ((text: string, other?: Parameters<typeof sendText>[1], signal?: Parameters<typeof sendText>[2]) =>
         sendText(text, other, signal).then((m) => { replies.push(text); return m; })) as typeof ctx.reply;
+
+      // Atuona channel (26 Nov 2026): armed by /channel, or the note starts "в канал …" / "channel …".
+      // Before every other route, so a poem is never read as a Trello task or a question.
+      {
+        const lead = channelLead(transcription);
+        if (lead || channelArmed(ctx.from?.id || 0)) { await offerChannelDraft(ctx, lead || transcription, 'voice'); return; }
+      }
 
       // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
       // Must run BEFORE Trello NLP so these specific commands reach their handler.

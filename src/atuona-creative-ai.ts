@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config({ override: true });
 
 import { Bot, Context, InputFile } from 'grammy';
+import { channelKeeper, setAtuonaChannelApi } from './atuona-channel';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 import OpenAI from 'openai';
@@ -6161,6 +6162,11 @@ export function initAtuonaBot(): Bot | null {
   }
   
   atuonaBot = new Bot(token);
+  setAtuonaChannelApi(atuonaBot.api);
+
+  // Channel keeper (26 Nov 2026) — BEFORE the auth filter. A channel post is archived and never
+  // answered: the filter below replied "not authorized" inside the Atuona channel, in front of subscribers.
+  atuonaBot.use(channelKeeper());
   
   // Middleware: Check authorization and capture chat ID for proactive messages
   atuonaBot.use(async (ctx, next) => {
