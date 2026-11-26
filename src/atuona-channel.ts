@@ -82,6 +82,10 @@ export function channelKeeper() {
     if (!process.env.ATUONA_CHANNEL_ID && !st.channelId) {
       writeState({ channelId: chat.id, title: chat.title });
       console.log(`[atuona-channel] learned channel ${chat.id} "${chat.title}"`);
+      // The channel owner (Kira Velerevich) and the bot chat (Elena Revicheva) are different
+      // accounts, so a forward cannot teach it — an edit in the channel does. Waiting drafts come
+      // back to their author with fresh buttons (an old ✅ may be from before a restart).
+      await reofferPending(ctx.api, chat.title);
     }
     archive({
       kind: isEdit ? 'edit' : 'post', chat_id: chat.id, chat_title: chat.title, message_id: post.message_id,
@@ -99,6 +103,12 @@ const PENDING = path.join(DIR, 'pending.json');
 const drafts = new Map<string, Draft>(((): [string, Draft][] => {
   try { return Object.entries(JSON.parse(fs.readFileSync(PENDING, 'utf8'))) as [string, Draft][]; } catch { return []; }
 })());
+async function reofferPending(api: Api, title?: string): Promise<void> {
+  for (const [token, d] of drafts) {
+    await api.sendMessage(d.userId, `✅ I now know the channel "${title || ''}". Your saved draft, ready to post:\n\n${d.text}`, { reply_markup: buttons(token) })
+      .catch((e: any) => console.error(`[atuona-channel] re-offer to ${d.userId} failed: ${e?.description || e?.message}`));
+  }
+}
 function savePending(): void {
   try { ensureDir(); fs.writeFileSync(PENDING, JSON.stringify(Object.fromEntries(drafts), null, 2)); } catch (e: any) { console.error(`[atuona-channel] pending.json write failed: ${e?.message}`); }
 }
@@ -137,7 +147,7 @@ export async function offerDraft(ctx: Context, text: string, source: 'voice' | '
   await showDraft(ctx, token, clean);
 }
 
-const TEACH = '⚠️ I do not know the channel yet. One tap fixes it for good: in the channel, long-press any post → Forward → Atuona_AIPA. I will remember the channel and show this draft again.';
+const TEACH = '⚠️ I do not know the channel yet. Fix it once: in the channel, edit any post (add a space) and press ✓ — or forward me any post from it. I will then send this draft back to you with ✅.';
 const buttons = (token: string) => ({ inline_keyboard: [[
   { text: '✅ Publish', callback_data: `achan:ok:${token}` },
   { text: '❌ Cancel', callback_data: `achan:no:${token}` },

@@ -71,7 +71,7 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   t2('after the draft, text goes back to the old handler', reachedOld.at(-1) === 'А теперь просто поговорим');
   // forward a channel post while the channel is unknown -> learned, latest draft offered again
   t2('pending draft written to disk', JSON.stringify(JSON.parse(fs.readFileSync(path.join(dir, 'pending.json'), 'utf8'))).includes('В Панаме'));
-  t2('unknown channel: preview teaches the forward', calls.some((c) => /long-press any post → Forward/.test(c.payload.text || '')));
+  t2('unknown channel: preview teaches the edit', calls.some((c) => /edit any post \(add a space\)/.test(c.payload.text || '')));
   const n0 = calls.length, r0 = reachedOld.length;
   await bot.handleUpdate({ update_id: uid++, message: { message_id: uid, date: 0, chat: { id: 5, type: 'private' }, from: { id: 5, is_bot: false, first_name: 'E' }, text: 'old post', forward_origin: { type: 'channel', chat: { id: -100777, title: 'Atuona: NFT Gallery of Moments', type: 'channel' }, message_id: 3, date: 0 } } });
   t2('forward teaches the channel', m.channelId() === -100777);
@@ -80,5 +80,16 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   t2('learning forward not passed to old handler', reachedOld.length === r0);
   await bot.handleUpdate({ update_id: uid++, message: { message_id: uid, date: 0, chat: { id: 5, type: 'private' }, from: { id: 5, is_bot: false, first_name: 'E' }, text: 'another forward', forward_origin: { type: 'channel', chat: { id: -100777, title: 'X', type: 'channel' }, message_id: 4, date: 0 } } });
   t2('once learned, forwards go to old handlers as before', reachedOld.at(-1) === 'another forward');
+  // an EDIT in the channel teaches it too, and the waiting draft is sent back to its author (Kira owns the channel, Elena owns the bot chat)
+  fs.rmSync(path.join(dir, 'state.json'), { force: true });
+  const bot2 = new Bot('0:y', { botInfo: { id: 2, is_bot: true, first_name: 'B', username: 'b_bot', can_join_groups: false, can_read_all_group_messages: false, supports_inline_queries: false } });
+  const calls2 = [];
+  bot2.api.config.use(async (prev, method, payload) => { calls2.push({ method, payload }); return { ok: true, result: { message_id: 1, date: 0, chat: { id: 1, type: 'private' } } }; });
+  bot2.use(m.channelKeeper()); m.registerAtuonaChannel(bot2);
+  await m.offerDraft({ from: { id: 5 }, reply: async () => {} }, 'Сколько ждать еще', 'voice');
+  await bot2.handleUpdate({ update_id: 900, edited_channel_post: { message_id: 3, date: 0, edit_date: 1, chat: { id: -100888, title: 'Atuona: NFT Gallery of Moments', type: 'channel' }, text: 'old post ' } });
+  t2('edit teaches the channel', m.channelId() === -100888);
+  t2('waiting draft sent back to its author with ✅', calls2.some((c) => c.method === 'sendMessage' && c.payload.chat_id === 5 && (c.payload.text || '').includes('Сколько ждать') && c.payload.reply_markup));
+  t2('nothing posted into the channel', !calls2.some((c) => c.payload.chat_id === -100888));
   console.log(`${ok2}/${ok2 + bad2} grammY wiring checks`); if (bad2) process.exit(1);
 })();
