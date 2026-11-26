@@ -40,5 +40,33 @@ const lines = () => fs.existsSync(path.join(dir, 'archive.jsonl')) ? fs.readFile
   await m.offerDraft({ from: { id: 5 }, reply: async (txt, o) => sent.push({ txt, o }) }, 'x'.repeat(5000), 'text');
   t('long draft saved, no buttons', lines().at(-1).text.length === 5000 && !sent[0].o);
   t('markdown log written', fs.readFileSync(path.join(dir, 'archive.md'), 'utf8').includes('передохнуть'));
-  console.log(`${ok}/${ok + bad} atuona-channel checks`); process.exit(bad ? 1 : 0);
+  console.log(`${ok}/${ok + bad} atuona-channel checks`); if (bad) process.exitCode = 1;
+})();
+
+// ── grammY wiring: /channel and the armed step must never swallow ordinary messages (26 Nov 2026) ──
+(async () => {
+  await new Promise((r) => setTimeout(r, 300));
+  const { Bot } = require('grammy');
+  const bot = new Bot('0:x', { botInfo: { id: 1, is_bot: true, first_name: 'A', username: 'a_bot', can_join_groups: false, can_read_all_group_messages: false, supports_inline_queries: false } });
+  const calls = [];
+  bot.api.config.use(async (prev, method, payload) => { calls.push({ method, payload }); return { ok: true, result: { message_id: 99, date: 0, chat: { id: 1, type: 'private' } } }; });
+  m.registerAtuonaChannel(bot);
+  const reachedOld = [];
+  bot.on('message:text', (ctx) => { reachedOld.push(ctx.message.text); });
+  bot.command('menu', (ctx) => { reachedOld.push('/menu'); });
+  let uid = 1;
+  const upd = (text) => ({ update_id: uid++, message: { message_id: uid, date: 0, chat: { id: 5, type: 'private' }, from: { id: 5, is_bot: false, first_name: 'E' }, text, ...(text.startsWith('/') ? { entities: [{ type: 'bot_command', offset: 0, length: text.split(' ')[0].length }] } : {}) } });
+  let ok2 = 0, bad2 = 0; const t2 = (n, c) => { if (c) ok2++; else { bad2++; console.log('✗', n); } };
+  await bot.handleUpdate(upd('Привет, как дела?'));
+  t2('ordinary text reaches the old handler', reachedOld[0] === 'Привет, как дела?');
+  await bot.handleUpdate(upd('/menu'));
+  t2('other commands still work', reachedOld.includes('/menu'));
+  const before = reachedOld.length;
+  await bot.handleUpdate(upd('/channel'));
+  t2('/channel arms, old handler not called', reachedOld.length === before && calls.some((c) => /Send the post now/.test(c.payload.text || '')));
+  await bot.handleUpdate(upd('Ливни, ливни... В Панаме - плыть.'));
+  t2('armed text becomes a draft, not chat', reachedOld.length === before && calls.some((c) => (c.payload.text || '').includes('В Панаме') && c.payload.reply_markup));
+  await bot.handleUpdate(upd('А теперь просто поговорим'));
+  t2('after the draft, text goes back to the old handler', reachedOld.at(-1) === 'А теперь просто поговорим');
+  console.log(`${ok2}/${ok2 + bad2} grammY wiring checks`); if (bad2) process.exit(1);
 })();

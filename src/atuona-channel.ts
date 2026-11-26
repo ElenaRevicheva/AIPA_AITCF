@@ -10,7 +10,8 @@
  *  1. KEEPER (Atuona bot, before its auth filter): every channel post and every SAVED edit is
  *     appended to an archive (JSONL, never rewritten) + a readable Markdown log. The bot never
  *     replies inside a channel.
- *  2. DRAFT (CTO AIPA bot): /channel <text>, or /channel then a voice note or text, or a voice
+ *  2. DRAFT (Atuona bot, in its menu — Elena's call: the poems live with Atuona, not CTO AIPA):
+ *     /channel <text>, or /channel then a voice note or text, or a voice
  *     note that starts "в канал …" / "channel …". The text is archived as a draft AT ONCE (so a
  *     draft is never lost), and Elena sees it with ✅ Publish / ❌ Cancel.
  *  3. PUBLISH: ✅ posts it to the channel through the Atuona bot (the admin). The keeper then

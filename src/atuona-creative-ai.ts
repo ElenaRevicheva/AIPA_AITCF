@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config({ override: true });
 
 import { Bot, Context, InputFile } from 'grammy';
-import { channelKeeper, setAtuonaChannelApi } from './atuona-channel';
+import { channelKeeper, setAtuonaChannelApi, registerAtuonaChannel, channelLead, isArmed as channelArmed, offerDraft as offerChannelDraft } from './atuona-channel';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 import OpenAI from 'openai';
@@ -6195,6 +6195,11 @@ export function initAtuonaBot(): Bot | null {
     }
   });
   
+  // /channel (26 Nov 2026, Elena): a poem by voice or text -> saved draft -> ✅ -> posted in the
+  // Atuona channel. Registered before every other handler; it only acts after /channel or on a
+  // voice note that starts "в канал …" — every other message passes straight on, untouched.
+  registerAtuonaChannel(atuonaBot);
+
   // ==========================================================================
   // COMMANDS
   // ==========================================================================
@@ -6455,6 +6460,7 @@ _Just click any command to see what it does!_
 ❓ *HELP* (start here!)
 ━━━━━━━━━━━━━━━━━━━━
 /help - 📖 Vibe coder guide
+/channel - 📢 Poem to the Atuona channel (voice or text, saved first)
 
 ━━━━━━━━━━━━━━━━━━━━
 🌅 *DAILY RITUAL*
@@ -11472,6 +11478,13 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       
       const hearYou = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'Hearing you...' : 'Слышу тебя...';
       await ctx.reply(`🎤 *"${text}"*\n\n_${hearYou}_`, { parse_mode: 'Markdown' });
+
+      // /channel (26 Nov 2026): armed by /channel, or the note starts "в канал …" — the poem goes to the
+      // channel draft, not into the creative chat. Any other voice note continues exactly as before.
+      {
+        const lead = channelLead(text);
+        if (lead || channelArmed(ctx.from?.id || 0)) { await offerChannelDraft(ctx, lead || text, 'voice'); return; }
+      }
       
       // Add Elena's voice message to conversation history
       addToConversation('elena', text, 'voice');
@@ -12119,6 +12132,7 @@ ${elenaLang === 'english'
       try {
         await atuonaBot!.api.setMyCommands([
           { command: 'menu', description: '📋 Full command menu' },
+          { command: 'channel', description: '📢 Post to the Atuona channel (saved first)' },
           { command: 'help', description: '📖 Vibe coder guide' },
           { command: 'ritual', description: '🔄 Begin daily writing flow' },
           { command: 'create', description: '🎨 Next page — Claude Opus 5' },
