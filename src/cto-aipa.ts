@@ -3251,7 +3251,8 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         () => {
           import('./espaluz-groups-listener')
             .then(m => m.runEspaluzGroupsCycle())
-            .then(r => console.log(`[espaluz-groups] ${r.candidates} candidates · ${r.declined} declined · ${r.delivered} delivered`))
+            .then(r => console.log(`[espaluz-groups] ${r.candidates} candidates · ${r.declined} declined · ${r.delivered} delivered` +
+              (r.ru ? ` | RU ${r.ru.candidates} candidates · ${r.ru.declined} declined · ${r.ru.delivered} delivered` : '')))
             .catch(e => console.error('[espaluz-groups] cron error:', e));
         },
         { timezone: triageTz },

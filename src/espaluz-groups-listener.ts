@@ -33,8 +33,6 @@ export const GROUP_QUERIES: GroupQuery[] = [
   { q: 'relocating to Colombia with children school', weight: 8 },
   { q: 'expat kids Spanish school struggling', weight: 8 },
   { q: 'learn Spanish as a family Latin America', weight: 7 },
-  { q: 'переезд в Панаму с детьми школа', weight: 8 },
-  { q: 'русские в Мексике дети испанский', weight: 7 },
   { q: 'familia extranjera Panamá niños inglés', weight: 6 },
   { q: 'relocating with daughter school Spanish expat', weight: 8 },
   { q: 'schools for expat families Costa Rica', weight: 8 },
@@ -42,8 +40,26 @@ export const GROUP_QUERIES: GroupQuery[] = [
   { q: 'expat family Ecuador kids school', weight: 7 },
 ];
 
-const FAMILY = /\b(kid|kids|child|children|son|daughter|famil\w*|school|colegio|escuela|niñ\w+|hij\w+|дет\w*|ребен\w*|ребён\w*|сын\w*|доч\w*|школ\w*|семь\w*)\b/i;
-const LANGUAGE_OR_MOVE = /\b(spanish|español|espanol|english|inglés|ingles|испанск\w*|английск\w*|move|moving|moved|relocat\w*|expat\w*|mudanza|mudarnos|nos mudamos|переезд\w*|переех\w*|adapt\w*|settl\w*)\b/i;
+/** 28 Nov 2026 (Elena: "one card a day for Russian-speaking expat groups"): Telegram group chats are not indexed by
+ *  Google (probe 28 Nov: 0 t.me message links), so the Russian lane reads Russian-speaking FACEBOOK groups the same way,
+ *  as its OWN daily card (ESPALUZ_GROUPS_RU_PER_DAY, default 1) next to the English/Spanish one. */
+export const RU_GROUP_QUERIES: GroupQuery[] = [
+  { q: 'переезд в Панаму с детьми школа', weight: 9 },
+  { q: 'русские в Панаме дети', weight: 9 },
+  { q: 'русские в Мексике дети испанский', weight: 8 },
+  { q: 'переезд в Мексику с детьми школа', weight: 8 },
+  { q: 'русские в Аргентине ребенок испанский', weight: 8 },
+  { q: 'переезд в Аргентину с детьми школа', weight: 8 },
+  { q: 'Коста-Рика переезд с семьей дети', weight: 7 },
+  { q: 'Колумбия переезд с детьми школа', weight: 7 },
+  { q: 'испанский для ребенка после переезда', weight: 7 },
+  { q: 'адаптация ребенка в школе Латинская Америка', weight: 7 },
+];
+
+// 28 Nov 2026: in JS, the word boundary and the word class are ASCII-only, so no Cyrillic word ever matched here and the
+// Russian queries never delivered a card. Unicode letter boundaries (letter class, flag u) fix Russian and accented Spanish.
+const FAMILY = /(?<!\p{L})(kid|kids|child|children|son|daughter|famil\p{L}*|school|colegio|escuela|niñ\p{L}+|hij\p{L}+|дет\p{L}*|ребен\p{L}*|ребён\p{L}*|сын\p{L}*|доч\p{L}*|школ\p{L}*|семь\p{L}*)(?!\p{L})/iu;
+const LANGUAGE_OR_MOVE = /(?<!\p{L})(spanish|español|espanol|english|inglés|ingles|испанск\p{L}*|английск\p{L}*|move|moving|moved|relocat\p{L}*|expat\p{L}*|mudanza|mudarnos|nos mudamos|переезд\p{L}*|переех\p{L}*|adapt\p{L}*|settl\p{L}*)(?!\p{L})/iu;
 /** Sales posts, services, rentals, jobs - never a family asking for help. */
 const NOISE = /(for sale|se vende|vendo|alquil|for rent|rent\b|servicio de|transporte|acarreo|mudanzas? (económica|baratas)|hiring|vacante|empleo|job offer|tutor available|clases? de español (desde|a solo)|promo|descuento|discount|whatsapp \+?\d|teacher (for|available)|private pod|we are hiring|buscamos (profesor|maestr)|te encanta trabajar|inscripciones|matr[ií]cula abierta|enroll now)/i;
 
@@ -78,9 +94,9 @@ export function isFamilyQuestion(title: string, body: string): boolean {
 }
 
 /** Search all queries, keep real group posts about a family settling in, best first. */
-export async function findGroupPosts(seen: Set<string>): Promise<ScoredThread[]> {
+export async function findGroupPosts(seen: Set<string>, queries: GroupQuery[] = GROUP_QUERIES): Promise<ScoredThread[]> {
   const best = new Map<string, ScoredThread>();
-  for (const spec of GROUP_QUERIES) {
+  for (const spec of queries) {
     // Past week first, then past month: Google returns only ~2 real group posts per query (22 Nov probe), and a
     // three-week-old family question is still worth a helpful answer. Redirect links (google.com/goto) are blogs - dropped.
     let results: Awaited<ReturnType<typeof bdSerpSearch>> = [];
@@ -161,16 +177,24 @@ export async function draftGroupReply(thread: ScoredThread, groupId: string): Pr
   return text;
 }
 
-export interface GroupsCycleResult { candidates: number; declined: number; delivered: number; titles: string[] }
+export interface LaneResult { candidates: number; declined: number; delivered: number; titles: string[] }
+export interface GroupsCycleResult extends LaneResult { ru?: LaneResult }
 
-/** One weekday run: find, draft until ONE good reply is delivered. Unused candidates stay unseen for tomorrow. */
+/** One daily run: the English/Spanish lane, then the Russian lane - each delivers at most its own cap (default 1). */
 export async function runEspaluzGroupsCycle(options: { dryRun?: boolean } = {}): Promise<GroupsCycleResult> {
+  const main = await runGroupsLane(GROUP_QUERIES, Number(process.env.ESPALUZ_GROUPS_PER_DAY ?? 1), options);
+  const ru = await runGroupsLane(RU_GROUP_QUERIES, Number(process.env.ESPALUZ_GROUPS_RU_PER_DAY ?? 1), options);
+  return { ...main, ru };
+}
+
+/** One lane: find, draft until `capRaw` good replies are delivered. Unused candidates stay unseen for tomorrow. */
+async function runGroupsLane(queries: GroupQuery[], capRaw: number, options: { dryRun?: boolean }): Promise<LaneResult> {
   const store = await import('./community-store');
   const seen = new Set<string>();
   for (const id of await store.seenExternalIds(GROUPS_SOURCE as any)) seen.add(`${GROUPS_SOURCE}:${id}`);
-  const candidates = await findGroupPosts(seen);
-  const perDay = Math.max(1, Number(process.env.ESPALUZ_GROUPS_PER_DAY ?? 1) || 1);
-  const result: GroupsCycleResult = { candidates: candidates.length, declined: 0, delivered: 0, titles: candidates.slice(0, 5).map((c) => c.title) };
+  const candidates = await findGroupPosts(seen, queries);
+  const perDay = Math.max(1, Math.min(3, capRaw || 1)); // hard ceiling of 3, whatever the env says
+  const result: LaneResult = { candidates: candidates.length, declined: 0, delivered: 0, titles: candidates.slice(0, 5).map((c) => c.title) };
   if (options.dryRun) return result;
 
   const { offerAndDeliverCommunityReply } = await import('./community-notify');
