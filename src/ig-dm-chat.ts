@@ -164,6 +164,10 @@ export async function handleMessaging(ev: any, send: Sender, opts: { ownId?: str
   const own = opts.ownId ?? process.env.IG_USER_ID?.trim() ?? '';
   if (!from) return 'skip: no sender';
   if (from === own || ev?.message?.is_echo) return 'skip: own/echo';
+  // 28 Nov 2026 (after Meta restricted the business for automation): for the App Review recording the app answers ONLY
+  // the test accounts (IG_TEST_IDS = Instagram-scoped ids), never a stranger, while IG_ONLY_TESTERS=true.
+  if (process.env.IG_ONLY_TESTERS === 'true' &&
+      !(process.env.IG_TEST_IDS || '').split(',').map((x) => x.trim()).filter(Boolean).includes(from)) return 'skip: testers only';
   const payload = String(ev?.postback?.payload || ev?.message?.quick_reply?.payload || '');
   const text = String(ev?.message?.text || '').trim();
   if (!payload && !text) return 'skip: no text (sticker/media)';

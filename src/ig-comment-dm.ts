@@ -135,6 +135,8 @@ export async function handleComment(value: any, opts: { dryRun?: boolean; captio
   const list = (v?: string) => (v || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   const tester = list(process.env.IG_DM_TEST_USERNAMES).includes(String(value?.from?.username || '').toLowerCase());
   if (!tester && list(process.env.IG_DM_SKIP_MEDIA).includes(mediaId)) return 'skip: media still on ManyChat';
+  // 28 Nov 2026: App Review recording - only the test accounts (IG_DM_TEST_USERNAMES) get an answer, never a stranger.
+  if (process.env.IG_ONLY_TESTERS === 'true' && !tester) return 'skip: testers only';
 
   const state = loadState();
   if (state.done.includes(commentId)) return 'skip: already answered';
@@ -227,6 +229,7 @@ export function registerInstagramCommentDm(app: Express): void {
   console.log(
     `📸 Instagram comment-to-DM webhook: /ig/webhook (${process.env.IG_DM_ENABLED === 'true' ? 'ON' : 'off'})` +
       ` · inbox poll ${process.env.IG_CHAT_POLL === 'true' ? 'ON' : 'off'}` +
-      ` · DM chat ${process.env.IG_CHAT_ENABLED === 'true' ? 'ON' : 'off'}`,
+      ` · DM chat ${process.env.IG_CHAT_ENABLED === 'true' ? 'ON' : 'off'}` +
+      (process.env.IG_ONLY_TESTERS === 'true' ? ' · TESTERS ONLY' : ''),
   );
 }
