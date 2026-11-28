@@ -667,8 +667,12 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
   let declined = 0;
   let delivered = 0;
 
+  // 28 Nov 2026 (Elena: "not flooding my CTO AIPA bot ... Reddit just once a week"): the weekly run sends at most
+  // COMMUNITY_MAX_DELIVER cards (default 1) - the best-scored thread that gets a good draft. The rest stay unseen.
+  const maxDeliver = Math.max(1, Number(process.env.COMMUNITY_MAX_DELIVER ?? 1) || 1);
   for (const thread of scan.candidates) {
     if (options.dryRun) continue;
+    if (delivered >= maxDeliver) break;
     let draft: string | null = null;
     try {
       draft = await draftReply(thread);
